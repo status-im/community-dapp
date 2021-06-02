@@ -1,0 +1,18 @@
+{
+    "compilerOptions": {
+        "outDir": "dist",
+        "esModuleInterop": true,
+        "jsx": "react",
+        "resolveJsonModule": true,
+        "skipLibCheck": true,
+        "downlevelIteration": true,
+        "strict": true,
+        "sourceMap": true,
+        "module": "commonjs",
+        "forceConsistentCasingInFileNames": true,
+        "target": "es6",
+    },
+    "exclude": [
+        "**/dist",
+    ]
+}
