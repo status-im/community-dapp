@@ -3,7 +3,8 @@ import { Redirect, Route, Switch } from 'react-router'
 import { BrowserRouter } from 'react-router-dom'
 
 import styled from 'styled-components'
-import { TopBar } from './components/TopBar'
+import { GlobalStyle } from './providers/GlobalStyle'
+import { TopBar } from './components/top/TopBar'
 import { Votes } from './pages/Votes'
 import { Directory } from './pages/Directory'
 import { Info } from './pages/Info'
@@ -12,6 +13,7 @@ export function App() {
   return (
     <Page>
       <BrowserRouter>
+        <GlobalStyle />
         <TopBar />
         <Switch>
           <Route exact path="/votes" component={Votes} />
