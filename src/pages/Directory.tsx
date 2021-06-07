@@ -1,7 +1,9 @@
 import React from 'react'
-import { InfoBtn, InfoWrap, PageInfo } from '../components/PageInfo'
+import { ConnectButton, InfoWrap, PageInfo } from '../components/PageInfo'
+import { useEthers } from '@usedapp/core'
 
 export function Directory() {
+  const { account } = useEthers()
   return (
     <InfoWrap>
       <PageInfo
@@ -9,7 +11,7 @@ export function Directory() {
         text="Vote on your favourite communities being included in 
       Weekly Featured Communities"
       />
-      <InfoBtn />
+      {!account && <ConnectButton />}
     </InfoWrap>
   )
 }

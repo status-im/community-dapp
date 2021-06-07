@@ -15,14 +15,13 @@ export const PageInfo = ({ heading, text }: PageInfoProps) => (
   </InfoBlock>
 )
 
-export function InfoBtn() {
-  const { account, activateBrowserWallet } = useEthers()
+export function ProposeButton() {
+  return <InfoButton>Propose community</InfoButton>
+}
 
-  return account ? (
-    <InfoButton onClick={() => activateBrowserWallet()}>Connect to Vote</InfoButton>
-  ) : (
-    <InfoButton onClick={() => activateBrowserWallet()}>Propose community</InfoButton>
-  )
+export function ConnectButton() {
+  const { activateBrowserWallet } = useEthers()
+  return <InfoButton onClick={() => activateBrowserWallet()}>Connect to Vote</InfoButton>
 }
 
 export const InfoWrap = styled.div`

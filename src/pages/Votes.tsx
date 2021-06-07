@@ -1,14 +1,16 @@
 import React from 'react'
-import { InfoWrap, InfoBtn, PageInfo } from '../components/PageInfo'
+import { InfoWrap, ConnectButton, ProposeButton, PageInfo } from '../components/PageInfo'
+import { useEthers } from '@usedapp/core'
 
 export function Votes() {
+  const { account } = useEthers()
   return (
     <InfoWrap>
       <PageInfo
         heading="Ongoing Votes"
         text="Help curate the Status Communities directory by voting which communities should be included"
       />
-      <InfoBtn />
+      {account ? <ProposeButton /> : <ConnectButton />}
     </InfoWrap>
   )
 }
