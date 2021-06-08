@@ -5,6 +5,7 @@ export const GlobalStyle = createGlobalStyle`
   * {
     box-sizing: border-box;
      }
+
   body, html {
     margin: 0;
     width: 100%;
@@ -51,21 +52,26 @@ ol, ul {
 blockquote, q {
 	quotes: none;
 }
+
 blockquote:before, blockquote:after,
 q:before, q:after {
 	content: '';
 	content: none;
 }
+
 table {
 	border-collapse: collapse;
 	border-spacing: 0;
 }
+
 button {
 	border: none;
 	background: none;
   cursor:pointer;
 }
+
 a {
 	text-decoration: none;
+  cursor:pointer;
 }
 `

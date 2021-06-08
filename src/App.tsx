@@ -15,12 +15,14 @@ export function App() {
       <BrowserRouter>
         <GlobalStyle />
         <TopBar />
-        <Switch>
-          <Route exact path="/votes" component={Votes} />
-          <Route exact path="/directory" component={Directory} />
-          <Route exact path="/info" component={Info} />
-        </Switch>
-        <Redirect exact from="/" to="/votes" />
+        <PageContent>
+          <Switch>
+            <Route exact path="/votes" component={Votes} />
+            <Route exact path="/directory" component={Directory} />
+            <Route exact path="/info" component={Info} />
+          </Switch>
+          <Redirect exact from="/" to="/votes" />
+        </PageContent>
       </BrowserRouter>
     </Page>
   )
@@ -28,4 +30,9 @@ export function App() {
 
 const Page = styled.div`
   height: 100%;
+`
+const PageContent = styled.div`
+  height: 100%;
+  max-width: 936px;
+  margin: 0 auto;
 `
