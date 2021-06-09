@@ -15,6 +15,7 @@ export const GlobalStyle = createGlobalStyle`
     font-family: ${Font};
     font-weight: normal;
     font-size: 15px;
+    line-height: 22px;
   }
 
   html, body, div, span, applet, object, iframe,
