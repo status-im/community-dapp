@@ -4,6 +4,7 @@ import { Colors } from '../constants/styles'
 import { ButtonSecondary } from '../components/Button'
 import externalIcon from '../assets/images/ext.svg'
 import indicatorIcon from '../assets/images/indicator.svg'
+import rightIcon from '../assets/images/arrowRight.svg'
 
 interface CardCommunityProps {
   img: string
@@ -132,6 +133,36 @@ function calculateWidth(votesFor: number, votesAgainst: number) {
   return (100 * votesAgainst) / (votesFor + votesAgainst)
 }
 
+interface CardFeatureProps {
+  heading: string
+  text: string
+  icon: string
+  sum?: number
+  timeLeft?: string
+  voting?: boolean
+}
+
+export const CardFeature = ({ heading, text, icon, sum, timeLeft, voting }: CardFeatureProps) => (
+  <CardVoteBlock style={{ backgroundColor: `${Colors.GrayLight}` }}>
+    <FeatureTop>
+      <CardHeading>{heading}</CardHeading>
+      {voting && <CardLinkFeature>Ongoing vote for removal</CardLinkFeature>}
+    </FeatureTop>
+
+    <FeatureVote>
+      <p>{text}</p>
+      <p style={{ fontSize: '24px' }}>{icon}</p>
+
+      {timeLeft && <span>{timeLeft}</span>}
+
+      {sum && <span style={{ fontWeight: 'normal' }}>{addCommas(sum)} SNT</span>}
+    </FeatureVote>
+    <FeatureBtn disabled={Boolean(timeLeft)}>
+      Feature this community! <span style={{ fontSize: '20px' }}>⭐️</span>
+    </FeatureBtn>
+  </CardVoteBlock>
+)
+
 export const Card = styled.div`
   display: flex;
   align-items: center;
@@ -230,6 +261,26 @@ const CardLinkInternal = styled.a`
     color: ${Colors.VioletDark};
   }
 `
+
+const CardLinkFeature = styled(CardLinkInternal)`
+  padding-right: 28px;
+  font-size: 12px;
+  line-height: 20px;
+  position: relative;
+
+  &::after {
+    content: '';
+    width: 24px;
+    height: 24px;
+    position: absolute;
+    top: 50%;
+    right: 0;
+    transform: translateY(-50%);
+    background-image: url(${rightIcon});
+    background-size: cover;
+  }
+`
+
 const CardVoteBlock = styled.div`
   width: 50%;
   z-index: 2;
@@ -331,4 +382,34 @@ const VoteBtn = styled(ButtonSecondary)`
 `
 const VoteBtnFinal = styled(VoteBtn)`
   width: 100%;
+`
+
+const FeatureTop = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`
+
+const FeatureBtn = styled(VoteBtn)`
+  width: 100%;
+`
+const FeatureVote = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 45px auto 32px;
+  max-width: 290px;
+  text-align: center;
+
+  & > p {
+    font-size: 17px;
+    line-height: 18px;
+    margin-bottom: 8px;
+  }
+
+  & > span {
+    font-weight: bold;
+    font-size: 15px;
+    line-height: 22px;
+  }
 `

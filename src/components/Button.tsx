@@ -40,5 +40,6 @@ export const ButtonSecondary = styled(Button)`
 
   &:disabled {
     background: ${Colors.GrayDisabledLight};
+    filter: grayscale(1);
   }
 `
