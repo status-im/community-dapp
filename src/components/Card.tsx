@@ -21,8 +21,8 @@ export const CardCommunity = ({ img, heading, text, tags }: CardCommunityProps) 
         <CardHeading>{heading}</CardHeading>
         <CardText>{text}</CardText>
         <CardTags>
-          {tags.map((tag) => (
-            <Tag>
+          {tags.map((tag, key) => (
+            <Tag key={key}>
               <p>{tag}</p>
             </Tag>
           ))}
@@ -66,7 +66,17 @@ export const CardVote = ({
   voteWinner,
 }: CardVoteProps) => (
   <CardVoteBlock>
-    <CardHeading>{voteHeading}</CardHeading>
+    {voteWinner ? (
+      <CardHeadingEndedVote>
+        SNT holders have decided{' '}
+        <b>
+          <u>{voteHeading}</u>
+        </b>{' '}
+        this community to the directory!
+      </CardHeadingEndedVote>
+    ) : (
+      <CardHeading>{voteHeading}</CardHeading>
+    )}
     <Votes>
       <VotesChart>
         <VoteBox style={{ filter: voteWinner && voteWinner === 2 ? 'grayscale(1)' : 'none' }}>
@@ -164,6 +174,7 @@ export const CardFeature = ({ heading, text, icon, sum, timeLeft, voting }: Card
 )
 
 export const Card = styled.div`
+  margin: 20px;
   display: flex;
   align-items: center;
 `
@@ -199,6 +210,11 @@ const CardHeading = styled.h2`
   font-size: 17px;
   line-height: 24px;
 `
+const CardHeadingEndedVote = styled.p`
+  fint-weight: normal;
+  font-size: 17px;
+  line-height: 24px;
+`
 const CardText = styled.p`
   line-height: 22px;
   margin: 8px 0;
@@ -209,6 +225,7 @@ const CardTags = styled.div`
   flex-wrap: wrap;
 `
 const Tag = styled.div`
+  margin: 5px;
   padding: 0 10px;
   border: 1px solid ${Colors.VioletDark};
   box-sizing: border-box;

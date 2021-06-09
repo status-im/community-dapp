@@ -4,6 +4,7 @@ import { CommunityDetail } from '../models/community'
 export const communitiesUnderVote = [
   '0xabA1eF51ef4aE360a9e8C9aD2d787330B602eb24',
   '0xabA1eFawef4bc39ud9e8C9aD2d787330B602eb24',
+  '0xabA1eFawef4bc39ud9e8C9aD2d787330B6021231',
 ]
 
 export const communitiesInDirectory = [
@@ -19,7 +20,7 @@ export const communities: Array<CommunityDetail> = [
     ens: 'CryptoPunks',
     name: 'CryptoPunks',
     link: 'cryptopunks.com',
-    icon: '',
+    icon: 'https://static.coindesk.com/wp-content/uploads/2021/01/cryptopunk.jpg',
     tags: ['nfts', 'collectables', 'cryptopunks', 'quite long', 'funny', 'very long tag', 'short'],
     description: 'Owners of CryptoPunks, marketplace. Nullam mattis mattis mattis fermentum libero.',
     numberOfMembers: 50,
@@ -93,7 +94,7 @@ export const communities: Array<CommunityDetail> = [
     ens: 'CryptoKitties',
     name: 'CryptoKitties',
     link: 'CryptoKitties.com',
-    icon: '',
+    icon: 'https://www.cryptokitties.co/icons/logo.svg',
     tags: ['nfts', 'collectables', 'cats', 'quite long', 'funny', 'very long tag', 'short'],
     description:
       'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque interdum rutrum sodales. Nullam mattis fermentum libero, non volutpat.',
@@ -104,7 +105,26 @@ export const communities: Array<CommunityDetail> = [
       timeLeft: 28800,
       type: 'Add',
       voteFor: BigNumber.from(16740235),
-      voteAgainst: BigNumber.from(6740235),
+      voteAgainst: BigNumber.from(126740235),
+    },
+  },
+  {
+    publicKey: '0xabA1eFawef4bc39ud9e8C9aD2d787330B6021231',
+    ens: 'Awesome Community',
+    name: 'Awesome Community',
+    link: 'Awesome Community.com',
+    icon: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/LetterA.svg/1200px-LetterA.svg.png',
+    tags: ['nfts', 'collectables', 'cats', 'quite long', 'funny', 'very long tag', 'short'],
+    description:
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque interdum rutrum sodales. Nullam mattis fermentum libero, non volutpat.',
+    numberOfMembers: 50,
+    validForAddition: true,
+    votingHistory: [],
+    currentVoting: {
+      timeLeft: 0,
+      type: 'Add',
+      voteFor: BigNumber.from(16740235),
+      voteAgainst: BigNumber.from(126740235),
     },
   },
 ]

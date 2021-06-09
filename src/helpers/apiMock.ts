@@ -1,19 +1,11 @@
-import { communities, communitiesInDirectory } from './apiMockData'
-import { CommunityDetail, DirectorySortingEnum } from '../models/community'
+import { communities, communitiesInDirectory, communitiesUnderVote } from './apiMockData'
+import { CommunityDetail, DirectorySortingEnum, VotingSortingEnum } from '../models/community'
 
 export function getCommunityDetails(publicKey: string) {
   return communities.filter((community) => community.publicKey == publicKey)[0]
 }
 
-export function getCommunitiesInDirectory(
-  numberPerPage: number,
-  pageNumber: number,
-  sortedBy?: DirectorySortingEnum,
-  filterKeyword?: string
-) {
-  const resolvedCommunities = communitiesInDirectory.map(
-    (communityAddress) => communities.filter((e) => e.publicKey === communityAddress)[0]
-  )
+function filterCommunities(resolvedCommunities: CommunityDetail[], filterKeyword?: string) {
   let filteredCommunities = undefined
 
   if (filterKeyword) {
@@ -26,6 +18,21 @@ export function getCommunitiesInDirectory(
   } else {
     filteredCommunities = resolvedCommunities
   }
+
+  return filteredCommunities
+}
+
+export function getCommunitiesInDirectory(
+  numberPerPage: number,
+  pageNumber: number,
+  sortedBy?: DirectorySortingEnum,
+  filterKeyword?: string
+) {
+  const resolvedCommunities = communitiesInDirectory.map(
+    (communityAddress) => communities.filter((e) => e.publicKey === communityAddress)[0]
+  )
+
+  const filteredCommunities = filterCommunities(resolvedCommunities, filterKeyword)
 
   let sortFunction = undefined
   switch (sortedBy) {
@@ -61,6 +68,74 @@ export function getCommunitiesInDirectory(
         if (!a.directoryInfo?.featureVotes) return 1
         if (!b.directoryInfo?.featureVotes) return -1
         return a?.directoryInfo?.featureVotes < b?.directoryInfo?.featureVotes ? -1 : 1
+      }
+      break
+  }
+
+  const sortedCommunities = filteredCommunities.sort(sortFunction)
+
+  const paginatedCommunities = sortedCommunities.slice(numberPerPage * pageNumber, numberPerPage * (pageNumber + 1))
+
+  return {
+    page: pageNumber,
+    communities: paginatedCommunities,
+  }
+}
+
+export function getCommunitiesUnderVote(
+  numberPerPage: number,
+  pageNumber: number,
+  sortedBy?: VotingSortingEnum,
+  filterKeyword?: string
+) {
+  const resolvedCommunities = communitiesUnderVote.map(
+    (communityAddress) => communities.filter((e) => e.publicKey === communityAddress)[0]
+  )
+
+  const filteredCommunities = filterCommunities(resolvedCommunities, filterKeyword)
+
+  let sortFunction = undefined
+  switch (sortedBy) {
+    case VotingSortingEnum.AtoZ:
+      sortFunction = (a: CommunityDetail, b: CommunityDetail) => (a.name < b.name ? -1 : 1)
+      break
+    case VotingSortingEnum.ZtoA:
+      sortFunction = (a: CommunityDetail, b: CommunityDetail) => (a.name < b.name ? 1 : -1)
+      break
+    case VotingSortingEnum.EndingLatest:
+      sortFunction = (a: CommunityDetail, b: CommunityDetail) => {
+        if (!a.currentVoting) return 1
+        if (!b.currentVoting) return -1
+        return a.currentVoting?.timeLeft < b?.currentVoting?.timeLeft ? -1 : 1
+      }
+      break
+    case VotingSortingEnum.EndingSoonest:
+      sortFunction = (a: CommunityDetail, b: CommunityDetail) => {
+        if (!a.currentVoting) return -1
+        if (!b.currentVoting) return 1
+        return a.currentVoting?.timeLeft < b?.currentVoting?.timeLeft ? 1 : -1
+      }
+      break
+    case VotingSortingEnum.MostVotes:
+      sortFunction = (a: CommunityDetail, b: CommunityDetail) => {
+        if (!a.currentVoting?.voteAgainst) return 1
+        if (!a.currentVoting?.voteFor) return 1
+        if (!b.currentVoting?.voteAgainst) return -1
+        if (!b.currentVoting.voteFor) return -1
+        const aSum = a.currentVoting.voteAgainst.add(a.currentVoting.voteFor)
+        const bSum = b.currentVoting.voteAgainst.add(b.currentVoting.voteFor)
+        return aSum < bSum ? -1 : 1
+      }
+      break
+    case VotingSortingEnum.LeastVotes:
+      sortFunction = (a: CommunityDetail, b: CommunityDetail) => {
+        if (!a.currentVoting?.voteAgainst) return 1
+        if (!a.currentVoting?.voteFor) return 1
+        if (!b.currentVoting?.voteAgainst) return -1
+        if (!b.currentVoting.voteFor) return -1
+        const aSum = a.currentVoting.voteAgainst.add(a.currentVoting.voteFor)
+        const bSum = b.currentVoting.voteAgainst.add(b.currentVoting.voteFor)
+        return aSum < bSum ? 1 : -1
       }
       break
   }
