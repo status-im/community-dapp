@@ -5,23 +5,21 @@ import { ButtonSecondary } from '../components/Button'
 import externalIcon from '../assets/images/ext.svg'
 import indicatorIcon from '../assets/images/indicator.svg'
 import rightIcon from '../assets/images/arrowRight.svg'
+import { CommunityDetail } from '../models/community'
 
 interface CardCommunityProps {
-  img: string
-  heading: string
-  text: string
-  tags: string[]
+  community: CommunityDetail
 }
 
-export const CardCommunity = ({ img, heading, text, tags }: CardCommunityProps) => (
+export const CardCommunity = ({ community }: CardCommunityProps) => (
   <CardInfoBlock>
     <Community>
-      <CardLogo src={img} alt={`${heading} logo`} />
+      <CardLogo src={community.icon} alt={`${community.name} logo`} />
       <CommunityInfo>
-        <CardHeading>{heading}</CardHeading>
-        <CardText>{text}</CardText>
+        <CardHeading>{community.name}</CardHeading>
+        <CardText>{community.description}</CardText>
         <CardTags>
-          {tags.map((tag, key) => (
+          {community.tags.map((tag, key) => (
             <Tag key={key}>
               <p>{tag}</p>
             </Tag>
@@ -200,8 +198,8 @@ const CommunityInfo = styled.div`
 `
 
 const CardLogo = styled.img`
-  width: 64px;
-  height: 64px;
+  width: 64px !important;
+  height: 64px !important;
   border-radius: 50%;
   margin-right: 16px;
 `
