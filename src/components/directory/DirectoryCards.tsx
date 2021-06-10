@@ -4,9 +4,10 @@ import styled from 'styled-components'
 import { CommunityDetail, DirectorySortingEnum } from '../../models/community'
 import { useCommunities } from '../hooks/useCommunities'
 import { getCommunitiesInDirectory } from '../../helpers/apiMock'
-import { Filter } from '../Filter'
+import { FilterList } from '../Filter'
 import { Search } from '../Input'
 import { PageBar } from '../PageBar'
+import { DirectorySortingOptions } from '../../constants/SortingOptions'
 
 interface DirectoryCardProps {
   community: CommunityDetail
@@ -49,14 +50,7 @@ export function DirectoryCards() {
           value={searchField}
           onChange={(e) => setSearchField(e.currentTarget.value)}
         />
-        <Filter value={sortingType} onChange={(e) => setSortingType(parseInt(e.currentTarget.value))}>
-          <option value={DirectorySortingEnum.IncludedRecently}>Included Recently</option>
-          <option value={DirectorySortingEnum.IncludedLongAgo}>Included Long Ago</option>
-          <option value={DirectorySortingEnum.AtoZ}>A to Z</option>
-          <option value={DirectorySortingEnum.ZtoA}>Z to A</option>
-          <option value={DirectorySortingEnum.LeastVotes}>Least Votes</option>
-          <option value={DirectorySortingEnum.MostVotes}>Most Votes</option>
-        </Filter>
+        <FilterList value={sortingType} setValue={setSortingType} options={DirectorySortingOptions} />
       </PageBar>
       <Voting>
         {communities.map((community) => (
