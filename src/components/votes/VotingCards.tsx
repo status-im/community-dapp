@@ -3,6 +3,9 @@ import { Card, CardCommunity, CardVote } from '../Card'
 import { getCommunitiesUnderVote } from '../../helpers/apiMock'
 import { CommunityDetail, VotingSortingEnum } from '../../models/community'
 import styled from 'styled-components'
+import { Filter } from '../Filter'
+import { Search } from '../Input'
+import { PageBar } from '../PageBar'
 
 export function VotingCards() {
   const [searchField, setSearchField] = useState('')
@@ -49,16 +52,24 @@ export function VotingCards() {
 
   return (
     <div>
-      <input type="text" value={searchField} onChange={(e) => setSearchField(e.currentTarget.value)} />
+      <PageBar>
+        <Search
+          type="text"
+          placeholder="Search communities..."
+          value={searchField}
+          onChange={(e) => setSearchField(e.currentTarget.value)}
+        />
 
-      <select value={sortingType} onChange={(e) => setSortingType(parseInt(e.currentTarget.value))}>
-        <option value={VotingSortingEnum.EndingSoonest}>Ending Soonest</option>
-        <option value={VotingSortingEnum.EndingLatest}>Ending Latest</option>
-        <option value={VotingSortingEnum.AtoZ}>A to Z</option>
-        <option value={VotingSortingEnum.ZtoA}>Z to A</option>
-        <option value={VotingSortingEnum.LeastVotes}>Least Votes</option>
-        <option value={VotingSortingEnum.MostVotes}>Most Votes</option>
-      </select>
+        <Filter value={sortingType} onChange={(e) => setSortingType(parseInt(e.currentTarget.value))}>
+          <option value={VotingSortingEnum.EndingSoonest}>Ending Soonest</option>
+          <option value={VotingSortingEnum.EndingLatest}>Ending Latest</option>
+          <option value={VotingSortingEnum.AtoZ}>A to Z</option>
+          <option value={VotingSortingEnum.ZtoA}>Z to A</option>
+          <option value={VotingSortingEnum.LeastVotes}>Least Votes</option>
+          <option value={VotingSortingEnum.MostVotes}>Most Votes</option>
+        </Filter>
+      </PageBar>
+
       <Voting>
         {communities.map((community) => {
           let heading =
