@@ -39,7 +39,7 @@ export function DirectoryCards() {
   const [searchField, setSearchField] = useState('')
   const [sortingType, setSortingType] = useState(DirectorySortingEnum.IncludedRecently)
   const communities = useCommunities(getCommunitiesInDirectory, searchField, sortingType)
-  console.log(communities)
+
   return (
     <div>
       <PageBar>
