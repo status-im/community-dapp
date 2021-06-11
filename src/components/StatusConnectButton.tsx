@@ -2,21 +2,9 @@ import React, { ReactNode, useState } from 'react'
 import { ButtonPrimary } from './Button'
 import { useEthers } from '@usedapp/core'
 import styled from 'styled-components'
-
-type StatusModalProps = {
-  setShowModal: (val: boolean) => void
-}
-
-function StatusModal({ setShowModal }: StatusModalProps) {
-  return (
-    <ModalBackground onClick={() => setShowModal(false)}>
-      <Modal onClick={(e) => e.stopPropagation()}>
-        <CloseButton onClick={() => setShowModal(false)}>X</CloseButton>
-        This DApp only works with status
-      </Modal>
-    </ModalBackground>
-  )
-}
+import { Modal } from './Modal'
+import { LinkExternal } from './Link'
+import statusLogo from '../assets/images/statusLogo.png'
 
 export type StatusConnectButtonProps = {
   children: ReactNode
@@ -28,7 +16,7 @@ export function StatusConnectButton({ children, className }: StatusConnectButton
   const { activateBrowserWallet } = useEthers()
 
   const activateStatusWallet = () => {
-    if ((window as any).ethereum.isStatus) {
+    if ((window as any).ethereum?.isStatus) {
       activateBrowserWallet()
     } else {
       setShowModal(true)
@@ -37,7 +25,11 @@ export function StatusConnectButton({ children, className }: StatusConnectButton
 
   return (
     <div>
-      {showModal && <StatusModal setShowModal={setShowModal} />}
+      {showModal && (
+        <Modal heading={'Connect with Status'} setShowModal={setShowModal}>
+          <StatusModal />{' '}
+        </Modal>
+      )}
       <ButtonPrimary className={className} onClick={activateStatusWallet}>
         {children}
       </ButtonPrimary>
@@ -45,28 +37,35 @@ export function StatusConnectButton({ children, className }: StatusConnectButton
   )
 }
 
-const ModalBackground = styled.div`
-  position: fixed;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(100, 100, 100, 0.5);
-  z-index: 99;
+function StatusModal() {
+  return (
+    <StatusInfo>
+      <p>This DApp is only available for</p>
+      <StatusLogo src={statusLogo} />
+      <p>Secure Crypto Wallet & Messenger</p>
+      <StatusLink href="https://status.im/get/" target="_blank">
+        Get Status
+      </StatusLink>
+    </StatusInfo>
+  )
+}
+
+const StatusInfo = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  & > p {
+    font-weight: 500;
+    font-size: 15px;
+    line-height: 22px;
+  }
+`
+const StatusLogo = styled.img`
+  margin: 16px 0;
 `
 
-const Modal = styled.div`
-  position: fixed;
-  top: calc(50% - 150px);
-  left: calc(50% - 150px);
-  width: 300px;
-  height: 300px;
-  background-color: white;
-  color: black;
-  border: 1px solid black;
-  z-index: 100;
-`
-
-const CloseButton = styled.button`
-  margin-left: 20px;
+const StatusLink = styled(LinkExternal)`
+  margin-top: 45px;
+  margin-bottom: 13px;
 `

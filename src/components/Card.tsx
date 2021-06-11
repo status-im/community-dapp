@@ -2,10 +2,10 @@ import React from 'react'
 import styled from 'styled-components'
 import { Colors } from '../constants/styles'
 import { ButtonSecondary } from '../components/Button'
-import externalIcon from '../assets/images/ext.svg'
 import indicatorIcon from '../assets/images/indicator.svg'
 import rightIcon from '../assets/images/arrowRight.svg'
 import { CommunityDetail } from '../models/community'
+import { LinkExternal, LinkInternal } from './Link'
 
 interface CardCommunityProps {
   community: CommunityDetail
@@ -29,9 +29,9 @@ export const CardCommunity = ({ community }: CardCommunityProps) => (
     </Community>
 
     <CardLinks>
-      <CardLinkExternal>Visit community</CardLinkExternal>
-      <CardLinkExternal>View on Etherscan</CardLinkExternal>
-      <CardLinkInternal>Voting history</CardLinkInternal>
+      <LinkExternal>Visit community</LinkExternal>
+      <LinkExternal>View on Etherscan</LinkExternal>
+      <LinkInternal>Voting history</LinkInternal>
     </CardLinks>
   </CardInfoBlock>
 )
@@ -240,44 +240,8 @@ const CardLinks = styled.div`
   font-size: 15px;
   line-height: 22px;
 `
-const CardLinkExternal = styled.a`
-  color: ${Colors.BlueLink};
-  position: relative;
-  padding-right: 20px;
 
-  &:hover {
-    text-decoration: underline;
-  }
-
-  &:active {
-    text-decoration: none;
-  }
-
-  &::after {
-    content: '';
-    width: 11px;
-    height: 11px;
-    position: absolute;
-    top: 50%;
-    right: 0;
-    transform: translateY(-50%);
-    background-image: url(${externalIcon});
-  }
-`
-const CardLinkInternal = styled.a`
-  color: ${Colors.VioletDark};
-  font-weight: 500;
-
-  &:hover {
-    color: ${Colors.Violet};
-  }
-
-  &:active {
-    color: ${Colors.VioletDark};
-  }
-`
-
-const CardLinkFeature = styled(CardLinkInternal)`
+const CardLinkFeature = styled(LinkInternal)`
   padding-right: 28px;
   font-size: 12px;
   line-height: 20px;
