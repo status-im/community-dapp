@@ -8,7 +8,7 @@ type APIFunction = (
   filterKeyword?: string
 ) => { page: number; communities: CommunityDetail[] }
 
-export function useCommunities(API: APIFunction, searchField: string, sortingType: number) {
+export function useCommunities(API: APIFunction, searchField?: string, sortingType?: number) {
   const [communities, setCommunities] = useState<CommunityDetail[]>([])
   const [page, setPage] = useState(0)
   const [increment, setIncrement] = useState(true)

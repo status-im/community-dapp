@@ -4,10 +4,11 @@ import { getCommunitiesUnderVote } from '../../helpers/apiMock'
 import { CommunityDetail, VotingSortingEnum } from '../../models/community'
 import styled from 'styled-components'
 import { FilterList } from '../Filter'
-import { Search } from '../Input'
 import { PageBar } from '../PageBar'
 import { useCommunities } from '../hooks/useCommunities'
 import { VotingSortingOptions } from '../../constants/SortingOptions'
+import { ButtonSecondary } from '../Button'
+import { Colors } from '../../constants/styles'
 
 interface VotingCardProps {
   community: CommunityDetail
@@ -44,19 +45,17 @@ function VotingCard({ community }: VotingCardProps) {
 }
 
 export function VotingCards() {
-  const [searchField, setSearchField] = useState('')
   const [sortingType, setSortingType] = useState(VotingSortingEnum.EndingSoonest)
-  const communities = useCommunities(getCommunitiesUnderVote, searchField, sortingType)
+  const communities = useCommunities(getCommunitiesUnderVote, undefined, sortingType)
 
   return (
     <div>
       <PageBar>
-        <Search
-          type="text"
-          placeholder="Search communities..."
-          value={searchField}
-          onChange={(e) => setSearchField(e.currentTarget.value)}
-        />
+        <VoteFilter>
+          <span>Vote types:</span>
+          <VoteType>Add</VoteType>
+          <VoteType>Remove</VoteType>
+        </VoteFilter>
         <FilterList value={sortingType} setValue={setSortingType} options={VotingSortingOptions} />
       </PageBar>
       <Voting>
@@ -71,4 +70,20 @@ export function VotingCards() {
 const Voting = styled.div`
   display: flex;
   flex-direction: column;
+`
+
+const VoteFilter = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 257px;
+  color: ${Colors.VioletDark};
+`
+
+const VoteType = styled(ButtonSecondary)`
+  display: flex;
+  justify-content: space-between;
+  color: ${Colors.VioletDark};
+  line-height: 22px;
+  padding: 5px 12px;
 `
