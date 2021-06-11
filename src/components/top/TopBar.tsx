@@ -3,12 +3,12 @@ import styled from 'styled-components'
 import { NavLink } from 'react-router-dom'
 import { useEthers, shortenAddress } from '@usedapp/core'
 import { Logo } from './Logo'
-import { ButtonPrimary } from '../../components/Button'
 import { Colors } from '../../constants/styles'
 import { Animation } from '../../constants/animation'
+import { StatusConnectButton } from '../StatusConnectButton'
 
 export function TopBar() {
-  const { account, activateBrowserWallet } = useEthers()
+  const { account } = useEthers()
 
   return (
     <Header>
@@ -34,11 +34,7 @@ export function TopBar() {
           </NavLinks>
         </nav>
 
-        {account ? (
-          <Account>{shortenAddress(account)}</Account>
-        ) : (
-          <ButtonConnect onClick={() => activateBrowserWallet()}>Connect</ButtonConnect>
-        )}
+        {account ? <Account>{shortenAddress(account)}</Account> : <ButtonConnect>Connect</ButtonConnect>}
       </MenuContent>
     </Header>
   )
@@ -109,7 +105,7 @@ const StyledNavLink = styled(NavLink)`
     animation: ${Animation} 0.25s linear;
   }
 `
-const ButtonConnect = styled(ButtonPrimary)`
+const ButtonConnect = styled(StatusConnectButton)`
   padding: 10px 27px;
 `
 const Account = styled.button`

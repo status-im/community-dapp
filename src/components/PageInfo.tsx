@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
-import { useEthers } from '@usedapp/core'
 import { ButtonPrimary } from '../components/Button'
+import { StatusConnectButton } from './StatusConnectButton'
 
 interface PageInfoProps {
   heading: string
@@ -16,12 +16,11 @@ export const PageInfo = ({ heading, text }: PageInfoProps) => (
 )
 
 export function ProposeButton() {
-  return <InfoButton>Propose community</InfoButton>
+  return <ProposeButtonStyled>Propose community</ProposeButtonStyled>
 }
 
 export function ConnectButton() {
-  const { activateBrowserWallet } = useEthers()
-  return <InfoButton onClick={() => activateBrowserWallet()}>Connect to Vote</InfoButton>
+  return <ConnectButtonStyled>Connect to Vote</ConnectButtonStyled>
 }
 
 export const InfoWrap = styled.div`
@@ -53,7 +52,12 @@ const InfoText = styled.p`
   line-height: 32px;
   margin-bottom: 24px;
 `
-const InfoButton = styled(ButtonPrimary)`
+const ProposeButtonStyled = styled(ButtonPrimary)`
+  padding: 10px 0;
+  width: 343px;
+`
+
+const ConnectButtonStyled = styled(StatusConnectButton)`
   padding: 10px 0;
   width: 343px;
 `
