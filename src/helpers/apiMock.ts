@@ -22,7 +22,7 @@ function filterCommunities(resolvedCommunities: CommunityDetail[], filterKeyword
   return filteredCommunities
 }
 
-export function getCommunitiesInDirectory(
+export function getCommunitiesInDirectorySync(
   numberPerPage: number,
   pageNumber: number,
   sortedBy?: DirectorySortingEnum,
@@ -82,7 +82,17 @@ export function getCommunitiesInDirectory(
   }
 }
 
-export function getCommunitiesUnderVote(
+export async function getCommunitiesInDirectory(
+  numberPerPage: number,
+  pageNumber: number,
+  sortedBy?: DirectorySortingEnum,
+  filterKeyword?: string
+) {
+  await new Promise((r) => setTimeout(r, 3000))
+  return getCommunitiesInDirectorySync(numberPerPage, pageNumber, sortedBy, filterKeyword)
+}
+
+export function getCommunitiesUnderVoteSync(
   numberPerPage: number,
   pageNumber: number,
   sortedBy?: VotingSortingEnum,
@@ -148,4 +158,13 @@ export function getCommunitiesUnderVote(
     page: pageNumber,
     communities: paginatedCommunities,
   }
+}
+export async function getCommunitiesUnderVote(
+  numberPerPage: number,
+  pageNumber: number,
+  sortedBy?: VotingSortingEnum,
+  filterKeyword?: string
+) {
+  await new Promise((r) => setTimeout(r, 3000))
+  return getCommunitiesUnderVoteSync(numberPerPage, pageNumber, sortedBy, filterKeyword)
 }

@@ -8,6 +8,7 @@ import { FilterList } from '../Filter'
 import { Search } from '../Input'
 import { PageBar } from '../PageBar'
 import { DirectorySortingOptions } from '../../constants/SortingOptions'
+import { SpinnerIcon } from '../../assets/animatedIcons/spinnerIcon'
 
 interface DirectoryCardProps {
   community: CommunityDetail
@@ -37,9 +38,13 @@ function DirectoryCard({ community }: DirectoryCardProps) {
 }
 
 export function DirectoryCards() {
-  const [searchField, setSearchField] = useState('')
-  const [sortingType, setSortingType] = useState(DirectorySortingEnum.IncludedRecently)
-  const communities = useCommunities(getCommunitiesInDirectory, searchField, sortingType)
+  const [filterKeyword, setFilterKeyword] = useState('')
+  const [sortedBy, setSortedBy] = useState(DirectorySortingEnum.IncludedRecently)
+  const { communities, loading } = useCommunities(getCommunitiesInDirectory, {
+    numberPerPage: 2,
+    sortedBy,
+    filterKeyword,
+  })
 
   return (
     <div>
@@ -47,19 +52,31 @@ export function DirectoryCards() {
         <Search
           type="text"
           placeholder="Search communities..."
-          value={searchField}
-          onChange={(e) => setSearchField(e.currentTarget.value)}
+          value={filterKeyword}
+          onChange={(e) => setFilterKeyword(e.currentTarget.value)}
         />
-        <FilterList value={sortingType} setValue={setSortingType} options={DirectorySortingOptions} />
+        <FilterList value={sortedBy} setValue={setSortedBy} options={DirectorySortingOptions} />
       </PageBar>
       <Voting>
         {communities.map((community) => (
           <DirectoryCard key={community.publicKey} community={community} />
         ))}
       </Voting>
+      {loading && (
+        <IconWrapper>
+          <SpinnerIcon />
+        </IconWrapper>
+      )}
     </div>
   )
 }
+
+const IconWrapper = styled.div`
+  height: 64px;
+  width: 64px;
+  margin: 100px;
+  margin-left: calc(50% - 32px);
+`
 
 const Voting = styled.div`
   display: flex;

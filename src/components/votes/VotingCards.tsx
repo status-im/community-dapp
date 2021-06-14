@@ -9,6 +9,7 @@ import { useCommunities } from '../hooks/useCommunities'
 import { VotingSortingOptions } from '../../constants/SortingOptions'
 import { ButtonSecondary } from '../Button'
 import { Colors } from '../../constants/styles'
+import { SpinnerIcon } from '../../assets/animatedIcons/spinnerIcon'
 
 interface VotingCardProps {
   community: CommunityDetail
@@ -45,8 +46,8 @@ function VotingCard({ community }: VotingCardProps) {
 }
 
 export function VotingCards() {
-  const [sortingType, setSortingType] = useState(VotingSortingEnum.EndingSoonest)
-  const communities = useCommunities(getCommunitiesUnderVote, undefined, sortingType)
+  const [sortedBy, setSortedBy] = useState(VotingSortingEnum.EndingSoonest)
+  const { communities, loading } = useCommunities(getCommunitiesUnderVote, { numberPerPage: 2, sortedBy })
 
   return (
     <div>
@@ -56,16 +57,28 @@ export function VotingCards() {
           <VoteType>Add</VoteType>
           <VoteType>Remove</VoteType>
         </VoteFilter>
-        <FilterList value={sortingType} setValue={setSortingType} options={VotingSortingOptions} />
+        <FilterList value={sortedBy} setValue={setSortedBy} options={VotingSortingOptions} />
       </PageBar>
       <Voting>
         {communities.map((community) => (
           <VotingCard key={community.publicKey} community={community} />
         ))}
       </Voting>
+      {loading && (
+        <IconWrapper>
+          <SpinnerIcon />
+        </IconWrapper>
+      )}
     </div>
   )
 }
+
+const IconWrapper = styled.div`
+  height: 64px;
+  width: 64px;
+  margin: 100px;
+  margin-left: calc(50% - 32px);
+`
 
 const Voting = styled.div`
   display: flex;
