@@ -27,6 +27,7 @@ export const ButtonPrimary = styled(Button)`
 `
 export const ButtonSecondary = styled(Button)`
   background: ${Colors.VioletSecondary};
+  color: ${Colors.VioletDark};
   line-height: 24px;
 
   &:not(:disabled):hover {

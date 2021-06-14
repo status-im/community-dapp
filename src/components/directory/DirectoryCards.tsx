@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
-import { Card, CardCommunity, CardFeature } from '../Card'
+import { Card, CardCommunity } from '../Card'
+import { CardFeature } from '../card/CardFeature'
 import styled from 'styled-components'
 import { CommunityDetail, DirectorySortingEnum } from '../../models/community'
 import { useCommunities } from '../hooks/useCommunities'

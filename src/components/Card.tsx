@@ -1,11 +1,12 @@
-import React from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
 import { Colors } from '../constants/styles'
 import { ButtonSecondary } from '../components/Button'
-import indicatorIcon from '../assets/images/indicator.svg'
-import rightIcon from '../assets/images/arrowRight.svg'
 import { CommunityDetail } from '../models/community'
 import { LinkExternal, LinkInternal } from './Link'
+import { Modal } from './Modal'
+import { CardModal } from './card/CardModal'
+import { VoteChart } from './votes/VoteChart'
 
 interface CardCommunityProps {
   community: CommunityDetail
@@ -36,10 +37,6 @@ export const CardCommunity = ({ community }: CardCommunityProps) => (
   </CardInfoBlock>
 )
 
-function addCommas(votes: number) {
-  return votes.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-}
-
 interface CardVoteProps {
   voteHeading: string
   votesAgainst: number
@@ -62,123 +59,85 @@ export const CardVote = ({
   votesForText,
   timeLeft,
   voteWinner,
-}: CardVoteProps) => (
-  <CardVoteBlock>
-    {voteWinner ? (
-      <CardHeadingEndedVote>
-        SNT holders have decided{' '}
-        <b>
-          <u>{voteHeading}</u>
-        </b>{' '}
-        this community to the directory!
-      </CardHeadingEndedVote>
-    ) : (
-      <CardHeading>{voteHeading}</CardHeading>
-    )}
-    <Votes>
-      <VotesChart>
-        <VoteBox style={{ filter: voteWinner && voteWinner === 2 ? 'grayscale(1)' : 'none' }}>
-          <p style={{ fontSize: voteWinner === 1 ? '42px' : '24px' }}>{votesAgainstIcon}</p>
-          <span>
-            {' '}
-            {addCommas(votesAgainst)} <span style={{ fontWeight: 'normal' }}>SNT</span>
-          </span>
-        </VoteBox>
-        <TimeLeft>{timeLeft}</TimeLeft>
-        <VoteBox style={{ filter: voteWinner && voteWinner === 1 ? 'grayscale(1)' : 'none' }}>
-          <p style={{ fontSize: voteWinner === 2 ? '42px' : '24px' }}>{votesForIcon}</p>
-          <span>
-            {' '}
-            {addCommas(votesFor)} <span style={{ fontWeight: 'normal' }}>SNT</span>
-          </span>
-        </VoteBox>
-      </VotesChart>
+}: CardVoteProps) => {
+  const [showModal, setShowModal] = useState(false)
+  const [votesModalText, setVotesModalText] = useState('')
+  const [voteTypeModal, setVoteTypeModal] = useState('')
 
-      <VoteGraphBar votesFor={votesFor} votesAgainst={votesAgainst} voteWinner={voteWinner} />
-    </Votes>
-
-    {voteWinner ? (
-      <VoteBtnFinal>
-        Finalize the vote <span>✍️</span>
-      </VoteBtnFinal>
-    ) : (
-      <VotesBtns>
-        <VoteBtn>
-          {votesAgainstText} <span>{votesAgainstIcon}</span>
-        </VoteBtn>
-        <VoteBtn>
-          {votesForText} <span>{votesForIcon}</span>
-        </VoteBtn>
-      </VotesBtns>
-    )}
-  </CardVoteBlock>
-)
-
-interface VoteGraphBarProps {
-  votesAgainst: number
-  votesFor: number
-  voteWinner?: number
-}
-
-export function VoteGraphBar({ votesFor, votesAgainst, voteWinner }: VoteGraphBarProps) {
   return (
-    <VoteGraph
-      style={{
-        backgroundColor: voteWinner && voteWinner === 1 ? `${Colors.GrayDisabledLight}` : `${Colors.BlueBar}`,
-      }}
-    >
-      <VoteGraphAgainst
-        style={{
-          width: calculateWidth(votesFor, votesAgainst) + '%',
-          backgroundColor: voteWinner && voteWinner === 2 ? `${Colors.GrayDisabledLight}` : `${Colors.Orange}`,
-        }}
+    <CardVoteBlock>
+      {voteWinner ? (
+        <CardHeadingEndedVote>
+          SNT holders have decided{' '}
+          <b>
+            <u>{voteHeading}</u>
+          </b>{' '}
+          this community to the directory!
+        </CardHeadingEndedVote>
+      ) : (
+        <CardHeading>{voteHeading}</CardHeading>
+      )}
+      <VoteChart
+        votesAgainst={votesAgainst}
+        votesFor={votesFor}
+        votesAgainstIcon={votesAgainstIcon}
+        votesForIcon={votesForIcon}
+        timeLeft={timeLeft}
+        voteWinner={voteWinner}
       />
-    </VoteGraph>
+
+      {voteWinner ? (
+        <VoteBtnFinal>
+          Finalize the vote <span>✍️</span>
+        </VoteBtnFinal>
+      ) : (
+        <VotesBtns>
+          {showModal && (
+            <Modal heading={voteTypeModal === 'for' ? 'Add ?' : 'Remove ?'} setShowModal={setShowModal}>
+              <CardModal
+                voteType={voteTypeModal}
+                votesAgainst={votesAgainst}
+                votesFor={votesFor}
+                votesAgainstIcon={votesAgainstIcon}
+                votesForIcon={votesForIcon}
+                timeLeft={timeLeft}
+                votesText={votesModalText}
+              />{' '}
+            </Modal>
+          )}
+          <VoteBtn
+            onClick={() => {
+              setVotesModalText('Vote not to add community')
+              setVoteTypeModal('against')
+              setShowModal(true)
+            }}
+          >
+            {votesAgainstText} <span>{votesAgainstIcon}</span>
+          </VoteBtn>
+          <VoteBtn
+            onClick={() => {
+              setVotesModalText('Vote to add community')
+              setVoteTypeModal('for')
+              setShowModal(true)
+            }}
+          >
+            {votesForText} <span>{votesForIcon}</span>
+          </VoteBtn>
+        </VotesBtns>
+      )}
+    </CardVoteBlock>
   )
 }
-
-function calculateWidth(votesFor: number, votesAgainst: number) {
-  return (100 * votesAgainst) / (votesFor + votesAgainst)
-}
-
-interface CardFeatureProps {
-  heading: string
-  text: string
-  icon: string
-  sum?: number
-  timeLeft?: string
-  voting?: boolean
-}
-
-export const CardFeature = ({ heading, text, icon, sum, timeLeft, voting }: CardFeatureProps) => (
-  <CardVoteBlock style={{ backgroundColor: `${Colors.GrayLight}` }}>
-    <FeatureTop>
-      <CardHeading>{heading}</CardHeading>
-      {voting && <CardLinkFeature>Ongoing vote for removal</CardLinkFeature>}
-    </FeatureTop>
-
-    <FeatureVote>
-      <p>{text}</p>
-      <p style={{ fontSize: '24px' }}>{icon}</p>
-
-      {timeLeft && <span>{timeLeft}</span>}
-
-      {sum && <span style={{ fontWeight: 'normal' }}>{addCommas(sum)} SNT</span>}
-    </FeatureVote>
-    <FeatureBtn disabled={Boolean(timeLeft)}>
-      Feature this community! <span style={{ fontSize: '20px' }}>⭐️</span>
-    </FeatureBtn>
-  </CardVoteBlock>
-)
 
 export const Card = styled.div`
   margin: 20px;
   display: flex;
-  align-items: center;
+  align-items: stretch;
 `
 
 const CardInfoBlock = styled.div`
   width: 50%;
+  margin: 13px 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -203,10 +162,11 @@ const CardLogo = styled.img`
   border-radius: 50%;
   margin-right: 16px;
 `
-const CardHeading = styled.h2`
+export const CardHeading = styled.h2`
   font-weight: bold;
   font-size: 17px;
   line-height: 24px;
+  margin-bottom: 8px;
 `
 const CardHeadingEndedVote = styled.p`
   fint-weight: normal;
@@ -215,7 +175,7 @@ const CardHeadingEndedVote = styled.p`
 `
 const CardText = styled.p`
   line-height: 22px;
-  margin: 8px 0;
+  margin-bottom: 8px;
 `
 
 const CardTags = styled.div`
@@ -241,106 +201,14 @@ const CardLinks = styled.div`
   line-height: 22px;
 `
 
-const CardLinkFeature = styled(LinkInternal)`
-  padding-right: 28px;
-  font-size: 12px;
-  line-height: 20px;
-  position: relative;
-
-  &::after {
-    content: '';
-    width: 24px;
-    height: 24px;
-    position: absolute;
-    top: 50%;
-    right: 0;
-    transform: translateY(-50%);
-    background-image: url(${rightIcon});
-    background-size: cover;
-  }
-`
-
-const CardVoteBlock = styled.div`
+export const CardVoteBlock = styled.div`
   width: 50%;
-  z-index: 2;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   padding: 24px 24px 32px;
   box-shadow: 0px 2px 12px rgba(0, 0, 0, 0.15);
   border-radius: 6px;
-`
-
-const Votes = styled.div`
-  display: flex;
-  flex-direction: column;
-  margin: 48px 0 32px;
-`
-const VotesChart = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 13px;
-`
-
-const VoteBox = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-content: center;
-  max-width: 100px;
-  font-size: 12px;
-  line-height: 16px;
-  text-align: center;
-  font-weight: normal;
-
-  & > p {
-    font-size: 24px;
-    line-height: 24px;
-    margin-bottom: 8px;
-  }
-
-  & > span {
-    font-weight: bold;
-  }
-`
-
-const TimeLeft = styled.p`
-  font-size: 12px;
-  line-height: 16px;
-  letter-spacing: 0.1px;
-  color: ${Colors.GreyText};
-`
-
-const VoteGraph = styled.div`
-  position: relative;
-  width: 100%;
-  height: 16px;
-  background-color: ${Colors.BlueBar};
-  border-radius: 10px;
-  padding-top: 5px;
-
-  &::before {
-    content: '';
-    width: 16px;
-    height: 5px;
-    position: absolute;
-    top: -5px;
-    left: 50%;
-    transform: translateX(-50%);
-    background-image: url(${indicatorIcon});
-    background-size: cover;
-  }
-`
-
-const VoteGraphAgainst = styled.div`
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 13px;
-  height: 16px;
-  background-color: ${Colors.Orange};
-  border-right: 2px solid ${Colors.VioletLight};
-  border-radius: 10px 0 0 10px;
-  z-index: 2;
 `
 
 const VotesBtns = styled.div`
@@ -348,12 +216,11 @@ const VotesBtns = styled.div`
   justify-content: space-between;
   width: 100%;
 `
-const VoteBtn = styled(ButtonSecondary)`
+export const VoteBtn = styled(ButtonSecondary)`
   padding: 11px 46px;
   font-weight: 500;
   font-size: 15px;
   line-height: 22px;
-  color: ${Colors.VioletDark};
 
   & > span {
     font-size: 20px;
@@ -361,34 +228,4 @@ const VoteBtn = styled(ButtonSecondary)`
 `
 const VoteBtnFinal = styled(VoteBtn)`
   width: 100%;
-`
-
-const FeatureTop = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`
-
-const FeatureBtn = styled(VoteBtn)`
-  width: 100%;
-`
-const FeatureVote = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin: 45px auto 32px;
-  max-width: 290px;
-  text-align: center;
-
-  & > p {
-    font-size: 17px;
-    line-height: 18px;
-    margin-bottom: 8px;
-  }
-
-  & > span {
-    font-weight: bold;
-    font-size: 15px;
-    line-height: 22px;
-  }
 `
