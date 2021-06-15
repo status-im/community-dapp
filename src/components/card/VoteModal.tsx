@@ -7,7 +7,7 @@ import { ButtonSecondary } from '../Button'
 import { addCommas } from '../../helpers/addCommas'
 import { CurrentVoting } from '../../models/community'
 
-export interface CardModalProps {
+export interface VoteModalProps {
   vote: CurrentVoting
   selectedVote: {
     icon: string
@@ -15,9 +15,10 @@ export interface CardModalProps {
     verb: string
   }
   availableAmount: number
+  setShowVoteModal: (show: boolean) => void
 }
 
-export function CardModal({ vote, selectedVote, availableAmount }: CardModalProps) {
+export function VoteModal({ vote, selectedVote, availableAmount, setShowVoteModal }: VoteModalProps) {
   const [proposingAmount, setProposingAmount] = useState(0)
   const [displayAmount, setDisplayAmount] = useState('0 SNT')
 
@@ -35,6 +36,9 @@ export function CardModal({ vote, selectedVote, availableAmount }: CardModalProp
       setDisplayAmount(addCommas(Number(e.target.value)) + ' SNT')
     }
   }
+
+  const progress = (proposingAmount / availableAmount) * 100 + '%'
+
   return (
     <CardProposing>
       <VoteChart vote={vote} />
@@ -60,10 +64,15 @@ export function CardModal({ vote, selectedVote, availableAmount }: CardModalProp
             step={step}
             value={proposingAmount}
             onChange={sliderChange}
+            style={{
+              background: `linear-gradient(90deg, ${Colors.VioletDark} 0% ${progress},  ${Colors.VioletSecondary} ${progress} 100%)`,
+            }}
           />
         </VoteProposingRangeWrap>
       </VoteProposing>
-      <VoteConfirmBtn>{`Vote ${selectedVote.verb} community ${selectedVote.icon}`}</VoteConfirmBtn>
+      <VoteConfirmBtn
+        onClick={() => setShowVoteModal(true)}
+      >{`Vote ${selectedVote.verb} community ${selectedVote.icon}`}</VoteConfirmBtn>
     </CardProposing>
   )
 }
@@ -114,7 +123,6 @@ const VoteProposingRange = styled.input`
   margin: 10px 0;
   border-radius: 2px;
   outline: none;
-  background: ${Colors.VioletSecondary};
 
   &::-webkit-slider-thumb {
     -webkit-appearance: none;
@@ -129,7 +137,7 @@ const VoteProposingRange = styled.input`
   &::-moz-range-thumb {
     width: 20px;
     height: 20px;
-    background: #bd5de2;
+    background: ${Colors.Violet};
     border: 0.5px solid rgba(0, 0, 0, 0);
     border-radius: 50px;
     cursor: pointer;
@@ -142,8 +150,4 @@ const VoteConfirmBtn = styled(ButtonSecondary)`
   font-weight: 500;
   font-size: 15px;
   line-height: 22px;
-
-  & > span {
-    font-size: 20px;
-  }
 `

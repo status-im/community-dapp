@@ -5,9 +5,10 @@ import { ButtonSecondary } from '../components/Button'
 import { CommunityDetail } from '../models/community'
 import { LinkExternal, LinkInternal } from './Link'
 import { Modal } from './Modal'
-import { CardModal } from './card/CardModal'
+import { VoteModal } from './card/VoteModal'
 import { VoteChart } from './votes/VoteChart'
 import { voteTypes } from './../constants/voteTypes'
+import { VoteConfirmModal } from './card/VoteConfirmModal'
 
 interface CardCommunityProps {
   community: CommunityDetail
@@ -44,7 +45,13 @@ interface CardVoteProps {
 
 export const CardVote = ({ community }: CardVoteProps) => {
   const [showModal, setShowModal] = useState(false)
+  const [showVoteModal, setShowVoteModal] = useState(false)
   const [selectedVoted, setSelectedVoted] = useState(voteTypes['Add'].for)
+
+  const setNext = (val: boolean) => {
+    setShowVoteModal(val)
+    setShowModal(false)
+  }
 
   const vote = community.currentVoting
 
@@ -81,7 +88,17 @@ export const CardVote = ({ community }: CardVoteProps) => {
         <VotesBtns>
           {showModal && (
             <Modal heading={`${vote?.type} ${community.name} ?`} setShowModal={setShowModal}>
-              <CardModal vote={vote} selectedVote={selectedVoted} availableAmount={65245346} />{' '}
+              <VoteModal
+                vote={vote}
+                selectedVote={selectedVoted}
+                availableAmount={65245346}
+                setShowVoteModal={setNext}
+              />{' '}
+            </Modal>
+          )}
+          {showVoteModal && (
+            <Modal setShowModal={setShowVoteModal}>
+              <VoteConfirmModal community={community} selectedVote={selectedVoted} setShowModal={setNext} />
             </Modal>
           )}
           <VoteBtn
