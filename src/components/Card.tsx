@@ -44,13 +44,13 @@ interface CardVoteProps {
 }
 
 export const CardVote = ({ community }: CardVoteProps) => {
-  const [showModal, setShowModal] = useState(false)
   const [showVoteModal, setShowVoteModal] = useState(false)
+  const [showConfirmModal, setShowConfirmModal] = useState(false)
   const [selectedVoted, setSelectedVoted] = useState(voteTypes['Add'].for)
 
   const setNext = (val: boolean) => {
-    setShowVoteModal(val)
-    setShowModal(false)
+    setShowConfirmModal(val)
+    setShowVoteModal(false)
   }
 
   const vote = community.currentVoting
@@ -86,25 +86,25 @@ export const CardVote = ({ community }: CardVoteProps) => {
         </VoteBtnFinal>
       ) : (
         <VotesBtns>
-          {showModal && (
-            <Modal heading={`${vote?.type} ${community.name} ?`} setShowModal={setShowModal}>
+          {showVoteModal && (
+            <Modal heading={`${vote?.type} ${community.name} ?`} setShowModal={setShowVoteModal}>
               <VoteModal
                 vote={vote}
                 selectedVote={selectedVoted}
                 availableAmount={65245346}
-                setShowVoteModal={setNext}
+                setShowConfirmModal={setNext}
               />{' '}
             </Modal>
           )}
-          {showVoteModal && (
-            <Modal setShowModal={setShowVoteModal}>
+          {showConfirmModal && (
+            <Modal setShowModal={setShowConfirmModal}>
               <VoteConfirmModal community={community} selectedVote={selectedVoted} setShowModal={setNext} />
             </Modal>
           )}
           <VoteBtn
             onClick={() => {
               setSelectedVoted(voteConstants.against)
-              setShowModal(true)
+              setShowVoteModal(true)
             }}
           >
             {voteConstants.against.text} <span>{voteConstants.against.icon}</span>
@@ -112,7 +112,7 @@ export const CardVote = ({ community }: CardVoteProps) => {
           <VoteBtn
             onClick={() => {
               setSelectedVoted(voteConstants.for)
-              setShowModal(true)
+              setShowVoteModal(true)
             }}
           >
             {voteConstants.for.text} <span>{voteConstants.for.icon}</span>

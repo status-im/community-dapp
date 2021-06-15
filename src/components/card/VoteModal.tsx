@@ -15,10 +15,10 @@ export interface VoteModalProps {
     verb: string
   }
   availableAmount: number
-  setShowVoteModal: (show: boolean) => void
+  setShowConfirmModal: (show: boolean) => void
 }
 
-export function VoteModal({ vote, selectedVote, availableAmount, setShowVoteModal }: VoteModalProps) {
+export function VoteModal({ vote, selectedVote, availableAmount, setShowConfirmModal }: VoteModalProps) {
   const [proposingAmount, setProposingAmount] = useState(0)
   const [displayAmount, setDisplayAmount] = useState('0 SNT')
 
@@ -71,7 +71,7 @@ export function VoteModal({ vote, selectedVote, availableAmount, setShowVoteModa
         </VoteProposingRangeWrap>
       </VoteProposing>
       <VoteConfirmBtn
-        onClick={() => setShowVoteModal(true)}
+        onClick={() => setShowConfirmModal(true)}
       >{`Vote ${selectedVote.verb} community ${selectedVote.icon}`}</VoteConfirmBtn>
     </CardProposing>
   )
