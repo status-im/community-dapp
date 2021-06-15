@@ -5,28 +5,19 @@ import { VoteChart } from '../votes/VoteChart'
 import { Input } from '../Input'
 import { ButtonSecondary } from '../Button'
 import { addCommas } from '../../helpers/addCommas'
+import { CurrentVoting } from '../../models/community'
 
 export interface CardModalProps {
-  voteType: string
-  votesAgainst: number
-  votesFor: number
-  votesAgainstIcon: string
-  votesForIcon: string
-  timeLeft: string
-  votesText: string
+  vote: CurrentVoting
+  selectedVote: {
+    icon: string
+    text: string
+    verb: string
+  }
   availableAmount: number
 }
 
-export function CardModal({
-  voteType,
-  votesAgainst,
-  votesFor,
-  votesAgainstIcon,
-  votesForIcon,
-  timeLeft,
-  votesText,
-  availableAmount,
-}: CardModalProps) {
+export function CardModal({ vote, selectedVote, availableAmount }: CardModalProps) {
   const [proposingAmount, setProposingAmount] = useState(0)
   const [displayAmount, setDisplayAmount] = useState('0 SNT')
 
@@ -44,16 +35,9 @@ export function CardModal({
       setDisplayAmount(addCommas(Number(e.target.value)) + ' SNT')
     }
   }
-
   return (
     <CardProposing>
-      <VoteChart
-        votesAgainst={votesAgainst}
-        votesFor={votesFor}
-        votesAgainstIcon={votesAgainstIcon}
-        votesForIcon={votesForIcon}
-        timeLeft={timeLeft}
-      />
+      <VoteChart vote={vote} />
       <VoteProposing>
         <VoteProposingInfo>
           <p>My vote</p>
@@ -79,9 +63,7 @@ export function CardModal({
           />
         </VoteProposingRangeWrap>
       </VoteProposing>
-      <VoteConfirmBtn>
-        {votesText} <span>{voteType === 'for' ? votesForIcon : votesAgainstIcon}</span>
-      </VoteConfirmBtn>
+      <VoteConfirmBtn>{`Vote ${selectedVote.verb} community ${selectedVote.icon}`}</VoteConfirmBtn>
     </CardProposing>
   )
 }

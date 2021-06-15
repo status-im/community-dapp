@@ -7,6 +7,7 @@ import { LinkExternal, LinkInternal } from './Link'
 import { Modal } from './Modal'
 import { CardModal } from './card/CardModal'
 import { VoteChart } from './votes/VoteChart'
+import { voteTypes } from './../constants/voteTypes'
 
 interface CardCommunityProps {
   community: CommunityDetail
@@ -38,93 +39,66 @@ export const CardCommunity = ({ community }: CardCommunityProps) => (
 )
 
 interface CardVoteProps {
-  voteHeading: string
-  votesAgainst: number
-  votesFor: number
-  votesAgainstIcon: string
-  votesForIcon: string
-  votesAgainstText: string
-  votesForText: string
-  timeLeft: string
-  voteWinner?: number
-  availableAmount: number
+  community: CommunityDetail
 }
 
-export const CardVote = ({
-  voteHeading,
-  votesAgainst,
-  votesFor,
-  votesAgainstIcon,
-  votesForIcon,
-  votesAgainstText,
-  votesForText,
-  timeLeft,
-  voteWinner,
-  availableAmount,
-}: CardVoteProps) => {
+export const CardVote = ({ community }: CardVoteProps) => {
   const [showModal, setShowModal] = useState(false)
-  const [votesModalText, setVotesModalText] = useState('')
-  const [voteTypeModal, setVoteTypeModal] = useState('')
+  const [selectedVoted, setSelectedVoted] = useState(voteTypes['Add'].for)
+
+  const vote = community.currentVoting
+
+  if (!vote) {
+    return <CardVoteBlock />
+  }
+
+  const voteConstants = voteTypes[vote.type]
+  let winner: number | undefined = undefined
+  if (vote?.timeLeft === 0) {
+    winner = vote.voteAgainst > vote.voteFor ? 2 : 1
+  }
 
   return (
     <CardVoteBlock>
-      {voteWinner ? (
+      {winner ? (
         <CardHeadingEndedVote>
           SNT holders have decided{' '}
           <b>
-            <u>{voteHeading}</u>
+            <u>{winner == 1 ? voteConstants.against.verb : voteConstants.for.verb}</u>
           </b>{' '}
           this community to the directory!
         </CardHeadingEndedVote>
       ) : (
-        <CardHeading>{voteHeading}</CardHeading>
+        <CardHeading>{voteConstants.question}</CardHeading>
       )}
-      <VoteChart
-        votesAgainst={votesAgainst}
-        votesFor={votesFor}
-        votesAgainstIcon={votesAgainstIcon}
-        votesForIcon={votesForIcon}
-        timeLeft={timeLeft}
-        voteWinner={voteWinner}
-      />
+      <VoteChart vote={vote} voteWinner={winner} />
 
-      {voteWinner ? (
+      {winner ? (
         <VoteBtnFinal>
           Finalize the vote <span>✍️</span>
         </VoteBtnFinal>
       ) : (
         <VotesBtns>
           {showModal && (
-            <Modal heading={voteTypeModal === 'for' ? 'Add ?' : 'Remove ?'} setShowModal={setShowModal}>
-              <CardModal
-                voteType={voteTypeModal}
-                votesAgainst={votesAgainst}
-                votesFor={votesFor}
-                votesAgainstIcon={votesAgainstIcon}
-                votesForIcon={votesForIcon}
-                timeLeft={timeLeft}
-                votesText={votesModalText}
-                availableAmount={availableAmount}
-              />{' '}
+            <Modal heading={`${vote?.type} ${community.name} ?`} setShowModal={setShowModal}>
+              <CardModal vote={vote} selectedVote={selectedVoted} availableAmount={65245346} />{' '}
             </Modal>
           )}
           <VoteBtn
             onClick={() => {
-              setVotesModalText('Vote not to add community')
-              setVoteTypeModal('against')
+              setSelectedVoted(voteConstants.against)
               setShowModal(true)
             }}
           >
-            {votesAgainstText} <span>{votesAgainstIcon}</span>
+            {voteConstants.against.text} <span>{voteConstants.against.icon}</span>
           </VoteBtn>
           <VoteBtn
             onClick={() => {
-              setVotesModalText('Vote to add community')
-              setVoteTypeModal('for')
+              setSelectedVoted(voteConstants.for)
               setShowModal(true)
             }}
           >
-            {votesForText} <span>{votesForIcon}</span>
+            {voteConstants.for.text} <span>{voteConstants.for.icon}</span>
           </VoteBtn>
         </VotesBtns>
       )}

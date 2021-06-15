@@ -1,5 +1,14 @@
 import { BigNumber } from 'ethers'
 
+export type CurrentVoting = {
+  // object describing current voting if community isnt under vote returns undefined
+  timeLeft: number // number of seconds left in vote if vote is waiting for finalization returns 0
+  type: 'Remove' | 'Add'
+  voteFor: BigNumber // number of snt for a vote
+  voteAgainst: BigNumber // number of snt against a vote
+  ID?: number // id of voting room
+}
+
 export type CommunityDetail = {
   publicKey: string // Address of a community
   ens: string // ens of a community
@@ -20,15 +29,7 @@ export type CommunityDetail = {
         }
       ]
     | []
-  currentVoting:
-    | {
-        // object describing current voting if community isnt under vote returns undefined
-        timeLeft: number // number of seconds left in vote if vote is waiting for finalization returns 0
-        type: 'Remove' | 'Add'
-        voteFor: BigNumber // number of snt for a vote
-        voteAgainst: BigNumber // number of snt against a vote
-      }
-    | undefined
+  currentVoting: CurrentVoting | undefined
   directoryInfo?: {
     // if community is in directory this object describes additional directory info
     additionDate: Date // date of addition to directory

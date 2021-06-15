@@ -16,32 +16,10 @@ interface VotingCardProps {
 }
 
 function VotingCard({ community }: VotingCardProps) {
-  let heading =
-    community.currentVoting?.type === 'Add' ? 'Add to Communities directory?' : 'Remove from Communities directory?'
-  let winner: number | undefined = undefined
-  if (community.currentVoting?.timeLeft === 0) {
-    winner = community.currentVoting.voteAgainst > community.currentVoting.voteFor ? 2 : 1
-    if (community.currentVoting?.type === 'Add') {
-      heading = winner === 1 ? 'not to add' : 'to add'
-    } else {
-      heading = winner === 1 ? 'to keep' : 'to remove'
-    }
-  }
   return (
     <Card>
       <CardCommunity community={community} />
-      <CardVote
-        voteWinner={winner}
-        voteHeading={heading}
-        votesAgainst={community?.currentVoting?.voteAgainst.toNumber() || 0}
-        votesFor={community?.currentVoting?.voteFor.toNumber() || 0}
-        votesAgainstIcon={community.currentVoting?.type === 'Add' ? '👎' : '📌'}
-        votesForIcon={community.currentVoting?.type === 'Add' ? '👍' : '🗑'}
-        votesAgainstText={community.currentVoting?.type === 'Add' ? "Don't add" : 'Keep'}
-        votesForText={community.currentVoting?.type === 'Add' ? 'Add' : 'Remove'}
-        timeLeft={(community.currentVoting?.timeLeft || 0) / 3600 + ' hours left'}
-        availableAmount={65245346}
-      />
+      <CardVote community={community} />
     </Card>
   )
 }

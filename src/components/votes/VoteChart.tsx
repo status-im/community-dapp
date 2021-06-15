@@ -3,45 +3,42 @@ import styled from 'styled-components'
 import { Colors } from '../../constants/styles'
 import indicatorIcon from '../../assets/images/indicator.svg'
 import { addCommas } from '../../helpers/addCommas'
+import { voteTypes } from './../../constants/voteTypes'
+import { CurrentVoting } from '../../models/community'
 
 export interface VoteChartProps {
-  votesAgainst: number
-  votesFor: number
-  votesAgainstIcon: string
-  votesForIcon: string
-  timeLeft: string
+  vote: CurrentVoting
   voteWinner?: number
 }
 
-export function VoteChart({
-  votesAgainst,
-  votesFor,
-  votesAgainstIcon,
-  votesForIcon,
-  timeLeft,
-  voteWinner,
-}: VoteChartProps) {
+export function VoteChart({ vote, voteWinner }: VoteChartProps) {
+  const voteConstants = voteTypes[vote.type]
+
   return (
     <Votes>
       <VotesChart>
         <VoteBox style={{ filter: voteWinner && voteWinner === 2 ? 'grayscale(1)' : 'none' }}>
-          <p style={{ fontSize: voteWinner === 1 ? '42px' : '24px' }}>{votesAgainstIcon}</p>
+          <p style={{ fontSize: voteWinner === 1 ? '42px' : '24px' }}>{voteConstants.against.icon}</p>
           <span>
             {' '}
-            {addCommas(votesAgainst)} <span style={{ fontWeight: 'normal' }}>SNT</span>
+            {addCommas(vote.voteAgainst.toNumber())} <span style={{ fontWeight: 'normal' }}>SNT</span>
           </span>
         </VoteBox>
-        <TimeLeft>{timeLeft}</TimeLeft>
+        <TimeLeft>{vote.timeLeft / 3600} Hours</TimeLeft>
         <VoteBox style={{ filter: voteWinner && voteWinner === 1 ? 'grayscale(1)' : 'none' }}>
-          <p style={{ fontSize: voteWinner === 2 ? '42px' : '24px' }}>{votesForIcon}</p>
+          <p style={{ fontSize: voteWinner === 2 ? '42px' : '24px' }}>{voteConstants.for.icon}</p>
           <span>
             {' '}
-            {addCommas(votesFor)} <span style={{ fontWeight: 'normal' }}>SNT</span>
+            {addCommas(vote.voteFor.toNumber())} <span style={{ fontWeight: 'normal' }}>SNT</span>
           </span>
         </VoteBox>
       </VotesChart>
 
-      <VoteGraphBar votesFor={votesFor} votesAgainst={votesAgainst} voteWinner={voteWinner} />
+      <VoteGraphBar
+        votesFor={vote.voteFor.toNumber()}
+        votesAgainst={vote.voteAgainst.toNumber()}
+        voteWinner={voteWinner}
+      />
     </Votes>
   )
 }
