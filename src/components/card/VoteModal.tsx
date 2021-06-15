@@ -13,6 +13,7 @@ export interface VoteModalProps {
     icon: string
     text: string
     verb: string
+    noun: string
   }
   availableAmount: number
   setShowConfirmModal: (show: boolean) => void
@@ -70,6 +71,13 @@ export function VoteModal({ vote, selectedVote, availableAmount, setShowConfirmM
           />
         </VoteProposingRangeWrap>
       </VoteProposing>
+      {vote?.type === 'Remove' && Number(proposingAmount) > 2000000 && vote.timeLeft / 3600 > 24 && (
+        <VoteWarning>
+          <span>⚠️</span>
+          <WarningText>{`Your vote will shorten vote duration! Votes over 2,000,000 SNT for ${selectedVote.noun} of the community shortens the vote duration to 24 hours.`}</WarningText>
+        </VoteWarning>
+      )}
+
       <VoteConfirmBtn
         onClick={() => setShowConfirmModal(true)}
       >{`Vote ${selectedVote.verb} community ${selectedVote.icon}`}</VoteConfirmBtn>
@@ -142,6 +150,29 @@ const VoteProposingRange = styled.input`
     border-radius: 50px;
     cursor: pointer;
   }
+`
+
+const VoteWarning = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 16px;
+  background: #ffeff2;
+  border-radius: 6px;
+  margin-bottom: 32px;
+
+  & > span {
+    font-size: 24px;
+    line-height: 32px;
+  }
+`
+
+const WarningText = styled.div`
+  max-width: 353px;
+  font-size: 12px;
+  line-height: 16px;
+  letter-spacing: 0.1px;
 `
 
 const VoteConfirmBtn = styled(ButtonSecondary)`

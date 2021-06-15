@@ -27,7 +27,7 @@ export const communities: Array<CommunityDetail> = [
     validForAddition: true,
     votingHistory: [],
     currentVoting: {
-      timeLeft: 28800,
+      timeLeft: 172800,
       type: 'Remove',
       voteFor: BigNumber.from(16740235),
       voteAgainst: BigNumber.from(6740235),
