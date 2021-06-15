@@ -10,6 +10,7 @@ import { VotingSortingOptions } from '../../constants/SortingOptions'
 import { ButtonSecondary } from '../Button'
 import { Colors } from '../../constants/styles'
 import { SpinnerIcon } from '../../assets/animatedIcons/spinnerIcon'
+import { useConfig } from '../../providers/config'
 
 interface VotingCardProps {
   community: CommunityDetail
@@ -25,8 +26,12 @@ function VotingCard({ community }: VotingCardProps) {
 }
 
 export function VotingCards() {
+  const { config } = useConfig()
   const [sortedBy, setSortedBy] = useState(VotingSortingEnum.EndingSoonest)
-  const { communities, loading } = useCommunities(getCommunitiesUnderVote, { numberPerPage: 2, sortedBy })
+  const { communities, loading } = useCommunities(getCommunitiesUnderVote, {
+    numberPerPage: config.numberPerPage,
+    sortedBy,
+  })
 
   return (
     <div>

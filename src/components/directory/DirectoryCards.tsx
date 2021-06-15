@@ -10,6 +10,7 @@ import { Search } from '../Input'
 import { PageBar } from '../PageBar'
 import { DirectorySortingOptions } from '../../constants/SortingOptions'
 import { SpinnerIcon } from '../../assets/animatedIcons/spinnerIcon'
+import { useConfig } from '../../providers/config'
 
 interface DirectoryCardProps {
   community: CommunityDetail
@@ -39,10 +40,11 @@ function DirectoryCard({ community }: DirectoryCardProps) {
 }
 
 export function DirectoryCards() {
+  const { config } = useConfig()
   const [filterKeyword, setFilterKeyword] = useState('')
   const [sortedBy, setSortedBy] = useState(DirectorySortingEnum.IncludedRecently)
   const { communities, loading } = useCommunities(getCommunitiesInDirectory, {
-    numberPerPage: 2,
+    numberPerPage: config.numberPerPage,
     sortedBy,
     filterKeyword,
   })
