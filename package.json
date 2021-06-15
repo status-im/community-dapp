@@ -6,8 +6,8 @@
   "repository": "git@github.com:EthWorks/status-community-dapp.git",
   "license": "MIT",
   "scripts": {
-    "build": "rm -rf dist && webpack --mode=production",
-    "start": "webpack serve --mode=development",
+    "build": "rm -rf dist && webpack --mode=production --env ENV=production",
+    "start": "webpack serve --mode=development --env ENV=development",
     "test": "mocha",
     "lint": "yarn lint:prettier --check && yarn lint:eslint",
     "lint:fix": "yarn lint:prettier --write && yarn lint:eslint --fix",
