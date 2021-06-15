@@ -13,7 +13,6 @@ export interface VoteChartProps {
 
 export function VoteChart({ vote, voteWinner }: VoteChartProps) {
   const voteConstants = voteTypes[vote.type]
-
   return (
     <Votes>
       <VotesChart>
@@ -24,7 +23,11 @@ export function VoteChart({ vote, voteWinner }: VoteChartProps) {
             {addCommas(vote.voteAgainst.toNumber())} <span style={{ fontWeight: 'normal' }}>SNT</span>
           </span>
         </VoteBox>
-        <TimeLeft>{vote.timeLeft / 3600} Hours</TimeLeft>
+        <TimeLeft>
+          {vote.timeLeft > 3600 * 24
+            ? `${Math.floor(vote.timeLeft / (3600 * 24))} Days`
+            : `${Math.floor(vote.timeLeft / 3600)} Hours`}
+        </TimeLeft>
         <VoteBox style={{ filter: voteWinner && voteWinner === 1 ? 'grayscale(1)' : 'none' }}>
           <p style={{ fontSize: voteWinner === 2 ? '42px' : '24px' }}>{voteConstants.for.icon}</p>
           <span>

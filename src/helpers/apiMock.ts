@@ -116,14 +116,14 @@ export function getCommunitiesUnderVoteSync(
       sortFunction = (a: CommunityDetail, b: CommunityDetail) => {
         if (!a.currentVoting) return 1
         if (!b.currentVoting) return -1
-        return a.currentVoting?.timeLeft < b?.currentVoting?.timeLeft ? -1 : 1
+        return a.currentVoting?.timeLeft > b?.currentVoting?.timeLeft ? -1 : 1
       }
       break
     case VotingSortingEnum.EndingSoonest:
       sortFunction = (a: CommunityDetail, b: CommunityDetail) => {
         if (!a.currentVoting) return -1
         if (!b.currentVoting) return 1
-        return a.currentVoting?.timeLeft < b?.currentVoting?.timeLeft ? 1 : -1
+        return a.currentVoting?.timeLeft > b?.currentVoting?.timeLeft ? 1 : -1
       }
       break
     case VotingSortingEnum.MostVotes:
