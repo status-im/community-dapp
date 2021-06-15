@@ -47,6 +47,7 @@ interface CardVoteProps {
   votesForText: string
   timeLeft: string
   voteWinner?: number
+  availableAmount: number
 }
 
 export const CardVote = ({
@@ -59,6 +60,7 @@ export const CardVote = ({
   votesForText,
   timeLeft,
   voteWinner,
+  availableAmount,
 }: CardVoteProps) => {
   const [showModal, setShowModal] = useState(false)
   const [votesModalText, setVotesModalText] = useState('')
@@ -102,6 +104,7 @@ export const CardVote = ({
                 votesForIcon={votesForIcon}
                 timeLeft={timeLeft}
                 votesText={votesModalText}
+                availableAmount={availableAmount}
               />{' '}
             </Modal>
           )}

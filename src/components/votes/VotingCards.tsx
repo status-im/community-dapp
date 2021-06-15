@@ -40,6 +40,7 @@ function VotingCard({ community }: VotingCardProps) {
         votesAgainstText={community.currentVoting?.type === 'Add' ? "Don't add" : 'Keep'}
         votesForText={community.currentVoting?.type === 'Add' ? 'Add' : 'Remove'}
         timeLeft={(community.currentVoting?.timeLeft || 0) / 3600 + ' hours left'}
+        availableAmount={65245346}
       />
     </Card>
   )
