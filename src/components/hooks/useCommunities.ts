@@ -26,7 +26,7 @@ export function useCommunities(API: APIFunction, options: APIOptions) {
       if (!scrollingElement?.scrollHeight || !scrollingElement?.scrollTop || !scrollingElement?.clientHeight) {
         return
       }
-      if (scrollingElement.scrollHeight - scrollingElement.scrollTop <= scrollingElement.clientHeight + 10) {
+      if (scrollingElement.scrollHeight - scrollingElement.scrollTop <= scrollingElement.clientHeight + 60) {
         setPage((prevPage) => prevPage + 1)
         window.removeEventListener('scroll', handleScroll)
       }
