@@ -1,18 +1,6 @@
 import { useState, useEffect } from 'react'
 import { CommunityDetail } from '../../models/community'
-
-type APIOptions = {
-  numberPerPage: number
-  sortedBy?: number
-  filterKeyword?: string
-}
-
-type APIFunction = (
-  numberPerPage: number,
-  pageNumber: number,
-  sortedBy?: number,
-  filterKeyword?: string
-) => Promise<{ page: number; communities: CommunityDetail[] }>
+import { APIOptions, APIFunction } from './../../models/api'
 
 export function useCommunities(API: APIFunction, options: APIOptions) {
   const [communities, setCommunities] = useState<CommunityDetail[]>([])
@@ -51,7 +39,7 @@ export function useCommunities(API: APIFunction, options: APIOptions) {
   useEffect(() => {
     const getCommunities = async () => {
       setLoading(true)
-      const communities = (await API(options.numberPerPage, 0, options.sortedBy, options.filterKeyword)).communities
+      const communities = (await API(0, options)).communities
       setCommunities(communities)
       setLoading(false)
       setIncrement(true)
@@ -61,13 +49,12 @@ export function useCommunities(API: APIFunction, options: APIOptions) {
     setPage(0)
     setIncrement(false)
     getCommunities()
-  }, [options.filterKeyword, options.sortedBy])
+  }, [options.filterKeyword, options.sortedBy, options.types])
 
   useEffect(() => {
     const updateCommunities = async () => {
       setLoading(true)
-      const newCommunities = (await API(options.numberPerPage, page, options.sortedBy, options.filterKeyword))
-        .communities
+      const newCommunities = (await API(page, options)).communities
       setCommunities((oldCommunities) => [...oldCommunities, ...newCommunities])
       if (newCommunities.length === options.numberPerPage) {
         setIncrement(true)

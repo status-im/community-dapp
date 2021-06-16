@@ -1,5 +1,6 @@
 import { communities, communitiesInDirectory, communitiesUnderVote } from './apiMockData'
 import { CommunityDetail, DirectorySortingEnum, VotingSortingEnum } from '../models/community'
+import { APIOptions } from '../models/api'
 
 export function getCommunityDetails(publicKey: string) {
   return communities.filter((community) => community.publicKey == publicKey)[0]
@@ -83,10 +84,8 @@ export function getCommunitiesInDirectorySync(
 }
 
 export async function getCommunitiesInDirectory(
-  numberPerPage: number,
   pageNumber: number,
-  sortedBy?: DirectorySortingEnum,
-  filterKeyword?: string
+  { numberPerPage, sortedBy, filterKeyword }: APIOptions
 ) {
   await new Promise((r) => setTimeout(r, 3000))
   return getCommunitiesInDirectorySync(numberPerPage, pageNumber, sortedBy, filterKeyword)
@@ -96,13 +95,24 @@ export function getCommunitiesUnderVoteSync(
   numberPerPage: number,
   pageNumber: number,
   sortedBy?: VotingSortingEnum,
-  filterKeyword?: string
+  filterKeyword?: string,
+  types: any = {
+    Add: true,
+    Remove: true,
+  }
 ) {
   const resolvedCommunities = communitiesUnderVote.map(
     (communityAddress) => communities.filter((e) => e.publicKey === communityAddress)[0]
   )
 
-  const filteredCommunities = filterCommunities(resolvedCommunities, filterKeyword)
+  const correctTypeCommunities = resolvedCommunities.filter((e) => {
+    if (!e.currentVoting) {
+      return false
+    }
+    return types[e.currentVoting.type]
+  })
+
+  const filteredCommunities = filterCommunities(correctTypeCommunities, filterKeyword)
 
   let sortFunction = undefined
   switch (sortedBy) {
@@ -160,11 +170,9 @@ export function getCommunitiesUnderVoteSync(
   }
 }
 export async function getCommunitiesUnderVote(
-  numberPerPage: number,
   pageNumber: number,
-  sortedBy?: VotingSortingEnum,
-  filterKeyword?: string
+  { numberPerPage, sortedBy, filterKeyword, types }: APIOptions
 ) {
   await new Promise((r) => setTimeout(r, 3000))
-  return getCommunitiesUnderVoteSync(numberPerPage, pageNumber, sortedBy, filterKeyword)
+  return getCommunitiesUnderVoteSync(numberPerPage, pageNumber, sortedBy, filterKeyword, types)
 }

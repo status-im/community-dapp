@@ -11,6 +11,7 @@ import { ButtonSecondary } from '../Button'
 import { Colors } from '../../constants/styles'
 import { SpinnerIcon } from '../../assets/animatedIcons/spinnerIcon'
 import { useConfig } from '../../providers/config'
+import { toggleField } from './../../helpers/objectOperations'
 
 interface VotingCardProps {
   community: CommunityDetail
@@ -28,9 +29,14 @@ function VotingCard({ community }: VotingCardProps) {
 export function VotingCards() {
   const { config } = useConfig()
   const [sortedBy, setSortedBy] = useState(VotingSortingEnum.EndingSoonest)
+  const [types, setTypes] = useState({
+    Add: true,
+    Remove: true,
+  })
   const { communities, loading } = useCommunities(getCommunitiesUnderVote, {
     numberPerPage: config.numberPerPage,
     sortedBy,
+    types,
   })
 
   return (
@@ -38,8 +44,18 @@ export function VotingCards() {
       <PageBar>
         <VoteFilter>
           <span>Vote types:</span>
-          <VoteType>Add</VoteType>
-          <VoteType>Remove</VoteType>
+          <VoteType
+            className={types['Add'] ? 'selected' : 'notSelected'}
+            onClick={() => setTypes((prev) => toggleField(prev, 'Add'))}
+          >
+            Add
+          </VoteType>
+          <VoteType
+            className={types['Remove'] ? 'selected' : 'notSelected'}
+            onClick={() => setTypes((prev) => toggleField(prev, 'Remove'))}
+          >
+            Remove
+          </VoteType>
         </VoteFilter>
         <FilterList value={sortedBy} setValue={setSortedBy} options={VotingSortingOptions} />
       </PageBar>
@@ -83,4 +99,8 @@ const VoteType = styled(ButtonSecondary)`
   color: ${Colors.VioletDark};
   line-height: 22px;
   padding: 5px 12px;
+
+  &.notSelected {
+    background: none;
+  }
 `
