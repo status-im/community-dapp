@@ -17,7 +17,9 @@ export function VoteChart({ vote, voteWinner }: VoteChartProps) {
     <Votes>
       <VotesChart>
         <VoteBox style={{ filter: voteWinner && voteWinner === 2 ? 'grayscale(1)' : 'none' }}>
-          <p style={{ fontSize: voteWinner === 1 ? '42px' : '24px' }}>{voteConstants.against.icon}</p>
+          <p style={{ fontSize: voteWinner === 1 ? '42px' : '24px', marginTop: voteWinner === 2 ? '18px' : '0' }}>
+            {voteConstants.against.icon}
+          </p>
           <span>
             {' '}
             {addCommas(vote.voteAgainst.toNumber())} <span style={{ fontWeight: 'normal' }}>SNT</span>
@@ -29,7 +31,9 @@ export function VoteChart({ vote, voteWinner }: VoteChartProps) {
             : `${Math.floor(vote.timeLeft / 3600)} Hours`}
         </TimeLeft>
         <VoteBox style={{ filter: voteWinner && voteWinner === 1 ? 'grayscale(1)' : 'none' }}>
-          <p style={{ fontSize: voteWinner === 2 ? '42px' : '24px' }}>{voteConstants.for.icon}</p>
+          <p style={{ fontSize: voteWinner === 2 ? '42px' : '24px', marginTop: voteWinner === 1 ? '18px' : '0' }}>
+            {voteConstants.for.icon}
+          </p>
           <span>
             {' '}
             {addCommas(vote.voteFor.toNumber())} <span style={{ fontWeight: 'normal' }}>SNT</span>
@@ -90,20 +94,18 @@ const VoteBox = styled.div`
   display: flex;
   flex-direction: column;
   align-content: center;
-  max-width: 100px;
   font-size: 12px;
-  line-height: 16px;
   text-align: center;
   font-weight: normal;
 
   & > p {
     font-size: 24px;
-    line-height: 24px;
-    margin-bottom: 8px;
+    line-height: 100%;
   }
 
   & > span {
     font-weight: bold;
+    margin-top: 8px;
   }
 `
 

@@ -33,7 +33,7 @@ export const CardCommunity = ({ community }: CardCommunityProps) => (
 
     <CardLinks>
       <LinkExternal>Visit community</LinkExternal>
-      <LinkExternal>View on Etherscan</LinkExternal>
+      <LinkExternal>Etherscan</LinkExternal>
       <LinkInternal>Voting history</LinkInternal>
     </CardLinks>
   </CardInfoBlock>
@@ -166,6 +166,7 @@ const CardHeadingEndedVote = styled.p`
   fint-weight: normal;
   font-size: 17px;
   line-height: 24px;
+  margin-bottom: 18px;
 `
 const CardText = styled.p`
   line-height: 22px;
@@ -211,6 +212,7 @@ const VotesBtns = styled.div`
   width: 100%;
 `
 export const VoteBtn = styled(ButtonSecondary)`
+  width: 187px;
   padding: 11px 46px;
   font-weight: 500;
   font-size: 15px;
