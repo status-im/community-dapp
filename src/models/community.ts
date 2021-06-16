@@ -20,14 +20,13 @@ export type CommunityDetail = {
   numberOfMembers: number // amount of members in community
   validForAddition: boolean // boolean of wheather community can be added to directory
   votingHistory:
-    | [
-        // list of objects describing previous votes
-        {
-          date: Date // date of vote
-          type: 'Remove' | 'Add' // string with type of vote
-          result: 'Passed' | 'Failed' // string with vote result
-        }
-      ]
+    | // list of objects describing previous votes
+    {
+        date: Date // date of vote
+        type: 'Remove' | 'Add' | 'Feature' // string with type of vote
+        result: 'Passed' | 'Failed' // string with vote result
+        ID: number // ID of vote on smart contract
+      }[]
     | []
   currentVoting: CurrentVoting | undefined
   directoryInfo?: {

@@ -14,30 +14,54 @@ interface CardCommunityProps {
   community: CommunityDetail
 }
 
-export const CardCommunity = ({ community }: CardCommunityProps) => (
-  <CardInfoBlock>
-    <Community>
-      <CardLogo src={community.icon} alt={`${community.name} logo`} />
-      <CommunityInfo>
-        <CardHeading>{community.name}</CardHeading>
-        <CardText>{community.description}</CardText>
-        <CardTags>
-          {community.tags.map((tag, key) => (
-            <Tag key={key}>
-              <p>{tag}</p>
-            </Tag>
-          ))}
-        </CardTags>
-      </CommunityInfo>
-    </Community>
-
-    <CardLinks>
-      <LinkExternal>Visit community</LinkExternal>
-      <LinkExternal>Etherscan</LinkExternal>
-      <LinkInternal>Voting history</LinkInternal>
-    </CardLinks>
-  </CardInfoBlock>
-)
+export const CardCommunity = ({ community }: CardCommunityProps) => {
+  const [showHistoryModal, setShowHistoryModal] = useState(false)
+  return (
+    <CardInfoBlock>
+      {showHistoryModal && (
+        <Modal heading={`${community.name} voting history`} setShowModal={setShowHistoryModal}>
+          <VoteHistoryTable>
+            <tbody>
+              <tr>
+                <VoteHistoryTableColumnCell>Date</VoteHistoryTableColumnCell>
+                <VoteHistoryTableColumnCell>Type</VoteHistoryTableColumnCell>
+                <VoteHistoryTableColumnCell>Result</VoteHistoryTableColumnCell>
+              </tr>
+              {community.votingHistory.map((vote) => {
+                return (
+                  <tr key={vote.ID}>
+                    <VoteHistoryTableCell>{vote.date.toLocaleDateString()}</VoteHistoryTableCell>
+                    <VoteHistoryTableCell>{vote.type}</VoteHistoryTableCell>
+                    <VoteHistoryTableCell>{vote.result}</VoteHistoryTableCell>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </VoteHistoryTable>
+        </Modal>
+      )}
+      <Community>
+        <CardLogo src={community.icon} alt={`${community.name} logo`} />
+        <CommunityInfo>
+          <CardHeading>{community.name}</CardHeading>
+          <CardText>{community.description}</CardText>
+          <CardTags>
+            {community.tags.map((tag, key) => (
+              <Tag key={key}>
+                <p>{tag}</p>
+              </Tag>
+            ))}
+          </CardTags>
+        </CommunityInfo>
+      </Community>
+      <CardLinks>
+        <LinkExternal>Visit community</LinkExternal>
+        <LinkExternal>Etherscan</LinkExternal>
+        <LinkInternal onClick={() => setShowHistoryModal(true)}>Voting history</LinkInternal>
+      </CardLinks>
+    </CardInfoBlock>
+  )
+}
 
 interface CardVoteProps {
   community: CommunityDetail
@@ -224,4 +248,21 @@ export const VoteBtn = styled(ButtonSecondary)`
 `
 const VoteBtnFinal = styled(VoteBtn)`
   width: 100%;
+`
+
+const VoteHistoryTable = styled.table`
+  width: 100%;
+`
+
+const VoteHistoryTableColumnCell = styled.td`
+  font-weight: bold;
+  padding-bottom: 24px;
+  padding-right: 112px;
+  width: 65px;
+`
+
+const VoteHistoryTableCell = styled.td`
+  width: 65px;
+  padding-bottom: 18px;
+  padding-right: 112px;
 `

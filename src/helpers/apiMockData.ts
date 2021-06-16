@@ -100,7 +100,32 @@ export const communities: Array<CommunityDetail> = [
       'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque interdum rutrum sodales. Nullam mattis fermentum libero, non volutpat.',
     numberOfMembers: 50,
     validForAddition: true,
-    votingHistory: [],
+    votingHistory: [
+      {
+        type: 'Add',
+        date: new Date('2021-03-16'),
+        result: 'Failed',
+        ID: 0,
+      },
+      {
+        type: 'Add',
+        date: new Date('2021-04-02'),
+        result: 'Passed',
+        ID: 1,
+      },
+      {
+        type: 'Feature',
+        date: new Date('2021-04-17'),
+        result: 'Failed',
+        ID: 2,
+      },
+      {
+        type: 'Remove',
+        date: new Date('2021-05-07'),
+        result: 'Passed',
+        ID: 3,
+      },
+    ],
     currentVoting: {
       timeLeft: 28800,
       type: 'Add',
