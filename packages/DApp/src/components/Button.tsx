@@ -34,8 +34,7 @@ export const ButtonSecondary = styled(Button)`
     background: ${Colors.VioletSecondaryDark};
   }
 
-  &:not(:disabled):active,
-  &:not(:disabled):focus {
+  &:not(:disabled):active {
     background: ${Colors.VioletSecondaryLight};
   }
 

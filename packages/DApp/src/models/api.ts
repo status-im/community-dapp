@@ -2,10 +2,7 @@ import { CommunityDetail } from './community'
 
 export type APIOptions = {
   numberPerPage: number
-  types?: {
-    Add: boolean
-    Remove: boolean
-  }
+  voteType?: string
   sortedBy?: number
   filterKeyword?: string
 }

@@ -96,23 +96,21 @@ export function getCommunitiesUnderVoteSync(
   pageNumber: number,
   sortedBy?: VotingSortingEnum,
   filterKeyword?: string,
-  types: any = {
-    Add: true,
-    Remove: true,
-  }
+  voteType?: string
 ) {
-  const resolvedCommunities = communitiesUnderVote.map(
+  let resolvedCommunities = communitiesUnderVote.map(
     (communityAddress) => communities.filter((e) => e.publicKey === communityAddress)[0]
   )
+  if (voteType) {
+    resolvedCommunities = resolvedCommunities.filter((e) => {
+      if (!e.currentVoting) {
+        return false
+      }
+      return e.currentVoting.type == voteType
+    })
+  }
 
-  const correctTypeCommunities = resolvedCommunities.filter((e) => {
-    if (!e.currentVoting) {
-      return false
-    }
-    return types[e.currentVoting.type]
-  })
-
-  const filteredCommunities = filterCommunities(correctTypeCommunities, filterKeyword)
+  const filteredCommunities = filterCommunities(resolvedCommunities, filterKeyword)
 
   let sortFunction = undefined
   switch (sortedBy) {
@@ -171,8 +169,8 @@ export function getCommunitiesUnderVoteSync(
 }
 export async function getCommunitiesUnderVote(
   pageNumber: number,
-  { numberPerPage, sortedBy, filterKeyword, types }: APIOptions
+  { numberPerPage, sortedBy, filterKeyword, voteType }: APIOptions
 ) {
   await new Promise((r) => setTimeout(r, 3000))
-  return getCommunitiesUnderVoteSync(numberPerPage, pageNumber, sortedBy, filterKeyword, types)
+  return getCommunitiesUnderVoteSync(numberPerPage, pageNumber, sortedBy, filterKeyword, voteType)
 }

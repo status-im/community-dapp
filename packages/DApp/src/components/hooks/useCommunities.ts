@@ -49,7 +49,7 @@ export function useCommunities(API: APIFunction, options: APIOptions) {
     setPage(0)
     setIncrement(false)
     getCommunities()
-  }, [options.filterKeyword, options.sortedBy, options.types])
+  }, [options.filterKeyword, options.sortedBy, options.voteType])
 
   useEffect(() => {
     const updateCommunities = async () => {

@@ -11,7 +11,7 @@ import { ButtonSecondary } from '../Button'
 import { Colors } from '../../constants/styles'
 import { SpinnerIcon } from '../../assets/animatedIcons/spinnerIcon'
 import { useConfig } from '../../providers/config'
-import { toggleField } from './../../helpers/objectOperations'
+// import { toggleField } from './../../helpers/objectOperations'
 
 interface VotingCardProps {
   community: CommunityDetail
@@ -33,14 +33,11 @@ function VotingCard({ community }: VotingCardProps) {
 export function VotingCards() {
   const { config } = useConfig()
   const [sortedBy, setSortedBy] = useState(VotingSortingEnum.EndingSoonest)
-  const [types, setTypes] = useState({
-    Add: true,
-    Remove: true,
-  })
+  const [voteType, setVoteType] = useState('')
   const { communities, loading } = useCommunities(getCommunitiesUnderVote, {
     numberPerPage: config.numberPerPage,
     sortedBy,
-    types,
+    voteType,
   })
 
   return (
@@ -48,16 +45,13 @@ export function VotingCards() {
       <PageBar>
         <VoteFilter>
           <span>Vote types:</span>
-          <VoteType
-            className={types['Add'] ? 'selected' : 'notSelected'}
-            onClick={() => setTypes((prev) => toggleField(prev, 'Add'))}
-          >
+          <VoteType className={voteType == '' ? 'selected' : 'notSelected'} onClick={() => setVoteType('')}>
+            All
+          </VoteType>
+          <VoteType className={voteType == 'Add' ? 'selected' : 'notSelected'} onClick={() => setVoteType('Add')}>
             Add
           </VoteType>
-          <VoteType
-            className={types['Remove'] ? 'selected' : 'notSelected'}
-            onClick={() => setTypes((prev) => toggleField(prev, 'Remove'))}
-          >
+          <VoteType className={voteType == 'Remove' ? 'selected' : 'notSelected'} onClick={() => setVoteType('Remove')}>
             Remove
           </VoteType>
         </VoteFilter>
@@ -93,7 +87,7 @@ const VoteFilter = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  width: 257px;
+  width: 315px;
   color: ${Colors.VioletDark};
 `
 
