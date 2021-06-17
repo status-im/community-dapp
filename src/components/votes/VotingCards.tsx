@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Card, CardCommunity, CardVote } from '../Card'
+import { Card, CardCommunity, CardCommunityWrap, CardVote } from '../Card'
 import { getCommunitiesUnderVote } from '../../helpers/apiMock'
 import { CommunityDetail, VotingSortingEnum } from '../../models/community'
 import styled from 'styled-components'
@@ -20,7 +20,11 @@ interface VotingCardProps {
 function VotingCard({ community }: VotingCardProps) {
   return (
     <Card>
-      <CardCommunity community={community} />
+      <CardCommunityWrap>
+        {' '}
+        <CardCommunity community={community} />
+      </CardCommunityWrap>
+
       <CardVote community={community} />
     </Card>
   )

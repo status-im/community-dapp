@@ -15,8 +15,12 @@ export const PageInfo = ({ heading, text }: PageInfoProps) => (
   </InfoBlock>
 )
 
-export function ProposeButton() {
-  return <ProposeButtonStyled>Propose community</ProposeButtonStyled>
+interface ProposeButtonProps {
+  onClick: () => void
+}
+
+export function ProposeButton({ onClick }: ProposeButtonProps) {
+  return <ProposeButtonStyled onClick={onClick}>Propose community</ProposeButtonStyled>
 }
 
 export function ConnectButton() {

@@ -38,13 +38,14 @@ const PopUpOverlay = styled.div`
   background-color: rgba(0, 0, 0, 0.4);
   z-index: 9999;
   transition: all 0.3s;
+  overflow: auto;
 `
 
 const PopUpWindow = styled.div`
   display: flex;
   flex-direction: column;
   max-width: 475px;
-  margin: 205px auto 0;
+  margin: 20vh auto 2vh;
   padding: 24px;
   background-color: ${Colors.GrayLight};
   box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.1);

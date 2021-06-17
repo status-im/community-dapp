@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Card, CardCommunity } from '../Card'
+import { Card, CardCommunity, CardCommunityWrap } from '../Card'
 import { CardFeature } from '../card/CardFeature'
 import styled from 'styled-components'
 import { CommunityDetail, DirectorySortingEnum } from '../../models/community'
@@ -26,7 +26,10 @@ function DirectoryCard({ community }: DirectoryCardProps) {
   }
   return (
     <Card>
-      <CardCommunity community={community} />
+      <CardCommunityWrap>
+        {' '}
+        <CardCommunity community={community} />
+      </CardCommunityWrap>
       <CardFeature
         heading="Feature this community?"
         text={timeLeft ? 'This community has to wait until it can be featured again' : 'Weekly Feature vote'}

@@ -152,16 +152,17 @@ export const Card = styled.div`
   display: flex;
   align-items: stretch;
 `
-
-const CardInfoBlock = styled.div`
+export const CardCommunityWrap = styled.div`
   width: 50%;
   margin: 13px 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   padding: 24px 24px 16px;
   box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
   border-radius: 6px 0px 0px 6px;
+`
+const CardInfoBlock = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 `
 
 const Community = styled.div`
