@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react'
+import React, { ReactNode, useEffect } from 'react'
 import styled from 'styled-components'
 import { Colors } from '../constants/styles'
 import closeIcon from '../assets/images/close.svg'
@@ -10,6 +10,12 @@ type ModalProps = {
 }
 
 export function Modal({ heading, children, setShowModal }: ModalProps) {
+  useEffect(() => {
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = 'unset'
+    }
+  }, [])
   return (
     <PopUpOverlay onClick={() => setShowModal(false)}>
       <PopUpWindow onClick={(e) => e.stopPropagation()}>
