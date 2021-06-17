@@ -1,6 +1,19 @@
 {
-  "semi": false,
   "singleQuote": true,
   "printWidth": 120,
-  "bracketSpacing": true
+  "bracketSpacing": true,
+  "overrides": [
+    {
+      "files": ["*.ts","*.tsx"],
+      "options": {
+        "semi": false
+      }
+    },
+    {
+      "files": ["*.sol"],
+      "options": {
+        "semi": true
+      }
+    }
+  ]
 }
