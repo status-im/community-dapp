@@ -12,42 +12,50 @@ export function TopBar() {
 
   return (
     <Header>
-      <Logo />
-      <MenuContent>
-        <nav>
-          <NavLinks>
-            <NavItem>
-              <StyledNavLink activeClassName="active-page" to="/votes">
-                Votes
-              </StyledNavLink>
-            </NavItem>
-            <NavItem>
-              <StyledNavLink activeClassName="active-page" to="/directory">
-                Directory
-              </StyledNavLink>
-            </NavItem>
-            <NavItem>
-              <StyledNavLink activeClassName="active-page" to="/info">
-                Info
-              </StyledNavLink>
-            </NavItem>
-          </NavLinks>
-        </nav>
+      <HeaderWrapper>
+        <Logo />
+        <MenuContent>
+          <Navigation>
+            <NavLinks>
+              <NavItem>
+                <StyledNavLink activeClassName="active-page" to="/votes">
+                  Votes
+                </StyledNavLink>
+              </NavItem>
+              <NavItem>
+                <StyledNavLink activeClassName="active-page" to="/directory">
+                  Directory
+                </StyledNavLink>
+              </NavItem>
+              <NavItem>
+                <StyledNavLink activeClassName="active-page" to="/info">
+                  Info
+                </StyledNavLink>
+              </NavItem>
+            </NavLinks>
+          </Navigation>
 
-        {account ? <Account>{shortenAddress(account)}</Account> : <ButtonConnect>Connect</ButtonConnect>}
-      </MenuContent>
+          {account ? <Account>{shortenAddress(account)}</Account> : <ButtonConnect>Connect</ButtonConnect>}
+        </MenuContent>
+      </HeaderWrapper>
     </Header>
   )
 }
 
 const Header = styled.header`
+  height: 96px;
+  background-color: ${Colors.GrayLight};
+  border-bottom: 1px solid rgba(189, 93, 226, 0.15);
+`
+
+const HeaderWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 96px;
+  max-width: 1440px;
+  height: 100%;
   padding: 0 40px;
-  background-color: ${Colors.GrayLight};
-  border-bottom: 1px solid rgba(189, 93, 226, 0.15);
+  margin: 0 auto;
 `
 
 const MenuContent = styled.div`
@@ -60,20 +68,21 @@ const MenuContent = styled.div`
   background-color: ${Colors.GrayLight};
 `
 
+const Navigation = styled.nav`
+  max-width: 500px;
+  width: 100%;
+`
+
 const NavLinks = styled.ul`
   display: flex;
-  align-self: stre
-  height:100%;
+  justify-content: space-between;
+  height: 100%;
   color: ${Colors.Black};
 `
 
 const NavItem = styled.li`
   width: 124px;
   text-align: center;
-
-  & + & {
-    margin-left: 64px;
-  }
 `
 
 const StyledNavLink = styled(NavLink)`

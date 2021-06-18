@@ -20,7 +20,8 @@ const LogoIcon = styled.span`
   line-height: 38px;
 `
 
-const LogoText = styled.p`
+const LogoText = styled.div`
+  width: 180px;
   font-weight: 600;
   font-size: 17px;
   line-height: 18px;
