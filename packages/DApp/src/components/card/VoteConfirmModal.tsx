@@ -61,7 +61,7 @@ const EtherscanLink = styled(LinkExternal)`
   margin-bottom: 32px;
 `
 
-const ConfirmBtn = styled(ButtonSecondary)`
+export const ConfirmBtn = styled(ButtonSecondary)`
   width: 100%;
   padding: 11px 0;
   font-weight: 500;

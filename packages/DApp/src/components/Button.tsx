@@ -23,6 +23,7 @@ export const ButtonPrimary = styled(Button)`
 
   &:disabled {
     background: ${Colors.GrayDisabledDark};
+    color: ${Colors.GreyTextDisabled};
   }
 `
 export const ButtonSecondary = styled(Button)`

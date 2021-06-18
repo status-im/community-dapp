@@ -14,6 +14,7 @@ export const Colors = {
   GrayDisabledDark: '#888888',
   GrayDisabledLight: '#F3F3F3',
   GreyText: '#939BA1',
+  GreyTextDisabled: '#B1B1B1',
   GrayLight: '#FBFCFE',
   GrayBorder: '#EEF2F5',
   ShadowCard: '0px 2px 12px rgba(0, 0, 0, 0.15)',

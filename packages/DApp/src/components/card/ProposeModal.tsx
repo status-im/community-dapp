@@ -5,6 +5,8 @@ import { ButtonPrimary } from '../Button'
 import { CardCommunity } from '../Card'
 import { Input } from '../Input'
 import { VotePropose } from '../votes/VotePropose'
+import { Warning } from '../votes/VoteWarning'
+import { ConfirmBtn } from './VoteConfirmModal'
 
 interface ProposeModalProps {
   availableAmount: number
@@ -32,9 +34,18 @@ export function ProposeModal({ availableAmount, setShowConfirmModal, setPublicKe
       {publicKey && communityFound && (
         <div>
           <CardCommunity community={communityFound} />
-          <VoteProposeWrap>
-            <VotePropose availableAmount={availableAmount} />
-          </VoteProposeWrap>
+          {communityFound.validForAddition ? (
+            <VoteProposeWrap>
+              <VotePropose availableAmount={availableAmount} />
+            </VoteProposeWrap>
+          ) : (
+            <WarningWrap>
+              <Warning
+                icon="🤏"
+                text={`${communityFound.name} currently only has ${communityFound.numberOfMembers} members. A community needs more than 42 members before a vote to be added to the Status community directory can be proposed.`}
+              />
+            </WarningWrap>
+          )}
         </div>
       )}
 
@@ -45,14 +56,25 @@ export function ProposeModal({ availableAmount, setShowConfirmModal, setPublicKe
         </ProposingInfo>
       )}
 
-      <ProposingBtn
-        type="submit"
-        disabled={!communityFound}
-        onSubmit={() => setShowConfirmModal(true)}
-        onClick={() => setShowConfirmModal(true)}
-      >
-        Confirm vote to add community
-      </ProposingBtn>
+      {communityFound && !communityFound.validForAddition ? (
+        <ConfirmBtn
+          onClick={() => {
+            setShowConfirmModal(false)
+            setPublicKey('')
+          }}
+        >
+          OK, let’s move on! <span>🤙</span>
+        </ConfirmBtn>
+      ) : (
+        <ProposingBtn
+          type="submit"
+          disabled={!communityFound}
+          onSubmit={() => setShowConfirmModal(true)}
+          onClick={() => setShowConfirmModal(true)}
+        >
+          Confirm vote to add community
+        </ProposingBtn>
+      )}
     </CommunityProposing>
   )
 }
@@ -103,4 +125,7 @@ const InfoText = styled.div`
 const ProposingBtn = styled(ButtonPrimary)`
   width: 100%;
   padding: 11px 0;
+`
+const WarningWrap = styled.div`
+  margin: 24px 0;
 `

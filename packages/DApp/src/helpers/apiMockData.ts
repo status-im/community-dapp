@@ -23,8 +23,8 @@ export const communities: Array<CommunityDetail> = [
     icon: 'https://static.coindesk.com/wp-content/uploads/2021/01/cryptopunk.jpg',
     tags: ['nfts', 'collectables', 'cryptopunks', 'quite long', 'funny', 'very long tag', 'short'],
     description: 'Owners of CryptoPunks, marketplace. Nullam mattis mattis mattis fermentum libero.',
-    numberOfMembers: 50,
-    validForAddition: true,
+    numberOfMembers: 4,
+    validForAddition: false,
     votingHistory: [],
     currentVoting: {
       timeLeft: 172800,

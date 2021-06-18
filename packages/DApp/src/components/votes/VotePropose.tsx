@@ -5,6 +5,7 @@ import { Colors } from '../../constants/styles'
 import { addCommas } from '../../helpers/addCommas'
 import { CurrentVoting } from '../../models/community'
 import { Input } from '../Input'
+import { Warning } from './VoteWarning'
 
 export interface VoteProposingProps {
   vote?: CurrentVoting
@@ -65,10 +66,10 @@ export function VotePropose({ vote, selectedVote, availableAmount }: VoteProposi
       </VoteProposingRangeWrap>
 
       {vote?.type === 'Remove' && Number(proposingAmount) > 2000000 && vote.timeLeft / 3600 > 24 && (
-        <VoteWarning>
-          <span>⚠️</span>
-          <WarningText>{`Your vote will shorten vote duration! Votes over 2,000,000 SNT for ${selectedVote?.noun} of the community shortens the vote duration to 24 hours.`}</WarningText>
-        </VoteWarning>
+        <Warning
+          icon="⚠️"
+          text={`Your vote will shorten vote duration! Votes over 2,000,000 SNT for ${selectedVote?.noun} of the community shortens the vote duration to 24 hours.`}
+        />
       )}
     </VoteProposing>
   )
@@ -133,27 +134,4 @@ const VoteProposingRange = styled.input`
     border-radius: 50px;
     cursor: pointer;
   }
-`
-
-const VoteWarning = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  padding: 16px;
-  background: #ffeff2;
-  border-radius: 6px;
-  margin-bottom: 32px;
-
-  & > span {
-    font-size: 24px;
-    line-height: 32px;
-  }
-`
-
-const WarningText = styled.div`
-  max-width: 353px;
-  font-size: 12px;
-  line-height: 16px;
-  letter-spacing: 0.1px;
 `
