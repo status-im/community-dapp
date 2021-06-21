@@ -25,7 +25,32 @@ export const communities: Array<CommunityDetail> = [
     description: 'Owners of CryptoPunks, marketplace. Nullam mattis mattis mattis fermentum libero.',
     numberOfMembers: 4,
     validForAddition: false,
-    votingHistory: [],
+    votingHistory: [
+      {
+        type: 'Add',
+        date: new Date('2021-03-16'),
+        result: 'Failed',
+        ID: 0,
+      },
+      {
+        type: 'Add',
+        date: new Date('2021-04-02'),
+        result: 'Passed',
+        ID: 1,
+      },
+      {
+        type: 'Feature',
+        date: new Date('2021-04-17'),
+        result: 'Failed',
+        ID: 2,
+      },
+      {
+        type: 'Remove',
+        date: new Date('2021-05-07'),
+        result: 'Passed',
+        ID: 3,
+      },
+    ],
     currentVoting: {
       timeLeft: 172800,
       type: 'Remove',

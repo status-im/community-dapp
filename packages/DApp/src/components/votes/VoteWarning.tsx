@@ -24,6 +24,7 @@ const VoteWarning = styled.div`
   background: #ffeff2;
   border-radius: 6px;
   margin-bottom: 32px;
+  margin-right: 11px;
 
   & > span {
     font-size: 24px;

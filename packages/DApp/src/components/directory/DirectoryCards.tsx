@@ -24,11 +24,12 @@ function DirectoryCard({ community }: DirectoryCardProps) {
   if (community.directoryInfo.untilNextFeature) {
     timeLeft = `${community.directoryInfo.untilNextFeature / (3600 * 24 * 7)} weeks left`
   }
+
   return (
     <Card>
       <CardCommunityWrap>
         {' '}
-        <CardCommunity community={community} />
+        <CardCommunity community={community} showRemoveButton={true} />
       </CardCommunityWrap>
       <CardFeature
         heading="Feature this community?"

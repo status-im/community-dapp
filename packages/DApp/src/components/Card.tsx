@@ -9,13 +9,24 @@ import { VoteModal } from './card/VoteModal'
 import { VoteChart } from './votes/VoteChart'
 import { voteTypes } from './../constants/voteTypes'
 import { VoteConfirmModal } from './card/VoteConfirmModal'
+import binIcon from '../assets/images/bin.svg'
+import { RemoveModal } from './card/RemoveModal'
 
 interface CardCommunityProps {
   community: CommunityDetail
+  showRemoveButton?: boolean
 }
 
-export const CardCommunity = ({ community }: CardCommunityProps) => {
+export const CardCommunity = ({ community, showRemoveButton }: CardCommunityProps) => {
   const [showHistoryModal, setShowHistoryModal] = useState(false)
+  const [showRemoveModal, setShowRemoveModal] = useState(false)
+  const [showConfirmModal, setShowConfirmModal] = useState(false)
+
+  const setNewModal = (val: boolean) => {
+    setShowConfirmModal(val)
+    setShowRemoveModal(false)
+  }
+
   return (
     <CardInfoBlock>
       {showHistoryModal && (
@@ -40,10 +51,28 @@ export const CardCommunity = ({ community }: CardCommunityProps) => {
           </VoteHistoryTable>
         </Modal>
       )}
+      {showRemoveModal && (
+        <Modal
+          heading="Remove from Communities directory?"
+          setShowModal={(val: boolean) => {
+            setShowRemoveModal(val)
+          }}
+        >
+          <RemoveModal community={community} availableAmount={549739700} setShowConfirmModal={setNewModal} />{' '}
+        </Modal>
+      )}
+      {showConfirmModal && (
+        <Modal setShowModal={setNewModal}>
+          <VoteConfirmModal community={community} selectedVote={{ verb: 'to remove' }} setShowModal={setNewModal} />
+        </Modal>
+      )}
       <Community>
         <CardLogo src={community.icon} alt={`${community.name} logo`} />
         <CommunityInfo>
-          <CardHeading>{community.name}</CardHeading>
+          <CardTop>
+            <CardHeading>{community.name}</CardHeading>
+            {community.directoryInfo && showRemoveButton && <RemoveBtn onClick={() => setShowRemoveModal(true)} />}
+          </CardTop>
           <CardText>{community.description}</CardText>
           <CardTags>
             {community.tags.map((tag, key) => (
@@ -184,9 +213,23 @@ const CardLogo = styled.img`
 export const CardHeading = styled.h2`
   font-weight: bold;
   font-size: 17px;
-  line-height: 24px;
-  margin-bottom: 8px;
 `
+
+const CardTop = styled.div`
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  line-height: 24px;
+`
+
+const RemoveBtn = styled.button`
+  width: 16px;
+  height: 16px;
+  margin-left: 16px;
+  background-image: url(${binIcon});
+  background-size: cover;
+`
+
 const CardHeadingEndedVote = styled.p`
   fint-weight: normal;
   font-size: 17px;

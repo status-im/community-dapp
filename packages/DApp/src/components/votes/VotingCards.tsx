@@ -11,7 +11,6 @@ import { ButtonSecondary } from '../Button'
 import { Colors } from '../../constants/styles'
 import { SpinnerIcon } from '../../assets/animatedIcons/spinnerIcon'
 import { useConfig } from '../../providers/config'
-// import { toggleField } from './../../helpers/objectOperations'
 
 interface VotingCardProps {
   community: CommunityDetail
