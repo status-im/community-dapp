@@ -16,8 +16,8 @@ export interface VoteProposingProps {
 }
 
 export function VotePropose({ vote, selectedVote, availableAmount }: VoteProposingProps) {
-  const [proposingAmount, setProposingAmount] = useState(0)
-  const [displayAmount, setDisplayAmount] = useState('0 SNT')
+  const [proposingAmount, setProposingAmount] = useState(availableAmount)
+  const [displayAmount, setDisplayAmount] = useState(`${addCommas(availableAmount)} SNT`)
 
   let step = 10 ** (Math.floor(Math.log10(availableAmount)) - 2)
   if (availableAmount < 100) {

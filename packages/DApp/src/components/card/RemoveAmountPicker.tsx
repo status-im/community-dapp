@@ -56,9 +56,13 @@ export function RemoveAmountPicker({ community, availableAmount, setShowConfirmM
   return (
     <VoteProposeWrap>
       <VotePropose availableAmount={availableAmount} />
-      <ProposingBtn type="submit" onSubmit={() => setShowConfirmModal(true)} onClick={() => setShowConfirmModal(true)}>
+      <VoteConfirmBtn
+        type="submit"
+        onSubmit={() => setShowConfirmModal(true)}
+        onClick={() => setShowConfirmModal(true)}
+      >
         Confirm vote to remove community
-      </ProposingBtn>
+      </VoteConfirmBtn>
     </VoteProposeWrap>
   )
 }
@@ -72,7 +76,7 @@ const WarningWrapRemoval = styled.div`
   margin-top: 32px;
 `
 
-const ProposingBtn = styled(ButtonPrimary)`
+const VoteConfirmBtn = styled(ButtonPrimary)`
   width: 100%;
   padding: 11px 0;
 `

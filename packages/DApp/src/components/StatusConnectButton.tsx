@@ -4,7 +4,7 @@ import { useEthers } from '@usedapp/core'
 import styled from 'styled-components'
 import { Modal } from './Modal'
 import { LinkExternal } from './Link'
-import statusLogo from '../assets/images/statusLogo.png'
+import statusLogo from '../assets/images/statusLogo.svg'
 
 export type StatusConnectButtonProps = {
   children: ReactNode

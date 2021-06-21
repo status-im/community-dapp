@@ -44,7 +44,7 @@ export const FilterList = ({ value, setValue, options }: FilterListProps) => {
 const Filter = styled.button`
   display: flex;
   align-items: center;
-  padding: 0 5px;
+  padding: 0 9px;
   font-weight: 500;
   font-size: 15px;
   line-height: 22px;
@@ -107,6 +107,7 @@ const SelectOptions = styled.div`
   border-radius: 16px 4px 16px 16px;
 
   &.opened {
+    margin-right: -10px;
     opacity: 1;
     background: ${Colors.White};
     visibility: visible;

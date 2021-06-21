@@ -31,7 +31,7 @@ export const InfoWrap = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  max-width: 693px;
+  max-width: 630px;
   padding: 48px 0;
   margin: 0 auto;
 `
