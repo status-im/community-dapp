@@ -67,7 +67,11 @@ export const CardCommunity = ({ community, showRemoveButton }: CardCommunityProp
         </Modal>
       )}
       <Community>
-        <CardLogo src={community.icon} alt={`${community.name} logo`} />
+        <CardLogoWrap>
+          {' '}
+          <CardLogo src={community.icon} alt={`${community.name} logo`} />
+        </CardLogoWrap>
+
         <CommunityInfo>
           <CardTop>
             <CardHeading>{community.name}</CardHeading>
@@ -131,47 +135,49 @@ export const CardVote = ({ community }: CardVoteProps) => {
       ) : (
         <CardHeading>{voteConstants.question}</CardHeading>
       )}
-      <VoteChart vote={vote} voteWinner={winner} />
+      <div>
+        <VoteChart vote={vote} voteWinner={winner} />
 
-      {winner ? (
-        <VoteBtnFinal>
-          Finalize the vote <span>✍️</span>
-        </VoteBtnFinal>
-      ) : (
-        <VotesBtns>
-          {showVoteModal && (
-            <Modal heading={`${vote?.type} ${community.name} ?`} setShowModal={setShowVoteModal}>
-              <VoteModal
-                vote={vote}
-                selectedVote={selectedVoted}
-                availableAmount={65245346}
-                setShowConfirmModal={setNext}
-              />{' '}
-            </Modal>
-          )}
-          {showConfirmModal && (
-            <Modal setShowModal={setShowConfirmModal}>
-              <VoteConfirmModal community={community} selectedVote={selectedVoted} setShowModal={setNext} />
-            </Modal>
-          )}
-          <VoteBtn
-            onClick={() => {
-              setSelectedVoted(voteConstants.against)
-              setShowVoteModal(true)
-            }}
-          >
-            {voteConstants.against.text} <span>{voteConstants.against.icon}</span>
-          </VoteBtn>
-          <VoteBtn
-            onClick={() => {
-              setSelectedVoted(voteConstants.for)
-              setShowVoteModal(true)
-            }}
-          >
-            {voteConstants.for.text} <span>{voteConstants.for.icon}</span>
-          </VoteBtn>
-        </VotesBtns>
-      )}
+        {winner ? (
+          <VoteBtnFinal>
+            Finalize the vote <span>✍️</span>
+          </VoteBtnFinal>
+        ) : (
+          <VotesBtns>
+            {showVoteModal && (
+              <Modal heading={`${vote?.type} ${community.name} ?`} setShowModal={setShowVoteModal}>
+                <VoteModal
+                  vote={vote}
+                  selectedVote={selectedVoted}
+                  availableAmount={65245346}
+                  setShowConfirmModal={setNext}
+                />{' '}
+              </Modal>
+            )}
+            {showConfirmModal && (
+              <Modal setShowModal={setShowConfirmModal}>
+                <VoteConfirmModal community={community} selectedVote={selectedVoted} setShowModal={setNext} />
+              </Modal>
+            )}
+            <VoteBtn
+              onClick={() => {
+                setSelectedVoted(voteConstants.against)
+                setShowVoteModal(true)
+              }}
+            >
+              {voteConstants.against.text} <span>{voteConstants.against.icon}</span>
+            </VoteBtn>
+            <VoteBtn
+              onClick={() => {
+                setSelectedVoted(voteConstants.for)
+                setShowVoteModal(true)
+              }}
+            >
+              {voteConstants.for.text} <span>{voteConstants.for.icon}</span>
+            </VoteBtn>
+          </VotesBtns>
+        )}
+      </div>
     </CardVoteBlock>
   )
 }
@@ -204,12 +210,18 @@ const CommunityInfo = styled.div`
   flex-direction: column;
 `
 
+const CardLogoWrap = styled.div`
+  width: 64px !important;
+  height: 64px !important;
+  object-fit: cover;
+  margin-right: 16px;
+`
 const CardLogo = styled.img`
   width: 64px !important;
   height: 64px !important;
   border-radius: 50%;
-  margin-right: 16px;
 `
+
 export const CardHeading = styled.h2`
   font-weight: bold;
   font-size: 17px;
@@ -246,7 +258,7 @@ const CardTags = styled.div`
   flex-wrap: wrap;
 `
 const Tag = styled.div`
-  margin: 5px;
+  margin: 0 8px 8px 0;
   padding: 0 10px;
   border: 1px solid ${Colors.VioletDark};
   box-sizing: border-box;

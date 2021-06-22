@@ -118,12 +118,26 @@ const ButtonConnect = styled(StatusConnectButton)`
   padding: 10px 27px;
 `
 const Account = styled.button`
+  position: relative;
   font-weight: 500;
   font-size: 13px;
   line-height: 22px;
   color: ${Colors.Black};
-  padding: 11px 12px 11px 17px;
+  padding: 11px 12px 11px 28px;
   background: ${Colors.White};
   border: 1px solid ${Colors.GrayBorder};
   border-radius: 21px;
+
+  &::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    position: absolute;
+    top: 50%;
+    left: 17px;
+    transform: translate(-50%, -50%);
+    background-color: ${Colors.Green};
+    bacground-position: center;
+    border-radius: 50%;
+  }
 `
