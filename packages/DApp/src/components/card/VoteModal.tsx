@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
 import { VoteChart } from '../votes/VoteChart'
 import { ButtonSecondary } from '../Button'
@@ -18,13 +18,24 @@ export interface VoteModalProps {
 }
 
 export function VoteModal({ vote, selectedVote, availableAmount, setShowConfirmModal }: VoteModalProps) {
+  const [proposingAmount, setProposingAmount] = useState(availableAmount)
+  const disabled = proposingAmount === 0
+
   return (
     <CardProposing>
       <VoteChart vote={vote} />
-      <VotePropose vote={vote} selectedVote={selectedVote} availableAmount={availableAmount} />
+      <VotePropose
+        vote={vote}
+        selectedVote={selectedVote}
+        availableAmount={availableAmount}
+        setProposingAmount={setProposingAmount}
+        proposingAmount={proposingAmount}
+        disabled={disabled}
+      />
 
       <VoteConfirmBtn
         onClick={() => setShowConfirmModal(true)}
+        disabled={disabled}
       >{`Vote ${selectedVote.verb} community ${selectedVote.icon}`}</VoteConfirmBtn>
     </CardProposing>
   )

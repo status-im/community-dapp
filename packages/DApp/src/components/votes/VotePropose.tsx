@@ -13,10 +13,19 @@ export interface VoteProposingProps {
     noun: string
   }
   availableAmount: number
+  setProposingAmount: (show: number) => void
+  proposingAmount: number
+  disabled?: boolean
 }
 
-export function VotePropose({ vote, selectedVote, availableAmount }: VoteProposingProps) {
-  const [proposingAmount, setProposingAmount] = useState(availableAmount)
+export function VotePropose({
+  vote,
+  selectedVote,
+  availableAmount,
+  proposingAmount,
+  disabled,
+  setProposingAmount,
+}: VoteProposingProps) {
   const [displayAmount, setDisplayAmount] = useState(`${addCommas(availableAmount)} SNT`)
 
   let step = 10 ** (Math.floor(Math.log10(availableAmount)) - 2)
@@ -24,10 +33,14 @@ export function VotePropose({ vote, selectedVote, availableAmount }: VoteProposi
     step = 1
   }
 
+  const setAvailableAmount = () => {
+    setProposingAmount(availableAmount)
+    setDisplayAmount(addCommas(availableAmount) + ' SNT')
+  }
+
   const sliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (Number(e.target.value) == step * Math.floor(availableAmount / step)) {
-      setProposingAmount(availableAmount)
-      setDisplayAmount(addCommas(availableAmount) + ' SNT')
+      setAvailableAmount()
     } else {
       setProposingAmount(Number(e.target.value))
       setDisplayAmount(addCommas(Number(e.target.value)) + ' SNT')
@@ -35,6 +48,14 @@ export function VotePropose({ vote, selectedVote, availableAmount }: VoteProposi
   }
 
   const progress = (proposingAmount / availableAmount) * 100 + '%'
+
+  const onInputAmountBlur = () => {
+    if (proposingAmount > availableAmount) {
+      setAvailableAmount()
+    } else {
+      setDisplayAmount(addCommas(proposingAmount) + ' SNT')
+    }
+  }
 
   return (
     <VoteProposing>
@@ -48,7 +69,7 @@ export function VotePropose({ vote, selectedVote, availableAmount }: VoteProposi
           setProposingAmount(Number(e.currentTarget.value))
           setDisplayAmount(e.currentTarget.value)
         }}
-        onBlur={() => setDisplayAmount(addCommas(proposingAmount) + ' SNT')}
+        onBlur={onInputAmountBlur}
         onFocus={() => setDisplayAmount(proposingAmount.toString())}
       />
       <VoteProposingRangeWrap>
@@ -59,8 +80,11 @@ export function VotePropose({ vote, selectedVote, availableAmount }: VoteProposi
           step={step}
           value={proposingAmount}
           onChange={sliderChange}
+          isDisabled={disabled}
           style={{
-            background: `linear-gradient(90deg, ${Colors.VioletDark} 0% ${progress},  ${Colors.VioletSecondary} ${progress} 100%)`,
+            background: disabled
+              ? Colors.GrayDisabledLight
+              : `linear-gradient(90deg, ${Colors.VioletDark} 0% ${progress},  ${Colors.VioletSecondary} ${progress} 100%)`,
           }}
         />
       </VoteProposingRangeWrap>
@@ -107,7 +131,7 @@ const VoteProposingRangeWrap = styled.div`
   margin-bottom: 32px;
 `
 
-const VoteProposingRange = styled.input`
+const VoteProposingRange = styled.input<{ isDisabled?: boolean }>`
   appearance: none;
   width: 100%;
   height: 4px;
@@ -122,14 +146,14 @@ const VoteProposingRange = styled.input`
     width: 20px;
     height: 20px;
     border-radius: 50%;
-    background: ${Colors.Violet};
+    background: ${({ isDisabled }) => (isDisabled ? Colors.GrayDisabledDark : Colors.Violet)};
     cursor: pointer;
   }
 
   &::-moz-range-thumb {
     width: 20px;
     height: 20px;
-    background: ${Colors.Violet};
+    background: ${({ isDisabled }) => (isDisabled ? Colors.GrayDisabledDark : Colors.Violet)};
     border: 0.5px solid rgba(0, 0, 0, 0);
     border-radius: 50px;
     cursor: pointer;

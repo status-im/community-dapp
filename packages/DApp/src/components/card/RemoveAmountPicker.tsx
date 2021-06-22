@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
 import { timespan } from '../../helpers/timespan'
 import { CommunityDetail } from '../../models/community'
@@ -14,6 +14,7 @@ interface RemoveAmountPickerProps {
 }
 
 export function RemoveAmountPicker({ community, availableAmount, setShowConfirmModal }: RemoveAmountPickerProps) {
+  const [proposingAmount, setProposingAmount] = useState(availableAmount)
   const lastVote = community.votingHistory[community.votingHistory.length - 1]
   const lastVoteDate = lastVote.date
 
@@ -55,14 +56,12 @@ export function RemoveAmountPicker({ community, availableAmount, setShowConfirmM
   }
   return (
     <VoteProposeWrap>
-      <VotePropose availableAmount={availableAmount} />
-      <VoteConfirmBtn
-        type="submit"
-        onSubmit={() => setShowConfirmModal(true)}
-        onClick={() => setShowConfirmModal(true)}
-      >
-        Confirm vote to remove community
-      </VoteConfirmBtn>
+      <VotePropose
+        availableAmount={availableAmount}
+        setProposingAmount={setProposingAmount}
+        proposingAmount={proposingAmount}
+      />
+      <VoteConfirmBtn onClick={() => setShowConfirmModal(true)}>Confirm vote to remove community</VoteConfirmBtn>
     </VoteProposeWrap>
   )
 }

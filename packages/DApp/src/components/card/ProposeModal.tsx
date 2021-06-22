@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
 import { getCommunityDetails } from '../../helpers/apiMock'
 import { ButtonPrimary } from '../Button'
@@ -16,6 +16,7 @@ interface ProposeModalProps {
 }
 
 export function ProposeModal({ availableAmount, setShowConfirmModal, setPublicKey, publicKey }: ProposeModalProps) {
+  const [proposingAmount, setProposingAmount] = useState(availableAmount)
   const communityFound = getCommunityDetails(publicKey)
 
   return (
@@ -36,7 +37,11 @@ export function ProposeModal({ availableAmount, setShowConfirmModal, setPublicKe
           <CardCommunity community={communityFound} />
           {communityFound.validForAddition ? (
             <VoteProposeWrap>
-              <VotePropose availableAmount={availableAmount} />
+              <VotePropose
+                availableAmount={availableAmount}
+                setProposingAmount={setProposingAmount}
+                proposingAmount={proposingAmount}
+              />
             </VoteProposeWrap>
           ) : (
             <WarningWrap>
