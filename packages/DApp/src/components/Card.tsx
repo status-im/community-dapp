@@ -244,7 +244,7 @@ const RemoveBtn = styled.button`
 `
 
 const CardHeadingEndedVote = styled.p`
-  fint-weight: normal;
+  font-weight: normal;
   font-size: 17px;
   line-height: 24px;
   margin-bottom: 18px;
@@ -269,7 +269,7 @@ const Tag = styled.div`
   font-size: 12px;
   line-height: 20px;
 `
-const CardLinks = styled.div`
+export const CardLinks = styled.div`
   display: flex;
   justify-content: space-between;
   width: 100%;

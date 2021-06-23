@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
-import { Card, CardCommunity, CardCommunityWrap, CardVote } from '../Card'
 import { getCommunitiesUnderVote } from '../../helpers/apiMock'
-import { CommunityDetail, VotingSortingEnum } from '../../models/community'
+import { VotingSortingEnum } from '../../models/community'
 import styled from 'styled-components'
 import { FilterList } from '../Filter'
 import { PageBar } from '../PageBar'
@@ -9,25 +8,9 @@ import { useCommunities } from '../hooks/useCommunities'
 import { VotingSortingOptions } from '../../constants/SortingOptions'
 import { ButtonSecondary } from '../Button'
 import { Colors } from '../../constants/styles'
-import { SpinnerIcon } from '../../assets/animatedIcons/spinnerIcon'
 import { useConfig } from '../../providers/config'
-
-interface VotingCardProps {
-  community: CommunityDetail
-}
-
-function VotingCard({ community }: VotingCardProps) {
-  return (
-    <Card>
-      <CardCommunityWrap>
-        {' '}
-        <CardCommunity community={community} />
-      </CardCommunityWrap>
-
-      <CardVote community={community} />
-    </Card>
-  )
-}
+import { VotingCardSkeleton } from './VotingCardSkeleton'
+import { VotingCard } from './VotingCard'
 
 export function VotingCards() {
   const { config } = useConfig()
@@ -56,31 +39,19 @@ export function VotingCards() {
         </VoteFilter>
         <FilterList value={sortedBy} setValue={setSortedBy} options={VotingSortingOptions} />
       </PageBar>
-      <Voting>
-        {communities.map((community) => (
-          <VotingCard key={community.publicKey} community={community} />
-        ))}
-      </Voting>
+      {communities.map((community) => (
+        <VotingCard key={community.publicKey} community={community} />
+      ))}
       {loading && (
-        <IconWrapper>
-          <SpinnerIcon />
-        </IconWrapper>
+        <>
+          <VotingCardSkeleton />
+          <VotingCardSkeleton />
+          <VotingCardSkeleton />
+        </>
       )}
     </div>
   )
 }
-
-const IconWrapper = styled.div`
-  height: 64px;
-  width: 64px;
-  margin: 100px;
-  margin-left: calc(50% - 32px);
-`
-
-const Voting = styled.div`
-  display: flex;
-  flex-direction: column;
-`
 
 const VoteFilter = styled.div`
   display: flex;

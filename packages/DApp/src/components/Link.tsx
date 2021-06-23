@@ -24,6 +24,7 @@ export const LinkExternal = styled.a`
     right: 0;
     transform: translateY(-50%);
     background-image: url(${externalIcon});
+    background-size: contain;
   }
 `
 export const LinkInternal = styled.a`
