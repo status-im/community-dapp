@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { NavLink } from 'react-router-dom'
 import { useEthers, shortenAddress } from '@usedapp/core'
@@ -8,7 +8,15 @@ import { Animation } from '../../constants/animation'
 import { StatusConnectButton } from '../StatusConnectButton'
 
 export function TopBar() {
-  const { account } = useEthers()
+  const { account, deactivate } = useEthers()
+  const [isOpened, setIsOpened] = useState(false)
+
+  useEffect(() => {
+    window.addEventListener('click', () => setIsOpened(false))
+    return () => {
+      window.removeEventListener('click', () => setIsOpened(false))
+    }
+  }, [])
 
   return (
     <Header>
@@ -35,7 +43,23 @@ export function TopBar() {
             </NavLinks>
           </Navigation>
 
-          {account ? <Account>{shortenAddress(account)}</Account> : <ButtonConnect>Connect</ButtonConnect>}
+          {account ? (
+            <AccountWrap>
+              <Account
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setIsOpened(!isOpened)
+                }}
+              >
+                {shortenAddress(account)}
+              </Account>
+              <ButtonDisconnect className={isOpened ? 'opened' : undefined} onClick={() => deactivate()}>
+                Disconnect
+              </ButtonDisconnect>
+            </AccountWrap>
+          ) : (
+            <ButtonConnect>Connect</ButtonConnect>
+          )}
         </MenuContent>
       </HeaderWrapper>
     </Header>
@@ -117,6 +141,11 @@ const StyledNavLink = styled(NavLink)`
 const ButtonConnect = styled(StatusConnectButton)`
   padding: 10px 27px;
 `
+
+const AccountWrap = styled.div`
+  position: relative;
+`
+
 const Account = styled.button`
   position: relative;
   font-weight: 500;
@@ -127,6 +156,12 @@ const Account = styled.button`
   background: ${Colors.White};
   border: 1px solid ${Colors.GrayBorder};
   border-radius: 21px;
+  outline: none;
+
+  &:focus,
+  &:active {
+    border: 1px solid ${Colors.Violet};
+  }
 
   &::before {
     content: '';
@@ -139,5 +174,41 @@ const Account = styled.button`
     background-color: ${Colors.Green};
     bacground-position: center;
     border-radius: 50%;
+  }
+`
+const ButtonDisconnect = styled.button`
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  font-weight: 500;
+  font-size: 15px;
+  line-height: 22px;
+  text-align: center;
+  padding: 12px 32px;
+  cursor: pointer;
+  color: ${Colors.VioletDark};
+  background: ${Colors.White};
+  border: 1px solid ${Colors.GrayBorder};
+  border-radius: 16px 4px 16px 16px;
+  box-shadow: 0px 2px 16px rgba(0, 9, 26, 0.12);
+  transition: all 0.3s;
+  outline: none;
+
+  &:hover {
+    background: ${Colors.VioletSecondaryDark};
+  }
+
+  &:active {
+    background: ${Colors.VioletSecondaryLight};
+  }
+
+  &.opened {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    z-index: 10;
   }
 `
