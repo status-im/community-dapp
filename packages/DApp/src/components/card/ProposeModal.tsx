@@ -18,6 +18,7 @@ interface ProposeModalProps {
 export function ProposeModal({ availableAmount, setShowConfirmModal, setPublicKey, publicKey }: ProposeModalProps) {
   const [proposingAmount, setProposingAmount] = useState(availableAmount)
   const communityFound = getCommunityDetails(publicKey)
+  const disabled = proposingAmount === 0
 
   return (
     <CommunityProposing>
@@ -41,6 +42,7 @@ export function ProposeModal({ availableAmount, setShowConfirmModal, setPublicKe
                 availableAmount={availableAmount}
                 setProposingAmount={setProposingAmount}
                 proposingAmount={proposingAmount}
+                disabled={disabled}
               />
             </VoteProposeWrap>
           ) : (

@@ -32,6 +32,7 @@ function DirectoryCard({ community }: DirectoryCardProps) {
         <CardCommunity community={community} showRemoveButton={true} />
       </CardCommunityWrap>
       <CardFeature
+        community={community}
         heading="Feature this community?"
         text={timeLeft ? 'This community has to wait until it can be featured again' : 'Weekly Feature vote'}
         icon={timeLeft ? '⏳' : '⭐'}

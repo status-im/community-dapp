@@ -103,6 +103,7 @@ interface CardVoteProps {
 export const CardVote = ({ community }: CardVoteProps) => {
   const [showVoteModal, setShowVoteModal] = useState(false)
   const [showConfirmModal, setShowConfirmModal] = useState(false)
+
   const [selectedVoted, setSelectedVoted] = useState(voteTypes['Add'].for)
 
   const setNext = (val: boolean) => {

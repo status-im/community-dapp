@@ -23,7 +23,7 @@ export function RemoveModal({ community, availableAmount, setShowConfirmModal }:
   )
 }
 
-const CommunityProposing = styled.form`
+const CommunityProposing = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
