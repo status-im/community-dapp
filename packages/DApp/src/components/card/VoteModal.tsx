@@ -18,7 +18,9 @@ export interface VoteModalProps {
 }
 
 export function VoteModal({ vote, selectedVote, availableAmount, setShowConfirmModal }: VoteModalProps) {
-  const [proposingAmount, setProposingAmount] = useState(availableAmount)
+  const initialProposing = vote?.type === 'Remove' && availableAmount > 2000000 ? 2000000 : 0
+
+  const [proposingAmount, setProposingAmount] = useState(initialProposing)
   const disabled = proposingAmount === 0
 
   return (
