@@ -2,21 +2,21 @@ import { BigNumber } from 'ethers'
 import { CommunityDetail } from '../models/community'
 
 export const communitiesUnderVote = [
-  '0xabA1eF51ef4aE360a9e8C9aD2d787330B602eb24',
-  '0xabA1eFawef4bc39ud9e8C9aD2d787330B602eb24',
-  '0xabA1eFawef4bc39ud9e8C9aD2d787330B6021231',
+  '0x344C19E3040Ec63A96b7aeB708C82a066315604B',
+  '0x0FA1A5CC3911A5697B625EF1C75eF4caE764bd34',
+  '0x95863d16bA2fb60B7d9Ca725f22df76fA5dEe61D',
 ]
 
 export const communitiesInDirectory = [
-  '0xabA1eF51ef4aE360a9e8C9aD2d787330B602eb24',
-  '0xabA1eF51ef4bc360a9e8C9aD2d787330B602eb24',
-  '0xabA1eF51ef4bc36ed9e8C9aD2d787330B602eb24',
-  '0xabA1eF51ef4bc39ud9e8C9aD2d787330B602eb24',
+  '0x344C19E3040Ec63A96b7aeB708C82a066315604B',
+  '0xABA1EF51EF4bc360A9E8c9Ad2d787330b602EB24',
+  '0xabA1EF51eF4Bc36ED9e8C9ad2d787330b602EB24',
+  '0x9Ac2b2E23eb62fa70fc7f31c0895AC46230C241e',
 ]
 
 export const communities: Array<CommunityDetail> = [
   {
-    publicKey: '0xabA1eF51ef4aE360a9e8C9aD2d787330B602eb24',
+    publicKey: '0x344C19E3040Ec63A96b7aeB708C82a066315604B',
     ens: 'CryptoPunks',
     name: 'CryptoPunks',
     link: 'cryptopunks.com',
@@ -63,7 +63,7 @@ export const communities: Array<CommunityDetail> = [
     },
   },
   {
-    publicKey: '0xabA1eF51ef4bc360a9e8C9aD2d787330B602eb24',
+    publicKey: '0xABA1EF51EF4bc360A9E8c9Ad2d787330b602EB24',
     ens: 'MakerDAO Community',
     name: 'MakerDAO Community',
     link: 'MakerDAOCommunity.com',
@@ -81,7 +81,7 @@ export const communities: Array<CommunityDetail> = [
     },
   },
   {
-    publicKey: '0xabA1eF51ef4bc36ed9e8C9aD2d787330B602eb24',
+    publicKey: '0xabA1EF51eF4Bc36ED9e8C9ad2d787330b602EB24',
     ens: 'DDEX',
     name: 'DDEX',
     link: 'ddex.com',
@@ -98,7 +98,7 @@ export const communities: Array<CommunityDetail> = [
     },
   },
   {
-    publicKey: '0xabA1eF51ef4bc39ud9e8C9aD2d787330B602eb24',
+    publicKey: '0x9Ac2b2E23eb62fa70fc7f31c0895AC46230C241e',
     ens: 'Name Baazar',
     name: 'Name Baazar',
     link: 'NameBaazar.com',
@@ -115,7 +115,7 @@ export const communities: Array<CommunityDetail> = [
     },
   },
   {
-    publicKey: '0xabA1eFawef4bc39ud9e8C9aD2d787330B602eb24',
+    publicKey: '0x0FA1A5CC3911A5697B625EF1C75eF4caE764bd34',
     ens: 'CryptoKitties',
     name: 'CryptoKitties',
     link: 'CryptoKitties.com',
@@ -159,7 +159,7 @@ export const communities: Array<CommunityDetail> = [
     },
   },
   {
-    publicKey: '0xabA1eFawef4bc39ud9e8C9aD2d787330B6021231',
+    publicKey: '0x95863d16bA2fb60B7d9Ca725f22df76fA5dEe61D',
     ens: 'Awesome Community',
     name: 'Awesome Community',
     link: 'Awesome Community.com',
