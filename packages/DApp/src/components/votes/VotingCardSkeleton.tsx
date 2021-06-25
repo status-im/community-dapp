@@ -1,6 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
-import { Card, CardCommunityWrap, CardLinks, CardVoteBlock } from '../Card'
+import { Card, CardCommunityWrap, CardLinks, CardVoteBlock, CardVoteWrap } from '../Card'
 import { LinkExternal, LinkInternal } from '../Link'
 import { Skeleton } from '../skeleton/Skeleton'
 import { TagsSkeletonList } from '../skeleton/TagSkeleton'
@@ -24,29 +24,31 @@ export const VotingCardSkeleton = () => {
           <StyledInternalink>Voting history </StyledInternalink>
         </CardLinks>
       </CardCommunityWrap>
-      <CardVoteBlock>
-        <CardHeader>
-          <Skeleton width="50%" />
-        </CardHeader>
-        <Row>
-          <div>
-            <span>❓</span>
-            <Skeleton width="90px" height="16px" />
-          </div>
-          <div>
-            <Skeleton width="43px" height="8px" />
-          </div>
-          <div>
-            <span>❓</span>
-            <Skeleton width="90px" height="16px" />
-          </div>
-        </Row>
-        <ProgressSkeleton />
-        <ButtonsRow>
-          <SkeletonButton />
-          <SkeletonButton />
-        </ButtonsRow>
-      </CardVoteBlock>
+      <CardVoteWrap>
+        <CardVoteBlock>
+          <CardHeader>
+            <Skeleton width="50%" />
+          </CardHeader>
+          <Row>
+            <div>
+              <span>❓</span>
+              <Skeleton width="90px" height="16px" />
+            </div>
+            <div>
+              <Skeleton width="43px" height="8px" />
+            </div>
+            <div>
+              <span>❓</span>
+              <Skeleton width="90px" height="16px" />
+            </div>
+          </Row>
+          <ProgressSkeleton />
+          <ButtonsRow>
+            <SkeletonButton />
+            <SkeletonButton />
+          </ButtonsRow>
+        </CardVoteBlock>
+      </CardVoteWrap>
     </Card>
   )
 }

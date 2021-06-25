@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Card, CardCommunity, CardCommunityWrap } from '../Card'
+import { Card, CardCommunity, CardCommunityWrap, CardVoteWrap } from '../Card'
 import { CardFeature } from '../card/CardFeature'
 import styled from 'styled-components'
 import { CommunityDetail, DirectorySortingEnum } from '../../models/community'
@@ -11,6 +11,7 @@ import { PageBar } from '../PageBar'
 import { DirectorySortingOptions } from '../../constants/SortingOptions'
 import { SpinnerIcon } from '../../assets/animatedIcons/spinnerIcon'
 import { useConfig } from '../../providers/config'
+import { Colors } from '../../constants/styles'
 
 interface DirectoryCardProps {
   community: CommunityDetail
@@ -31,15 +32,17 @@ function DirectoryCard({ community }: DirectoryCardProps) {
         {' '}
         <CardCommunity community={community} showRemoveButton={true} />
       </CardCommunityWrap>
-      <CardFeature
-        community={community}
-        heading="Feature this community?"
-        text={timeLeft ? 'This community has to wait until it can be featured again' : 'Weekly Feature vote'}
-        icon={timeLeft ? '⏳' : '⭐'}
-        sum={community.directoryInfo.featureVotes?.toNumber()}
-        voting={Boolean(community.currentVoting)}
-        timeLeft={timeLeft}
-      />
+      <CardVoteWrap style={{ backgroundColor: `${Colors.GrayLight}` }}>
+        <CardFeature
+          community={community}
+          heading="Feature this community?"
+          text={timeLeft ? 'This community has to wait until it can be featured again' : 'Weekly Feature vote'}
+          icon={timeLeft ? '⏳' : '⭐'}
+          sum={community.directoryInfo.featureVotes?.toNumber()}
+          voting={Boolean(community.currentVoting)}
+          timeLeft={timeLeft}
+        />
+      </CardVoteWrap>
     </Card>
   )
 }

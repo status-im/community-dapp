@@ -98,9 +98,10 @@ export const CardCommunity = ({ community, showRemoveButton }: CardCommunityProp
 
 interface CardVoteProps {
   community: CommunityDetail
+  hideModalFunction?: (val: boolean) => void
 }
 
-export const CardVote = ({ community }: CardVoteProps) => {
+export const CardVote = ({ community, hideModalFunction }: CardVoteProps) => {
   const [showVoteModal, setShowVoteModal] = useState(false)
   const [showConfirmModal, setShowConfirmModal] = useState(false)
 
@@ -109,6 +110,13 @@ export const CardVote = ({ community }: CardVoteProps) => {
   const setNext = (val: boolean) => {
     setShowConfirmModal(val)
     setShowVoteModal(false)
+  }
+
+  const hideConfirm = (val: boolean) => {
+    if (hideModalFunction) {
+      hideModalFunction(false)
+    }
+    setShowConfirmModal(val)
   }
 
   const vote = community.currentVoting
@@ -125,6 +133,21 @@ export const CardVote = ({ community }: CardVoteProps) => {
 
   return (
     <CardVoteBlock>
+      {showVoteModal && (
+        <Modal heading={`${vote?.type} ${community.name}?`} setShowModal={setShowVoteModal}>
+          <VoteModal
+            vote={vote}
+            selectedVote={selectedVoted}
+            availableAmount={65245346}
+            setShowConfirmModal={setNext}
+          />{' '}
+        </Modal>
+      )}
+      {showConfirmModal && (
+        <Modal setShowModal={hideConfirm}>
+          <VoteConfirmModal community={community} selectedVote={selectedVoted} setShowModal={hideConfirm} />
+        </Modal>
+      )}
       {winner ? (
         <CardHeadingEndedVote>
           SNT holders have decided{' '}
@@ -133,6 +156,8 @@ export const CardVote = ({ community }: CardVoteProps) => {
           </b>{' '}
           this community to the directory!
         </CardHeadingEndedVote>
+      ) : hideModalFunction ? (
+        <CardHeading />
       ) : (
         <CardHeading>{voteConstants.question}</CardHeading>
       )}
@@ -145,21 +170,6 @@ export const CardVote = ({ community }: CardVoteProps) => {
           </VoteBtnFinal>
         ) : (
           <VotesBtns>
-            {showVoteModal && (
-              <Modal heading={`${vote?.type} ${community.name} ?`} setShowModal={setShowVoteModal}>
-                <VoteModal
-                  vote={vote}
-                  selectedVote={selectedVoted}
-                  availableAmount={65245346}
-                  setShowConfirmModal={setNext}
-                />{' '}
-              </Modal>
-            )}
-            {showConfirmModal && (
-              <Modal setShowModal={setShowConfirmModal}>
-                <VoteConfirmModal community={community} selectedVote={selectedVoted} setShowModal={setNext} />
-              </Modal>
-            )}
             <VoteBtn
               onClick={() => {
                 setSelectedVoted(voteConstants.against)
@@ -184,14 +194,22 @@ export const CardVote = ({ community }: CardVoteProps) => {
 }
 
 export const Card = styled.div`
-  margin: 20px;
   display: flex;
   align-items: stretch;
+  margin: 20px;
 `
 export const CardCommunityWrap = styled.div`
   width: 50%;
   margin: 13px 0;
   padding: 24px 24px 16px;
+  box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 6px 0px 0px 6px;
+`
+export const CardVoteWrap = styled.div`
+  width: 50%;
+  display: flex;
+  align-items: stretch;
+  padding: 24px 24px 32px;
   box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
   border-radius: 6px 0px 0px 6px;
 `
@@ -278,16 +296,13 @@ export const CardLinks = styled.div`
 `
 
 export const CardVoteBlock = styled.div`
-  width: 50%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 24px 24px 32px;
-  box-shadow: 0px 2px 12px rgba(0, 0, 0, 0.15);
-  border-radius: 6px;
+  width: 100%;
 `
 
-const VotesBtns = styled.div`
+export const VotesBtns = styled.div`
   display: flex;
   justify-content: space-between;
   width: 100%;

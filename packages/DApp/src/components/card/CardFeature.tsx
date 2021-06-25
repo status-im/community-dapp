@@ -9,6 +9,7 @@ import { CommunityDetail } from '../../models/community'
 import { Modal } from '../Modal'
 import { FeatureModal } from './FeatureModal'
 import { VoteConfirmModal } from './VoteConfirmModal'
+import { OngoingVote } from './OngoingVote'
 
 interface CardFeatureProps {
   community: CommunityDetail
@@ -23,6 +24,7 @@ interface CardFeatureProps {
 export const CardFeature = ({ community, heading, text, icon, sum, timeLeft, voting }: CardFeatureProps) => {
   const [showFeatureModal, setShowFeatureModal] = useState(false)
   const [showConfirmModal, setShowConfirmModal] = useState(false)
+  const [showOngoingVote, setShowOngoingVote] = useState(false)
 
   const setNewModal = (val: boolean) => {
     setShowConfirmModal(val)
@@ -33,7 +35,12 @@ export const CardFeature = ({ community, heading, text, icon, sum, timeLeft, vot
     <CardVoteBlock style={{ backgroundColor: `${Colors.GrayLight}` }}>
       <FeatureTop>
         <CardHeading>{heading}</CardHeading>
-        {voting && <CardLinkFeature>Ongoing vote for removal</CardLinkFeature>}
+        {voting && (
+          <div>
+            {showOngoingVote && <OngoingVote community={community} setShowOngoingVote={setShowOngoingVote} />}
+            <CardLinkFeature onClick={() => setShowOngoingVote(true)}>Ongoing vote for removal</CardLinkFeature>
+          </div>
+        )}
       </FeatureTop>
 
       <FeatureVote>

@@ -43,7 +43,7 @@ export function VoteModal({ vote, selectedVote, availableAmount, setShowConfirmM
   )
 }
 
-const CardProposing = styled.div`
+export const CardProposing = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;

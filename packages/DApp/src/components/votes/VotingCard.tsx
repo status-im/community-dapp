@@ -1,6 +1,6 @@
 import React from 'react'
 import { CommunityDetail } from '../../models/community'
-import { Card, CardCommunity, CardCommunityWrap, CardVote } from '../Card'
+import { Card, CardCommunity, CardCommunityWrap, CardVote, CardVoteWrap } from '../Card'
 
 interface VotingCardProps {
   community: CommunityDetail
@@ -12,8 +12,10 @@ export const VotingCard = ({ community }: VotingCardProps) => {
         {' '}
         <CardCommunity community={community} />
       </CardCommunityWrap>
-
-      <CardVote community={community} />
+      <CardVoteWrap>
+        {' '}
+        <CardVote community={community} />
+      </CardVoteWrap>
     </Card>
   )
 }
