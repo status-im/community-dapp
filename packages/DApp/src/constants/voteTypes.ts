@@ -1,18 +1,16 @@
+export type VoteType = {
+  type: 0 | 1
+  icon: string
+  text: string
+  verb: string
+  noun: string
+}
+
 type Vote = {
   [type: string]: {
     question: string
-    for: {
-      icon: string
-      text: string
-      verb: string
-      noun: string
-    }
-    against: {
-      icon: string
-      text: string
-      verb: string
-      noun: string
-    }
+    for: VoteType
+    against: VoteType
   }
 }
 
@@ -20,12 +18,14 @@ export const voteTypes: Vote = {
   Add: {
     question: 'Add to Communities directory?',
     for: {
+      type: 1,
       icon: '👍',
       text: 'Add',
       verb: 'to add',
       noun: '',
     },
     against: {
+      type: 0,
       icon: '👎',
       text: "Don't add",
       verb: 'not to add',
@@ -36,12 +36,14 @@ export const voteTypes: Vote = {
   Remove: {
     question: 'Remove from Communities directory?',
     for: {
+      type: 1,
       icon: '🗑',
       text: 'Remove',
       verb: 'to remove',
       noun: 'removal',
     },
     against: {
+      type: 0,
       icon: '📌',
       text: 'Keep',
       verb: 'to keep',

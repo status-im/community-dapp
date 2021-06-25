@@ -4,15 +4,11 @@ import { VoteChart } from '../votes/VoteChart'
 import { ButtonSecondary } from '../Button'
 import { CurrentVoting } from '../../models/community'
 import { VotePropose } from '../votes/VotePropose'
+import { VoteType } from '../../constants/voteTypes'
 
 export interface VoteModalProps {
   vote: CurrentVoting
-  selectedVote: {
-    icon: string
-    text: string
-    verb: string
-    noun: string
-  }
+  selectedVote: VoteType
   availableAmount: number
   setShowConfirmModal: (show: boolean) => void
 }
