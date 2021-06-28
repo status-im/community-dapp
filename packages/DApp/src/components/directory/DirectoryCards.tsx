@@ -9,10 +9,10 @@ import { FilterList } from '../Filter'
 import { Search } from '../Input'
 import { PageBar } from '../PageBar'
 import { DirectorySortingOptions } from '../../constants/SortingOptions'
-import { SpinnerIcon } from '../../assets/animatedIcons/spinnerIcon'
 import { useConfig } from '../../providers/config'
 import { Colors } from '../../constants/styles'
 import { WeeklyFeature } from '../WeeklyFeature'
+import { DirectoryCardSkeleton } from './DirectoryCardSkeleton'
 
 interface DirectoryCardProps {
   community: CommunityDetail
@@ -75,20 +75,15 @@ export function DirectoryCards() {
         ))}
       </Voting>
       {loading && (
-        <IconWrapper>
-          <SpinnerIcon />
-        </IconWrapper>
+        <>
+          <DirectoryCardSkeleton />
+          <DirectoryCardSkeleton />
+          <DirectoryCardSkeleton />
+        </>
       )}
     </>
   )
 }
-
-const IconWrapper = styled.div`
-  height: 64px;
-  width: 64px;
-  margin: 100px;
-  margin-left: calc(50% - 32px);
-`
 
 const Voting = styled.div`
   display: flex;

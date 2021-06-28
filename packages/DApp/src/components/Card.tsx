@@ -206,7 +206,7 @@ export const CardVote = ({ community, room, hideModalFunction }: CardVoteProps) 
 export const Card = styled.div`
   display: flex;
   align-items: stretch;
-  margin: 24px 0;
+  margin-top: 24px;
 `
 export const CardCommunityWrap = styled.div`
   width: 50%;
