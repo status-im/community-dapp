@@ -1,7 +1,7 @@
 import { expect, use } from 'chai'
 import { deployContract, MockProvider, solidity } from 'ethereum-waffle'
 import MockContract from '../build/MockContract.json'
-import { Contract, utils, BigNumber, providers } from 'ethers'
+import { Contract, utils, BigNumber } from 'ethers'
 
 use(solidity)
 

@@ -8,6 +8,10 @@ import { VotePropose } from '../votes/VotePropose'
 import { Warning } from '../votes/VoteWarning'
 import { ConfirmBtn } from './VoteConfirmModal'
 
+import { useContractFunction } from '@usedapp/core'
+
+import { useContracts } from '../hooks/useContracts'
+
 interface ProposeModalProps {
   availableAmount: number
   setShowConfirmModal: (val: boolean) => void
@@ -19,6 +23,9 @@ export function ProposeModal({ availableAmount, setShowConfirmModal, setPublicKe
   const [proposingAmount, setProposingAmount] = useState(availableAmount)
   const communityFound = getCommunityDetails(publicKey)
   const disabled = proposingAmount === 0
+
+  const { votingContract } = useContracts()
+  const { send } = useContractFunction(votingContract, 'initializeVotingRoom')
 
   return (
     <CommunityProposing>
@@ -74,10 +81,11 @@ export function ProposeModal({ availableAmount, setShowConfirmModal, setPublicKe
         </ConfirmBtn>
       ) : (
         <ProposingBtn
-          type="submit"
           disabled={!communityFound}
-          onSubmit={() => setShowConfirmModal(true)}
-          onClick={() => setShowConfirmModal(true)}
+          onClick={() => {
+            send(1, publicKey)
+            setShowConfirmModal(true)
+          }}
         >
           Confirm vote to add community
         </ProposingBtn>
@@ -86,7 +94,7 @@ export function ProposeModal({ availableAmount, setShowConfirmModal, setPublicKe
   )
 }
 
-const CommunityProposing = styled.form`
+const CommunityProposing = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;

@@ -6,6 +6,8 @@ import { addCommas } from '../../helpers/addCommas'
 import { voteTypes } from './../../constants/voteTypes'
 import { CurrentVoting } from '../../models/community'
 
+import { formatTimeLeft } from '../../helpers/fomatTimeLeft'
+
 export interface VoteChartProps {
   vote: CurrentVoting
   voteWinner?: number
@@ -25,11 +27,7 @@ export function VoteChart({ vote, voteWinner }: VoteChartProps) {
             {addCommas(vote.voteAgainst.toNumber())} <span style={{ fontWeight: 'normal' }}>SNT</span>
           </span>
         </VoteBox>
-        <TimeLeft>
-          {vote.timeLeft > 3600 * 24
-            ? `${Math.floor(vote.timeLeft / (3600 * 24))} Days`
-            : `${Math.floor(vote.timeLeft / 3600)} Hours`}
-        </TimeLeft>
+        <TimeLeft>{formatTimeLeft(vote.timeLeft)}</TimeLeft>
         <VoteBox style={{ filter: voteWinner && voteWinner === 1 ? 'grayscale(1)' : 'none' }}>
           <p style={{ fontSize: voteWinner === 2 ? '42px' : '24px', marginTop: voteWinner === 1 ? '18px' : '0' }}>
             {voteConstants.for.icon}

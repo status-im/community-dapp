@@ -12,6 +12,9 @@ import { VoteConfirmModal } from './card/VoteConfirmModal'
 import binIcon from '../assets/images/bin.svg'
 import { RemoveModal } from './card/RemoveModal'
 import { useEthers } from '@usedapp/core'
+import { useContractFunction } from '@usedapp/core'
+import { useContracts } from './hooks/useContracts'
+import { getVotingWinner } from '../helpers/voting'
 
 interface CardCommunityProps {
   community: CommunityDetail
@@ -99,15 +102,19 @@ export const CardCommunity = ({ community, showRemoveButton }: CardCommunityProp
 
 interface CardVoteProps {
   community: CommunityDetail
+  room: number
   hideModalFunction?: (val: boolean) => void
 }
 
-export const CardVote = ({ community, hideModalFunction }: CardVoteProps) => {
+export const CardVote = ({ community, room, hideModalFunction }: CardVoteProps) => {
   const { account } = useEthers()
   const [showVoteModal, setShowVoteModal] = useState(false)
   const [showConfirmModal, setShowConfirmModal] = useState(false)
 
   const [selectedVoted, setSelectedVoted] = useState(voteTypes['Add'].for)
+
+  const { votingContract } = useContracts()
+  const finalizeVoting = useContractFunction(votingContract, 'finalizeVotingRoom')
 
   const setNext = (val: boolean) => {
     setShowConfirmModal(val)
@@ -128,10 +135,8 @@ export const CardVote = ({ community, hideModalFunction }: CardVoteProps) => {
   }
 
   const voteConstants = voteTypes[vote.type]
-  let winner: number | undefined = undefined
-  if (vote?.timeLeft === 0) {
-    winner = vote.voteAgainst > vote.voteFor ? 2 : 1
-  }
+
+  const winner = getVotingWinner(vote)
 
   return (
     <CardVoteBlock>
@@ -139,6 +144,7 @@ export const CardVote = ({ community, hideModalFunction }: CardVoteProps) => {
         <Modal heading={`${vote?.type} ${community.name}?`} setShowModal={setShowVoteModal}>
           <VoteModal
             vote={vote}
+            room={room}
             selectedVote={selectedVoted}
             availableAmount={65245346}
             setShowConfirmModal={setNext}
@@ -167,7 +173,7 @@ export const CardVote = ({ community, hideModalFunction }: CardVoteProps) => {
         <VoteChart vote={vote} voteWinner={winner} />
 
         {winner ? (
-          <VoteBtnFinal disabled={!account}>
+          <VoteBtnFinal onClick={() => finalizeVoting.send(room)} disabled={!account}>
             Finalize the vote <span>✍️</span>
           </VoteBtnFinal>
         ) : (

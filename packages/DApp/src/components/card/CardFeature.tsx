@@ -11,6 +11,8 @@ import { FeatureModal } from './FeatureModal'
 import { VoteConfirmModal } from './VoteConfirmModal'
 import { OngoingVote } from './OngoingVote'
 import { useEthers } from '@usedapp/core'
+import { useContracts } from '../hooks/useContracts'
+import { useContractCall } from '@usedapp/core'
 
 interface CardFeatureProps {
   community: CommunityDetail
@@ -19,10 +21,9 @@ interface CardFeatureProps {
   icon: string
   sum?: number
   timeLeft?: string
-  voting?: boolean
 }
 
-export const CardFeature = ({ community, heading, text, icon, sum, timeLeft, voting }: CardFeatureProps) => {
+export const CardFeature = ({ community, heading, text, icon, sum, timeLeft }: CardFeatureProps) => {
   const { account } = useEthers()
   const [showFeatureModal, setShowFeatureModal] = useState(false)
   const [showConfirmModal, setShowConfirmModal] = useState(false)
@@ -32,14 +33,24 @@ export const CardFeature = ({ community, heading, text, icon, sum, timeLeft, vot
     setShowConfirmModal(val)
     setShowFeatureModal(false)
   }
+  const { votingContract } = useContracts()
+  const [roomList] =
+    useContractCall({
+      abi: votingContract.interface,
+      address: votingContract.address,
+      method: 'communityVotingId',
+      args: [community.publicKey],
+    }) ?? []
 
   return (
     <CardVoteBlock style={{ backgroundColor: `${Colors.GrayLight}` }}>
       <FeatureTop>
         <CardHeading>{heading}</CardHeading>
-        {voting && (
+        {roomList > 0 && (
           <div>
-            {showOngoingVote && <OngoingVote community={community} setShowOngoingVote={setShowOngoingVote} />}
+            {showOngoingVote && (
+              <OngoingVote community={community} setShowOngoingVote={setShowOngoingVote} room={roomList} />
+            )}
             <CardLinkFeature onClick={() => setShowOngoingVote(true)}>Ongoing vote for removal</CardLinkFeature>
           </div>
         )}

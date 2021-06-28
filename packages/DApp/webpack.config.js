@@ -18,6 +18,9 @@ module.exports = (env) => {
         devtool: 'source-map',
         resolve: {
             extensions: ['.ts', '.tsx', '.js', '.json'],
+            fallback: { 
+                "buffer": require.resolve("buffer/") 
+            }
         },
         module: {
             rules: [
@@ -62,7 +65,11 @@ module.exports = (env) => {
             }),
             new webpack.DefinePlugin({
                 'process.env.ENV': JSON.stringify(environment),
-            })
+            }),
+            new webpack.ProvidePlugin({
+                process: 'process/browser.js',
+                Buffer: ['buffer', 'Buffer'],
+              }),
         ],
         devServer: {
             historyApiFallback: true,
@@ -71,6 +78,6 @@ module.exports = (env) => {
             overlay: true,
             hot: true,
         },
-        stats: 'minimal',
+        stats: 'minimal'
     }
 }

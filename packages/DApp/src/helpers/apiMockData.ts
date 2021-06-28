@@ -6,7 +6,6 @@ export const communitiesUnderVote = [
   '0x0FA1A5CC3911A5697B625EF1C75eF4caE764bd34',
   '0x95863d16bA2fb60B7d9Ca725f22df76fA5dEe61D',
 ]
-
 export const communitiesInDirectory = [
   '0x344C19E3040Ec63A96b7aeB708C82a066315604B',
   '0xABA1EF51EF4bc360A9E8c9Ad2d787330b602EB24',

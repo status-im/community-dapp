@@ -40,7 +40,6 @@ function DirectoryCard({ community }: DirectoryCardProps) {
           text={timeLeft ? 'This community has to wait until it can be featured again' : 'Weekly Feature vote'}
           icon={timeLeft ? '⏳' : '⭐'}
           sum={community.directoryInfo.featureVotes?.toNumber()}
-          voting={Boolean(community.currentVoting)}
           timeLeft={timeLeft}
         />
       </CardVoteWrap>

@@ -5,19 +5,22 @@ import { ButtonSecondary } from '../Button'
 import { CurrentVoting } from '../../models/community'
 import { VotePropose } from '../votes/VotePropose'
 import { VoteType } from '../../constants/voteTypes'
+import { useSendWakuVote } from '../hooks/useSendWakuVote'
 
 export interface VoteModalProps {
   vote: CurrentVoting
   selectedVote: VoteType
   availableAmount: number
+  room: number
   setShowConfirmModal: (show: boolean) => void
 }
 
-export function VoteModal({ vote, selectedVote, availableAmount, setShowConfirmModal }: VoteModalProps) {
+export function VoteModal({ vote, room, selectedVote, availableAmount, setShowConfirmModal }: VoteModalProps) {
   const initialProposing = vote?.type === 'Remove' && availableAmount > 2000000 ? 2000000 : 0
 
   const [proposingAmount, setProposingAmount] = useState(initialProposing)
   const disabled = proposingAmount === 0
+  const sendWakuVote = useSendWakuVote()
 
   return (
     <CardProposing>
@@ -32,7 +35,10 @@ export function VoteModal({ vote, selectedVote, availableAmount, setShowConfirmM
       />
 
       <VoteConfirmBtn
-        onClick={() => setShowConfirmModal(true)}
+        onClick={() => {
+          sendWakuVote(proposingAmount, room, selectedVote.type)
+          setShowConfirmModal(true)
+        }}
         disabled={disabled}
       >{`Vote ${selectedVote.verb} community ${selectedVote.icon}`}</VoteConfirmBtn>
     </CardProposing>

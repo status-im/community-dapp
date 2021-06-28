@@ -1,30 +1,28 @@
 import React, { useState } from 'react'
-import { getCommunitiesUnderVote } from '../../helpers/apiMock'
 import { VotingSortingEnum } from '../../models/community'
 import styled from 'styled-components'
 import { FilterList } from '../Filter'
 import { PageBar } from '../PageBar'
-import { useCommunities } from '../hooks/useCommunities'
-import { VotingSortingOptions } from '../../constants/SortingOptions'
 import { ButtonSecondary } from '../Button'
 import { Colors } from '../../constants/styles'
-import { useConfig } from '../../providers/config'
-import { VotingCardSkeleton } from './VotingCardSkeleton'
 import { VotingCard } from './VotingCard'
 import { Search } from '../Input'
+import { useContractCall } from '@usedapp/core'
+import { VotingSortingOptions } from '../../constants/SortingOptions'
+import { useContracts } from '../hooks/useContracts'
 
 export function VotingCards() {
-  const { config } = useConfig()
+  const { votingContract } = useContracts()
   const [sortedBy, setSortedBy] = useState(VotingSortingEnum.EndingSoonest)
   const [voteType, setVoteType] = useState('')
   const [filterKeyword, setFilterKeyword] = useState('')
-  const { communities, loading } = useCommunities(getCommunitiesUnderVote, {
-    numberPerPage: config.numberPerPage,
-    sortedBy,
-    voteType,
-    filterKeyword,
-  })
 
+  const [roomList] = useContractCall({
+    abi: votingContract.interface,
+    address: votingContract.address,
+    method: 'getActiveVotingRooms',
+    args: [],
+  }) ?? [[]]
   return (
     <div>
       <PageBar>
@@ -48,16 +46,9 @@ export function VotingCards() {
         </VoteFilter>
         <FilterList value={sortedBy} setValue={setSortedBy} options={VotingSortingOptions} />
       </PageBar>
-      {communities.map((community) => (
-        <VotingCard key={community.publicKey} community={community} />
+      {roomList.map((room: any) => (
+        <VotingCard key={room.toString()} room={Number(room.toString())} />
       ))}
-      {loading && (
-        <>
-          <VotingCardSkeleton />
-          <VotingCardSkeleton />
-          <VotingCardSkeleton />
-        </>
-      )}
     </div>
   )
 }
