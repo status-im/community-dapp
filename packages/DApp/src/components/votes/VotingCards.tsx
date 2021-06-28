@@ -9,7 +9,7 @@ import { VotingCard } from './VotingCard'
 import { Search } from '../Input'
 import { useContractCall } from '@usedapp/core'
 import { VotingSortingOptions } from '../../constants/SortingOptions'
-import { useContracts } from '../hooks/useContracts'
+import { useContracts } from '../../hooks/useContracts'
 
 export function VotingCards() {
   const { votingContract } = useContracts()

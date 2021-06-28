@@ -1,9 +1,9 @@
 import { useContractCall } from '@usedapp/core'
 import { useEffect, useState } from 'react'
-import { getCommunityDetails } from '../../helpers/apiMock'
-import { CommunityDetail } from '../../models/community'
+import { getCommunityDetails } from '../helpers/apiMock'
+import { CommunityDetail } from '../models/community'
 import { useContracts } from './useContracts'
-import voting from '../../helpers/voting'
+import voting from '../helpers/voting'
 
 export function useCommunity(room: number) {
   const { votingContract } = useContracts()

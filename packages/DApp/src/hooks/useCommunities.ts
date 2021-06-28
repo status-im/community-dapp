@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
-import { CommunityDetail } from '../../models/community'
-import { APIOptions, APIFunction } from './../../models/api'
+import { CommunityDetail } from '../models/community'
+import { APIOptions, APIFunction } from './../models/api'
 
 export function useCommunities(API: APIFunction, options: APIOptions) {
   const [communities, setCommunities] = useState<CommunityDetail[]>([])

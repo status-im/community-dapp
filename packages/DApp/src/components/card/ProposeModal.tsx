@@ -10,7 +10,7 @@ import { ConfirmBtn } from './VoteConfirmModal'
 
 import { useContractFunction } from '@usedapp/core'
 
-import { useContracts } from '../hooks/useContracts'
+import { useContracts } from '../../hooks/useContracts'
 
 interface ProposeModalProps {
   availableAmount: number

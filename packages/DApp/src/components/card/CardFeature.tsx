@@ -11,7 +11,7 @@ import { FeatureModal } from './FeatureModal'
 import { VoteConfirmModal } from './VoteConfirmModal'
 import { OngoingVote } from './OngoingVote'
 import { useEthers } from '@usedapp/core'
-import { useContracts } from '../hooks/useContracts'
+import { useContracts } from '../../hooks/useContracts'
 import { useContractCall } from '@usedapp/core'
 
 interface CardFeatureProps {

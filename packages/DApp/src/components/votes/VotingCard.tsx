@@ -1,9 +1,9 @@
 import { useContractFunction } from '@usedapp/core'
 import React from 'react'
 import { Card, CardCommunity, CardCommunityWrap, CardVote, CardVoteWrap } from '../Card'
-import { useCommunity } from '../hooks/useCommunity'
-import { useContracts } from '../hooks/useContracts'
-import { useVotesAggregate } from '../hooks/useVotesAggregate'
+import { useCommunity } from '../../hooks/useCommunity'
+import { useContracts } from '../../hooks/useContracts'
+import { useVotesAggregate } from '../../hooks/useVotesAggregate'
 import { VotingCardSkeleton } from './VotingCardSkeleton'
 
 interface VotingCardProps {

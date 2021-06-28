@@ -5,7 +5,7 @@ import { ButtonSecondary } from '../Button'
 import { CurrentVoting } from '../../models/community'
 import { VotePropose } from '../votes/VotePropose'
 import { VoteType } from '../../constants/voteTypes'
-import { useSendWakuVote } from '../hooks/useSendWakuVote'
+import { useSendWakuVote } from '../../hooks/useSendWakuVote'
 
 export interface VoteModalProps {
   vote: CurrentVoting

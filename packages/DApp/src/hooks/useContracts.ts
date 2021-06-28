@@ -1,5 +1,5 @@
 import { useEthers } from '@usedapp/core'
-import { useConfig } from '../../providers/config'
+import { useConfig } from '../providers/config'
 import { Contract } from '@usedapp/core/node_modules/ethers'
 import { Interface } from '@ethersproject/abi'
 import { MockContract } from '@status-community-dapp/contracts/abi'

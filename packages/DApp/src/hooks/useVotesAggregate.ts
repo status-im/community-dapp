@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react'
-import { useWaku } from '../../providers/waku/provider'
+import { useWaku } from '../providers/waku/provider'
 import { useContractCall } from '@usedapp/core'
-import { useConfig } from '../../providers/config'
+import { useConfig } from '../providers/config'
 import { useContracts } from '../hooks/useContracts'
 
-import wakuMessage from '../../helpers/wakuMessage'
+import wakuMessage from '../helpers/wakuMessage'
 
 export function useVotesAggregate(room: number) {
   const { config } = useConfig()

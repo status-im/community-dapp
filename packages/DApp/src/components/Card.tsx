@@ -13,7 +13,7 @@ import binIcon from '../assets/images/bin.svg'
 import { RemoveModal } from './card/RemoveModal'
 import { useEthers } from '@usedapp/core'
 import { useContractFunction } from '@usedapp/core'
-import { useContracts } from './hooks/useContracts'
+import { useContracts } from '../hooks/useContracts'
 import { getVotingWinner } from '../helpers/voting'
 
 interface CardCommunityProps {
