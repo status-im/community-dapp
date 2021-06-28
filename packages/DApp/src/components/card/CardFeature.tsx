@@ -10,6 +10,7 @@ import { Modal } from '../Modal'
 import { FeatureModal } from './FeatureModal'
 import { VoteConfirmModal } from './VoteConfirmModal'
 import { OngoingVote } from './OngoingVote'
+import { useEthers } from '@usedapp/core'
 
 interface CardFeatureProps {
   community: CommunityDetail
@@ -22,6 +23,7 @@ interface CardFeatureProps {
 }
 
 export const CardFeature = ({ community, heading, text, icon, sum, timeLeft, voting }: CardFeatureProps) => {
+  const { account } = useEthers()
   const [showFeatureModal, setShowFeatureModal] = useState(false)
   const [showConfirmModal, setShowConfirmModal] = useState(false)
   const [showOngoingVote, setShowOngoingVote] = useState(false)
@@ -62,7 +64,7 @@ export const CardFeature = ({ community, heading, text, icon, sum, timeLeft, vot
             <VoteConfirmModal community={community} selectedVote={{ verb: 'to feature' }} setShowModal={setNewModal} />
           </Modal>
         )}
-        <FeatureBtn disabled={Boolean(timeLeft)} onClick={() => setShowFeatureModal(true)}>
+        <FeatureBtn disabled={Boolean(timeLeft) || !account} onClick={() => setShowFeatureModal(true)}>
           Feature this community! <span style={{ fontSize: '20px' }}>⭐️</span>
         </FeatureBtn>
       </div>

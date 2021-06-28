@@ -11,6 +11,7 @@ import { voteTypes } from './../constants/voteTypes'
 import { VoteConfirmModal } from './card/VoteConfirmModal'
 import binIcon from '../assets/images/bin.svg'
 import { RemoveModal } from './card/RemoveModal'
+import { useEthers } from '@usedapp/core'
 
 interface CardCommunityProps {
   community: CommunityDetail
@@ -102,6 +103,7 @@ interface CardVoteProps {
 }
 
 export const CardVote = ({ community, hideModalFunction }: CardVoteProps) => {
+  const { account } = useEthers()
   const [showVoteModal, setShowVoteModal] = useState(false)
   const [showConfirmModal, setShowConfirmModal] = useState(false)
 
@@ -165,12 +167,13 @@ export const CardVote = ({ community, hideModalFunction }: CardVoteProps) => {
         <VoteChart vote={vote} voteWinner={winner} />
 
         {winner ? (
-          <VoteBtnFinal>
+          <VoteBtnFinal disabled={!account}>
             Finalize the vote <span>✍️</span>
           </VoteBtnFinal>
         ) : (
           <VotesBtns>
             <VoteBtn
+              disabled={!account}
               onClick={() => {
                 setSelectedVoted(voteConstants.against)
                 setShowVoteModal(true)
@@ -179,6 +182,7 @@ export const CardVote = ({ community, hideModalFunction }: CardVoteProps) => {
               {voteConstants.against.text} <span>{voteConstants.against.icon}</span>
             </VoteBtn>
             <VoteBtn
+              disabled={!account}
               onClick={() => {
                 setSelectedVoted(voteConstants.for)
                 setShowVoteModal(true)
