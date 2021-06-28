@@ -33,6 +33,7 @@ const Page = styled.div`
 `
 const PageContent = styled.div`
   height: 100%;
-  max-width: 936px;
+  max-width: 996px;
+  padding: 0 30px;
   margin: 0 auto;
 `

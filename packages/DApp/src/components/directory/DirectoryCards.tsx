@@ -12,6 +12,7 @@ import { DirectorySortingOptions } from '../../constants/SortingOptions'
 import { SpinnerIcon } from '../../assets/animatedIcons/spinnerIcon'
 import { useConfig } from '../../providers/config'
 import { Colors } from '../../constants/styles'
+import { WeeklyFeature } from '../WeeklyFeature'
 
 interface DirectoryCardProps {
   community: CommunityDetail
@@ -29,7 +30,7 @@ function DirectoryCard({ community }: DirectoryCardProps) {
   return (
     <Card>
       <CardCommunityWrap>
-        {' '}
+        &nbsp;
         <CardCommunity community={community} showRemoveButton={true} />
       </CardCommunityWrap>
       <CardVoteWrap style={{ backgroundColor: `${Colors.GrayLight}` }}>
@@ -58,7 +59,7 @@ export function DirectoryCards() {
   })
 
   return (
-    <div>
+    <>
       <PageBar>
         <Search
           type="text"
@@ -68,6 +69,7 @@ export function DirectoryCards() {
         />
         <FilterList value={sortedBy} setValue={setSortedBy} options={DirectorySortingOptions} />
       </PageBar>
+      <WeeklyFeature endDate={new Date('07/26/2021')} />
       <Voting>
         {communities.map((community) => (
           <DirectoryCard key={community.publicKey} community={community} />
@@ -78,7 +80,7 @@ export function DirectoryCards() {
           <SpinnerIcon />
         </IconWrapper>
       )}
-    </div>
+    </>
   )
 }
 
