@@ -11,20 +11,29 @@ import { Colors } from '../../constants/styles'
 import { useConfig } from '../../providers/config'
 import { VotingCardSkeleton } from './VotingCardSkeleton'
 import { VotingCard } from './VotingCard'
+import { Search } from '../Input'
 
 export function VotingCards() {
   const { config } = useConfig()
   const [sortedBy, setSortedBy] = useState(VotingSortingEnum.EndingSoonest)
   const [voteType, setVoteType] = useState('')
+  const [filterKeyword, setFilterKeyword] = useState('')
   const { communities, loading } = useCommunities(getCommunitiesUnderVote, {
     numberPerPage: config.numberPerPage,
     sortedBy,
     voteType,
+    filterKeyword,
   })
 
   return (
     <div>
       <PageBar>
+        <Search
+          type="text"
+          placeholder="Search communities..."
+          value={filterKeyword}
+          onChange={(e) => setFilterKeyword(e.currentTarget.value)}
+        />
         <VoteFilter>
           <span>Vote types:</span>
           <VoteType className={voteType == '' ? 'selected' : 'notSelected'} onClick={() => setVoteType('')}>
