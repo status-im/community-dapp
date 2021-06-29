@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import styled from 'styled-components'
 import { getCommunityDetails } from '../../helpers/apiMock'
 import { ButtonPrimary } from '../Button'
@@ -31,19 +31,24 @@ export function ProposeModal({
   const [publicKey, setPublicKey] = useState('')
   const [loading, setLoading] = useState(false)
   const disabled = proposingAmount === 0
-
+  const loadingIdx = useRef(0)
   const { votingContract } = useContracts()
   const { send } = useContractFunction(votingContract, 'initializeVotingRoom')
 
   useEffect(() => {
     const getDetails = async (key: string) => {
+      const idx = ++loadingIdx.current
       setLoading(true)
       setCommunityFound(await getCommunityDetails(key))
-      setLoading(false)
+      if (idx === loadingIdx.current) {
+        setLoading(false)
+      }
     }
     setCommunityFound(undefined)
     getDetails(publicKey)
   }, [publicKey])
+
+  useEffect(() => setCommunityFound(undefined), [])
 
   return (
     <CommunityProposing>

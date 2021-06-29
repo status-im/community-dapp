@@ -17,11 +17,6 @@ export function VotesInfo() {
     setShowProposeModal(false)
   }
 
-  const clearKey = (val: boolean) => {
-    setShowConfirmModal(val)
-    setCommunityFound(undefined)
-  }
-
   return (
     <InfoWrap>
       <PageInfo
@@ -29,13 +24,7 @@ export function VotesInfo() {
         text="Help curate the Status Communities directory by voting which communities should be included"
       />
       {showProposeModal && (
-        <Modal
-          heading="Add community to directory"
-          setShowModal={(val: boolean) => {
-            setShowProposeModal(val)
-            setCommunityFound(undefined)
-          }}
-        >
+        <Modal heading="Add community to directory" setShowModal={setShowProposeModal}>
           <ProposeModal
             availableAmount={65245346}
             setShowConfirmModal={setNext}
@@ -45,8 +34,12 @@ export function VotesInfo() {
         </Modal>
       )}
       {showConfirmModal && communityFound && (
-        <Modal setShowModal={clearKey}>
-          <VoteConfirmModal community={communityFound} selectedVote={{ verb: 'to add' }} setShowModal={clearKey} />
+        <Modal setShowModal={setShowConfirmModal}>
+          <VoteConfirmModal
+            community={communityFound}
+            selectedVote={{ verb: 'to add' }}
+            setShowModal={setShowConfirmModal}
+          />
         </Modal>
       )}
 
