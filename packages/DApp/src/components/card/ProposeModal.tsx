@@ -1,18 +1,36 @@
-import React, { useEffect, useState, useRef } from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
-import { getCommunityDetails } from '../../helpers/apiMock'
 import { ButtonPrimary } from '../Button'
 import { CardCommunity } from '../Card'
 import { Input } from '../Input'
 import { VotePropose } from '../votes/VotePropose'
 import { Warning } from '../votes/VoteWarning'
 import { ConfirmBtn } from './VoteConfirmModal'
-
 import { useContractFunction } from '@usedapp/core'
-
 import { useContracts } from '../../hooks/useContracts'
 import { CommunityDetail } from '../../models/community'
 import { CommunitySkeleton } from '../skeleton/CommunitySkeleton'
+import { useCommunityDetails } from '../../hooks/useCommunityDetails'
+
+interface PublicKeyInputProps {
+  publicKey: string
+  setPublicKey: (val: string) => void
+}
+
+function PublicKeyInput({ publicKey, setPublicKey }: PublicKeyInputProps) {
+  return (
+    <CommunityKeyLabel>
+      Community public key
+      <CommunityKey
+        value={publicKey}
+        placeholder="E.g. 0xbede83eef5d82c4dd5d82c4dd5fa837ad"
+        onChange={(e) => {
+          setPublicKey(e.currentTarget.value)
+        }}
+      ></CommunityKey>
+    </CommunityKeyLabel>
+  )
+}
 
 interface ProposeModalProps {
   availableAmount: number
@@ -29,39 +47,14 @@ export function ProposeModal({
 }: ProposeModalProps) {
   const [proposingAmount, setProposingAmount] = useState(0)
   const [publicKey, setPublicKey] = useState('')
-  const [loading, setLoading] = useState(false)
   const disabled = proposingAmount === 0
-  const loadingIdx = useRef(0)
+  const loading = useCommunityDetails(publicKey, setCommunityFound)
   const { votingContract } = useContracts()
   const { send } = useContractFunction(votingContract, 'initializeVotingRoom')
 
-  useEffect(() => {
-    const getDetails = async (key: string) => {
-      const idx = ++loadingIdx.current
-      setLoading(true)
-      setCommunityFound(await getCommunityDetails(key))
-      if (idx === loadingIdx.current) {
-        setLoading(false)
-      }
-    }
-    setCommunityFound(undefined)
-    getDetails(publicKey)
-  }, [publicKey])
-
-  useEffect(() => setCommunityFound(undefined), [])
-
   return (
     <CommunityProposing>
-      <CommunityKeyLabel>
-        Community public key
-        <CommunityKey
-          value={publicKey}
-          placeholder="E.g. 0xbede83eef5d82c4dd5d82c4dd5fa837ad"
-          onChange={(e) => {
-            setPublicKey(e.currentTarget.value)
-          }}
-        ></CommunityKey>
-      </CommunityKeyLabel>
+      <PublicKeyInput publicKey={publicKey} setPublicKey={setPublicKey} />
 
       {publicKey && communityFound && (
         <ProposingData>
@@ -111,7 +104,6 @@ export function ProposeModal({
         <ConfirmBtn
           onClick={() => {
             setShowConfirmModal(false)
-            setPublicKey('')
           }}
         >
           OK, let’s move on! <span>🤙</span>

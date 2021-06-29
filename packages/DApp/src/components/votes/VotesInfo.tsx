@@ -30,7 +30,7 @@ export function VotesInfo() {
             setShowConfirmModal={setNext}
             setCommunityFound={setCommunityFound}
             communityFound={communityFound}
-          />{' '}
+          />
         </Modal>
       )}
       {showConfirmModal && communityFound && (
