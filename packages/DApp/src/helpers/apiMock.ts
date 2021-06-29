@@ -2,8 +2,13 @@ import { communities, communitiesInDirectory, communitiesUnderVote } from './api
 import { CommunityDetail, DirectorySortingEnum, VotingSortingEnum } from '../models/community'
 import { APIOptions } from '../models/api'
 
-export function getCommunityDetails(publicKey: string) {
+export function getCommunityDetailsSync(publicKey: string) {
   return communities.filter((community) => community.publicKey == publicKey)[0]
+}
+
+export async function getCommunityDetails(publicKey: string) {
+  await new Promise((r) => setTimeout(r, 3000))
+  return getCommunityDetailsSync(publicKey)
 }
 
 function filterCommunities(resolvedCommunities: CommunityDetail[], filterKeyword?: string) {

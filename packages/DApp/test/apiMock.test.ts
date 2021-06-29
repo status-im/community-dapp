@@ -1,17 +1,17 @@
 import { expect } from 'chai'
-import { getCommunityDetails, getCommunitiesInDirectorySync } from '../src/helpers/apiMock'
+import { getCommunityDetailsSync, getCommunitiesInDirectorySync } from '../src/helpers/apiMock'
 import { communities } from '../src/helpers/apiMockData'
 import { DirectorySortingEnum } from '../src/models/community'
 
 describe('getCommunityDetails', () => {
   it('success', async () => {
-    expect(getCommunityDetails('0x344C19E3040Ec63A96b7aeB708C82a066315604B')).to.deep.eq(communities[0])
+    expect(getCommunityDetailsSync('0x344C19E3040Ec63A96b7aeB708C82a066315604B')).to.deep.eq(communities[0])
   })
   it('gets different community', async () => {
-    expect(getCommunityDetails('0xABA1EF51EF4bc360A9E8c9Ad2d787330b602EB24')).to.deep.eq(communities[1])
+    expect(getCommunityDetailsSync('0xABA1EF51EF4bc360A9E8c9Ad2d787330b602EB24')).to.deep.eq(communities[1])
   })
   it('empty', async () => {
-    expect(getCommunityDetails('0xabA1eF51ef4bc360a9e8C9aD2d787330B6q2eb24')).to.deep.eq(undefined)
+    expect(getCommunityDetailsSync('0xabA1eF51ef4bc360a9e8C9aD2d787330B6q2eb24')).to.deep.eq(undefined)
   })
 })
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { getCommunityDetails } from '../../helpers/apiMock'
 import { ButtonPrimary } from '../Button'
@@ -11,21 +11,38 @@ import { ConfirmBtn } from './VoteConfirmModal'
 import { useContractFunction } from '@usedapp/core'
 
 import { useContracts } from '../../hooks/useContracts'
+import { CommunityDetail } from '../../models/community'
 
 interface ProposeModalProps {
   availableAmount: number
   setShowConfirmModal: (val: boolean) => void
-  setPublicKey: (publicKey: string) => void
-  publicKey: string
+  setCommunityFound: (community: CommunityDetail | undefined) => void
+  communityFound: CommunityDetail | undefined
 }
 
-export function ProposeModal({ availableAmount, setShowConfirmModal, setPublicKey, publicKey }: ProposeModalProps) {
+export function ProposeModal({
+  availableAmount,
+  setShowConfirmModal,
+  setCommunityFound,
+  communityFound,
+}: ProposeModalProps) {
   const [proposingAmount, setProposingAmount] = useState(availableAmount)
-  const communityFound = getCommunityDetails(publicKey)
+  const [publicKey, setPublicKey] = useState('')
+  const [loading, setLoading] = useState(false)
   const disabled = proposingAmount === 0
 
   const { votingContract } = useContracts()
   const { send } = useContractFunction(votingContract, 'initializeVotingRoom')
+
+  useEffect(() => {
+    const getDetails = async (key: string) => {
+      setLoading(true)
+      setCommunityFound(await getCommunityDetails(key))
+      setLoading(false)
+    }
+    setCommunityFound(undefined)
+    getDetails(publicKey)
+  }, [publicKey])
 
   return (
     <CommunityProposing>
@@ -69,7 +86,7 @@ export function ProposeModal({ availableAmount, setShowConfirmModal, setPublicKe
           <InfoText>To propose a community, it must have at least 42 members and have a ENS domain.</InfoText>
         </ProposingInfo>
       )}
-
+      {loading && publicKey && <div>LOADING</div>}
       {communityFound && !communityFound.validForAddition ? (
         <ConfirmBtn
           onClick={() => {

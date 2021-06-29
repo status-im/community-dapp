@@ -4,13 +4,13 @@ import { useEthers } from '@usedapp/core'
 import { Modal } from '../Modal'
 import { ProposeModal } from '../card/ProposeModal'
 import { VoteConfirmModal } from '../card/VoteConfirmModal'
-import { getCommunityDetails } from '../../helpers/apiMock'
+import { CommunityDetail } from '../../models/community'
 
 export function VotesInfo() {
   const { account } = useEthers()
   const [showProposeModal, setShowProposeModal] = useState(false)
   const [showConfirmModal, setShowConfirmModal] = useState(false)
-  const [publicKey, setPublicKey] = useState('')
+  const [communityFound, setCommunityFound] = useState<undefined | CommunityDetail>(undefined)
 
   const setNext = (val: boolean) => {
     setShowConfirmModal(val)
@@ -19,7 +19,7 @@ export function VotesInfo() {
 
   const clearKey = (val: boolean) => {
     setShowConfirmModal(val)
-    setPublicKey('')
+    setCommunityFound(undefined)
   }
 
   return (
@@ -33,24 +33,20 @@ export function VotesInfo() {
           heading="Add community to directory"
           setShowModal={(val: boolean) => {
             setShowProposeModal(val)
-            setPublicKey('')
+            setCommunityFound(undefined)
           }}
         >
           <ProposeModal
             availableAmount={65245346}
             setShowConfirmModal={setNext}
-            setPublicKey={setPublicKey}
-            publicKey={publicKey}
+            setCommunityFound={setCommunityFound}
+            communityFound={communityFound}
           />{' '}
         </Modal>
       )}
-      {showConfirmModal && (
+      {showConfirmModal && communityFound && (
         <Modal setShowModal={clearKey}>
-          <VoteConfirmModal
-            community={getCommunityDetails(publicKey)}
-            selectedVote={{ verb: 'to add' }}
-            setShowModal={clearKey}
-          />
+          <VoteConfirmModal community={communityFound} selectedVote={{ verb: 'to add' }} setShowModal={clearKey} />
         </Modal>
       )}
 
