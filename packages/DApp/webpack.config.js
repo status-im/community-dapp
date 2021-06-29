@@ -26,7 +26,6 @@ module.exports = (env) => {
             rules: [
                 {
                     test: /\.[jt]sx?$/,
-                    exclude: /node_modules/,
                     use: {
                         loader: 'babel-loader',
                         options: {
@@ -36,7 +35,7 @@ module.exports = (env) => {
                                 '@babel/preset-typescript',
                                 [
                                     '@babel/preset-env',
-                                    { targets: { browsers: '> 5%, not IE <= 11' } },
+                                    { targets: { browsers: 'chrome 77' } },
                                 ],
                                 '@babel/preset-react',
                             ],
