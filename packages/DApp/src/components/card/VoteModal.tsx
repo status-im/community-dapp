@@ -24,7 +24,7 @@ export function VoteModal({ vote, room, selectedVote, availableAmount, setShowCo
 
   return (
     <CardProposing>
-      <VoteChart vote={vote} />
+      <VoteChart vote={vote} proposingAmount={proposingAmount} selectedVote={selectedVote} />
       <VotePropose
         vote={vote}
         selectedVote={selectedVote}

@@ -1,19 +1,21 @@
 import React from 'react'
 import styled from 'styled-components'
 import { Colors } from '../../constants/styles'
-import indicatorIcon from '../../assets/images/indicator.svg'
 import { addCommas } from '../../helpers/addCommas'
-import { voteTypes } from './../../constants/voteTypes'
+import { VoteType, voteTypes } from './../../constants/voteTypes'
 import { CurrentVoting } from '../../models/community'
+import { VoteGraphBar } from './VoteGraphBar'
 
 import { formatTimeLeft } from '../../helpers/fomatTimeLeft'
 
 export interface VoteChartProps {
   vote: CurrentVoting
   voteWinner?: number
+  proposingAmount?: number
+  selectedVote?: VoteType
 }
 
-export function VoteChart({ vote, voteWinner }: VoteChartProps) {
+export function VoteChart({ vote, voteWinner, proposingAmount, selectedVote }: VoteChartProps) {
   const voteConstants = voteTypes[vote.type]
   return (
     <Votes>
@@ -43,36 +45,11 @@ export function VoteChart({ vote, voteWinner }: VoteChartProps) {
         votesFor={vote.voteFor.toNumber()}
         votesAgainst={vote.voteAgainst.toNumber()}
         voteWinner={voteWinner}
+        proposingAmount={proposingAmount}
+        selectedVote={selectedVote}
       />
     </Votes>
   )
-}
-
-export interface VoteGraphBarProps {
-  votesAgainst: number
-  votesFor: number
-  voteWinner?: number
-}
-
-export function VoteGraphBar({ votesFor, votesAgainst, voteWinner }: VoteGraphBarProps) {
-  return (
-    <VoteGraph
-      style={{
-        backgroundColor: voteWinner && voteWinner === 1 ? `${Colors.GrayDisabledLight}` : `${Colors.BlueBar}`,
-      }}
-    >
-      <VoteGraphAgainst
-        style={{
-          width: calculateWidth(votesFor, votesAgainst) + '%',
-          backgroundColor: voteWinner && voteWinner === 2 ? `${Colors.GrayDisabledLight}` : `${Colors.Orange}`,
-        }}
-      />
-    </VoteGraph>
-  )
-}
-
-function calculateWidth(votesFor: number, votesAgainst: number) {
-  return (100 * votesAgainst) / (votesFor + votesAgainst)
 }
 
 const Votes = styled.div`
@@ -112,37 +89,4 @@ const TimeLeft = styled.p`
   line-height: 16px;
   letter-spacing: 0.1px;
   color: ${Colors.GreyText};
-`
-
-const VoteGraph = styled.div`
-  position: relative;
-  width: 100%;
-  height: 16px;
-  background-color: ${Colors.BlueBar};
-  border-radius: 10px;
-  padding-top: 5px;
-
-  &::before {
-    content: '';
-    width: 16px;
-    height: 5px;
-    position: absolute;
-    top: -5px;
-    left: 50%;
-    transform: translateX(-50%);
-    background-image: url(${indicatorIcon});
-    background-size: cover;
-  }
-`
-
-const VoteGraphAgainst = styled.div`
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 13px;
-  height: 16px;
-  background-color: ${Colors.Orange};
-  border-right: 2px solid ${Colors.VioletLight};
-  border-radius: 10px 0 0 10px;
-  z-index: 2;
 `
