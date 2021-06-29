@@ -22,8 +22,9 @@ export const ButtonPrimary = styled(Button)`
   }
 
   &:disabled {
-    background: ${Colors.GrayDisabledDark};
+    background: ${Colors.GrayDisabledLight};
     color: ${Colors.GreyTextDisabled};
+    filter: grayscale(1);
   }
 `
 export const ButtonSecondary = styled(Button)`

@@ -1,6 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
-import { CardCommunityWrap, CardLinks } from '../Card'
+import { CardInfoBlock, CardLinks } from '../Card'
 import { LinkExternal, LinkInternal } from '../Link'
 import { Skeleton } from '../skeleton/Skeleton'
 import { TagsSkeletonList } from '../skeleton/TagSkeleton'
@@ -8,7 +8,8 @@ import { TextBlock } from '../skeleton/TextSkeleton'
 
 export const CommunitySkeleton = () => {
   return (
-    <CardCommunityWrap>
+    <CardInfoBlock>
+      {' '}
       <CardRow>
         <AvatarSkeleton />
         <CardContent>
@@ -22,12 +23,13 @@ export const CommunitySkeleton = () => {
         <StyledExternalLink>Etherscan</StyledExternalLink>
         <StyledInternalink>Voting history </StyledInternalink>
       </CardLinks>
-    </CardCommunityWrap>
+    </CardInfoBlock>
   )
 }
 
 const CardRow = styled.div`
   display: flex;
+  width: 100%;
   margin-bottom: 48px;
 `
 

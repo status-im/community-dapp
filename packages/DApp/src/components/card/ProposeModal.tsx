@@ -12,6 +12,7 @@ import { useContractFunction } from '@usedapp/core'
 
 import { useContracts } from '../../hooks/useContracts'
 import { CommunityDetail } from '../../models/community'
+import { CommunitySkeleton } from '../skeleton/CommunitySkeleton'
 
 interface ProposeModalProps {
   availableAmount: number
@@ -26,7 +27,7 @@ export function ProposeModal({
   setCommunityFound,
   communityFound,
 }: ProposeModalProps) {
-  const [proposingAmount, setProposingAmount] = useState(availableAmount)
+  const [proposingAmount, setProposingAmount] = useState(0)
   const [publicKey, setPublicKey] = useState('')
   const [loading, setLoading] = useState(false)
   const disabled = proposingAmount === 0
@@ -58,7 +59,7 @@ export function ProposeModal({
       </CommunityKeyLabel>
 
       {publicKey && communityFound && (
-        <div>
+        <ProposingData>
           <CardCommunity community={communityFound} />
           {communityFound.validForAddition ? (
             <VoteProposeWrap>
@@ -77,16 +78,30 @@ export function ProposeModal({
               />
             </WarningWrap>
           )}
-        </div>
+        </ProposingData>
       )}
 
-      {!communityFound && (
+      {!communityFound && !publicKey && (
         <ProposingInfo>
           <span>ℹ️</span>
           <InfoText>To propose a community, it must have at least 42 members and have a ENS domain.</InfoText>
         </ProposingInfo>
       )}
-      {loading && publicKey && <div>LOADING</div>}
+
+      {loading && publicKey && (
+        <ProposingData>
+          <CommunitySkeleton />
+          <VoteProposeWrap>
+            <VotePropose
+              availableAmount={availableAmount}
+              setProposingAmount={setProposingAmount}
+              proposingAmount={proposingAmount}
+              disabled={disabled}
+            />
+          </VoteProposeWrap>
+        </ProposingData>
+      )}
+
       {communityFound && !communityFound.validForAddition ? (
         <ConfirmBtn
           onClick={() => {
@@ -98,7 +113,7 @@ export function ProposeModal({
         </ConfirmBtn>
       ) : (
         <ProposingBtn
-          disabled={!communityFound}
+          disabled={!communityFound || disabled}
           onClick={() => {
             send(1, publicKey)
             setShowConfirmModal(true)
@@ -132,6 +147,10 @@ const CommunityKeyLabel = styled.label`
 
 const VoteProposeWrap = styled.div`
   margin-top: 32px;
+`
+
+const ProposingData = styled.div`
+  width: 100%;
 `
 
 const ProposingInfo = styled.div`

@@ -223,7 +223,7 @@ export const CardVoteWrap = styled.div`
   box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
   border-radius: 6px 0px 0px 6px;
 `
-const CardInfoBlock = styled.div`
+export const CardInfoBlock = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;

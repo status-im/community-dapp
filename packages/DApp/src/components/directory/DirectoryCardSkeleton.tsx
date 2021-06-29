@@ -1,13 +1,15 @@
 import React from 'react'
 import styled from 'styled-components'
-import { Card, CardVoteBlock, CardVoteWrap } from '../Card'
+import { Card, CardCommunityWrap, CardVoteBlock, CardVoteWrap } from '../Card'
 import { CommunitySkeleton } from '../skeleton/CommunitySkeleton'
 import { Skeleton } from '../skeleton/Skeleton'
 
 export const DirectoryCardSkeleton = () => {
   return (
     <Card>
-      <CommunitySkeleton />
+      <CardCommunityWrap>
+        <CommunitySkeleton />
+      </CardCommunityWrap>
       <CardVoteWrap>
         <CardVoteBlock>
           <CardHeader>
