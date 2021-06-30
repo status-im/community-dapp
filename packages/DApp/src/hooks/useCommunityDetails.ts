@@ -16,7 +16,9 @@ export function useCommunityDetails(publicKey: string, setCommunityDetail: (val:
       }
     }
     setCommunityDetail(undefined)
-    getDetails(publicKey)
+    if (publicKey) {
+      getDetails(publicKey)
+    }
   }, [publicKey])
 
   useEffect(() => setCommunityDetail(undefined), [])

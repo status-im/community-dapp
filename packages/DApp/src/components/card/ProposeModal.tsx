@@ -48,7 +48,6 @@ export function ProposeModal({
 }: ProposeModalProps) {
   const [proposingAmount, setProposingAmount] = useState(0)
   const [publicKey, setPublicKey] = useState('')
-  const disabled = proposingAmount === 0
   const loading = useCommunityDetails(publicKey, setCommunityFound)
   const { votingContract } = useContracts()
   const { send } = useContractFunction(votingContract, 'initializeVotingRoom')
@@ -56,62 +55,41 @@ export function ProposeModal({
   return (
     <ColumnFlexDiv>
       <PublicKeyInput publicKey={publicKey} setPublicKey={setPublicKey} />
-
-      {publicKey && communityFound && (
-        <ProposingData>
-          <CardCommunity community={communityFound} />
-          {communityFound.validForAddition ? (
-            <VoteProposeWrap>
-              <VotePropose
-                availableAmount={availableAmount}
-                setProposingAmount={setProposingAmount}
-                proposingAmount={proposingAmount}
-                disabled={disabled}
-              />
-            </VoteProposeWrap>
-          ) : (
-            <WarningWrap>
-              <Warning
-                icon="🤏"
-                text={`${communityFound.name} currently only has ${communityFound.numberOfMembers} members. A community needs more than 42 members before a vote to be added to the Status community directory can be proposed.`}
-              />
-            </WarningWrap>
-          )}
-        </ProposingData>
-      )}
-
-      {!communityFound && !publicKey && (
-        <ProposingInfo>
-          <span>ℹ️</span>
-          <InfoText>To propose a community, it must have at least 42 members and have a ENS domain.</InfoText>
-        </ProposingInfo>
-      )}
-
-      {loading && publicKey && (
-        <ProposingData>
-          <CommunitySkeleton />
+      <ProposingData>
+        {communityFound ? <CardCommunity community={communityFound} /> : loading && <CommunitySkeleton />}
+        {communityFound && !communityFound.validForAddition && (
+          <WarningWrap>
+            <Warning
+              icon="🤏"
+              text={`${communityFound.name} currently only has ${communityFound.numberOfMembers} members. A community needs more than 42 members before a vote to be added to the Status community directory can be proposed.`}
+            />
+          </WarningWrap>
+        )}
+        {((communityFound && communityFound.validForAddition) || loading) && (
           <VoteProposeWrap>
             <VotePropose
               availableAmount={availableAmount}
               setProposingAmount={setProposingAmount}
               proposingAmount={proposingAmount}
-              disabled={disabled}
+              disabled={!communityFound || !proposingAmount}
             />
           </VoteProposeWrap>
-        </ProposingData>
-      )}
+        )}
+        {!publicKey && (
+          <ProposingInfo>
+            <span>ℹ️</span>
+            <InfoText>To propose a community, it must have at least 42 members and have a ENS domain.</InfoText>
+          </ProposingInfo>
+        )}
+      </ProposingData>
 
       {communityFound && !communityFound.validForAddition ? (
-        <ConfirmBtn
-          onClick={() => {
-            setShowConfirmModal(false)
-          }}
-        >
+        <ConfirmBtn onClick={() => setShowConfirmModal(false)}>
           OK, let’s move on! <span>🤙</span>
         </ConfirmBtn>
       ) : (
         <ProposingBtn
-          disabled={!communityFound || disabled}
+          disabled={!communityFound || !proposingAmount}
           onClick={() => {
             send(1, publicKey)
             setShowConfirmModal(true)
@@ -149,7 +127,6 @@ const ProposingInfo = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  width: 100%;
   margin-bottom: 32px;
 
   & > span {
