@@ -1,56 +1,83 @@
 ## Community details
 
+Community details is taken from status wallet API
+
 ```ts
 getCommunityDetails(publicKey: String) // returns object describing community of address communityAddress
 
 type CommunityDetail: {
-    publicKey: String // Address of a community
-    ens: String // ens of a community
-    name: String // name of a community
-    link: String // link to visit a community
-    icon: String // url to a icon of a community
-    tags: [String] // list of strings that contain tag names
-    description: String // short description about community
-    numberOfMembers: Number // amount of members in community
-    validForAddition: Boolean // boolean of wheather community can be added to directory
-    votingHistory: [ // list of objects describing previous votes
-        {
-            date: Date // date of vote
-            type: 'Remove' | 'Add' // string with type of vote
-            result: 'Passed' | 'Failed' // string with vote result
-        }
-    ]
-    currentVoting: { // object describing current voting if community isnt under vote returns undefined
-        timeLeft: Number // number of seconds left in vote if vote is waiting for finalization returns 0
-        type: 'Remove' | 'Add'
-        voteFor: BigNumber // number of snt for a vote
-        voteAgainst: BigNumber // number of snt against a vote
-    } | undefined
+    publicKey: string // Address of a community
+    ens: string | undefined // ens of a community
+    name: string // name of a community
+    link: string // link to visit a community
+    icon: string // url to a icon of a community
+    tags: [string] // list of strings that contain tag names
+    description: string // short description about community
+    numberOfMembers: number // amount of members in community
 }
 ```
+
+# Subgraph API
 
 ## List of communities under vote
 
 ```ts
 //Enum describing sorting types
-SortingEnum enum {
-    EndingSoonest: 0
-    EndingLatest: 1
-    MostVotes: 2
-    LeastVotes: 3
-    AtoZ: 4
-    ZtoA: 5
+enum VotingSortingEnum {
+    EndingSoonest= 0
+    EndingLatest= 1
+    MostVotes= 2
+    LeastVotes= 3
+    AtoZ= 4
+    ZtoA= 5
 }
 
-// returns a object describing Communities under vote
+// returns a list of public keys of communities under vote
 // amount of communities in list is described by NumberPerPage
 // pageNumber describes which page to return
 // sorted by describes sorting in list
-getCommunitiesUnderVote(numberPerPage: Number, pageNumber:Number, sortedBy: SortingEnum) 
-
+// filter keyword is a string that contains a text to filter a communities list
+// voteType:
+// voteType can be 'Add' , 'Remove' , '' when voteType is 'Add' or 'Remove' it will only return
+// communities that are under vote of type 'Add' or 'Remove' when voteType is '' it will return all 
+// communities under vote
+getCommunitiesUnderVote(numberPerPage: Number, 
+                        pageNumber:Number, 
+                        sortedBy: VotingSortingEnum, 
+                        filterKeyword: String,
+                        voteType: String) 
 {
     page: Number // page number
-    communities: [ CommunityDetail ] // list of communities under vote
+    communities: [ string ] // list of public keys of communities under vote
+}
+
+```
+
+## List of communities in directory
+
+```ts
+//Enum describing sorting types
+enum DirectorySortingEnum {
+    IncludedRecently= 0
+    IncludedLongAgo= 1
+    MostVotes= 2
+    LeastVotes= 3
+    AtoZ= 4
+    ZtoA= 5
+}
+
+// returns a list of public keys of communities under vote
+// amount of communities in list is described by NumberPerPage
+// pageNumber describes which page to return
+// sorted by describes sorting in list
+// filter keyword is a string that contains a text to filter a communities list
+getCommunitiesInDirectory(numberPerPage: Number, 
+                          pageNumber:Number, 
+                          sortedBy: DirectorySortingEnum, 
+                          filterKeyword: String) 
+{
+    page: Number // page number
+    communities: [ string ] // list of public keys of communities under vote
 }
 
 ```
