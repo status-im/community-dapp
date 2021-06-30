@@ -1,5 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
+import { ColumnFlexDiv } from '../../constants/styles'
 import { CommunityDetail } from '../../models/community'
 import { ButtonSecondary } from '../Button'
 import { LinkExternal } from '../Link'
@@ -14,7 +15,7 @@ interface VoteConfirmModalProps {
 
 export function VoteConfirmModal({ community, selectedVote, setShowModal }: VoteConfirmModalProps) {
   return (
-    <VoteConfirm>
+    <ColumnFlexDiv>
       <ConfirmLogo src={community.icon} alt={`${community.name} logo`} />
       <ConfirmText>
         Your vote{' '}
@@ -29,15 +30,9 @@ export function VoteConfirmModal({ community, selectedVote, setShowModal }: Vote
       <ConfirmBtn onClick={() => setShowModal(false)}>
         OK, let’s move on! <span>🤙</span>
       </ConfirmBtn>
-    </VoteConfirm>
+    </ColumnFlexDiv>
   )
 }
-
-const VoteConfirm = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-`
 
 const ConfirmLogo = styled.img`
   width: 64px !important;

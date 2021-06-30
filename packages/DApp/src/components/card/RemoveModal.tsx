@@ -1,5 +1,5 @@
 import React from 'react'
-import styled from 'styled-components'
+import { ColumnFlexDiv } from '../../constants/styles'
 import { CommunityDetail } from '../../models/community'
 import { CardCommunity } from '../Card'
 import { RemoveAmountPicker } from '../card/RemoveAmountPicker'
@@ -12,19 +12,13 @@ interface RemoveModalProps {
 
 export function RemoveModal({ community, availableAmount, setShowConfirmModal }: RemoveModalProps) {
   return (
-    <CommunityProposing>
+    <ColumnFlexDiv>
       <CardCommunity community={community} />
       <RemoveAmountPicker
         community={community}
         availableAmount={availableAmount}
         setShowConfirmModal={setShowConfirmModal}
       />
-    </CommunityProposing>
+    </ColumnFlexDiv>
   )
 }
-
-const CommunityProposing = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-`

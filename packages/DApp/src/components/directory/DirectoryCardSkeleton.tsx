@@ -1,5 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
+import { ColumnFlexDiv } from '../../constants/styles'
 import { Card, CardCommunityWrap, CardVoteBlock, CardVoteWrap } from '../Card'
 import { CommunitySkeleton } from '../skeleton/CommunitySkeleton'
 import { Skeleton } from '../skeleton/Skeleton'
@@ -37,10 +38,7 @@ const SkeletonButton = styled(Skeleton)`
   height: 44px;
 `
 
-const Column = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+const Column = styled(ColumnFlexDiv)`
   justify-content: space-between;
   height: 80px;
   margin-bottom: 32px;

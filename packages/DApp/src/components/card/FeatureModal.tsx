@@ -4,6 +4,7 @@ import { CommunityDetail } from '../../models/community'
 import { CardCommunity } from '../Card'
 import { ButtonPrimary } from '../Button'
 import { VotePropose } from '../votes/VotePropose'
+import { ColumnFlexDiv } from '../../constants/styles'
 
 interface FeatureModalProps {
   community: CommunityDetail
@@ -16,7 +17,7 @@ export function FeatureModal({ community, availableAmount, setShowConfirmModal }
   const disabled = proposingAmount === 0
 
   return (
-    <CommunityProposing>
+    <ColumnFlexDiv>
       <CardCommunity community={community} />
       <VoteProposeWrap>
         <VotePropose
@@ -29,15 +30,9 @@ export function FeatureModal({ community, availableAmount, setShowConfirmModal }
           Confirm vote to feature community
         </VoteConfirmBtn>
       </VoteProposeWrap>
-    </CommunityProposing>
+    </ColumnFlexDiv>
   )
 }
-
-const CommunityProposing = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-`
 
 const VoteProposeWrap = styled.div`
   margin-top: 32px;

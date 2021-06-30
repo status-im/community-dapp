@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
-import { Colors } from '../../constants/styles'
+import { Colors, ColumnFlexDiv } from '../../constants/styles'
 import { addCommas } from '../../helpers/addCommas'
 import { LinkInternal } from '../Link'
 import rightIcon from '../../assets/images/arrowRight.svg'
@@ -110,10 +110,7 @@ const FeatureTop = styled.div`
 const FeatureBtn = styled(VoteBtn)`
   width: 100%;
 `
-const FeatureVote = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+const FeatureVote = styled(ColumnFlexDiv)`
   margin: 45px auto 32px;
   max-width: 290px;
   text-align: center;

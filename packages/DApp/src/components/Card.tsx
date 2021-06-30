@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
-import { Colors } from '../constants/styles'
+import { Colors, ColumnFlexDiv } from '../constants/styles'
 import { ButtonSecondary } from '../components/Button'
 import { CommunityDetail } from '../models/community'
 import { LinkExternal, LinkInternal } from './Link'
@@ -32,7 +32,7 @@ export const CardCommunity = ({ community, showRemoveButton }: CardCommunityProp
   }
 
   return (
-    <CardInfoBlock>
+    <ColumnFlexDiv>
       {showHistoryModal && (
         <Modal heading={`${community.name} voting history`} setShowModal={setShowHistoryModal}>
           <VoteHistoryTable>
@@ -96,7 +96,7 @@ export const CardCommunity = ({ community, showRemoveButton }: CardCommunityProp
         <LinkExternal>Etherscan</LinkExternal>
         <LinkInternal onClick={() => setShowHistoryModal(true)}>Voting history</LinkInternal>
       </CardLinks>
-    </CardInfoBlock>
+    </ColumnFlexDiv>
   )
 }
 
@@ -222,11 +222,6 @@ export const CardVoteWrap = styled.div`
   padding: 24px 24px 32px;
   box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
   border-radius: 6px 0px 0px 6px;
-`
-export const CardInfoBlock = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
 `
 
 const Community = styled.div`

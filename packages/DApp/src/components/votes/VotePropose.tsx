@@ -1,7 +1,7 @@
 import React from 'react'
 import { useState } from 'react'
 import styled from 'styled-components'
-import { Colors } from '../../constants/styles'
+import { Colors, ColumnFlexDiv } from '../../constants/styles'
 import { addCommas } from '../../helpers/addCommas'
 import { CurrentVoting } from '../../models/community'
 import { Input } from '../Input'
@@ -99,10 +99,7 @@ export function VotePropose({
   )
 }
 
-export const VoteProposing = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+export const VoteProposing = styled(ColumnFlexDiv)`
   width: 100%;
 `
 const VoteProposingInfo = styled.div`

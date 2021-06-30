@@ -1,6 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 import { ButtonPrimary } from '../components/Button'
+import { ColumnFlexDiv } from '../constants/styles'
 import { StatusConnectButton } from './StatusConnectButton'
 
 interface PageInfoProps {
@@ -9,10 +10,10 @@ interface PageInfoProps {
 }
 
 export const PageInfo = ({ heading, text }: PageInfoProps) => (
-  <InfoBlock>
+  <ColumnFlexDiv>
     <InfoHeading>{heading}</InfoHeading>
     <InfoText>{text}</InfoText>
-  </InfoBlock>
+  </ColumnFlexDiv>
 )
 
 interface ProposeButtonProps {
@@ -27,19 +28,10 @@ export function ConnectButton() {
   return <ConnectButtonStyled>Connect to Vote</ConnectButtonStyled>
 }
 
-export const InfoWrap = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+export const InfoWrap = styled(ColumnFlexDiv)`
   max-width: 630px;
   padding: 48px 0;
   margin: 0 auto;
-`
-
-const InfoBlock = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
 `
 
 const InfoHeading = styled.h1`

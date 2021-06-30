@@ -1,3 +1,5 @@
+import styled from 'styled-components'
+
 export const Colors = {
   White: '#FFFFFF',
   Black: '#000000',
@@ -22,3 +24,9 @@ export const Colors = {
 }
 
 export const Font = 'Inter, sans-serif'
+
+export const ColumnFlexDiv = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`

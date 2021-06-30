@@ -6,6 +6,7 @@ import { CurrentVoting } from '../../models/community'
 import { VotePropose } from '../votes/VotePropose'
 import { VoteType } from '../../constants/voteTypes'
 import { useSendWakuVote } from '../../hooks/useSendWakuVote'
+import { ColumnFlexDiv } from '../../constants/styles'
 
 export interface VoteModalProps {
   vote: CurrentVoting
@@ -23,7 +24,7 @@ export function VoteModal({ vote, room, selectedVote, availableAmount, setShowCo
   const sendWakuVote = useSendWakuVote()
 
   return (
-    <CardProposing>
+    <ColumnFlexDiv>
       <VoteChart vote={vote} proposingAmount={proposingAmount} selectedVote={selectedVote} />
       <VotePropose
         vote={vote}
@@ -41,15 +42,9 @@ export function VoteModal({ vote, room, selectedVote, availableAmount, setShowCo
         }}
         disabled={disabled}
       >{`Vote ${selectedVote.verb} community ${selectedVote.icon}`}</VoteConfirmBtn>
-    </CardProposing>
+    </ColumnFlexDiv>
   )
 }
-
-export const CardProposing = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-`
 
 const VoteConfirmBtn = styled(ButtonSecondary)`
   width: 100%;

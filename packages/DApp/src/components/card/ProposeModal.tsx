@@ -11,6 +11,7 @@ import { useContracts } from '../../hooks/useContracts'
 import { CommunityDetail } from '../../models/community'
 import { CommunitySkeleton } from '../skeleton/CommunitySkeleton'
 import { useCommunityDetails } from '../../hooks/useCommunityDetails'
+import { ColumnFlexDiv } from '../../constants/styles'
 
 interface PublicKeyInputProps {
   publicKey: string
@@ -53,7 +54,7 @@ export function ProposeModal({
   const { send } = useContractFunction(votingContract, 'initializeVotingRoom')
 
   return (
-    <CommunityProposing>
+    <ColumnFlexDiv>
       <PublicKeyInput publicKey={publicKey} setPublicKey={setPublicKey} />
 
       {publicKey && communityFound && (
@@ -119,15 +120,9 @@ export function ProposeModal({
           Confirm vote to add community
         </ProposingBtn>
       )}
-    </CommunityProposing>
+    </ColumnFlexDiv>
   )
 }
-
-const CommunityProposing = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-`
 
 const CommunityKey = styled(Input)`
   width: 100%;

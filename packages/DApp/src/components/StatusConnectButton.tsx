@@ -5,6 +5,7 @@ import styled from 'styled-components'
 import { Modal } from './Modal'
 import { LinkExternal } from './Link'
 import statusLogo from '../assets/images/statusLogo.svg'
+import { ColumnFlexDiv } from '../constants/styles'
 
 export type StatusConnectButtonProps = {
   children: ReactNode
@@ -50,11 +51,7 @@ function StatusModal() {
   )
 }
 
-const StatusInfo = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-
+const StatusInfo = styled(ColumnFlexDiv)`
   & > p {
     font-weight: 500;
     font-size: 15px;
