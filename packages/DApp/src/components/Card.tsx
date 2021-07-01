@@ -15,6 +15,8 @@ import { useEthers } from '@usedapp/core'
 import { useContractFunction } from '@usedapp/core'
 import { useContracts } from '../hooks/useContracts'
 import { getVotingWinner } from '../helpers/voting'
+import { useVotesAggregate } from '../hooks/useVotesAggregate'
+import rightIcon from '../assets/images/arrowRight.svg'
 
 interface CardCommunityProps {
   community: CommunityDetail
@@ -114,6 +116,9 @@ export const CardVote = ({ community, room, hideModalFunction }: CardVoteProps) 
   const [selectedVoted, setSelectedVoted] = useState(voteTypes['Add'].for)
 
   const { votingContract } = useContracts()
+  const { votes } = useVotesAggregate(room)
+  const { send } = useContractFunction(votingContract, 'castVotes')
+
   const finalizeVoting = useContractFunction(votingContract, 'finalizeVotingRoom')
 
   const setNext = (val: boolean) => {
@@ -167,7 +172,12 @@ export const CardVote = ({ community, room, hideModalFunction }: CardVoteProps) 
       ) : hideModalFunction ? (
         <CardHeading />
       ) : (
-        <CardHeading>{voteConstants.question}</CardHeading>
+        <CardVoteTop>
+          <CardHeading>{voteConstants.question}</CardHeading>
+          {votes.length > 0 && community.currentVoting && community?.currentVoting.timeLeft > 0 && (
+            <VoteSendingBtn onClick={() => send(votes)}> {votes.length} votes need saving</VoteSendingBtn>
+          )}
+        </CardVoteTop>
       )}
       <div>
         <VoteChart vote={vote} voteWinner={winner} />
@@ -245,6 +255,11 @@ const CardLogo = styled.img`
   height: 64px !important;
   border-radius: 50%;
 `
+const CardVoteTop = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`
 
 export const CardHeading = styled.h2`
   font-weight: bold;
@@ -256,6 +271,35 @@ const CardTop = styled.div`
   align-items: center;
   margin-bottom: 8px;
   line-height: 24px;
+`
+
+const VoteSendingBtn = styled.button`
+  padding-right: 28px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 20px;
+  position: relative;
+  color: ${Colors.VioletDark};
+
+  &:hover {
+    color: ${Colors.Violet};
+  }
+
+  &:active {
+    color: ${Colors.VioletDark};
+  }
+
+  &::after {
+    content: '';
+    width: 24px;
+    height: 24px;
+    position: absolute;
+    top: 50%;
+    right: 0;
+    transform: translateY(-50%);
+    background-image: url(${rightIcon});
+    background-size: cover;
+  }
 `
 
 const RemoveBtn = styled.button`
