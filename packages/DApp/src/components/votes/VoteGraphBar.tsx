@@ -1,56 +1,56 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { Colors } from '../../constants/styles'
 import indicatorIcon from '../../assets/images/indicator.svg'
-import { VoteType } from '../../constants/voteTypes'
 
+function createKeyFrames(votesWidth: number, markerWidth: number) {
+  return `
+  @keyframes fade-in {  
+    0% {
+      width: ${votesWidth}%;
+    }
+    100% {
+      width: ${markerWidth}%;
+    }
+  }
+  `
+}
 export interface VoteGraphBarProps {
-  votesAgainst: number
-  votesFor: number
+  balanceWidth?: number
+  graphWidth?: number
   voteWinner?: number
-  proposingAmount?: number
-  selectedVote?: VoteType
+  isAnimation?: boolean
 }
 
-export function VoteGraphBar({ votesFor, votesAgainst, voteWinner, proposingAmount, selectedVote }: VoteGraphBarProps) {
-  const voteSum = votesFor + votesAgainst
-  const graphWidth = (100 * votesAgainst) / voteSum
+export function VoteGraphBar({ graphWidth, balanceWidth, isAnimation }: VoteGraphBarProps) {
+  const markerWidth: number = balanceWidth ? balanceWidth : 3
+  const votesWidth: number = graphWidth ? graphWidth : 3
+  const [keyFrames, setKeyFrames] = useState('')
+  const [style, setStyle] = useState<any>({ width: `${votesWidth}%` })
 
-  let balanceWidth = graphWidth
-
-  if (proposingAmount && selectedVote) {
-    balanceWidth =
-      selectedVote.type === 0
-        ? (100 * (votesAgainst + proposingAmount)) / (voteSum + proposingAmount)
-        : (100 * votesAgainst) / (voteSum + proposingAmount)
-  }
+  useEffect(() => {
+    if (isAnimation) {
+      setStyle({ width: `${markerWidth}%`, animation: 'fade-in 2s ease' })
+      setKeyFrames(createKeyFrames(votesWidth, markerWidth))
+    } else {
+      setStyle({ width: `${votesWidth}%` })
+    }
+  }, [isAnimation, votesWidth])
 
   return (
-    <VoteGraph
-      style={{
-        backgroundColor: voteWinner && voteWinner === 1 ? `${Colors.GrayDisabledLight}` : `${Colors.BlueBar}`,
-      }}
-    >
-      <VoteGraphAgainst
-        style={{
-          width: graphWidth + '%',
-          backgroundColor: voteWinner && voteWinner === 2 ? `${Colors.GrayDisabledLight}` : `${Colors.Orange}`,
-        }}
-      />
-      <VoteBalance
-        style={{
-          width: balanceWidth + '%',
-        }}
-      ></VoteBalance>
+    <VoteGraph>
+      <style children={keyFrames} />
+      <VoteGraphAgainst style={style} />
+      <VoteBalance style={{ width: `${markerWidth}%` }} />
     </VoteGraph>
   )
 }
 
-const VoteGraph = styled.div`
+const VoteGraph = styled.div<VoteGraphBarProps>`
   position: relative;
   width: 100%;
   height: 16px;
-  background-color: ${Colors.BlueBar};
+  background-color: ${({ voteWinner }) => (voteWinner && voteWinner === 1 ? Colors.GrayDisabledLight : Colors.BlueBar)};
   border-radius: 10px;
   padding-top: 5px;
 
@@ -67,14 +67,15 @@ const VoteGraph = styled.div`
   }
 `
 
-const VoteGraphAgainst = styled.div`
+const VoteGraphAgainst = styled.div<VoteGraphBarProps>`
   position: absolute;
   left: 0;
   top: 0;
-  width: 13px;
+  width: 3%;
   height: 16px;
-  background-color: ${Colors.Orange};
+  background-color: ${({ voteWinner }) => (voteWinner && voteWinner === 2 ? Colors.GrayDisabledLight : Colors.Orange)};
   border-radius: 10px 0 0 10px;
+  transition: width 2s;
   z-index: 2;
 `
 
@@ -82,7 +83,7 @@ const VoteBalance = styled.div`
   position: absolute;
   left: 0;
   top: 0;
-  width: 13px;
+  width: 3%;
   height: 16px;
   background-color: transparent;
   border-right: 2px solid ${Colors.VioletLight};

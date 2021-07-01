@@ -17,6 +17,7 @@ import { useContracts } from '../hooks/useContracts'
 import { getVotingWinner } from '../helpers/voting'
 import { useVotesAggregate } from '../hooks/useVotesAggregate'
 import rightIcon from '../assets/images/arrowRight.svg'
+import { VoteAnimatedModal } from './card/VoteAnimatedModal'
 
 interface CardCommunityProps {
   community: CommunityDetail
@@ -142,6 +143,10 @@ export const CardVote = ({ community, room, hideModalFunction }: CardVoteProps) 
   const voteConstants = voteTypes[vote.type]
 
   const winner = getVotingWinner(vote)
+  const availableAmount = 65800076
+
+  const initialProposing = vote?.type === 'Remove' && availableAmount > 2000000 ? 2000000 : 0
+  const [proposingAmount, setProposingAmount] = useState(initialProposing)
 
   return (
     <CardVoteBlock>
@@ -151,14 +156,22 @@ export const CardVote = ({ community, room, hideModalFunction }: CardVoteProps) 
             vote={vote}
             room={room}
             selectedVote={selectedVoted}
-            availableAmount={65245346}
+            availableAmount={availableAmount}
+            proposingAmount={proposingAmount}
             setShowConfirmModal={setNext}
+            setProposingAmount={setProposingAmount}
           />{' '}
         </Modal>
       )}
       {showConfirmModal && (
         <Modal setShowModal={hideConfirm}>
-          <VoteConfirmModal community={community} selectedVote={selectedVoted} setShowModal={hideConfirm} />
+          <VoteAnimatedModal
+            vote={vote}
+            community={community}
+            selectedVote={selectedVoted}
+            setShowModal={hideConfirm}
+            proposingAmount={proposingAmount}
+          />
         </Modal>
       )}
       {winner ? (

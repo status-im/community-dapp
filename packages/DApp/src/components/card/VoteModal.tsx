@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import styled from 'styled-components'
 import { VoteChart } from '../votes/VoteChart'
 import { ButtonSecondary } from '../Button'
@@ -12,14 +12,21 @@ export interface VoteModalProps {
   vote: CurrentVoting
   selectedVote: VoteType
   availableAmount: number
+  proposingAmount: number
   room: number
   setShowConfirmModal: (show: boolean) => void
+  setProposingAmount: (val: number) => void
 }
 
-export function VoteModal({ vote, room, selectedVote, availableAmount, setShowConfirmModal }: VoteModalProps) {
-  const initialProposing = vote?.type === 'Remove' && availableAmount > 2000000 ? 2000000 : 0
-
-  const [proposingAmount, setProposingAmount] = useState(initialProposing)
+export function VoteModal({
+  vote,
+  room,
+  selectedVote,
+  availableAmount,
+  proposingAmount,
+  setShowConfirmModal,
+  setProposingAmount,
+}: VoteModalProps) {
   const disabled = proposingAmount === 0
   const sendWakuVote = useSendWakuVote()
 
@@ -36,8 +43,8 @@ export function VoteModal({ vote, room, selectedVote, availableAmount, setShowCo
       />
 
       <VoteConfirmBtn
-        onClick={() => {
-          sendWakuVote(proposingAmount, room, selectedVote.type)
+        onClick={async () => {
+          await sendWakuVote(proposingAmount, room, selectedVote.type)
           setShowConfirmModal(true)
         }}
         disabled={disabled}

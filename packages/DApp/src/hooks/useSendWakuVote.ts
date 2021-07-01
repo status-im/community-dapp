@@ -14,7 +14,7 @@ export function useSendWakuVote() {
       const msg = await createWakuMessage(account, library?.getSigner(), room, voteAmount, type, config.wakuTopic)
       if (msg) {
         if (waku) {
-          waku.relay.send(msg)
+          await waku.relay.send(msg)
         } else {
           alert('error sending vote please try again')
         }

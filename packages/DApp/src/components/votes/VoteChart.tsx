@@ -13,10 +13,26 @@ export interface VoteChartProps {
   voteWinner?: number
   proposingAmount?: number
   selectedVote?: VoteType
+  isAnimation?: boolean
 }
 
-export function VoteChart({ vote, voteWinner, proposingAmount, selectedVote }: VoteChartProps) {
+export function VoteChart({ vote, voteWinner, proposingAmount, selectedVote, isAnimation }: VoteChartProps) {
   const voteConstants = voteTypes[vote.type]
+
+  const votesFor = vote.voteFor.toNumber()
+  const votesAgainst = vote.voteAgainst.toNumber()
+  const voteSum = votesFor + votesAgainst
+  const graphWidth = (100 * votesAgainst) / voteSum
+
+  let balanceWidth = graphWidth
+
+  if (proposingAmount && selectedVote) {
+    balanceWidth =
+      selectedVote.type === 0
+        ? (100 * (votesAgainst + proposingAmount)) / (voteSum + proposingAmount)
+        : (100 * votesAgainst) / (voteSum + proposingAmount)
+  }
+
   return (
     <Votes>
       <VotesChart>
@@ -42,11 +58,10 @@ export function VoteChart({ vote, voteWinner, proposingAmount, selectedVote }: V
       </VotesChart>
 
       <VoteGraphBar
-        votesFor={vote.voteFor.toNumber()}
-        votesAgainst={vote.voteAgainst.toNumber()}
+        graphWidth={graphWidth}
+        balanceWidth={balanceWidth}
         voteWinner={voteWinner}
-        proposingAmount={proposingAmount}
-        selectedVote={selectedVote}
+        isAnimation={isAnimation}
       />
     </Votes>
   )
