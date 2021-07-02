@@ -65,7 +65,7 @@ const PopUpContetnt = styled.div`
   width: 100%;
 `
 
-const CloseButton = styled.button`
+export const CloseButton = styled.button`
   position: absolute;
   content: '';
   top: 0;
