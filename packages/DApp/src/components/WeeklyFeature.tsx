@@ -33,11 +33,7 @@ const View = styled.div`
 
   span {
     font-weight: 400;
-    margin-right: 6px;
+    margin: 0 6px 0 8px;
     color: rgba(255, 255, 255, 0.5);
-  }
-
-  img {
-    margin-right: 8px;
   }
 `

@@ -22,15 +22,15 @@ export function VoteChart({ vote, voteWinner, proposingAmount, selectedVote, isA
   const votesFor = vote.voteFor.toNumber()
   const votesAgainst = vote.voteAgainst.toNumber()
   const voteSum = votesFor + votesAgainst
-  const graphWidth = (100 * votesAgainst) / voteSum
+  const graphWidth = (100 * votesAgainst) / voteSum - 3
 
   let balanceWidth = graphWidth
 
   if (proposingAmount && selectedVote) {
     balanceWidth =
       selectedVote.type === 0
-        ? (100 * (votesAgainst + proposingAmount)) / (voteSum + proposingAmount)
-        : (100 * votesAgainst) / (voteSum + proposingAmount)
+        ? (100 * (votesAgainst + proposingAmount)) / (voteSum + proposingAmount) - 3
+        : (100 * votesAgainst) / (voteSum + proposingAmount) - 3
   }
 
   return (
@@ -77,6 +77,7 @@ const VotesChart = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  position: relative;
   margin-bottom: 13px;
 `
 
@@ -99,7 +100,11 @@ const VoteBox = styled.div`
   }
 `
 
-const TimeLeft = styled.p`
+const TimeLeft = styled.div`
+  position: absolute;
+  top: 50%;
+  left: calc(50%);
+  transform: translateX(-50%);
   font-size: 12px;
   line-height: 16px;
   letter-spacing: 0.1px;

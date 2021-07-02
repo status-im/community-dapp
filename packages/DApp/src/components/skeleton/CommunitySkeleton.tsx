@@ -1,7 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
-import { ColumnFlexDiv } from '../../constants/styles'
-import { CardLinks } from '../Card'
+import { CardCommunityBlock, CardLinks } from '../Card'
 import { LinkExternal, LinkInternal } from '../Link'
 import { Skeleton } from '../skeleton/Skeleton'
 import { TagsSkeletonList } from '../skeleton/TagSkeleton'
@@ -9,7 +8,7 @@ import { TextBlock } from '../skeleton/TextSkeleton'
 
 export const CommunitySkeleton = () => {
   return (
-    <ColumnFlexDiv>
+    <CardCommunityBlock>
       {' '}
       <CardRow>
         <AvatarSkeleton />
@@ -24,7 +23,7 @@ export const CommunitySkeleton = () => {
         <StyledExternalLink>Etherscan</StyledExternalLink>
         <StyledInternalink>Voting history </StyledInternalink>
       </CardLinks>
-    </ColumnFlexDiv>
+    </CardCommunityBlock>
   )
 }
 

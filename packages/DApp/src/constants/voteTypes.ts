@@ -16,7 +16,7 @@ type Vote = {
 
 export const voteTypes: Vote = {
   Add: {
-    question: 'Add to Communities directory?',
+    question: 'Add to directory?',
     for: {
       type: 1,
       icon: '👍',
@@ -34,7 +34,7 @@ export const voteTypes: Vote = {
   },
 
   Remove: {
-    question: 'Remove from Communities directory?',
+    question: 'Remove from directory?',
     for: {
       type: 1,
       icon: '🗑',

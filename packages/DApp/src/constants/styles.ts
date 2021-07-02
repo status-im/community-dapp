@@ -14,7 +14,7 @@ export const Colors = {
   Orange: '#FFE6CF',
   GrayOverlay: '#E5E5E5',
   GrayDisabledDark: '#888888',
-  GrayDisabledLight: '#F3F3F3',
+  GrayDisabledLight: '#EAEBED',
   GreyText: '#939BA1',
   GreyTextDisabled: '#B1B1B1',
   GrayLight: '#FBFCFE',

@@ -13,7 +13,7 @@ interface FeatureModalProps {
 }
 
 export function FeatureModal({ community, availableAmount, setShowConfirmModal }: FeatureModalProps) {
-  const [proposingAmount, setProposingAmount] = useState(availableAmount)
+  const [proposingAmount, setProposingAmount] = useState(0)
   const disabled = proposingAmount === 0
 
   return (

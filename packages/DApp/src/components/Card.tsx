@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
-import { Colors, ColumnFlexDiv } from '../constants/styles'
+import { Colors } from '../constants/styles'
 import { ButtonSecondary } from '../components/Button'
 import { CommunityDetail } from '../models/community'
 import { LinkExternal, LinkInternal } from './Link'
@@ -35,7 +35,7 @@ export const CardCommunity = ({ community, showRemoveButton }: CardCommunityProp
   }
 
   return (
-    <ColumnFlexDiv>
+    <CardCommunityBlock>
       {showHistoryModal && (
         <Modal heading={`${community.name} voting history`} setShowModal={setShowHistoryModal}>
           <VoteHistoryTable>
@@ -60,7 +60,7 @@ export const CardCommunity = ({ community, showRemoveButton }: CardCommunityProp
       )}
       {showRemoveModal && (
         <Modal
-          heading="Remove from Communities directory?"
+          heading="Remove from directory?"
           setShowModal={(val: boolean) => {
             setShowRemoveModal(val)
           }}
@@ -99,7 +99,7 @@ export const CardCommunity = ({ community, showRemoveButton }: CardCommunityProp
         <LinkExternal>Etherscan</LinkExternal>
         <LinkInternal onClick={() => setShowHistoryModal(true)}>Voting history</LinkInternal>
       </CardLinks>
-    </ColumnFlexDiv>
+    </CardCommunityBlock>
   )
 }
 
@@ -231,7 +231,17 @@ export const Card = styled.div`
   align-items: stretch;
   margin-top: 24px;
 `
+
+export const CardCommunityBlock = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 100%;
+`
+
 export const CardCommunityWrap = styled.div`
+  display: flex;
+  align-items: stretch;
   width: 50%;
   margin: 13px 0;
   padding: 24px 24px 16px;

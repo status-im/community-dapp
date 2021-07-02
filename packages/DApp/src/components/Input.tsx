@@ -5,7 +5,7 @@ import searchIcon from '../assets/images/search.svg'
 export const Input = styled.input`
   max-width: 420px;
   padding: 11px 20px;
-  background: ${Colors.GrayBorder};
+  background: #f0f1f3;
   color: ${Colors.Black};
   border-radius: 8px;
   border: 1px solid ${Colors.GrayBorder};

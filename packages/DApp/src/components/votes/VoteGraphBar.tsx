@@ -22,7 +22,7 @@ export interface VoteGraphBarProps {
   isAnimation?: boolean
 }
 
-export function VoteGraphBar({ graphWidth, balanceWidth, isAnimation }: VoteGraphBarProps) {
+export function VoteGraphBar({ graphWidth, balanceWidth, voteWinner, isAnimation }: VoteGraphBarProps) {
   const markerWidth: number = balanceWidth ? balanceWidth : 3
   const votesWidth: number = graphWidth ? graphWidth : 3
   const [keyFrames, setKeyFrames] = useState('')
@@ -38,9 +38,9 @@ export function VoteGraphBar({ graphWidth, balanceWidth, isAnimation }: VoteGrap
   }, [isAnimation, votesWidth])
 
   return (
-    <VoteGraph>
+    <VoteGraph theme={{ voteWinner }}>
       <style children={keyFrames} />
-      <VoteGraphAgainst style={style} />
+      <VoteGraphAgainst theme={{ voteWinner }} style={style} />
       <VoteBalance style={{ width: `${markerWidth}%` }} />
     </VoteGraph>
   )
@@ -50,7 +50,7 @@ const VoteGraph = styled.div<VoteGraphBarProps>`
   position: relative;
   width: 100%;
   height: 16px;
-  background-color: ${({ voteWinner }) => (voteWinner && voteWinner === 1 ? Colors.GrayDisabledLight : Colors.BlueBar)};
+  background-color: ${({ theme }) => (theme.voteWinner === 1 ? Colors.GrayDisabledLight : Colors.BlueBar)};
   border-radius: 10px;
   padding-top: 5px;
 
@@ -73,7 +73,7 @@ const VoteGraphAgainst = styled.div<VoteGraphBarProps>`
   top: 0;
   width: 3%;
   height: 16px;
-  background-color: ${({ voteWinner }) => (voteWinner && voteWinner === 2 ? Colors.GrayDisabledLight : Colors.Orange)};
+  background-color: ${({ theme }) => (theme.voteWinner === 2 ? Colors.GrayDisabledLight : Colors.Orange)};
   border-radius: 10px 0 0 10px;
   transition: width 2s;
   z-index: 2;

@@ -14,7 +14,7 @@ interface RemoveAmountPickerProps {
 }
 
 export function RemoveAmountPicker({ community, availableAmount, setShowConfirmModal }: RemoveAmountPickerProps) {
-  const [proposingAmount, setProposingAmount] = useState(availableAmount)
+  const [proposingAmount, setProposingAmount] = useState(0)
   const lastVote = community.votingHistory[community.votingHistory.length - 1]
   const lastVoteDate = lastVote.date
   const disabled = proposingAmount === 0
@@ -63,7 +63,9 @@ export function RemoveAmountPicker({ community, availableAmount, setShowConfirmM
         proposingAmount={proposingAmount}
         disabled={disabled}
       />
-      <VoteConfirmBtn onClick={() => setShowConfirmModal(true)}>Confirm vote to remove community</VoteConfirmBtn>
+      <VoteConfirmBtn disabled={disabled} onClick={() => setShowConfirmModal(true)}>
+        Confirm vote to remove community
+      </VoteConfirmBtn>
     </VoteProposeWrap>
   )
 }
