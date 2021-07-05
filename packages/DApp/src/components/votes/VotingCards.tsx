@@ -3,7 +3,7 @@ import { VotingSortingEnum } from '../../models/community'
 import styled from 'styled-components'
 import { FilterList } from '../Filter'
 import { PageBar } from '../PageBar'
-import { ButtonSecondary } from '../Button'
+import { ButtonPrimary } from '../Button'
 import { Colors } from '../../constants/styles'
 import { VotingCard } from './VotingCard'
 import { Search } from '../Input'
@@ -34,15 +34,20 @@ export function VotingCards() {
         />
         <VoteFilter>
           <span>Vote types:</span>
-          <VoteType className={voteType == '' ? 'selected' : 'notSelected'} onClick={() => setVoteType('')}>
-            All
-          </VoteType>
-          <VoteType className={voteType == 'Add' ? 'selected' : 'notSelected'} onClick={() => setVoteType('Add')}>
-            Add
-          </VoteType>
-          <VoteType className={voteType == 'Remove' ? 'selected' : 'notSelected'} onClick={() => setVoteType('Remove')}>
-            Remove
-          </VoteType>
+          <VoteTypeWrapper>
+            <VoteType className={voteType == '' ? 'selected' : 'notSelected'} onClick={() => setVoteType('')}>
+              All
+            </VoteType>
+            <VoteType className={voteType == 'Add' ? 'selected' : 'notSelected'} onClick={() => setVoteType('Add')}>
+              Add
+            </VoteType>
+            <VoteType
+              className={voteType == 'Remove' ? 'selected' : 'notSelected'}
+              onClick={() => setVoteType('Remove')}
+            >
+              Remove
+            </VoteType>
+          </VoteTypeWrapper>
         </VoteFilter>
         <FilterList value={sortedBy} setValue={setSortedBy} options={VotingSortingOptions} />
       </PageBar>
@@ -57,18 +62,40 @@ const VoteFilter = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  width: 315px;
+  width: 310px;
   color: ${Colors.VioletDark};
 `
 
-const VoteType = styled(ButtonSecondary)`
+const VoteTypeWrapper = styled.div`
   display: flex;
   justify-content: space-between;
-  color: ${Colors.VioletDark};
+  width: 220px;
+  background-color: ${Colors.VioletSecondaryLight};
+  padding: 4px;
+  border-radius: 8px;
+`
+
+const VoteType = styled(ButtonPrimary)`
+  display: flex;
+  justify-content: space-between;
+  background-color: ${Colors.Violet};
+  color: ${Colors.White};
   line-height: 22px;
+  font-weight: 500;
   padding: 5px 12px;
+
+  &:not(:disabled):active,
+  &:not(:disabled):focus {
+    background: ${Colors.Violet};
+  }
+
+  &:not(:disabled):hover {
+    background: ${Colors.VioletDark};
+    color: ${Colors.White};
+  }
 
   &.notSelected {
     background: none;
+    color: ${Colors.VioletDark};
   }
 `
