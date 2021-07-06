@@ -16,7 +16,6 @@ import { useContractFunction } from '@usedapp/core'
 import { useContracts } from '../hooks/useContracts'
 import { getVotingWinner } from '../helpers/voting'
 import { useVotesAggregate } from '../hooks/useVotesAggregate'
-import rightIcon from '../assets/images/arrowRight.svg'
 import { VoteAnimatedModal } from './card/VoteAnimatedModal'
 import voting from '../helpers/voting'
 import { DetailedVotingRoom } from '../models/smartContract'
@@ -29,6 +28,8 @@ export const CardCommunity = ({ community, showRemoveButton }: CardCommunityProp
   const [showHistoryModal, setShowHistoryModal] = useState(false)
   const [showRemoveModal, setShowRemoveModal] = useState(false)
   const [showConfirmModal, setShowConfirmModal] = useState(false)
+
+  const isDisabled = community.votingHistory.length === 0
 
   const setNewModal = (val: boolean) => {
     setShowConfirmModal(val)
@@ -98,7 +99,9 @@ export const CardCommunity = ({ community, showRemoveButton }: CardCommunityProp
       <CardLinks>
         <LinkExternal>Visit community</LinkExternal>
         <LinkExternal>Etherscan</LinkExternal>
-        <LinkInternal onClick={() => setShowHistoryModal(true)}>Voting history</LinkInternal>
+        <LinkInternal onClick={() => setShowHistoryModal(true)} disabled={isDisabled}>
+          Voting history
+        </LinkInternal>
       </CardLinks>
     </CardCommunityBlock>
   )
@@ -178,21 +181,13 @@ export const CardVote = ({ room, hideModalFunction }: CardVoteProps) => {
       )}
       {winner ? (
         <CardHeadingEndedVote>
-          SNT holders have decided{' '}
-          <b>
-            <u>{winner == 1 ? voteConstants.against.verb : voteConstants.for.verb}</u>
-          </b>{' '}
-          this community to the directory!
+          SNT holders have decided <b>{winner == 1 ? voteConstants.against.verb : voteConstants.for.verb}</b> this
+          community to the directory!
         </CardHeadingEndedVote>
       ) : hideModalFunction ? (
         <CardHeading />
       ) : (
-        <CardVoteTop>
-          <CardHeading>{voteConstants.question}</CardHeading>
-          {votes.length > 0 && vote && vote.timeLeft > 0 && (
-            <VoteSendingBtn onClick={() => send(votes)}> {votes.length} votes need saving</VoteSendingBtn>
-          )}
-        </CardVoteTop>
+        <CardHeading>{voteConstants.question}</CardHeading>
       )}
       <div>
         <VoteChart vote={vote} voteWinner={winner} />
@@ -222,6 +217,12 @@ export const CardVote = ({ room, hideModalFunction }: CardVoteProps) => {
               {voteConstants.for.text} <span>{voteConstants.for.icon}</span>
             </VoteBtn>
           </VotesBtns>
+        )}
+
+        {votes.length > 0 && vote && vote.timeLeft > 0 && (
+          <CardVoteBottom>
+            <VoteSendingBtn onClick={() => send(votes)}> {votes.length} votes need saving</VoteSendingBtn>
+          </CardVoteBottom>
         )}
       </div>
     </CardVoteBlock>
@@ -280,15 +281,17 @@ const CardLogo = styled.img`
   height: 64px !important;
   border-radius: 50%;
 `
-const CardVoteTop = styled.div`
+const CardVoteBottom = styled.div`
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
 `
 
 export const CardHeading = styled.h2`
   font-weight: bold;
   font-size: 17px;
+  line-height: 24px;
+  text-align: center;
 `
 
 const CardTop = styled.div`
@@ -298,12 +301,12 @@ const CardTop = styled.div`
   line-height: 24px;
 `
 
-const VoteSendingBtn = styled.button`
-  padding-right: 28px;
-  font-size: 12px;
+export const VoteSendingBtn = styled.button`
   font-weight: 500;
-  line-height: 20px;
-  position: relative;
+  font-size: 15px;
+  line-height: 22px;
+  margin-top: 24px;
+  margin-bottom: -16px;
   color: ${Colors.VioletDark};
 
   &:hover {
@@ -312,18 +315,6 @@ const VoteSendingBtn = styled.button`
 
   &:active {
     color: ${Colors.VioletDark};
-  }
-
-  &::after {
-    content: '';
-    width: 24px;
-    height: 24px;
-    position: absolute;
-    top: 50%;
-    right: 0;
-    transform: translateY(-50%);
-    background-image: url(${rightIcon});
-    background-size: cover;
   }
 `
 
@@ -336,10 +327,13 @@ const RemoveBtn = styled.button`
 `
 
 const CardHeadingEndedVote = styled.p`
+  max-width: 290px;
+  align-self: center;
   font-weight: normal;
-  font-size: 17px;
-  line-height: 24px;
+  font-size: 15px;
+  line-height: 22px;
   margin-bottom: 18px;
+  text-align: center;
 `
 const CardText = styled.p`
   line-height: 22px;

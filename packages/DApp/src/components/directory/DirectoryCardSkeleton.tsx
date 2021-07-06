@@ -17,9 +17,8 @@ export const DirectoryCardSkeleton = () => {
             <Skeleton width="50%" />
           </CardHeader>
           <Column>
-            <Skeleton width="160px" height="18px" />
             <span>⭐️</span>
-            <Skeleton width="120px" height="22px" />
+            <Skeleton width="200px" height="22px" />
           </Column>
           <SkeletonButton />
         </CardVoteBlock>
@@ -30,6 +29,7 @@ export const DirectoryCardSkeleton = () => {
 
 const CardHeader = styled.div`
   display: flex;
+  justify-content: center;
   width: 100%;
   margin-bottom: 54px;
 `
@@ -40,7 +40,7 @@ const SkeletonButton = styled(Skeleton)`
 
 const Column = styled(ColumnFlexDiv)`
   justify-content: space-between;
-  height: 80px;
+  height: 60px;
   margin-bottom: 32px;
 
   span {

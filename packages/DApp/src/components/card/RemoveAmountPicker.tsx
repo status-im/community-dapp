@@ -61,7 +61,6 @@ export function RemoveAmountPicker({ community, availableAmount, setShowConfirmM
         availableAmount={availableAmount}
         setProposingAmount={setProposingAmount}
         proposingAmount={proposingAmount}
-        disabled={disabled}
       />
       <VoteConfirmBtn disabled={disabled} onClick={() => setShowConfirmModal(true)}>
         Confirm vote to remove community

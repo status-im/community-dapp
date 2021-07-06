@@ -27,9 +27,11 @@ export const LinkExternal = styled.a`
     background-size: contain;
   }
 `
-export const LinkInternal = styled.a`
+export const LinkInternal = styled.button`
   color: ${Colors.VioletDark};
   font-weight: 500;
+  font-size: 15px;
+  line-height: 22px;
 
   &:hover {
     color: ${Colors.Violet};
@@ -37,5 +39,9 @@ export const LinkInternal = styled.a`
 
   &:active {
     color: ${Colors.VioletDark};
+  }
+
+  &:disabled {
+    color: ${Colors.GrayDisabledDark};
   }
 `

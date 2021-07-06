@@ -44,7 +44,10 @@ export const FilterList = ({ value, setValue, options }: FilterListProps) => {
 const Filter = styled.button`
   display: flex;
   align-items: center;
-  padding: 0 9px;
+  height: 36px;
+  position: relative;
+  padding-left: 5px;
+  padding-right: 1px;
   font-weight: 500;
   font-size: 15px;
   line-height: 22px;
@@ -53,7 +56,6 @@ const Filter = styled.button`
   border-radius: 14px;
   appearance: none;
   outline: none;
-  position: relative;
 
   &:focus,
   &:active {
@@ -68,13 +70,14 @@ const Select = styled.div`
 `
 const SelectTrigger = styled.div`
   position: relative;
-  width: 175px;
-  padding: 0 22px 0 25px;
+  min-width: 167px;
+  padding: 0 28px;
+  box-sizing: border-box;
 
   &::before {
     content: '';
-    width: 18px;
-    height: 10px;
+    width: 24px;
+    height: 24px;
     position: absolute;
     top: 50%;
     left: 0;
@@ -84,8 +87,8 @@ const SelectTrigger = styled.div`
 
   &::after {
     content: '';
-    width: 12px;
-    height: 7px;
+    width: 24px;
+    height: 24px;
     position: absolute;
     top: 50%;
     right: 0;
@@ -96,8 +99,8 @@ const SelectTrigger = styled.div`
 const SelectOptions = styled.div`
   position: absolute;
   display: block;
-  top: calc(100% + 7px);
-  left: 0;
+  width: 175px;
+  top: calc(100% + 11px);
   right: 0;
   opacity: 0;
   visibility: hidden;
@@ -107,7 +110,6 @@ const SelectOptions = styled.div`
   border-radius: 16px 4px 16px 16px;
 
   &.opened {
-    margin-right: -10px;
     opacity: 1;
     background: ${Colors.White};
     visibility: visible;

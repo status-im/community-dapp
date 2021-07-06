@@ -39,7 +39,6 @@ export function VoteModal({
         availableAmount={availableAmount}
         setProposingAmount={setProposingAmount}
         proposingAmount={proposingAmount}
-        disabled={disabled}
       />
 
       <VoteConfirmBtn

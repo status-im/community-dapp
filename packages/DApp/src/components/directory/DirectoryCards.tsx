@@ -13,7 +13,6 @@ import { useConfig } from '../../providers/config'
 import { Colors } from '../../constants/styles'
 import { WeeklyFeature } from '../WeeklyFeature'
 import { DirectoryCardSkeleton } from './DirectoryCardSkeleton'
-
 interface DirectoryCardProps {
   community: CommunityDetail
 }
@@ -36,8 +35,7 @@ function DirectoryCard({ community }: DirectoryCardProps) {
       <CardVoteWrap style={{ backgroundColor: `${Colors.GrayLight}` }}>
         <CardFeature
           community={community}
-          heading="Feature this community?"
-          text={timeLeft ? 'This community has to wait until it can be featured again' : 'Weekly Feature vote'}
+          heading={timeLeft ? 'This community has to wait until it can be featured again' : 'Weekly Feature vote'}
           icon={timeLeft ? '⏳' : '⭐'}
           sum={community.directoryInfo.featureVotes?.toNumber()}
           timeLeft={timeLeft}

@@ -42,6 +42,7 @@ export const VotingCardSkeleton = () => {
 
 const CardHeader = styled.div`
   display: flex;
+  justify-content: center;
   width: 100%;
   margin-bottom: 54px;
 `

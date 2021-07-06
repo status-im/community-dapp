@@ -71,7 +71,7 @@ export function ProposeModal({
               availableAmount={availableAmount}
               setProposingAmount={setProposingAmount}
               proposingAmount={proposingAmount}
-              disabled={!communityFound || !proposingAmount}
+              disabled={!communityFound}
             />
           </VoteProposeWrap>
         )}

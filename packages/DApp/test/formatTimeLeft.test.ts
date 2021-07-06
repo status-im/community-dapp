@@ -12,12 +12,12 @@ describe('formatTimeLeft', () => {
     expect(formatTimeLeft(172800000)).to.eq('2 days left')
   })
   it('seconds ago', () => {
-    expect(formatTimeLeft(-10000)).to.eq('10 seconds ago')
+    expect(formatTimeLeft(-10000)).to.eq('Vote ended')
   })
   it('hours ago', () => {
-    expect(formatTimeLeft(-8000000)).to.eq('2 hours ago')
+    expect(formatTimeLeft(-8000000)).to.eq('Vote ended')
   })
   it('days ago', () => {
-    expect(formatTimeLeft(-172800000)).to.eq('2 days ago')
+    expect(formatTimeLeft(-172800000)).to.eq('Vote ended')
   })
 })

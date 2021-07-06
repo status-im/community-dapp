@@ -15,7 +15,7 @@ export interface VoteProposingProps {
   availableAmount: number
   setProposingAmount: (show: number) => void
   proposingAmount: number
-  disabled: boolean
+  disabled?: boolean
 }
 
 export function VotePropose({

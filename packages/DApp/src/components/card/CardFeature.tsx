@@ -2,28 +2,26 @@ import React, { useState } from 'react'
 import styled from 'styled-components'
 import { Colors, ColumnFlexDiv } from '../../constants/styles'
 import { addCommas } from '../../helpers/addCommas'
-import { LinkInternal } from '../Link'
-import rightIcon from '../../assets/images/arrowRight.svg'
-import { CardHeading, CardVoteBlock, VoteBtn } from '../Card'
+import { CardHeading, CardVoteBlock, VoteBtn, VoteSendingBtn } from '../Card'
 import { CommunityDetail } from '../../models/community'
 import { Modal } from '../Modal'
 import { FeatureModal } from './FeatureModal'
 import { VoteConfirmModal } from './VoteConfirmModal'
 import { OngoingVote } from './OngoingVote'
-import { useEthers } from '@usedapp/core'
+import { useContractFunction, useEthers } from '@usedapp/core'
 import { useContracts } from '../../hooks/useContracts'
 import { useContractCall } from '@usedapp/core'
-
+import { useVotesAggregate } from '../../hooks/useVotesAggregate'
+import { votingFromRoom } from '../../helpers/voting'
 interface CardFeatureProps {
   community: CommunityDetail
   heading: string
-  text: string
   icon: string
   sum?: number
   timeLeft?: string
 }
 
-export const CardFeature = ({ community, heading, text, icon, sum, timeLeft }: CardFeatureProps) => {
+export const CardFeature = ({ community, heading, icon, sum, timeLeft }: CardFeatureProps) => {
   const { account } = useEthers()
   const [showFeatureModal, setShowFeatureModal] = useState(false)
   const [showConfirmModal, setShowConfirmModal] = useState(false)
@@ -33,6 +31,7 @@ export const CardFeature = ({ community, heading, text, icon, sum, timeLeft }: C
     setShowConfirmModal(val)
     setShowFeatureModal(false)
   }
+
   const { votingContract } = useContracts()
   const [roomNumber] =
     useContractCall({
@@ -42,38 +41,37 @@ export const CardFeature = ({ community, heading, text, icon, sum, timeLeft }: C
       args: [community.publicKey],
     }) ?? []
 
-  const room = useContractCall({
+  const { votes } = useVotesAggregate(roomNumber)
+  const { send } = useContractFunction(votingContract, 'castVotes')
+
+  const votingRoom = useContractCall({
     abi: votingContract.interface,
     address: votingContract.address,
     method: 'votingRoomMap',
     args: [roomNumber],
   }) as any
 
+  let currentVoting
+  if (votingRoom) {
+    currentVoting = { ...votingFromRoom(votingRoom), room: roomNumber }
+  }
+
   return (
     <CardVoteBlock style={{ backgroundColor: `${Colors.GrayLight}` }}>
-      <FeatureTop>
-        <CardHeading>{heading}</CardHeading>
-        {roomNumber > 0 && room && (
-          <div>
-            {showOngoingVote && (
-              <OngoingVote
-                community={community}
-                setShowOngoingVote={setShowOngoingVote}
-                room={{ ...room, room: roomNumber }}
-              />
-            )}
-            <CardLinkFeature onClick={() => setShowOngoingVote(true)}>Ongoing vote for removal</CardLinkFeature>
-          </div>
-        )}
-      </FeatureTop>
+      <CardHeading style={{ fontWeight: timeLeft ? 'normal' : 'bold', fontSize: timeLeft ? '15px' : '17px' }}>
+        {heading}
+      </CardHeading>
 
       <FeatureVote>
-        <p>{text}</p>
-        <p style={{ fontSize: '24px' }}>{icon}</p>
+        <FeatureIcon>{icon}</FeatureIcon>
 
         {timeLeft && <span>{timeLeft}</span>}
 
-        {sum && <span style={{ fontWeight: 'normal' }}>{addCommas(sum)} SNT</span>}
+        {sum && (
+          <FeatureText>
+            <span>{addCommas(sum)}</span> SNT votes for this community
+          </FeatureText>
+        )}
       </FeatureVote>
       <div>
         {showFeatureModal && (
@@ -90,48 +88,49 @@ export const CardFeature = ({ community, heading, text, icon, sum, timeLeft }: C
           Feature this community! <span style={{ fontSize: '20px' }}>⭐️</span>
         </FeatureBtn>
       </div>
+
+      {currentVoting && (
+        <FeatureBottom>
+          {showOngoingVote && (
+            <OngoingVote community={community} setShowOngoingVote={setShowOngoingVote} room={votingRoom} />
+          )}
+          <VoteSendingBtn onClick={() => setShowOngoingVote(true)}>Removal vote in progress</VoteSendingBtn>
+          {votes.length > 0 && currentVoting && currentVoting?.timeLeft > 0 && (
+            <VoteSendingBtn onClick={() => send(votes)}> {votes.length} votes need saving</VoteSendingBtn>
+          )}
+        </FeatureBottom>
+      )}
     </CardVoteBlock>
   )
 }
 
-const CardLinkFeature = styled(LinkInternal)`
-  padding-right: 28px;
-  font-size: 12px;
-  line-height: 20px;
-  position: relative;
-
-  &::after {
-    content: '';
-    width: 24px;
-    height: 24px;
-    position: absolute;
-    top: 50%;
-    right: 0;
-    transform: translateY(-50%);
-    background-image: url(${rightIcon});
-    background-size: cover;
-  }
-`
-const FeatureTop = styled.div`
+const FeatureBottom = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+`
+
+const FeatureIcon = styled.p`
+  font-size: 24px;
+  margin-bottom: 8px;
 `
 
 const FeatureBtn = styled(VoteBtn)`
   width: 100%;
 `
 const FeatureVote = styled(ColumnFlexDiv)`
-  margin: 45px auto 32px;
-  max-width: 290px;
+  margin: 32px auto;
+  max-width: 330px;
   text-align: center;
 
-  & > p {
-    font-size: 17px;
-    line-height: 18px;
-    margin-bottom: 8px;
+  & > span {
+    font-weight: bold;
+    font-size: 15px;
+    line-height: 22px;
   }
+`
 
+const FeatureText = styled.p`
   & > span {
     font-weight: bold;
     font-size: 15px;

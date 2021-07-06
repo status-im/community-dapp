@@ -20,6 +20,7 @@ export const Input = styled.input`
 
 export const Search = styled(Input)`
   width: 270px;
+  height: 36px;
   padding: 6px 36px;
   font-size: 15px;
   line-height: 22px;
