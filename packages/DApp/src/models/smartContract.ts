@@ -1,4 +1,5 @@
 import { BigNumber } from 'ethers'
+import { CommunityDetail } from './community'
 
 export type VotingRoom = {
   startBlock: BigNumber
@@ -9,4 +10,7 @@ export type VotingRoom = {
   totalVotesFor: BigNumber
   totalVotesAgainst: BigNumber
   voters: string[]
+  room: number
 }
+
+export type DetailedVotingRoom = VotingRoom & { details: CommunityDetail }

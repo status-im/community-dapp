@@ -34,7 +34,7 @@ export const CardFeature = ({ community, heading, text, icon, sum, timeLeft }: C
     setShowFeatureModal(false)
   }
   const { votingContract } = useContracts()
-  const [roomList] =
+  const [roomNumber] =
     useContractCall({
       abi: votingContract.interface,
       address: votingContract.address,
@@ -42,14 +42,25 @@ export const CardFeature = ({ community, heading, text, icon, sum, timeLeft }: C
       args: [community.publicKey],
     }) ?? []
 
+  const room = useContractCall({
+    abi: votingContract.interface,
+    address: votingContract.address,
+    method: 'votingRoomMap',
+    args: [roomNumber],
+  }) as any
+
   return (
     <CardVoteBlock style={{ backgroundColor: `${Colors.GrayLight}` }}>
       <FeatureTop>
         <CardHeading>{heading}</CardHeading>
-        {roomList > 0 && (
+        {roomNumber > 0 && room && (
           <div>
             {showOngoingVote && (
-              <OngoingVote community={community} setShowOngoingVote={setShowOngoingVote} room={roomList} />
+              <OngoingVote
+                community={community}
+                setShowOngoingVote={setShowOngoingVote}
+                room={{ ...room, room: roomNumber }}
+              />
             )}
             <CardLinkFeature onClick={() => setShowOngoingVote(true)}>Ongoing vote for removal</CardLinkFeature>
           </div>

@@ -15,6 +15,7 @@ describe('voting', () => {
         totalVotesFor: BigNumber.from(100),
         totalVotesAgainst: BigNumber.from(100),
         voters: ['0x01', '0x02'],
+        room: 1,
       }
       const room = voting.fromRoom(votingRoom)
 
@@ -32,6 +33,7 @@ describe('voting', () => {
         totalVotesFor: BigNumber.from(1000),
         totalVotesAgainst: BigNumber.from(100),
         voters: ['0x01', '0x02'],
+        room: 1,
       }
       const room = voting.fromRoom(votingRoom)
 

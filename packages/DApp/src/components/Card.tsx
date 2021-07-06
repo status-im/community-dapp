@@ -18,7 +18,8 @@ import { getVotingWinner } from '../helpers/voting'
 import { useVotesAggregate } from '../hooks/useVotesAggregate'
 import rightIcon from '../assets/images/arrowRight.svg'
 import { VoteAnimatedModal } from './card/VoteAnimatedModal'
-
+import voting from '../helpers/voting'
+import { DetailedVotingRoom } from '../models/smartContract'
 interface CardCommunityProps {
   community: CommunityDetail
   showRemoveButton?: boolean
@@ -104,12 +105,11 @@ export const CardCommunity = ({ community, showRemoveButton }: CardCommunityProp
 }
 
 interface CardVoteProps {
-  community: CommunityDetail
-  room: number
+  room: DetailedVotingRoom
   hideModalFunction?: (val: boolean) => void
 }
 
-export const CardVote = ({ community, room, hideModalFunction }: CardVoteProps) => {
+export const CardVote = ({ room, hideModalFunction }: CardVoteProps) => {
   const { account } = useEthers()
   const [showVoteModal, setShowVoteModal] = useState(false)
   const [showConfirmModal, setShowConfirmModal] = useState(false)
@@ -117,11 +117,13 @@ export const CardVote = ({ community, room, hideModalFunction }: CardVoteProps) 
   const [selectedVoted, setSelectedVoted] = useState(voteTypes['Add'].for)
 
   const { votingContract } = useContracts()
-  const { votes } = useVotesAggregate(room)
+
+  const { votes } = useVotesAggregate(room.room)
+
   const { send } = useContractFunction(votingContract, 'castVotes')
 
   const finalizeVoting = useContractFunction(votingContract, 'finalizeVotingRoom')
-
+  const community = room.details
   const setNext = (val: boolean) => {
     setShowConfirmModal(val)
     setShowVoteModal(false)
@@ -134,7 +136,7 @@ export const CardVote = ({ community, room, hideModalFunction }: CardVoteProps) 
     setShowConfirmModal(val)
   }
 
-  const vote = community.currentVoting
+  const vote = voting.fromRoom(room)
 
   if (!vote) {
     return <CardVoteBlock />
@@ -154,7 +156,7 @@ export const CardVote = ({ community, room, hideModalFunction }: CardVoteProps) 
         <Modal heading={`${vote?.type} ${community.name}?`} setShowModal={setShowVoteModal}>
           <VoteModal
             vote={vote}
-            room={room}
+            room={room.room}
             selectedVote={selectedVoted}
             availableAmount={availableAmount}
             proposingAmount={proposingAmount}
@@ -187,7 +189,7 @@ export const CardVote = ({ community, room, hideModalFunction }: CardVoteProps) 
       ) : (
         <CardVoteTop>
           <CardHeading>{voteConstants.question}</CardHeading>
-          {votes.length > 0 && community.currentVoting && community?.currentVoting.timeLeft > 0 && (
+          {votes.length > 0 && vote && vote.timeLeft > 0 && (
             <VoteSendingBtn onClick={() => send(votes)}> {votes.length} votes need saving</VoteSendingBtn>
           )}
         </CardVoteTop>
@@ -196,7 +198,7 @@ export const CardVote = ({ community, room, hideModalFunction }: CardVoteProps) 
         <VoteChart vote={vote} voteWinner={winner} />
 
         {winner ? (
-          <VoteBtnFinal onClick={() => finalizeVoting.send(room)} disabled={!account}>
+          <VoteBtnFinal onClick={() => finalizeVoting.send(room.room)} disabled={!account}>
             Finalize the vote <span>✍️</span>
           </VoteBtnFinal>
         ) : (

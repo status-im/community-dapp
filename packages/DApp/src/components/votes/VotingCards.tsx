@@ -7,22 +7,16 @@ import { ButtonPrimary } from '../Button'
 import { Colors } from '../../constants/styles'
 import { VotingCard } from './VotingCard'
 import { Search } from '../Input'
-import { useContractCall } from '@usedapp/core'
 import { VotingSortingOptions } from '../../constants/SortingOptions'
-import { useContracts } from '../../hooks/useContracts'
+import { VotingCardSkeleton } from './VotingCardSkeleton'
+import { useVotingCommunities } from '../../hooks/useVotingCommunities'
 
 export function VotingCards() {
-  const { votingContract } = useContracts()
   const [sortedBy, setSortedBy] = useState(VotingSortingEnum.EndingSoonest)
   const [voteType, setVoteType] = useState('')
   const [filterKeyword, setFilterKeyword] = useState('')
+  const roomsToShow = useVotingCommunities(filterKeyword)
 
-  const [roomList] = useContractCall({
-    abi: votingContract.interface,
-    address: votingContract.address,
-    method: 'getActiveVotingRooms',
-    args: [],
-  }) ?? [[]]
   return (
     <div>
       <PageBar>
@@ -51,9 +45,10 @@ export function VotingCards() {
         </VoteFilter>
         <FilterList value={sortedBy} setValue={setSortedBy} options={VotingSortingOptions} />
       </PageBar>
-      {roomList.map((room: any) => (
-        <VotingCard key={room.toString()} room={Number(room.toString())} />
+      {roomsToShow.map((room: any) => (
+        <VotingCard key={room.room.toString()} room={room} />
       ))}
+      {roomsToShow.length === 0 && <VotingCardSkeleton />}
     </div>
   )
 }
