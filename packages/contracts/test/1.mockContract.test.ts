@@ -1,22 +1,108 @@
 import { expect, use } from 'chai'
-import { deployContract, MockProvider, solidity } from 'ethereum-waffle'
+import { loadFixture, deployContract, MockProvider, solidity } from 'ethereum-waffle'
 import MockContract from '../build/MockContract.json'
-import { Contract, utils, BigNumber } from 'ethers'
+import { utils, BigNumber, Wallet } from 'ethers'
 
 use(solidity)
 
-describe('Contract', () => {
+const getSignedMessages = async (
+  alice: Wallet,
+  firstAddress: Wallet,
+  secondAddress: Wallet
+): Promise<{ messages: any[]; signedMessages: any[] }> => {
+  const votes = [
+    {
+      voter: alice,
+      vote: 1,
+      sntAmount: BigNumber.from(100),
+      sessionID: 1,
+    },
+    {
+      voter: firstAddress,
+      vote: 0,
+      sntAmount: BigNumber.from(100),
+      sessionID: 1,
+    },
+    {
+      voter: secondAddress,
+      vote: 1,
+      sntAmount: BigNumber.from(100),
+      sessionID: 1,
+    },
+  ]
+  const types = ['address', 'uint256', 'uint256']
+  const messages = votes.map((vote) => [
+    vote.voter.address,
+    BigNumber.from(vote.sessionID).mul(2).add(vote.vote),
+    vote.sntAmount,
+  ])
+
+  const signedMessages = await Promise.all(
+    messages.map(async (message, idx) => {
+      const returnArray = [...message]
+      const signature = utils.splitSignature(
+        await votes[idx].voter.signMessage(utils.arrayify(utils.solidityPack(types, message)))
+      )
+      returnArray.push(signature.r)
+      returnArray.push(signature._vs)
+      return returnArray
+    })
+  )
+
+  return { messages, signedMessages }
+}
+
+describe('Contract story', () => {
   const provider = new MockProvider()
   const [alice, firstAddress, secondAddress] = provider.getWallets()
-  let contract: Contract
 
-  beforeEach(async () => {
-    contract = await deployContract(alice, MockContract)
-    await provider.send('evm_mine', [Math.floor(Date.now() / 1000)])
-  })
+  const types = [0, 1]
+  for (const index in [0, 1]) {
+    const type = types[index]
+
+    it(`type ${type}`, async () => {
+      const contract = await deployContract(alice, MockContract)
+      await provider.send('evm_mine', [Math.floor(Date.now() / 1000)])
+
+      expect(await contract.initializeVotingRoom(type, '0x0FA1A5CC3911A5697B625EF1C75eF4caE764bd34'))
+        .to.emit(contract, 'VotingRoomStarted')
+        .withArgs(1)
+
+      expect(await contract.initializeVotingRoom(type, '0x95863d16bA2fb60B7d9Ca725f22df76fA5dEe61D'))
+        .to.emit(contract, 'VotingRoomStarted')
+        .withArgs(2)
+
+      await expect(
+        contract.initializeVotingRoom(type, '0x95863d16bA2fb60B7d9Ca725f22df76fA5dEe61D')
+      ).to.be.revertedWith('vote already ongoing')
+
+      const { signedMessages } = await getSignedMessages(alice, firstAddress, secondAddress)
+
+      await contract.castVotes(signedMessages)
+      await provider.send('evm_mine', [Math.floor(Date.now() + 10000)])
+      await contract.finalizeVotingRoom(1)
+
+      expect((await contract.votingRoomMap(1)).slice(2)).to.deep.eq([
+        type,
+        true,
+        '0x0FA1A5CC3911A5697B625EF1C75eF4caE764bd34',
+        BigNumber.from(200),
+        BigNumber.from(100),
+      ])
+    })
+  }
+})
+
+describe('Contract', () => {
+  async function fixture([alice, firstAddress, secondAddress]: any[], provider: any) {
+    const contract = await deployContract(alice, MockContract)
+    return { contract, alice, firstAddress, secondAddress, provider }
+  }
 
   describe('Voting Room', () => {
     it('initializes', async () => {
+      const { contract, firstAddress, secondAddress, provider } = await loadFixture(fixture)
+      await provider.send('evm_mine', [Math.floor(Date.now() / 1000)])
       expect(await contract.initializeVotingRoom(1, firstAddress.address))
         .to.emit(contract, 'VotingRoomStarted')
         .withArgs(1)
@@ -27,6 +113,8 @@ describe('Contract', () => {
     })
 
     it('gets', async () => {
+      const { contract, firstAddress, secondAddress, provider } = await loadFixture(fixture)
+      await provider.send('evm_mine', [Math.floor(Date.now() / 1000)])
       await contract.initializeVotingRoom(1, firstAddress.address)
       expect((await contract.votingRoomMap(1)).slice(2)).to.deep.eq([
         1,
@@ -54,6 +142,8 @@ describe('Contract', () => {
     })
 
     it('finalizes', async () => {
+      const { contract, firstAddress, provider } = await loadFixture(fixture)
+      await provider.send('evm_mine', [Math.floor(Date.now() / 1000)])
       await contract.initializeVotingRoom(1, firstAddress.address)
       expect((await contract.votingRoomMap(1)).slice(2)).to.deep.eq([
         1,
@@ -78,6 +168,8 @@ describe('Contract', () => {
 
   describe('helpers', () => {
     it('get active votes', async () => {
+      const { contract, firstAddress, secondAddress, provider } = await loadFixture(fixture)
+      await provider.send('evm_mine', [Math.floor(Date.now() / 1000)])
       await contract.initializeVotingRoom(1, firstAddress.address)
       expect(await contract.getActiveVotingRooms()).to.deep.eq([BigNumber.from(1)])
 
@@ -94,51 +186,10 @@ describe('Contract', () => {
   })
 
   describe('voting', () => {
-    const votes = [
-      {
-        voter: alice,
-        vote: 1,
-        sntAmount: BigNumber.from(100),
-        sessionID: 1,
-      },
-      {
-        voter: firstAddress,
-        vote: 0,
-        sntAmount: BigNumber.from(100),
-        nonce: 1,
-        sessionID: 1,
-      },
-      {
-        voter: secondAddress,
-        vote: 1,
-        sntAmount: BigNumber.from(100),
-        sessionID: 1,
-      },
-    ]
-    const types = ['address', 'uint256', 'uint256']
-    const messages = votes.map((vote) => [
-      vote.voter.address,
-      BigNumber.from(vote.sessionID).mul(2).add(vote.vote),
-      vote.sntAmount,
-    ])
-
-    let signedMessages: any[] = []
-
-    beforeEach(async () => {
-      signedMessages = await Promise.all(
-        messages.map(async (message, idx) => {
-          const returnArray = [...message]
-          const signature = utils.splitSignature(
-            await votes[idx].voter.signMessage(utils.arrayify(utils.solidityPack(types, message)))
-          )
-          returnArray.push(signature.r)
-          returnArray.push(signature._vs)
-          return returnArray
-        })
-      )
-    })
-
     it('check voters', async () => {
+      const { contract, alice, firstAddress, secondAddress, provider } = await loadFixture(fixture)
+      const { signedMessages } = await getSignedMessages(alice, firstAddress, secondAddress)
+      await provider.send('evm_mine', [Math.floor(Date.now() / 1000)])
       await contract.initializeVotingRoom(1, '0xabA1eF51ef4aE360a9e8C9aD2d787330B602eb24')
 
       expect(await contract.listRoomVoters(1)).to.deep.eq([])
@@ -149,6 +200,9 @@ describe('Contract', () => {
     })
 
     it('success', async () => {
+      const { contract, alice, firstAddress, secondAddress, provider } = await loadFixture(fixture)
+      const { signedMessages } = await getSignedMessages(alice, firstAddress, secondAddress)
+      await provider.send('evm_mine', [Math.floor(Date.now() / 1000)])
       await contract.initializeVotingRoom(1, '0xabA1eF51ef4aE360a9e8C9aD2d787330B602eb24')
       await contract.castVotes(signedMessages)
       expect((await contract.votingRoomMap(1)).slice(2)).to.deep.eq([
@@ -161,6 +215,9 @@ describe('Contract', () => {
     })
 
     it('double vote', async () => {
+      const { contract, alice, firstAddress, secondAddress, provider } = await loadFixture(fixture)
+      const { signedMessages } = await getSignedMessages(alice, firstAddress, secondAddress)
+      await provider.send('evm_mine', [Math.floor(Date.now() / 1000)])
       await contract.initializeVotingRoom(1, '0xabA1eF51ef4aE360a9e8C9aD2d787330B602eb24')
       await contract.castVotes(signedMessages)
       await contract.castVotes(signedMessages)
@@ -174,25 +231,37 @@ describe('Contract', () => {
     })
 
     it('random bytes', async () => {
+      const { contract, provider } = await loadFixture(fixture)
+      await provider.send('evm_mine', [Math.floor(Date.now() / 1000)])
       await contract.initializeVotingRoom(1, '0xabA1eF51ef4aE360a9e8C9aD2d787330B602eb24')
       await expect(contract.castVotes([new Uint8Array([12, 12, 12])])).to.be.reverted
     })
 
     it('none existent room', async () => {
+      const { contract, alice, firstAddress, secondAddress, provider } = await loadFixture(fixture)
+      const { signedMessages } = await getSignedMessages(alice, firstAddress, secondAddress)
+      await provider.send('evm_mine', [Math.floor(Date.now() / 1000)])
       await expect(contract.castVotes(signedMessages)).to.be.reverted
     })
 
     it('old room', async () => {
+      const { contract, alice, firstAddress, secondAddress, provider } = await loadFixture(fixture)
+      const { signedMessages } = await getSignedMessages(alice, firstAddress, secondAddress)
+      await provider.send('evm_mine', [Math.floor(Date.now() / 1000)])
       await contract.initializeVotingRoom(1, '0xabA1eF51ef4aE360a9e8C9aD2d787330B602eb24')
       await provider.send('evm_mine', [Math.floor(Date.now() / 1000 + 2000)])
       await expect(contract.castVotes(signedMessages)).to.be.reverted
     })
 
     it('wrong signature', async () => {
+      const { contract, alice, firstAddress, secondAddress, provider } = await loadFixture(fixture)
+      const { messages } = await getSignedMessages(alice, firstAddress, secondAddress)
+      const types = ['address', 'uint256', 'uint256']
+      await provider.send('evm_mine', [Math.floor(Date.now() / 1000)])
       await contract.initializeVotingRoom(1, '0xabA1eF51ef4aE360a9e8C9aD2d787330B602eb24')
       await provider.send('evm_mine', [Math.floor(Date.now() / 1000 + 2000)])
 
-      signedMessages = await Promise.all(
+      const signedMessages = await Promise.all(
         messages.map(async (message) => {
           const returnArray = [...message]
           const signature = utils.splitSignature(
