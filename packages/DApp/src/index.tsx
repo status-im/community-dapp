@@ -8,7 +8,7 @@ import { WakuProvider } from './providers/waku/provider'
 const config = {
   readOnlyChainId: ChainId.Ropsten,
   readOnlyUrls: {
-    [ChainId.Ropsten]: 'https://Ropsten.infura.io/v3/62687d1a985d4508b2b7a24827551934',
+    [ChainId.Ropsten]: 'https://ropsten.infura.io/v3/b4451d780cc64a078ccf2181e872cfcf',
   },
 }
 
