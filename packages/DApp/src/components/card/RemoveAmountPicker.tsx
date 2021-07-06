@@ -1,6 +1,8 @@
+import { useContractFunction } from '@usedapp/core'
 import React, { useState } from 'react'
 import styled from 'styled-components'
 import { timespan } from '../../helpers/timespan'
+import { useContracts } from '../../hooks/useContracts'
 import { CommunityDetail } from '../../models/community'
 import { ButtonPrimary } from '../Button'
 import { VotePropose } from '../votes/VotePropose'
@@ -15,28 +17,32 @@ interface RemoveAmountPickerProps {
 
 export function RemoveAmountPicker({ community, availableAmount, setShowConfirmModal }: RemoveAmountPickerProps) {
   const [proposingAmount, setProposingAmount] = useState(0)
-  const lastVote = community.votingHistory[community.votingHistory.length - 1]
-  const lastVoteDate = lastVote.date
   const disabled = proposingAmount === 0
+  const { votingContract } = useContracts()
+  const { send } = useContractFunction(votingContract, 'initializeVotingRoom')
 
-  if (community.votingHistory && timespan(lastVoteDate) < 30) {
-    return (
-      <WarningWrapRemoval>
-        <Warning
-          icon="⏳"
-          text={`${community.name} had a vote for removal ${timespan(
-            lastVoteDate
-          )} days ago. A new vote can be submitted after 30 days passes since the last vote.`}
-        />
-        <ConfirmBtn
-          onClick={() => {
-            setShowConfirmModal(false)
-          }}
-        >
-          OK, let’s move on! <span>🤙</span>
-        </ConfirmBtn>
-      </WarningWrapRemoval>
-    )
+  if (community.votingHistory && community.votingHistory.length > 0) {
+    const lastVote = community.votingHistory[community.votingHistory.length - 1]
+    const lastVoteDate = lastVote.date
+    if (timespan(lastVoteDate) < 30) {
+      return (
+        <WarningWrapRemoval>
+          <Warning
+            icon="⏳"
+            text={`${community.name} had a vote for removal ${timespan(
+              lastVoteDate
+            )} days ago. A new vote can be submitted after 30 days passes since the last vote.`}
+          />
+          <ConfirmBtn
+            onClick={() => {
+              setShowConfirmModal(false)
+            }}
+          >
+            OK, let’s move on! <span>🤙</span>
+          </ConfirmBtn>
+        </WarningWrapRemoval>
+      )
+    }
   }
   if (availableAmount < 10000) {
     return (
@@ -62,7 +68,13 @@ export function RemoveAmountPicker({ community, availableAmount, setShowConfirmM
         setProposingAmount={setProposingAmount}
         proposingAmount={proposingAmount}
       />
-      <VoteConfirmBtn disabled={disabled} onClick={() => setShowConfirmModal(true)}>
+      <VoteConfirmBtn
+        disabled={disabled}
+        onClick={async () => {
+          await send(0, community.publicKey)
+          setShowConfirmModal(true)
+        }}
+      >
         Confirm vote to remove community
       </VoteConfirmBtn>
     </VoteProposeWrap>
