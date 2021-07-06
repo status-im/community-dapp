@@ -88,6 +88,7 @@ describe('Contract story', () => {
         '0x0FA1A5CC3911A5697B625EF1C75eF4caE764bd34',
         BigNumber.from(200),
         BigNumber.from(100),
+        BigNumber.from(1),
       ])
     })
   }
@@ -122,6 +123,7 @@ describe('Contract', () => {
         firstAddress.address,
         BigNumber.from(0),
         BigNumber.from(0),
+        BigNumber.from(1),
       ])
 
       await contract.initializeVotingRoom(1, secondAddress.address)
@@ -131,6 +133,7 @@ describe('Contract', () => {
         secondAddress.address,
         BigNumber.from(0),
         BigNumber.from(0),
+        BigNumber.from(2),
       ])
       expect((await contract.votingRoomMap(1)).slice(2)).to.deep.eq([
         1,
@@ -138,6 +141,7 @@ describe('Contract', () => {
         firstAddress.address,
         BigNumber.from(0),
         BigNumber.from(0),
+        BigNumber.from(1),
       ])
     })
 
@@ -151,6 +155,7 @@ describe('Contract', () => {
         firstAddress.address,
         BigNumber.from(0),
         BigNumber.from(0),
+        BigNumber.from(1),
       ])
       await provider.send('evm_mine', [Math.floor(Date.now() / 1000 + 2000)])
       expect(await contract.finalizeVotingRoom(1))
@@ -162,11 +167,40 @@ describe('Contract', () => {
         firstAddress.address,
         BigNumber.from(0),
         BigNumber.from(0),
+        BigNumber.from(1),
       ])
     })
   })
 
   describe('helpers', () => {
+    it('getCommunityVoting', async () => {
+      const { contract, firstAddress, secondAddress, provider } = await loadFixture(fixture)
+      await provider.send('evm_mine', [Math.floor(Date.now() / 1000)])
+      await contract.initializeVotingRoom(1, firstAddress.address)
+      expect((await contract.getCommunityVoting(firstAddress.address)).slice(2)).to.deep.eq([
+        1,
+        false,
+        firstAddress.address,
+        BigNumber.from(0),
+        BigNumber.from(0),
+        BigNumber.from(1),
+      ])
+
+      await expect(contract.getCommunityVoting(secondAddress.address)).to.be.revertedWith('vote not found')
+
+      await provider.send('evm_mine', [Math.floor(Date.now() + 10000)])
+      await expect(contract.getCommunityVoting(firstAddress.address)).to.be.revertedWith('vote ended')
+      await contract.initializeVotingRoom(1, secondAddress.address)
+      expect((await contract.getCommunityVoting(secondAddress.address)).slice(2)).to.deep.eq([
+        1,
+        false,
+        secondAddress.address,
+        BigNumber.from(0),
+        BigNumber.from(0),
+        BigNumber.from(2),
+      ])
+    })
+
     it('get active votes', async () => {
       const { contract, firstAddress, secondAddress, provider } = await loadFixture(fixture)
       await provider.send('evm_mine', [Math.floor(Date.now() / 1000)])
@@ -211,6 +245,7 @@ describe('Contract', () => {
         '0xabA1eF51ef4aE360a9e8C9aD2d787330B602eb24',
         BigNumber.from(200),
         BigNumber.from(100),
+        BigNumber.from(1),
       ])
     })
 
@@ -227,6 +262,7 @@ describe('Contract', () => {
         '0xabA1eF51ef4aE360a9e8C9aD2d787330B602eb24',
         BigNumber.from(200),
         BigNumber.from(100),
+        BigNumber.from(1),
       ])
     })
 

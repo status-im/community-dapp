@@ -22,6 +22,7 @@ contract MockContract {
         address community;
         uint256 totalVotesFor;
         uint256 totalVotesAgainst;
+        uint256 roomNumber;
         mapping(address => bool) voted;
         address[] voters;
     }
@@ -35,6 +36,32 @@ contract MockContract {
 
     uint256[] public activeVotingRooms;
     mapping(uint256 => uint256) private indexOfActiveVotingRooms;
+
+    function getCommunityVoting(address publicKey)
+        public
+        view
+        returns (
+            uint256 startBlock,
+            uint256 endAt,
+            VoteType voteType,
+            bool finalized,
+            address community,
+            uint256 totalVotesFor,
+            uint256 totalVotesAgainst,
+            uint256 roomNumber
+        )
+    {
+        require(communityVotingId[publicKey] > 0, 'vote not found');
+        require(votingRoomMap[communityVotingId[publicKey]].endAt > block.timestamp, 'vote ended');
+        startBlock = votingRoomMap[communityVotingId[publicKey]].startBlock;
+        endAt = votingRoomMap[communityVotingId[publicKey]].endAt;
+        voteType = votingRoomMap[communityVotingId[publicKey]].voteType;
+        finalized = votingRoomMap[communityVotingId[publicKey]].finalized;
+        community = votingRoomMap[communityVotingId[publicKey]].community;
+        totalVotesFor = votingRoomMap[communityVotingId[publicKey]].totalVotesFor;
+        totalVotesAgainst = votingRoomMap[communityVotingId[publicKey]].totalVotesAgainst;
+        roomNumber = votingRoomMap[communityVotingId[publicKey]].roomNumber;
+    }
 
     function getActiveVotingRooms() public view returns (uint256[] memory) {
         return activeVotingRooms;
@@ -52,7 +79,7 @@ contract MockContract {
         newVotingRoom.endAt = block.timestamp.add(VOTING_LENGTH);
         newVotingRoom.voteType = voteType;
         newVotingRoom.community = publicKey;
-
+        newVotingRoom.roomNumber = latestVoting;
         communityVotingId[publicKey] = latestVoting;
 
         activeVotingRooms.push(latestVoting);
