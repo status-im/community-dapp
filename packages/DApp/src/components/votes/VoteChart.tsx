@@ -1,11 +1,11 @@
 import React from 'react'
+import CountUp from 'react-countup'
 import styled from 'styled-components'
 import { Colors } from '../../constants/styles'
 import { addCommas } from '../../helpers/addCommas'
 import { VoteType, voteTypes } from './../../constants/voteTypes'
 import { CurrentVoting } from '../../models/community'
 import { VoteGraphBar } from './VoteGraphBar'
-
 import { formatTimeLeft } from '../../helpers/fomatTimeLeft'
 
 export interface VoteChartProps {
@@ -42,7 +42,12 @@ export function VoteChart({ vote, voteWinner, proposingAmount, selectedVote, isA
           </p>
           <span>
             {' '}
-            {addCommas(vote.voteAgainst.toNumber())} <span style={{ fontWeight: 'normal' }}>SNT</span>
+            {isAnimation && proposingAmount && selectedVote && selectedVote.type === 0 ? (
+              <CountUp end={votesAgainst + proposingAmount} />
+            ) : (
+              addCommas(votesAgainst)
+            )}{' '}
+            <span style={{ fontWeight: 'normal' }}>SNT</span>
           </span>
         </VoteBox>
         <TimeLeft>{formatTimeLeft(vote.timeLeft)}</TimeLeft>
@@ -52,7 +57,12 @@ export function VoteChart({ vote, voteWinner, proposingAmount, selectedVote, isA
           </p>
           <span>
             {' '}
-            {addCommas(vote.voteFor.toNumber())} <span style={{ fontWeight: 'normal' }}>SNT</span>
+            {isAnimation && proposingAmount && selectedVote && selectedVote.type === 1 ? (
+              <CountUp end={votesFor + proposingAmount} />
+            ) : (
+              addCommas(votesFor)
+            )}{' '}
+            <span style={{ fontWeight: 'normal' }}>SNT</span>
           </span>
         </VoteBox>
       </VotesChart>
