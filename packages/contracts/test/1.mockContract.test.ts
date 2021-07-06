@@ -186,10 +186,7 @@ describe('Contract', () => {
         BigNumber.from(1),
       ])
 
-      await expect(contract.getCommunityVoting(secondAddress.address)).to.be.revertedWith('vote not found')
-
       await provider.send('evm_mine', [Math.floor(Date.now() + 10000)])
-      await expect(contract.getCommunityVoting(firstAddress.address)).to.be.revertedWith('vote ended')
       await contract.initializeVotingRoom(1, secondAddress.address)
       expect((await contract.getCommunityVoting(secondAddress.address)).slice(2)).to.deep.eq([
         1,

@@ -16,7 +16,7 @@ interface EnvConfigs {
 
 const contracts = {
   3: {
-    votingContract: '0xF8739d0dDC51aCC421808b6b887f4A34bEB92960',
+    votingContract: '0x942C8248d14c20b9E79d7A60178B5b17Dd7186c3',
   },
 }
 

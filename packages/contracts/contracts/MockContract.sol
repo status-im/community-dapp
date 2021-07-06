@@ -51,8 +51,6 @@ contract MockContract {
             uint256 roomNumber
         )
     {
-        require(communityVotingId[publicKey] > 0, 'vote not found');
-        require(votingRoomMap[communityVotingId[publicKey]].endAt > block.timestamp, 'vote ended');
         startBlock = votingRoomMap[communityVotingId[publicKey]].startBlock;
         endAt = votingRoomMap[communityVotingId[publicKey]].endAt;
         voteType = votingRoomMap[communityVotingId[publicKey]].voteType;
