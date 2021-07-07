@@ -66,13 +66,14 @@ export function VoteChart({ vote, voteWinner, proposingAmount, selectedVote, isA
           </span>
         </VoteBox>
       </VotesChart>
-
-      <VoteGraphBar
-        graphWidth={graphWidth}
-        balanceWidth={balanceWidth}
-        voteWinner={voteWinner}
-        isAnimation={isAnimation}
-      />
+      <VoteGraphBarWrap className={selectedVote ? '' : 'notModal'}>
+        <VoteGraphBar
+          graphWidth={graphWidth}
+          balanceWidth={balanceWidth}
+          voteWinner={voteWinner}
+          isAnimation={isAnimation}
+        />
+      </VoteGraphBarWrap>
     </Votes>
   )
 }
@@ -82,6 +83,7 @@ const Votes = styled.div`
   flex-direction: column;
   margin-bottom: 32px;
   width: 100%;
+  position: relative;
 `
 const VotesChart = styled.div`
   display: flex;
@@ -119,4 +121,21 @@ const TimeLeft = styled.div`
   line-height: 16px;
   letter-spacing: 0.1px;
   color: ${Colors.GreyText};
+
+  @media (max-width: 768px) {
+    top: 0;
+  }
+`
+
+const VoteGraphBarWrap = styled.div`
+  position: static;
+
+  &.notModal {
+    @media (max-width: 768px) {
+      position: absolute;
+      top: 60%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+  }
 `

@@ -64,6 +64,16 @@ const VoteGraph = styled.div<VoteGraphBarProps>`
     transform: translateX(-50%);
     background-image: url(${indicatorIcon});
     background-size: cover;
+
+    @media (max-width: 768px) {
+      width: 9px;
+      height: 3px;
+      left: 50%;
+    }
+  }
+
+  @media (max-width: 768px) {
+    width: 420px;
   }
 `
 

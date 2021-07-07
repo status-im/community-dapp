@@ -85,6 +85,10 @@ const HeaderWrapper = styled.div`
   height: 100%;
   padding: 0 40px;
   margin: 0 auto;
+
+  @media (max-width: 900px) {
+    padding: 0 32px;
+  }
 `
 
 const MenuContent = styled.div`
@@ -95,11 +99,19 @@ const MenuContent = styled.div`
   flex: 1;
   max-width: 780px;
   background-color: ${Colors.GrayLight};
+
+  @media (max-width: 768px) {
+    max-width: 440px;
+  }
 `
 
 const Navigation = styled.nav`
   max-width: 500px;
   width: 100%;
+
+  @media (max-width: 768px) {
+    max-width: 290px;
+  }
 `
 
 const NavLinks = styled.ul`
@@ -112,6 +124,10 @@ const NavLinks = styled.ul`
 const NavItem = styled.li`
   width: 124px;
   text-align: center;
+
+  @media (max-width: 768px) {
+    width: 80px;
+  }
 `
 
 const StyledNavLink = styled(NavLink)`
@@ -141,6 +157,10 @@ const StyledNavLink = styled(NavLink)`
     bacground-position: center;
     border-radius: 1px;
     animation: ${Animation} 0.25s linear;
+
+    @media (max-width: 768px) {
+      width: 80px;
+    }
   }
 `
 const ButtonConnect = styled(StatusConnectButton)`

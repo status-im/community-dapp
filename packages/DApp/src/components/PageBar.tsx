@@ -53,9 +53,13 @@ const PageBarContainer = styled.div`
 
 const StyledPageBar = styled.div`
   width: 100%;
-  padding: 24px 0 19px;
+  padding: 24px 0 16px;
   background: #fff;
   z-index: 110;
+
+  @media (max-width: 900px) {
+    padding: 24px 32px 16px;
+  }
 
   &.isFixed {
     position: fixed;

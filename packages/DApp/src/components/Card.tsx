@@ -24,9 +24,10 @@ import { useRoomAggregateVotes } from '../hooks/useRoomAggregateVotes'
 interface CardCommunityProps {
   community: CommunityDetail
   showRemoveButton?: boolean
+  customHeading?: string
 }
 
-export const CardCommunity = ({ community, showRemoveButton }: CardCommunityProps) => {
+export const CardCommunity = ({ community, showRemoveButton, customHeading }: CardCommunityProps) => {
   const [showHistoryModal, setShowHistoryModal] = useState(false)
   const [showRemoveModal, setShowRemoveModal] = useState(false)
   const [showConfirmModal, setShowConfirmModal] = useState(false)
@@ -85,7 +86,7 @@ export const CardCommunity = ({ community, showRemoveButton }: CardCommunityProp
 
         <CommunityInfo>
           <CardTop>
-            <CardHeading>{community.name}</CardHeading>
+            <CardHeading>{customHeading ? customHeading : community.name}</CardHeading>
             {community.directoryInfo && showRemoveButton && <RemoveBtn onClick={() => setShowRemoveModal(true)} />}
           </CardTop>
           <CardText>{community.description}</CardText>
@@ -183,7 +184,7 @@ export const CardVote = ({ room, hideModalFunction }: CardVoteProps) => {
           SNT holders have decided <b>{winner == 1 ? voteConstants.against.verb : voteConstants.for.verb}</b> this
           community to the directory!
         </CardHeadingEndedVote>
-      ) : hideModalFunction ? (
+      ) : hideModalFunction || window.innerWidth < 769 ? (
         <CardHeading />
       ) : (
         <CardHeading>{voteConstants.question}</CardHeading>
@@ -228,6 +229,11 @@ export const Card = styled.div`
   display: flex;
   align-items: stretch;
   margin-top: 24px;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    margin-top: 0;
+  }
 `
 
 export const CardCommunityBlock = styled.div`
@@ -245,14 +251,28 @@ export const CardCommunityWrap = styled.div`
   padding: 24px 24px 16px;
   box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
   border-radius: 6px 0px 0px 6px;
+
+  @media (max-width: 768px) {
+    width: 100%;
+    margin: 0;
+    border: none;
+    box-shadow: none;
+  }
 `
 export const CardVoteWrap = styled.div`
-  width: 50%;
   display: flex;
   align-items: stretch;
+  width: 50%;
   padding: 24px 24px 32px;
   box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
   border-radius: 6px 0px 0px 6px;
+
+  @media (max-width: 768px) {
+    width: 100%;
+    box-shadow: none;
+    border-radius: unset;
+    border-bottom: 1px solid #e0e0e0;
+  }
 `
 
 const Community = styled.div`
@@ -312,6 +332,10 @@ const CardHeadingEndedVote = styled.p`
   line-height: 22px;
   margin-bottom: 18px;
   text-align: center;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
 `
 const CardText = styled.p`
   line-height: 22px;
@@ -339,6 +363,11 @@ export const CardLinks = styled.div`
   width: 100%;
   font-size: 15px;
   line-height: 22px;
+
+  @media (max-width: 768px) {
+    width: auto;
+    margin-left: 80px;
+  }
 `
 
 export const CardVoteBlock = styled.div`
@@ -362,6 +391,10 @@ export const VoteBtn = styled(ButtonSecondary)`
 
   & > span {
     font-size: 20px;
+  }
+
+  @media (max-width: 768px) {
+    width: 305px;
   }
 `
 const VoteBtnFinal = styled(VoteBtn)`

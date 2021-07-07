@@ -20,7 +20,7 @@ export function VotingCards() {
   return (
     <div>
       <PageBar>
-        <Search
+        <VoteSearch
           type="text"
           placeholder="Search communities..."
           value={filterKeyword}
@@ -52,6 +52,12 @@ export function VotingCards() {
     </div>
   )
 }
+
+const VoteSearch = styled(Search)`
+  @media (max-width: 900px) {
+    display: none;
+  }
+`
 
 const VoteFilter = styled.div`
   display: flex;
