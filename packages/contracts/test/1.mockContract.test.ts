@@ -79,7 +79,7 @@ describe('Contract story', () => {
       const { signedMessages } = await getSignedMessages(alice, firstAddress, secondAddress)
 
       await contract.castVotes(signedMessages)
-      await provider.send('evm_mine', [Math.floor(Date.now() + 10000)])
+      await provider.send('evm_mine', [Math.floor(Date.now() / 1000 + 10000)])
       await contract.finalizeVotingRoom(1)
 
       expect((await contract.votingRoomMap(1)).slice(2)).to.deep.eq([
@@ -186,7 +186,7 @@ describe('Contract', () => {
         BigNumber.from(1),
       ])
 
-      await provider.send('evm_mine', [Math.floor(Date.now() + 10000)])
+      await provider.send('evm_mine', [Math.floor(Date.now() / 1000 + 10000)])
       await contract.initializeVotingRoom(1, secondAddress.address)
       expect((await contract.getCommunityVoting(secondAddress.address)).slice(2)).to.deep.eq([
         1,
