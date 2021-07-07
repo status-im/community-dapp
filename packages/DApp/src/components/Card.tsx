@@ -19,6 +19,7 @@ import { VoteAnimatedModal } from './card/VoteAnimatedModal'
 import voting from '../helpers/voting'
 import { DetailedVotingRoom } from '../models/smartContract'
 import { VoteSubmitButton } from './card/VoteSubmitButton'
+import { useRoomAggregateVotes } from '../hooks/useRoomAggregateVotes'
 
 interface CardCommunityProps {
   community: CommunityDetail
@@ -122,8 +123,10 @@ export const CardVote = ({ room, hideModalFunction }: CardVoteProps) => {
 
   const { votingContract } = useContracts()
 
+  room = useRoomAggregateVotes(room, showConfirmModal)
+
   const finalizeVoting = useContractFunction(votingContract, 'finalizeVotingRoom')
-  const community = room.details
+
   const setNext = (val: boolean) => {
     setShowConfirmModal(val)
     setShowVoteModal(false)
@@ -152,7 +155,7 @@ export const CardVote = ({ room, hideModalFunction }: CardVoteProps) => {
   return (
     <CardVoteBlock>
       {showVoteModal && (
-        <Modal heading={`${vote?.type} ${community.name}?`} setShowModal={setShowVoteModal}>
+        <Modal heading={`${vote?.type} ${room.details.name}?`} setShowModal={setShowVoteModal}>
           <VoteModal
             vote={vote}
             room={room.roomNumber}
@@ -168,7 +171,7 @@ export const CardVote = ({ room, hideModalFunction }: CardVoteProps) => {
         <Modal setShowModal={hideConfirm}>
           <VoteAnimatedModal
             vote={vote}
-            community={community}
+            community={room.details}
             selectedVote={selectedVoted}
             setShowModal={hideConfirm}
             proposingAmount={proposingAmount}
