@@ -2,17 +2,18 @@ import React, { useState } from 'react'
 import styled from 'styled-components'
 import { Colors, ColumnFlexDiv } from '../../constants/styles'
 import { addCommas } from '../../helpers/addCommas'
-import { CardHeading, CardVoteBlock, VoteBtn, VoteSendingBtn } from '../Card'
+import { CardHeading, CardVoteBlock, VoteBtn } from '../Card'
 import { CommunityDetail } from '../../models/community'
 import { Modal } from '../Modal'
 import { FeatureModal } from './FeatureModal'
 import { VoteConfirmModal } from './VoteConfirmModal'
 import { OngoingVote } from './OngoingVote'
-import { useContractFunction, useEthers } from '@usedapp/core'
+import { useEthers } from '@usedapp/core'
 import { useContracts } from '../../hooks/useContracts'
 import { useContractCall } from '@usedapp/core'
-import { useVotesAggregate } from '../../hooks/useVotesAggregate'
 import { votingFromRoom } from '../../helpers/voting'
+import { VoteSubmitButton } from './VoteSubmitButton'
+import { VoteSendingBtn } from '../Button'
 interface CardFeatureProps {
   community: CommunityDetail
   heading: string
@@ -33,27 +34,20 @@ export const CardFeature = ({ community, heading, icon, sum, timeLeft }: CardFea
   }
 
   const { votingContract } = useContracts()
-  const [roomNumber] =
-    useContractCall({
-      abi: votingContract.interface,
-      address: votingContract.address,
-      method: 'communityVotingId',
-      args: [community.publicKey],
-    }) ?? []
-
-  const { votes } = useVotesAggregate(roomNumber)
-  const { send } = useContractFunction(votingContract, 'castVotes')
-
-  const votingRoom = useContractCall({
+  let votingRoom = useContractCall({
     abi: votingContract.interface,
     address: votingContract.address,
-    method: 'votingRoomMap',
-    args: [roomNumber],
+    method: 'getCommunityVoting',
+    args: [community.publicKey],
   }) as any
+
+  if (votingRoom && (votingRoom.roomNumber.toNumber() === 0 || votingRoom.finalized == true)) {
+    votingRoom = undefined
+  }
 
   let currentVoting
   if (votingRoom) {
-    currentVoting = { ...votingFromRoom(votingRoom), room: roomNumber }
+    currentVoting = votingFromRoom(votingRoom)
   }
 
   return (
@@ -95,9 +89,7 @@ export const CardFeature = ({ community, heading, icon, sum, timeLeft }: CardFea
             <OngoingVote community={community} setShowOngoingVote={setShowOngoingVote} room={votingRoom} />
           )}
           <VoteSendingBtn onClick={() => setShowOngoingVote(true)}>Removal vote in progress</VoteSendingBtn>
-          {votes.length > 0 && currentVoting && currentVoting?.timeLeft > 0 && (
-            <VoteSendingBtn onClick={() => send(votes)}> {votes.length} votes need saving</VoteSendingBtn>
-          )}
+          {currentVoting && currentVoting.timeLeft > 0 && <VoteSubmitButton vote={currentVoting} />}
         </FeatureBottom>
       )}
     </CardVoteBlock>

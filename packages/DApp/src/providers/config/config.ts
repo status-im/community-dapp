@@ -22,17 +22,17 @@ const contracts = {
 
 export const config: EnvConfigs = {
   localhost: {
-    wakuTopic: `/myApp/localhost/${uuidv4()}/0.0.1/votingRoom/`,
+    wakuTopic: `/myApp/localhost/${uuidv4()}/0.0.2/votingRoom/`,
     numberPerPage: 2,
     contracts,
   },
   development: {
-    wakuTopic: '/myApp/development/0.0.1/votingRoom/',
+    wakuTopic: '/myApp/development/0.0.2/votingRoom/',
     numberPerPage: 3,
     contracts,
   },
   production: {
-    wakuTopic: '/myApp/production/0.0.1/votingRoom/',
+    wakuTopic: '/myApp/production/0.0.2/votingRoom/',
     numberPerPage: 4,
     contracts,
   },

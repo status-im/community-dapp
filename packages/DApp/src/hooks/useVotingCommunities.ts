@@ -6,7 +6,7 @@ import { useContracts } from './useContracts'
 
 export function useVotingCommunities(filterKeyword: string): DetailedVotingRoom[] {
   const [roomsWithCommunity, setRoomsWithCommunity] = useState<any[]>([])
-  const [roomsToShow, setRoomsToShow] = useState<any[]>([])
+  const [filteredRooms, setFilteredRooms] = useState<any[]>([])
 
   const { votingContract } = useContracts()
   const [roomList] = useContractCall({
@@ -31,9 +31,9 @@ export function useVotingCommunities(filterKeyword: string): DetailedVotingRoom[
     if (votingRooms.length > 0) {
       const getPromises = async () => {
         const rooms = await Promise.all(
-          votingRooms.map(async (el: any, idx) => {
+          votingRooms.map(async (el: any) => {
             if (el) {
-              return { ...el, room: roomList[idx].toNumber(), details: await getCommunityDetails(el.community) }
+              return { ...el, details: await getCommunityDetails(el.community) }
             }
             return undefined
           })
@@ -45,7 +45,7 @@ export function useVotingCommunities(filterKeyword: string): DetailedVotingRoom[
   }, [JSON.stringify(votingRooms)])
 
   useEffect(() => {
-    setRoomsToShow(
+    setFilteredRooms(
       roomsWithCommunity.filter((room: any) => {
         if (room) {
           return (
@@ -59,5 +59,5 @@ export function useVotingCommunities(filterKeyword: string): DetailedVotingRoom[
     )
   }, [roomsWithCommunity, filterKeyword])
 
-  return roomsToShow
+  return filteredRooms
 }

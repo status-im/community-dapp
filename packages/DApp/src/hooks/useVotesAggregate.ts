@@ -6,7 +6,7 @@ import { useContracts } from '../hooks/useContracts'
 
 import wakuMessage from '../helpers/wakuMessage'
 
-export function useVotesAggregate(room: number) {
+export function useVotesAggregate(room: number | undefined) {
   const { config } = useConfig()
   const { votingContract } = useContracts()
   const [alreadyVotedList] =
@@ -21,7 +21,7 @@ export function useVotesAggregate(room: number) {
 
   useEffect(() => {
     const accumulateVotes = async () => {
-      if (waku && alreadyVotedList) {
+      if (waku && alreadyVotedList && room) {
         const messages = await wakuMessage.receive(waku, config.wakuTopic, room)
         const verifiedMessages = wakuMessage.filterVerified(messages, alreadyVotedList)
         if (votesToSend.length != verifiedMessages.length) {

@@ -46,7 +46,7 @@ export function VotingCards() {
         <FilterList value={sortedBy} setValue={setSortedBy} options={VotingSortingOptions} />
       </PageBar>
       {roomsToShow.map((room: any) => (
-        <VotingCard key={room.room.toString()} room={room} />
+        <VotingCard key={room.roomNumber.toString()} room={room} />
       ))}
       {roomsToShow.length === 0 && <VotingCardSkeleton />}
     </div>

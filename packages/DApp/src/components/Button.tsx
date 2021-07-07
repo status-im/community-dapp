@@ -45,3 +45,20 @@ export const ButtonSecondary = styled(Button)`
     filter: grayscale(1);
   }
 `
+
+export const VoteSendingBtn = styled.button`
+  font-weight: 500;
+  font-size: 15px;
+  line-height: 22px;
+  margin-top: 24px;
+  margin-bottom: -16px;
+  color: ${Colors.VioletDark};
+
+  &:hover {
+    color: ${Colors.Violet};
+  }
+
+  &:active {
+    color: ${Colors.VioletDark};
+  }
+`

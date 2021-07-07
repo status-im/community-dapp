@@ -10,7 +10,7 @@ export type VotingRoom = {
   totalVotesFor: BigNumber
   totalVotesAgainst: BigNumber
   voters: string[]
-  room: number
+  roomNumber: number
 }
 
 export type DetailedVotingRoom = VotingRoom & { details: CommunityDetail }

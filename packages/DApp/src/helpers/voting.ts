@@ -14,6 +14,7 @@ export function votingFromRoom(votingRoom: VotingRoom) {
     type: votingRoom.voteType === 1 ? 'Add' : 'Remove',
     voteFor: votingRoom.totalVotesFor,
     voteAgainst: votingRoom.totalVotesAgainst,
+    ID: votingRoom.roomNumber,
   }
   return currentVoting
 }
