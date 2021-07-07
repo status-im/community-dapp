@@ -15,7 +15,7 @@ export function VotingCards() {
   const [sortedBy, setSortedBy] = useState(VotingSortingEnum.EndingSoonest)
   const [voteType, setVoteType] = useState('')
   const [filterKeyword, setFilterKeyword] = useState('')
-  const roomsToShow = useVotingCommunities(filterKeyword, voteType)
+  const roomsToShow = useVotingCommunities(filterKeyword, voteType, sortedBy)
 
   return (
     <div>

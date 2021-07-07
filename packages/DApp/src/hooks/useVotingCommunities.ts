@@ -1,6 +1,7 @@
 import { useContractCall, useContractCalls } from '@usedapp/core'
 import { useEffect, useState } from 'react'
 import { getCommunityDetails } from '../helpers/apiMock'
+import { VotingSortingEnum } from '../models/community'
 import { DetailedVotingRoom } from '../models/smartContract'
 import { useContracts } from './useContracts'
 
@@ -25,7 +26,40 @@ function isTypeInRoom(voteType: string, room: any) {
   return false
 }
 
-export function useVotingCommunities(filterKeyword: string, voteType: string): DetailedVotingRoom[] {
+function sortFunction(sortedBy: VotingSortingEnum) {
+  switch (sortedBy) {
+    case VotingSortingEnum.AtoZ:
+      return (a: DetailedVotingRoom, b: DetailedVotingRoom) => (a.details.name < b.details.name ? -1 : 1)
+    case VotingSortingEnum.ZtoA:
+      return (a: DetailedVotingRoom, b: DetailedVotingRoom) => (a.details.name < b.details.name ? 1 : -1)
+    case VotingSortingEnum.EndingLatest:
+      return (a: DetailedVotingRoom, b: DetailedVotingRoom) => {
+        return a.endAt < b.endAt ? -1 : 1
+      }
+    case VotingSortingEnum.EndingSoonest:
+      return (a: DetailedVotingRoom, b: DetailedVotingRoom) => {
+        return a.endAt < b.endAt ? 1 : -1
+      }
+    case VotingSortingEnum.MostVotes:
+      return (a: DetailedVotingRoom, b: DetailedVotingRoom) => {
+        const aSum = a.totalVotesAgainst.add(a.totalVotesFor)
+        const bSum = b.totalVotesAgainst.add(b.totalVotesFor)
+        return aSum < bSum ? 1 : -1
+      }
+    case VotingSortingEnum.LeastVotes:
+      return (a: DetailedVotingRoom, b: DetailedVotingRoom) => {
+        const aSum = a.totalVotesAgainst.add(a.totalVotesFor)
+        const bSum = b.totalVotesAgainst.add(b.totalVotesFor)
+        return aSum < bSum ? -1 : 1
+      }
+  }
+}
+
+export function useVotingCommunities(
+  filterKeyword: string,
+  voteType: string,
+  sortedBy: VotingSortingEnum
+): DetailedVotingRoom[] {
   const [roomsWithCommunity, setRoomsWithCommunity] = useState<any[]>([])
   const [filteredRooms, setFilteredRooms] = useState<any[]>([])
 
@@ -66,16 +100,14 @@ export function useVotingCommunities(filterKeyword: string, voteType: string): D
   }, [JSON.stringify(votingRooms)])
 
   useEffect(() => {
-    setFilteredRooms(
-      roomsWithCommunity.filter((room: any) => {
-        if (room) {
-          console.log(room)
-          return isTextInRoom(filterKeyword, room) && isTypeInRoom(voteType, room)
-        }
-        return false
-      })
-    )
-  }, [roomsWithCommunity, filterKeyword, voteType])
+    const filteredRooms = roomsWithCommunity.filter((room: any) => {
+      if (room) {
+        return isTextInRoom(filterKeyword, room) && isTypeInRoom(voteType, room)
+      }
+      return false
+    })
+    setFilteredRooms(filteredRooms.sort(sortFunction(sortedBy)))
+  }, [roomsWithCommunity, filterKeyword, voteType, sortedBy])
 
   return filteredRooms
 }
