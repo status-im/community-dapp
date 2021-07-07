@@ -4,7 +4,28 @@ import { getCommunityDetails } from '../helpers/apiMock'
 import { DetailedVotingRoom } from '../models/smartContract'
 import { useContracts } from './useContracts'
 
-export function useVotingCommunities(filterKeyword: string): DetailedVotingRoom[] {
+function isTextInRoom(filterKeyword: string, room: any) {
+  return (
+    room.details.name.toLowerCase().includes(filterKeyword.toLowerCase()) ||
+    room.details.description.toLowerCase().includes(filterKeyword.toLowerCase()) ||
+    room.details.tags.findIndex((item: any) => filterKeyword.toLowerCase() === item.toLowerCase()) > -1
+  )
+}
+
+function isTypeInRoom(voteType: string, room: any) {
+  if (!voteType) {
+    return true
+  }
+  if (voteType === 'Add') {
+    return room.voteType === 1
+  }
+  if (voteType === 'Remove') {
+    return room.voteType === 0
+  }
+  return false
+}
+
+export function useVotingCommunities(filterKeyword: string, voteType: string): DetailedVotingRoom[] {
   const [roomsWithCommunity, setRoomsWithCommunity] = useState<any[]>([])
   const [filteredRooms, setFilteredRooms] = useState<any[]>([])
 
@@ -48,16 +69,13 @@ export function useVotingCommunities(filterKeyword: string): DetailedVotingRoom[
     setFilteredRooms(
       roomsWithCommunity.filter((room: any) => {
         if (room) {
-          return (
-            room.details.name.toLowerCase().includes(filterKeyword.toLowerCase()) ||
-            room.details.description.toLowerCase().includes(filterKeyword.toLowerCase()) ||
-            room.details.tags.findIndex((item: any) => filterKeyword.toLowerCase() === item.toLowerCase()) > -1
-          )
+          console.log(room)
+          return isTextInRoom(filterKeyword, room) && isTypeInRoom(voteType, room)
         }
         return false
       })
     )
-  }, [roomsWithCommunity, filterKeyword])
+  }, [roomsWithCommunity, filterKeyword, voteType])
 
   return filteredRooms
 }
