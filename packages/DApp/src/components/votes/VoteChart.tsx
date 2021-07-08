@@ -22,15 +22,16 @@ export function VoteChart({ vote, voteWinner, proposingAmount, selectedVote, isA
   const votesFor = vote.voteFor.toNumber()
   const votesAgainst = vote.voteAgainst.toNumber()
   const voteSum = votesFor + votesAgainst
-  const graphWidth = (100 * votesAgainst) / voteSum - 3
+  const graphWidth = (100 * votesAgainst) / voteSum - (votesAgainst > 0 && votesFor > 0 ? 0 : 3)
 
   let balanceWidth = graphWidth
 
   if (proposingAmount && selectedVote) {
     balanceWidth =
       selectedVote.type === 0
-        ? (100 * (votesAgainst + proposingAmount)) / (voteSum + proposingAmount) - 3
-        : (100 * votesAgainst) / (voteSum + proposingAmount) - 3
+        ? (100 * (votesAgainst + proposingAmount)) / (voteSum + proposingAmount) -
+          (votesFor > 0 && votesAgainst > 0 && proposingAmount > 0 ? 0 : 3)
+        : (100 * votesAgainst) / (voteSum + proposingAmount) - (votesAgainst > 0 && proposingAmount > 0 ? 0 : 3)
   }
 
   return (
