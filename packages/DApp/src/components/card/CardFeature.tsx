@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import styled from 'styled-components'
 import { Colors, ColumnFlexDiv } from '../../constants/styles'
 import { addCommas } from '../../helpers/addCommas'
-import { CardHeading, CardVoteBlock, VoteBtn } from '../Card'
+import { CardHeading, CardVoteBlock } from '../Card'
 import { CommunityDetail } from '../../models/community'
 import { Modal } from '../Modal'
 import { FeatureModal } from './FeatureModal'
@@ -13,7 +13,8 @@ import { useContracts } from '../../hooks/useContracts'
 import { useContractCall } from '@usedapp/core'
 import { votingFromRoom } from '../../helpers/voting'
 import { VoteSubmitButton } from './VoteSubmitButton'
-import { VoteSendingBtn } from '../Button'
+import { VoteSendingBtn, VoteBtn } from '../Button'
+
 interface CardFeatureProps {
   community: CommunityDetail
   heading: string

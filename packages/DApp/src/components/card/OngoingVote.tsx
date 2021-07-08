@@ -2,7 +2,8 @@ import React from 'react'
 import { votingFromRoom } from '../../helpers/voting'
 import { CommunityDetail } from '../../models/community'
 import { VotingRoom } from '../../models/smartContract'
-import { CardVote, CardVoteBlock } from '../Card'
+import { CardVoteBlock } from '../Card'
+import { CardVote } from './CardVote/CardVote'
 import { Modal } from '../Modal'
 
 export interface OngoingVoteProps {

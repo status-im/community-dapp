@@ -62,3 +62,24 @@ export const VoteSendingBtn = styled.button`
     color: ${Colors.VioletDark};
   }
 `
+
+export const VotesBtns = styled.div`
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+`
+export const VoteBtn = styled(ButtonSecondary)`
+  width: 187px;
+  padding: 11px 46px;
+  font-weight: 500;
+  font-size: 15px;
+  line-height: 22px;
+
+  & > span {
+    font-size: 20px;
+  }
+
+  @media (max-width: 768px) {
+    width: 305px;
+  }
+`
