@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { DetailedVotingRoom } from '../../models/smartContract'
-import { Card, CardCommunity, CardCommunityWrap, CardVoteWrap } from '../Card'
+import { Card, CardCommunityWrap, CardVoteWrap } from '../Card'
+import { CardCommunity } from '../card/CardCommunity'
 import { CardVote } from './../card/CardVote/CardVote'
 
 interface VotingCardProps {

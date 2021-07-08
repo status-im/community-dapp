@@ -1,6 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
-import { CardCommunityBlock, CardLinks } from '../Card'
+import { CardCommunityBlock, CardLinks } from '../card/CardCommunity'
 import { LinkExternal, LinkInternal } from '../Link'
 import { Skeleton } from '../skeleton/Skeleton'
 import { TagsSkeletonList } from '../skeleton/TagSkeleton'

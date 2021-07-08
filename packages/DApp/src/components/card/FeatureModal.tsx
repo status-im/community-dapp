@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
 import { CommunityDetail } from '../../models/community'
-import { CardCommunity } from '../Card'
+import { CardCommunity } from './CardCommunity'
 import { ButtonPrimary } from '../Button'
 import { VotePropose } from '../votes/VotePropose'
 import { ColumnFlexDiv } from '../../constants/styles'

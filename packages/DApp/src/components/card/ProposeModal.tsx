@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
 import { ButtonPrimary } from '../Button'
-import { CardCommunity } from '../Card'
+import { CardCommunity } from './CardCommunity'
 import { Input } from '../Input'
 import { VotePropose } from '../votes/VotePropose'
 import { Warning } from '../votes/VoteWarning'

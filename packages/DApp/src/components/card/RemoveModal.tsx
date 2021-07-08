@@ -1,7 +1,7 @@
 import React from 'react'
 import { ColumnFlexDiv } from '../../constants/styles'
 import { CommunityDetail } from '../../models/community'
-import { CardCommunity } from '../Card'
+import { CardCommunity } from './CardCommunity'
 import { RemoveAmountPicker } from '../card/RemoveAmountPicker'
 
 interface RemoveModalProps {

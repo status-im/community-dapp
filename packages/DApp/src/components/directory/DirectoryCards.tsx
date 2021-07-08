@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
-import { Card, CardCommunity, CardCommunityWrap, CardVoteWrap } from '../Card'
+import { Card, CardCommunityWrap, CardVoteWrap } from '../Card'
+import { CardCommunity } from '../card/CardCommunity'
 import { CardFeature } from '../card/CardFeature'
 import styled from 'styled-components'
 import { CommunityDetail, DirectorySortingEnum } from '../../models/community'
@@ -13,6 +14,7 @@ import { useConfig } from '../../providers/config'
 import { Colors } from '../../constants/styles'
 import { WeeklyFeature } from '../WeeklyFeature'
 import { DirectoryCardSkeleton } from './DirectoryCardSkeleton'
+
 interface DirectoryCardProps {
   community: CommunityDetail
 }
