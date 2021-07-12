@@ -2,12 +2,13 @@ pragma solidity ^0.8.5;
 
 import '@openzeppelin/contracts/utils/cryptography/ECDSA.sol';
 import '@openzeppelin/contracts/utils/math/SafeMath.sol';
+import './Directory.sol';
 
 contract MockContract {
     using ECDSA for bytes32;
     using SafeMath for uint256;
 
-    uint256 constant VOTING_LENGTH = 1000;
+    uint256 private constant VOTING_LENGTH = 1000;
 
     enum VoteType {
         REMOVE,
@@ -30,12 +31,24 @@ contract MockContract {
     event VotingRoomStarted(uint256 roomId);
     event VotingRoomFinalized(uint256 roomId);
 
+    address public owner;
+    Directory public directory;
+
     uint256 private latestVoting = 1;
     mapping(uint256 => VotingRoom) public votingRoomMap;
     mapping(address => uint256) public communityVotingId;
 
     uint256[] public activeVotingRooms;
     mapping(uint256 => uint256) private indexOfActiveVotingRooms;
+
+    constructor() {
+        owner = msg.sender;
+    }
+
+    function setDirectory(Directory _address) public {
+        require(msg.sender == owner, 'Not owner');
+        directory = _address;
+    }
 
     function getCommunityVoting(address publicKey)
         public
@@ -71,7 +84,12 @@ contract MockContract {
 
     function initializeVotingRoom(VoteType voteType, address publicKey) public {
         require(communityVotingId[publicKey] == 0, 'vote already ongoing');
-
+        if (voteType == VoteType.REMOVE) {
+            require(directory.isCommunityInDirectory(publicKey), 'Community not in directory');
+        }
+        if (voteType == VoteType.ADD) {
+            require(!directory.isCommunityInDirectory(publicKey), 'Community already in directory');
+        }
         VotingRoom storage newVotingRoom = votingRoomMap[latestVoting];
         newVotingRoom.startBlock = block.number;
         newVotingRoom.endAt = block.timestamp.add(VOTING_LENGTH);
@@ -102,7 +120,14 @@ contract MockContract {
             indexOfActiveVotingRooms[activeVotingRooms[index]] = index + 1;
         }
         activeVotingRooms.pop();
-
+        if (votingRoomMap[roomId].totalVotesFor > votingRoomMap[roomId].totalVotesAgainst) {
+            if (votingRoomMap[roomId].voteType == VoteType.ADD) {
+                directory.addCommunity(votingRoomMap[roomId].community);
+            }
+            if (votingRoomMap[roomId].voteType == VoteType.REMOVE) {
+                directory.removeCommunity(votingRoomMap[roomId].community);
+            }
+        }
         emit VotingRoomFinalized(roomId);
     }
 
