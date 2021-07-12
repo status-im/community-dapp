@@ -70,53 +70,6 @@ const voteAndFinalize = async (
   await provider.send('evm_mine', [Math.floor(Date.now() / 1000)])
 }
 
-describe('Contract story', () => {
-  const provider = new MockProvider()
-  const [alice, firstAddress, secondAddress] = provider.getWallets()
-
-  it(`story`, async () => {
-    const contract = await deployContract(alice, MockContract)
-    const directory = await deployContract(alice, Directory, [contract.address])
-    await provider.send('evm_mine', [Math.floor(Date.now() / 1000)])
-
-    expect(await contract.owner()).to.be.eq(alice.address)
-    await contract.setDirectory(directory.address)
-
-    expect(await contract.directory()).to.be.eq(directory.address)
-    const differentSender = await contract.connect(firstAddress)
-    await expect(differentSender.setDirectory(differentSender.address)).to.be.revertedWith('Not owner')
-
-    expect(await contract.initializeVotingRoom(1, '0x0FA1A5CC3911A5697B625EF1C75eF4caE764bd34'))
-      .to.emit(contract, 'VotingRoomStarted')
-      .withArgs(1)
-
-    await expect(contract.initializeVotingRoom(1, '0x0FA1A5CC3911A5697B625EF1C75eF4caE764bd34')).to.be.revertedWith(
-      'vote already ongoing'
-    )
-
-    const { signedMessages } = await getSignedMessages(alice, firstAddress, secondAddress)
-
-    await contract.castVotes(signedMessages)
-    await provider.send('evm_mine', [Math.floor(Date.now() / 1000 + 2000)])
-    await contract.finalizeVotingRoom(1)
-
-    expect(await contract.initializeVotingRoom(0, '0x0FA1A5CC3911A5697B625EF1C75eF4caE764bd34'))
-      .to.emit(contract, 'VotingRoomStarted')
-      .withArgs(2)
-
-    await voteAndFinalize(2, 1, alice, contract, provider)
-    expect(await directory.getCommunities()).to.deep.eq([])
-    expect((await contract.votingRoomMap(2)).slice(2)).to.deep.eq([
-      0,
-      true,
-      '0x0FA1A5CC3911A5697B625EF1C75eF4caE764bd34',
-      BigNumber.from(100),
-      BigNumber.from(0),
-      BigNumber.from(2),
-    ])
-  })
-})
-
 describe('Contract', () => {
   async function fixture([alice, firstAddress, secondAddress]: any[], provider: any) {
     const contract = await deployContract(alice, MockContract)
