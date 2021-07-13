@@ -1,21 +1,25 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
 import { Colors } from '../../constants/styles'
-import { CommunityDetail } from '../../models/community'
+import { CommunityDetail, CurrentVoting } from '../../models/community'
 import { LinkExternal, LinkInternal } from '../Link'
 import { Modal } from '../Modal'
 import { VoteConfirmModal } from './VoteConfirmModal'
 import binIcon from '../../assets/images/bin.svg'
 import { RemoveModal } from './RemoveModal'
 import { CardHeading } from '../Card'
+import { useEthers } from '@usedapp/core'
 
 interface CardCommunityProps {
   community: CommunityDetail
   showRemoveButton?: boolean
   customHeading?: string
+  currentVoting?: CurrentVoting
 }
 
-export const CardCommunity = ({ community, showRemoveButton, customHeading }: CardCommunityProps) => {
+export const CardCommunity = ({ community, showRemoveButton, customHeading, currentVoting }: CardCommunityProps) => {
+  const { account } = useEthers()
+
   const [showHistoryModal, setShowHistoryModal] = useState(false)
   const [showRemoveModal, setShowRemoveModal] = useState(false)
   const [showConfirmModal, setShowConfirmModal] = useState(false)
@@ -76,7 +80,9 @@ export const CardCommunity = ({ community, showRemoveButton, customHeading }: Ca
         <CommunityInfo>
           <CardTop>
             <CardHeading>{customHeading ? customHeading : community.name}</CardHeading>
-            {community.directoryInfo && showRemoveButton && <RemoveBtn onClick={() => setShowRemoveModal(true)} />}
+            {community.directoryInfo && showRemoveButton && !currentVoting && (
+              <RemoveBtn onClick={() => setShowRemoveModal(true)} disabled={!account} />
+            )}
           </CardTop>
           <CardText>{community.description}</CardText>
           <CardTags>
@@ -162,9 +168,14 @@ const RemoveBtn = styled.button`
 `
 
 const RemoveBtnMobile = styled(RemoveBtn)`
+  display: none;
+
   @media (max-width: 768px) {
     display: block;
     margin-left: 0;
+  
+    &:disabled {
+    filter: grayscale(1);
   }
 `
 

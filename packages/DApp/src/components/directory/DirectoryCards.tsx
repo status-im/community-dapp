@@ -14,6 +14,9 @@ import { useConfig } from '../../providers/config'
 import { Colors } from '../../constants/styles'
 import { WeeklyFeature } from '../WeeklyFeature'
 import { DirectoryCardSkeleton } from './DirectoryCardSkeleton'
+import { useContracts } from '../../hooks/useContracts'
+import { useContractCall } from '@usedapp/core'
+import { votingFromRoom } from '../../helpers/voting'
 
 interface DirectoryCardProps {
   community: CommunityDetail
@@ -28,11 +31,28 @@ function DirectoryCard({ community }: DirectoryCardProps) {
     timeLeft = `${community.directoryInfo.untilNextFeature / (3600 * 24 * 7)} weeks left`
   }
 
+  const { votingContract } = useContracts()
+  let votingRoom = useContractCall({
+    abi: votingContract.interface,
+    address: votingContract.address,
+    method: 'getCommunityVoting',
+    args: [community.publicKey],
+  }) as any
+
+  if (votingRoom && (votingRoom.roomNumber.toNumber() === 0 || votingRoom.finalized == true)) {
+    votingRoom = undefined
+  }
+
+  let currentVoting
+  if (votingRoom) {
+    currentVoting = votingFromRoom(votingRoom)
+  }
+
   return (
     <Card>
       <CardCommunityWrap>
         &nbsp;
-        <CardCommunity community={community} showRemoveButton={true} />
+        <CardCommunity community={community} showRemoveButton={true} currentVoting={currentVoting} />
       </CardCommunityWrap>
       <CardVoteWrap style={{ backgroundColor: `${Colors.GrayLight}` }}>
         <CardFeature
@@ -41,6 +61,8 @@ function DirectoryCard({ community }: DirectoryCardProps) {
           icon={timeLeft ? '⏳' : '⭐'}
           sum={community.directoryInfo.featureVotes?.toNumber()}
           timeLeft={timeLeft}
+          currentVoting={currentVoting}
+          room={votingRoom}
         />
       </CardVoteWrap>
     </Card>

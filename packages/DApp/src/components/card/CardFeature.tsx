@@ -3,17 +3,15 @@ import styled from 'styled-components'
 import { Colors, ColumnFlexDiv } from '../../constants/styles'
 import { addCommas } from '../../helpers/addCommas'
 import { CardHeading, CardVoteBlock } from '../Card'
-import { CommunityDetail } from '../../models/community'
+import { CommunityDetail, CurrentVoting } from '../../models/community'
 import { Modal } from '../Modal'
 import { FeatureModal } from './FeatureModal'
 import { VoteConfirmModal } from './VoteConfirmModal'
 import { OngoingVote } from './OngoingVote'
 import { useEthers } from '@usedapp/core'
-import { useContracts } from '../../hooks/useContracts'
-import { useContractCall } from '@usedapp/core'
-import { votingFromRoom } from '../../helpers/voting'
 import { VoteSubmitButton } from './VoteSubmitButton'
 import { VoteSendingBtn, VoteBtn } from '../Button'
+import { VotingRoom } from '../../models/smartContract'
 
 interface CardFeatureProps {
   community: CommunityDetail
@@ -21,9 +19,11 @@ interface CardFeatureProps {
   icon: string
   sum?: number
   timeLeft?: string
+  currentVoting?: CurrentVoting
+  room?: VotingRoom
 }
 
-export const CardFeature = ({ community, heading, icon, sum, timeLeft }: CardFeatureProps) => {
+export const CardFeature = ({ community, heading, icon, sum, timeLeft, currentVoting, room }: CardFeatureProps) => {
   const { account } = useEthers()
   const [showFeatureModal, setShowFeatureModal] = useState(false)
   const [showConfirmModal, setShowConfirmModal] = useState(false)
@@ -32,23 +32,6 @@ export const CardFeature = ({ community, heading, icon, sum, timeLeft }: CardFea
   const setNewModal = (val: boolean) => {
     setShowConfirmModal(val)
     setShowFeatureModal(false)
-  }
-
-  const { votingContract } = useContracts()
-  let votingRoom = useContractCall({
-    abi: votingContract.interface,
-    address: votingContract.address,
-    method: 'getCommunityVoting',
-    args: [community.publicKey],
-  }) as any
-
-  if (votingRoom && (votingRoom.roomNumber.toNumber() === 0 || votingRoom.finalized == true)) {
-    votingRoom = undefined
-  }
-
-  let currentVoting
-  if (votingRoom) {
-    currentVoting = votingFromRoom(votingRoom)
   }
 
   return (
@@ -84,11 +67,9 @@ export const CardFeature = ({ community, heading, icon, sum, timeLeft }: CardFea
         </FeatureBtn>
       </div>
 
-      {currentVoting && (
+      {currentVoting && room && (
         <FeatureBottom>
-          {showOngoingVote && (
-            <OngoingVote community={community} setShowOngoingVote={setShowOngoingVote} room={votingRoom} />
-          )}
+          {showOngoingVote && <OngoingVote community={community} setShowOngoingVote={setShowOngoingVote} room={room} />}
           <VoteSendingBtn onClick={() => setShowOngoingVote(true)}>Removal vote in progress</VoteSendingBtn>
           {currentVoting && currentVoting.timeLeft > 0 && <VoteSubmitButton vote={currentVoting} />}
         </FeatureBottom>
