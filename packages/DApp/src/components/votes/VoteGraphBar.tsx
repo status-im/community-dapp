@@ -23,8 +23,8 @@ export interface VoteGraphBarProps {
 }
 
 export function VoteGraphBar({ graphWidth, balanceWidth, voteWinner, isAnimation }: VoteGraphBarProps) {
-  const markerWidth: number = balanceWidth ? balanceWidth : 3
-  const votesWidth: number = graphWidth ? graphWidth : 3
+  const markerWidth: number = balanceWidth ? balanceWidth : 0
+  const votesWidth: number = graphWidth ? graphWidth : 0
   const [keyFrames, setKeyFrames] = useState('')
   const [style, setStyle] = useState<any>({ width: `${votesWidth}%` })
 
@@ -53,14 +53,16 @@ const VoteGraph = styled.div<VoteGraphBarProps>`
   background-color: ${({ theme }) => (theme.voteWinner === 1 ? Colors.GrayDisabledLight : Colors.BlueBar)};
   border-radius: 10px;
   padding-top: 5px;
+  border-left: 13px solid ${({ theme }) => (theme.voteWinner === 0 ? Colors.GrayDisabledLight : Colors.Orange)};
+  border-right: 13px solid ${({ theme }) => (theme.voteWinner === 1 ? Colors.GrayDisabledLight : Colors.BlueBar)};
 
   &::before {
     content: '';
     width: 16px;
     height: 5px;
     position: absolute;
-    top: -5px;
-    left: calc(50% - 1px);
+    top: -6px;
+    left: calc(50% - 2px);
     transform: translateX(-50%);
     background-image: url(${indicatorIcon});
     background-size: cover;
@@ -81,10 +83,8 @@ const VoteGraphAgainst = styled.div<VoteGraphBarProps>`
   position: absolute;
   left: 0;
   top: 0;
-  width: 3%;
   height: 16px;
   background-color: ${({ theme }) => (theme.voteWinner === 2 ? Colors.GrayDisabledLight : Colors.Orange)};
-  border-radius: 10px 0 0 10px;
   transition: width 2s;
   z-index: 2;
 `
@@ -93,10 +93,8 @@ const VoteBalance = styled.div`
   position: absolute;
   left: 0;
   top: 0;
-  width: 3%;
   height: 16px;
   background-color: transparent;
   border-right: 2px solid ${Colors.VioletLight};
-  border-radius: 10px 0 0 10px;
   z-index: 2;
 `
