@@ -110,7 +110,6 @@ export const CardVote = ({ room, hideModalFunction }: CardVoteProps) => {
                 setSelectedVoted(voteConstants.against)
                 setShowVoteModal(true)
               }}
-              style={{ width: hideModalFunction ? '187px' : '305px' }}
             >
               {voteConstants.against.text} <span>{voteConstants.against.icon}</span>
             </VoteBtn>
@@ -120,7 +119,6 @@ export const CardVote = ({ room, hideModalFunction }: CardVoteProps) => {
                 setSelectedVoted(voteConstants.for)
                 setShowVoteModal(true)
               }}
-              style={{ width: hideModalFunction ? '187px' : '305px' }}
             >
               {voteConstants.for.text} <span>{voteConstants.for.icon}</span>
             </VoteBtn>

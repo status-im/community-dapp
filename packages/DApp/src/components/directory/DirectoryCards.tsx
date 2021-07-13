@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Card, CardCommunityWrap, CardVoteWrap } from '../Card'
 import { CardCommunity } from '../card/CardCommunity'
 import { CardFeature } from '../card/CardFeature'
@@ -8,7 +8,6 @@ import { FilterList } from '../Filter'
 import { Search } from '../Input'
 import { PageBar } from '../PageBar'
 import { DirectorySortingOptions } from '../../constants/SortingOptions'
-import { Colors } from '../../constants/styles'
 import { WeeklyFeature } from '../WeeklyFeature'
 import { DirectoryCardSkeleton } from './DirectoryCardSkeleton'
 import { useDirectoryCommunities } from '../../hooks/useDirectoryCommunities'
@@ -21,6 +20,21 @@ interface DirectoryCardProps {
 }
 
 function DirectoryCard({ community }: DirectoryCardProps) {
+  const [customStyle, setCustomStyle] = useState(true)
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 769) {
+        setCustomStyle(true)
+      } else {
+        setCustomStyle(false)
+      }
+    }
+
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [window.innerWidth])
+
   if (!community.directoryInfo) {
     return <div />
   }
@@ -50,9 +64,14 @@ function DirectoryCard({ community }: DirectoryCardProps) {
     <Card>
       <CardCommunityWrap>
         &nbsp;
-        <CardCommunity community={community} showRemoveButton={true} currentVoting={currentVoting} />
+        <CardCommunity
+          community={community}
+          showRemoveButton={true}
+          currentVoting={currentVoting}
+          customStyle={customStyle}
+        />
       </CardCommunityWrap>
-      <CardVoteWrap style={{ backgroundColor: `${Colors.GrayLight}` }}>
+      <CardVoteWrap>
         <CardFeature
           community={community}
           heading={timeLeft ? 'This community has to wait until it can be featured again' : 'Weekly Feature vote'}

@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
-import { Colors, ColumnFlexDiv } from '../../constants/styles'
+import { ColumnFlexDiv } from '../../constants/styles'
 import { addCommas } from '../../helpers/addCommas'
 import { CardHeading, CardVoteBlock } from '../Card'
 import { CommunityDetail, CurrentVoting } from '../../models/community'
@@ -35,7 +35,7 @@ export const CardFeature = ({ community, heading, icon, sum, timeLeft, currentVo
   }
 
   return (
-    <CardVoteBlock style={{ backgroundColor: `${Colors.GrayLight}` }}>
+    <CardVoteBlock>
       <CardHeading style={{ fontWeight: timeLeft ? 'normal' : 'bold', fontSize: timeLeft ? '15px' : '17px' }}>
         {heading}
       </CardHeading>

@@ -69,13 +69,18 @@ export const VotesBtns = styled.div`
   width: 100%;
 `
 export const VoteBtn = styled(ButtonSecondary)`
-  width: 187px;
-  padding: 11px 46px;
+  width: 44%;
+  padding: 11px 0;
   font-weight: 500;
   font-size: 15px;
   line-height: 22px;
+  text-align: center;
 
   & > span {
     font-size: 20px;
+  }
+
+  @media (max-width: 768px) {
+    width: 48%;
   }
 `

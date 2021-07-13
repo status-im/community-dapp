@@ -9,13 +9,18 @@ interface VotingCardProps {
 }
 
 export function VotingCard({ room }: VotingCardProps) {
-  const [customHeading, setCustomHeading] = useState<string | undefined>(undefined)
+  const heading = window.innerWidth < 769 ? `Add ${room.details.name}?` : ''
+  const [customHeading, setCustomHeading] = useState<string | undefined>(heading)
+  const [customStyle, setCustomStyle] = useState(true)
+
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth < 769) {
         setCustomHeading(`Add ${room.details.name}?`)
+        setCustomStyle(true)
       } else {
         setCustomHeading(undefined)
+        setCustomStyle(false)
       }
     }
 
@@ -27,7 +32,7 @@ export function VotingCard({ room }: VotingCardProps) {
     <Card>
       <CardCommunityWrap>
         {' '}
-        <CardCommunity community={room.details} customHeading={customHeading} />
+        <CardCommunity community={room.details} customHeading={customHeading} customStyle={customStyle} />
       </CardCommunityWrap>
       <CardVoteWrap>
         {' '}

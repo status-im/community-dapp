@@ -14,10 +14,17 @@ interface CardCommunityProps {
   community: CommunityDetail
   showRemoveButton?: boolean
   customHeading?: string
+  customStyle?: boolean
   currentVoting?: CurrentVoting
 }
 
-export const CardCommunity = ({ community, showRemoveButton, customHeading, currentVoting }: CardCommunityProps) => {
+export const CardCommunity = ({
+  community,
+  showRemoveButton,
+  customHeading,
+  customStyle,
+  currentVoting,
+}: CardCommunityProps) => {
   const { account } = useEthers()
 
   const [showHistoryModal, setShowHistoryModal] = useState(false)
@@ -32,7 +39,7 @@ export const CardCommunity = ({ community, showRemoveButton, customHeading, curr
   }
 
   return (
-    <CardCommunityBlock>
+    <CardCommunityBlock className={customStyle ? 'notModal' : ''}>
       {showHistoryModal && (
         <Modal heading={`${community.name} voting history`} setShowModal={setShowHistoryModal}>
           <VoteHistoryTable>
@@ -74,7 +81,9 @@ export const CardCommunity = ({ community, showRemoveButton, customHeading, curr
         <CardLogoWrap>
           {' '}
           <CardLogo src={community.icon} alt={`${community.name} logo`} />
-          {community.directoryInfo && showRemoveButton && <RemoveBtnMobile onClick={() => setShowRemoveModal(true)} />}
+          {community.directoryInfo && showRemoveButton && !currentVoting && (
+            <RemoveBtnMobile onClick={() => setShowRemoveModal(true)} disabled={!account} />
+          )}
         </CardLogoWrap>
 
         <CommunityInfo>
@@ -94,7 +103,7 @@ export const CardCommunity = ({ community, showRemoveButton, customHeading, curr
           </CardTags>
         </CommunityInfo>
       </Community>
-      <CardLinks>
+      <CardLinks className={customStyle ? 'notModal' : ''}>
         <LinkExternal>Visit community</LinkExternal>
         <LinkExternal>Etherscan</LinkExternal>
         <LinkInternal onClick={() => setShowHistoryModal(true)} disabled={isDisabled}>
@@ -110,6 +119,12 @@ export const CardCommunityBlock = styled.div`
   flex-direction: column;
   justify-content: space-between;
   width: 100%;
+
+  &.notModal {
+    @media (max-width: 768px) {
+      align-items: flex-end;
+    }
+  }
 `
 
 const Community = styled.div`
@@ -162,6 +177,10 @@ const RemoveBtn = styled.button`
   background-image: url(${binIcon});
   background-size: cover;
 
+  &:disabled {
+    filter: grayscale(1);
+  }
+
   @media (max-width: 768px) {
     display: none;
   }
@@ -173,9 +192,6 @@ const RemoveBtnMobile = styled(RemoveBtn)`
   @media (max-width: 768px) {
     display: block;
     margin-left: 0;
-  
-    &:disabled {
-    filter: grayscale(1);
   }
 `
 
@@ -206,9 +222,10 @@ export const CardLinks = styled.div`
   font-size: 15px;
   line-height: 22px;
 
-  @media (max-width: 768px) {
-    width: auto;
-    margin-left: 80px;
+  &.notModal {
+    @media (max-width: 768px) {
+      max-width: calc(100% - 60px);
+    }
   }
 `
 
