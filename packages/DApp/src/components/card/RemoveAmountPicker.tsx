@@ -1,5 +1,5 @@
 import { useContractFunction } from '@usedapp/core'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { timespan } from '../../helpers/timespan'
 import { useContracts } from '../../hooks/useContracts'
@@ -19,7 +19,13 @@ export function RemoveAmountPicker({ community, availableAmount, setShowConfirmM
   const [proposingAmount, setProposingAmount] = useState(0)
   const disabled = proposingAmount === 0
   const { votingContract } = useContracts()
-  const { send } = useContractFunction(votingContract, 'initializeVotingRoom')
+  const { send, state } = useContractFunction(votingContract, 'initializeVotingRoom')
+
+  useEffect(() => {
+    if (state.status === 'Mining' || state.status === 'Success') {
+      setShowConfirmModal(true)
+    }
+  }, [state])
 
   if (community.votingHistory && community.votingHistory.length > 0) {
     const lastVote = community.votingHistory[community.votingHistory.length - 1]
@@ -68,13 +74,7 @@ export function RemoveAmountPicker({ community, availableAmount, setShowConfirmM
         setProposingAmount={setProposingAmount}
         proposingAmount={proposingAmount}
       />
-      <VoteConfirmBtn
-        disabled={disabled}
-        onClick={async () => {
-          await send(0, community.publicKey)
-          setShowConfirmModal(true)
-        }}
-      >
+      <VoteConfirmBtn disabled={disabled} onClick={() => send(0, community.publicKey)}>
         Confirm vote to remove community
       </VoteConfirmBtn>
     </VoteProposeWrap>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { ButtonPrimary } from '../Button'
 import { CardCommunity } from './CardCommunity'
@@ -50,7 +50,12 @@ export function ProposeModal({
   const [publicKey, setPublicKey] = useState('')
   const loading = useCommunityDetails(publicKey, setCommunityFound)
   const { votingContract } = useContracts()
-  const { send } = useContractFunction(votingContract, 'initializeVotingRoom')
+  const { send, state } = useContractFunction(votingContract, 'initializeVotingRoom')
+  useEffect(() => {
+    if (state.status === 'Mining' || state.status === 'Success') {
+      setShowConfirmModal(true)
+    }
+  }, [state])
 
   return (
     <ColumnFlexDiv>
@@ -88,13 +93,7 @@ export function ProposeModal({
           OK, let’s move on! <span>🤙</span>
         </ConfirmBtn>
       ) : (
-        <ProposingBtn
-          disabled={!communityFound || !proposingAmount}
-          onClick={() => {
-            send(1, publicKey)
-            setShowConfirmModal(true)
-          }}
-        >
+        <ProposingBtn disabled={!communityFound || !proposingAmount} onClick={() => send(1, publicKey)}>
           Confirm vote to add community
         </ProposingBtn>
       )}
