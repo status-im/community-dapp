@@ -25,6 +25,7 @@ export const CardCommunityWrap = styled.div`
     margin: 0;
     border: none;
     box-shadow: none;
+    padding-bottom: 0;
   }
 `
 export const CardVoteWrap = styled.div`

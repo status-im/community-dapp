@@ -14,9 +14,17 @@ export interface VoteChartProps {
   proposingAmount?: number
   selectedVote?: VoteType
   isAnimation?: boolean
+  tabletMode?: (val: boolean) => void
 }
 
-export function VoteChart({ vote, voteWinner, proposingAmount, selectedVote, isAnimation }: VoteChartProps) {
+export function VoteChart({
+  vote,
+  voteWinner,
+  proposingAmount,
+  selectedVote,
+  isAnimation,
+  tabletMode,
+}: VoteChartProps) {
   const voteConstants = voteTypes[vote.type]
 
   const votesFor = vote.voteFor.toNumber()
@@ -51,7 +59,7 @@ export function VoteChart({ vote, voteWinner, proposingAmount, selectedVote, isA
             <span style={{ fontWeight: 'normal' }}>SNT</span>
           </span>
         </VoteBox>
-        <TimeLeft>{formatTimeLeft(vote.timeLeft)}</TimeLeft>
+        <TimeLeft className={selectedVote ? '' : 'notModal'}>{formatTimeLeft(vote.timeLeft)}</TimeLeft>
         <VoteBox style={{ filter: voteWinner && voteWinner === 1 ? 'grayscale(1)' : 'none' }}>
           <p style={{ fontSize: voteWinner === 2 ? '42px' : '24px', marginTop: voteWinner === 1 ? '18px' : '0' }}>
             {voteConstants.for.icon}
@@ -67,7 +75,7 @@ export function VoteChart({ vote, voteWinner, proposingAmount, selectedVote, isA
           </span>
         </VoteBox>
       </VotesChart>
-      <VoteGraphBarWrap className={selectedVote ? '' : 'notModal'}>
+      <VoteGraphBarWrap className={selectedVote || tabletMode ? '' : 'notModal'}>
         <VoteGraphBar
           graphWidth={graphWidth}
           balanceWidth={balanceWidth}
@@ -123,8 +131,10 @@ const TimeLeft = styled.div`
   letter-spacing: 0.1px;
   color: ${Colors.GreyText};
 
-  @media (max-width: 768px) {
-    top: 0;
+  &.notModal {
+    @media (max-width: 768px) {
+      top: 0;
+    }
   }
 `
 
@@ -134,7 +144,7 @@ const VoteGraphBarWrap = styled.div`
   &.notModal {
     @media (max-width: 768px) {
       position: absolute;
-      top: 60%;
+      top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
     }

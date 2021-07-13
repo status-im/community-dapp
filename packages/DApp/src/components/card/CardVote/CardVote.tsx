@@ -96,7 +96,7 @@ export const CardVote = ({ room, hideModalFunction }: CardVoteProps) => {
         <CardHeading>{voteConstants.question}</CardHeading>
       )}
       <div>
-        <VoteChart vote={vote} voteWinner={winner} />
+        <VoteChart vote={vote} voteWinner={winner} tabletMode={hideModalFunction} />
 
         {winner ? (
           <VoteBtnFinal onClick={() => finalizeVoting.send(room.roomNumber)} disabled={!account}>
@@ -110,6 +110,7 @@ export const CardVote = ({ room, hideModalFunction }: CardVoteProps) => {
                 setSelectedVoted(voteConstants.against)
                 setShowVoteModal(true)
               }}
+              style={{ width: hideModalFunction ? '187px' : '305px' }}
             >
               {voteConstants.against.text} <span>{voteConstants.against.icon}</span>
             </VoteBtn>
@@ -119,6 +120,7 @@ export const CardVote = ({ room, hideModalFunction }: CardVoteProps) => {
                 setSelectedVoted(voteConstants.for)
                 setShowVoteModal(true)
               }}
+              style={{ width: hideModalFunction ? '187px' : '305px' }}
             >
               {voteConstants.for.text} <span>{voteConstants.for.icon}</span>
             </VoteBtn>
@@ -141,7 +143,7 @@ const CardHeadingEndedVote = styled.p`
   text-align: center;
 
   @media (max-width: 768px) {
-    display: none;
+    max-width: 100%;
   }
 `
 

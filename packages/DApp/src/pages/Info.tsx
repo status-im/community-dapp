@@ -78,6 +78,10 @@ const VotingRules = styled.div`
   background-color: ${Colors.VioletSecondaryLight};
   box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
   border-radius: 6px;
+
+  @media (max-width: 768px) {
+    max-width: 524px;
+  }
 `
 
 const RulesHeading = styled.p`

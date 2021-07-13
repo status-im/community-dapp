@@ -70,6 +70,7 @@ export const CardCommunity = ({ community, showRemoveButton, customHeading }: Ca
         <CardLogoWrap>
           {' '}
           <CardLogo src={community.icon} alt={`${community.name} logo`} />
+          {community.directoryInfo && showRemoveButton && <RemoveBtnMobile onClick={() => setShowRemoveModal(true)} />}
         </CardLogoWrap>
 
         <CommunityInfo>
@@ -116,15 +117,29 @@ const CommunityInfo = styled.div`
 `
 
 const CardLogoWrap = styled.div`
-  width: 64px !important;
-  height: 64px !important;
+  width: 64px;
+  height: 64px;
   object-fit: cover;
   margin-right: 16px;
+
+  @media (max-width: 768px) {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    width: 40px;
+    height: 76px;
+  }
 `
 const CardLogo = styled.img`
   width: 64px !important;
   height: 64px !important;
   border-radius: 50%;
+
+  @media (max-width: 768px) {
+    width: 40px !important;
+    height: 40px !important;
+  }
 `
 
 const CardTop = styled.div`
@@ -140,6 +155,17 @@ const RemoveBtn = styled.button`
   margin-left: 16px;
   background-image: url(${binIcon});
   background-size: cover;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
+`
+
+const RemoveBtnMobile = styled(RemoveBtn)`
+  @media (max-width: 768px) {
+    display: block;
+    margin-left: 0;
+  }
 `
 
 const CardText = styled.p`

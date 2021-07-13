@@ -78,8 +78,4 @@ export const VoteBtn = styled(ButtonSecondary)`
   & > span {
     font-size: 20px;
   }
-
-  @media (max-width: 768px) {
-    width: 305px;
-  }
 `

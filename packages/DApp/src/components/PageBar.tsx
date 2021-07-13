@@ -58,7 +58,7 @@ const StyledPageBar = styled.div`
   z-index: 110;
 
   @media (max-width: 900px) {
-    padding: 24px 32px 16px;
+    padding: 24px 0 16px;
   }
 
   &.isFixed {
