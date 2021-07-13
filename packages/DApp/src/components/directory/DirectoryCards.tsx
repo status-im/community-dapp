@@ -30,17 +30,15 @@ function DirectoryCard({ community }: DirectoryCardProps) {
         setCustomStyle(false)
       }
     }
-
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
   }, [window.innerWidth])
 
-  if (!community.directoryInfo) {
-    return <div />
-  }
   let timeLeft: string | undefined = undefined
-  if (community.directoryInfo.untilNextFeature) {
+  if (community?.directoryInfo?.untilNextFeature) {
     timeLeft = `${community.directoryInfo.untilNextFeature / (3600 * 24 * 7)} weeks left`
+  } else {
+    timeLeft = `1 weeks left`
   }
 
   const { votingContract } = useContracts()
@@ -76,7 +74,7 @@ function DirectoryCard({ community }: DirectoryCardProps) {
           community={community}
           heading={timeLeft ? 'This community has to wait until it can be featured again' : 'Weekly Feature vote'}
           icon={timeLeft ? '⏳' : '⭐'}
-          sum={community.directoryInfo.featureVotes?.toNumber()}
+          sum={community?.directoryInfo?.featureVotes?.toNumber()}
           timeLeft={timeLeft}
           currentVoting={currentVoting}
           room={votingRoom}
@@ -90,7 +88,6 @@ export function DirectoryCards() {
   const [filterKeyword, setFilterKeyword] = useState('')
   const [sortedBy, setSortedBy] = useState(DirectorySortingEnum.IncludedRecently)
   const communities = useDirectoryCommunities(filterKeyword, sortedBy)
-
   return (
     <>
       <PageBar>
