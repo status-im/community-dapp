@@ -2,6 +2,9 @@ import { CommunityDetail, DirectorySortingEnum, VotingSortingEnum } from '../mod
 import { DetailedVotingRoom } from '../models/smartContract'
 
 export function isTextInDetails(filterKeyword: string, details: any) {
+  if (!details || !details.name || !details.description || !details.tags) {
+    return false
+  }
   return (
     details.name.toLowerCase().includes(filterKeyword.toLowerCase()) ||
     details.description.toLowerCase().includes(filterKeyword.toLowerCase()) ||
