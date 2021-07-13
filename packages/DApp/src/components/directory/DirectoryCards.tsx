@@ -4,16 +4,14 @@ import { CardCommunity } from '../card/CardCommunity'
 import { CardFeature } from '../card/CardFeature'
 import styled from 'styled-components'
 import { CommunityDetail, DirectorySortingEnum } from '../../models/community'
-import { useCommunities } from '../../hooks/useCommunities'
-import { getCommunitiesInDirectory } from '../../helpers/apiMock'
 import { FilterList } from '../Filter'
 import { Search } from '../Input'
 import { PageBar } from '../PageBar'
 import { DirectorySortingOptions } from '../../constants/SortingOptions'
-import { useConfig } from '../../providers/config'
 import { Colors } from '../../constants/styles'
 import { WeeklyFeature } from '../WeeklyFeature'
 import { DirectoryCardSkeleton } from './DirectoryCardSkeleton'
+import { useDirectoryCommunities } from '../../hooks/useDirectoryCommunities'
 import { useContracts } from '../../hooks/useContracts'
 import { useContractCall } from '@usedapp/core'
 import { votingFromRoom } from '../../helpers/voting'
@@ -70,14 +68,9 @@ function DirectoryCard({ community }: DirectoryCardProps) {
 }
 
 export function DirectoryCards() {
-  const { config } = useConfig()
   const [filterKeyword, setFilterKeyword] = useState('')
   const [sortedBy, setSortedBy] = useState(DirectorySortingEnum.IncludedRecently)
-  const { communities, loading } = useCommunities(getCommunitiesInDirectory, {
-    numberPerPage: config.numberPerPage,
-    sortedBy,
-    filterKeyword,
-  })
+  const communities = useDirectoryCommunities(filterKeyword, sortedBy)
 
   return (
     <>
@@ -95,14 +88,8 @@ export function DirectoryCards() {
         {communities.map((community) => (
           <DirectoryCard key={community.publicKey} community={community} />
         ))}
+        {communities.length === 0 && <DirectoryCardSkeleton />}
       </Voting>
-      {loading && (
-        <>
-          <DirectoryCardSkeleton />
-          <DirectoryCardSkeleton />
-          <DirectoryCardSkeleton />
-        </>
-      )}
     </>
   )
 }

@@ -78,7 +78,7 @@ describe('Contract', () => {
     await provider.send('evm_mine', [Math.floor(Date.now() / 1000)])
     return { contract, directory, alice, firstAddress, secondAddress, provider }
   }
-
+  loadFixture(fixture)
   it('deploys properly', async () => {
     const { contract, directory } = await loadFixture(fixture)
     expect(await contract.directory()).to.eq(directory.address)

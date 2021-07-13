@@ -1,3 +1,4 @@
 import MockContract from './../build/MockContract.json'
+import Directory from './../build/Directory.json'
 
-export { MockContract }
+export { MockContract, Directory }
