@@ -81,7 +81,7 @@ export const CardCommunity = ({
         <CardLogoWrap>
           {' '}
           <CardLogo src={community.icon} alt={`${community.name} logo`} />
-          {community.directoryInfo && showRemoveButton && !currentVoting && (
+          {showRemoveButton && !currentVoting && (
             <RemoveBtnMobile onClick={() => setShowRemoveModal(true)} disabled={!account} />
           )}
         </CardLogoWrap>
@@ -89,7 +89,7 @@ export const CardCommunity = ({
         <CommunityInfo>
           <CardTop>
             <CardHeading>{customHeading ? customHeading : community.name}</CardHeading>
-            {community.directoryInfo && showRemoveButton && !currentVoting && (
+            {showRemoveButton && !currentVoting && (
               <RemoveBtn onClick={() => setShowRemoveModal(true)} disabled={!account} />
             )}
           </CardTop>
