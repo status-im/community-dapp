@@ -6,9 +6,13 @@ import { Skeleton } from '../skeleton/Skeleton'
 import { TagsSkeletonList } from '../skeleton/TagSkeleton'
 import { TextBlock } from '../skeleton/TextSkeleton'
 
-export const CommunitySkeleton = () => {
+interface CommunitySkeletonProps {
+  customStyle?: boolean
+}
+
+export const CommunitySkeleton = ({ customStyle }: CommunitySkeletonProps) => {
   return (
-    <CardCommunityBlock>
+    <CardCommunityBlock className={customStyle ? 'notModal' : ''}>
       {' '}
       <CardRow>
         <AvatarSkeleton />
@@ -18,7 +22,7 @@ export const CommunitySkeleton = () => {
           <TagsSkeleton />
         </CardContent>
       </CardRow>
-      <CardLinks>
+      <CardLinks className={customStyle ? 'notModal' : ''}>
         <StyledExternalLink>Visit community</StyledExternalLink>
         <StyledExternalLink>Etherscan</StyledExternalLink>
         <StyledInternalink>Voting history </StyledInternalink>
@@ -31,6 +35,10 @@ const CardRow = styled.div`
   display: flex;
   width: 100%;
   margin-bottom: 48px;
+
+  @media (max-width: 768px) {
+    margin-bottom: 32px;
+  }
 `
 
 const CardContent = styled.div`

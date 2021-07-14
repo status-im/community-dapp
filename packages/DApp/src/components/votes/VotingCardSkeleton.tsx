@@ -8,7 +8,7 @@ export const VotingCardSkeleton = () => {
   return (
     <Card>
       <CardCommunityWrap>
-        <CommunitySkeleton />
+        <CommunitySkeleton customStyle={true} />
       </CardCommunityWrap>
 
       <CardVoteWrap>
@@ -22,7 +22,7 @@ export const VotingCardSkeleton = () => {
               <Skeleton width="90px" height="16px" />
             </div>
             <div>
-              <Skeleton width="43px" height="8px" />
+              <RowCenter width="43px" height="8px" />
             </div>
             <div>
               <span>❓</span>
@@ -45,15 +45,31 @@ const CardHeader = styled.div`
   justify-content: center;
   width: 100%;
   margin-bottom: 54px;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
 `
 
 const ProgressSkeleton = styled(Skeleton)`
   height: 16px;
   margin: 12px 0 32px;
+
+  @media (max-width: 768px) {
+    width: 400px;
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
 `
 
 const ButtonsRow = styled.div`
   display: flex;
+
+  @media (max-width: 768px) {
+    margin-top: 32px;
+  }
 `
 
 const SkeletonButton = styled(Skeleton)`
@@ -83,5 +99,13 @@ const Row = styled.div`
       margin-bottom: 8px;
       mix-blend-mode: luminosity;
     }
+  }
+`
+const RowCenter = styled(Skeleton)`
+  @media (max-width: 768px) {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
   }
 `

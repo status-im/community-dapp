@@ -52,6 +52,7 @@ export const CardVoteBlock = styled.div`
   justify-content: space-between;
   width: 100%;
   background-color: ${Colors.GrayLight};
+  position: relative;
 
   @media (max-width: 768px) {
     background-color: unset;
