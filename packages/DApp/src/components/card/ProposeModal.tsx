@@ -62,7 +62,7 @@ export function ProposeModal({
     <ColumnFlexDiv>
       <PublicKeyInput publicKey={publicKey} setPublicKey={setPublicKey} />
       <ProposingData>
-        {communityFound ? <CardCommunity community={communityFound} /> : loading && <CommunitySkeleton />}
+        {communityFound ? <CardCommunity community={communityFound} /> : loading && publicKey && <CommunitySkeleton />}
         {communityFound && !communityFound.validForAddition && (
           <WarningWrap>
             <Warning
@@ -71,7 +71,7 @@ export function ProposeModal({
             />
           </WarningWrap>
         )}
-        {((communityFound && communityFound.validForAddition) || loading) && (
+        {((communityFound && communityFound.validForAddition) || loading) && publicKey && (
           <VoteProposeWrap>
             <VotePropose
               availableAmount={availableAmount}
