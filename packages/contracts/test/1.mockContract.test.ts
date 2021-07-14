@@ -96,10 +96,10 @@ describe('Contract', () => {
         const { contract, firstAddress, secondAddress } = await loadFixture(fixture)
         expect(await contract.initializeVotingRoom(1, firstAddress.address))
           .to.emit(contract, 'VotingRoomStarted')
-          .withArgs(1)
+          .withArgs(1, firstAddress.address)
         expect(await contract.initializeVotingRoom(1, secondAddress.address))
           .to.emit(contract, 'VotingRoomStarted')
-          .withArgs(2)
+          .withArgs(2, secondAddress.address)
         await expect(contract.initializeVotingRoom(1, secondAddress.address)).to.be.revertedWith('vote already ongoing')
       })
 
@@ -169,7 +169,7 @@ describe('Contract', () => {
         await provider.send('evm_mine', [Math.floor(Date.now() / 1000 + 2000)])
         expect(await contract.finalizeVotingRoom(1))
           .to.emit(contract, 'VotingRoomFinalized')
-          .withArgs(1)
+          .withArgs(1, firstAddress.address, false, 1)
         expect((await contract.votingRoomMap(1)).slice(2)).to.deep.eq([
           1,
           true,

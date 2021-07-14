@@ -28,8 +28,8 @@ contract MockContract {
         address[] voters;
     }
 
-    event VotingRoomStarted(uint256 roomId);
-    event VotingRoomFinalized(uint256 roomId);
+    event VotingRoomStarted(uint256 roomId, address publicKey);
+    event VotingRoomFinalized(uint256 roomId, address publicKey, bool passed, VoteType voteType);
 
     address public owner;
     Directory public directory;
@@ -101,7 +101,7 @@ contract MockContract {
         activeVotingRooms.push(latestVoting);
         indexOfActiveVotingRooms[latestVoting] = activeVotingRooms.length;
 
-        emit VotingRoomStarted(latestVoting++);
+        emit VotingRoomStarted(latestVoting++, publicKey);
     }
 
     function finalizeVotingRoom(uint256 roomId) public {
@@ -110,7 +110,8 @@ contract MockContract {
         require(votingRoomMap[roomId].finalized == false, 'vote already finalized');
         require(votingRoomMap[roomId].endAt < block.timestamp, 'vote still ongoing');
         votingRoomMap[roomId].finalized = true;
-        communityVotingId[votingRoomMap[roomId].community] = 0;
+        address community = votingRoomMap[roomId].community;
+        communityVotingId[community] = 0;
 
         uint256 index = indexOfActiveVotingRooms[roomId];
         if (index == 0) return;
@@ -120,15 +121,16 @@ contract MockContract {
             indexOfActiveVotingRooms[activeVotingRooms[index]] = index + 1;
         }
         activeVotingRooms.pop();
-        if (votingRoomMap[roomId].totalVotesFor > votingRoomMap[roomId].totalVotesAgainst) {
+        bool passed = votingRoomMap[roomId].totalVotesFor > votingRoomMap[roomId].totalVotesAgainst;
+        if (passed) {
             if (votingRoomMap[roomId].voteType == VoteType.ADD) {
-                directory.addCommunity(votingRoomMap[roomId].community);
+                directory.addCommunity(community);
             }
             if (votingRoomMap[roomId].voteType == VoteType.REMOVE) {
-                directory.removeCommunity(votingRoomMap[roomId].community);
+                directory.removeCommunity(community);
             }
         }
-        emit VotingRoomFinalized(roomId);
+        emit VotingRoomFinalized(roomId, community, passed, votingRoomMap[roomId].voteType);
     }
 
     struct SignedVote {

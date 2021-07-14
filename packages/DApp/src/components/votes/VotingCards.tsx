@@ -47,12 +47,12 @@ export function VotingCards() {
       </PageBar>
       {roomsToShow.map((room: any, idx) => {
         if (room?.details) {
-          return <VotingCard key={room.roomNumber.toString()} room={room} />
+          return <VotingCard key={idx} room={room} />
         } else {
           return <VotingCardSkeleton key={idx} />
         }
       })}
-      {roomsToShow.length === 0 && <VotingCardSkeleton />}
+      {roomsToShow.length === 0 && <div>No communities in Voting</div>}
     </div>
   )
 }

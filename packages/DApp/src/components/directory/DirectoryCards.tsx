@@ -108,7 +108,7 @@ export function DirectoryCards() {
             return <DirectoryCardSkeleton key={idx} />
           }
         })}
-        {communities.length === 0 && <DirectoryCardSkeleton />}
+        {communities.length === 0 && <div>No Communities in Directory</div>}
       </Voting>
     </>
   )

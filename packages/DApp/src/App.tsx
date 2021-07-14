@@ -8,7 +8,7 @@ import { TopBar } from './components/top/TopBar'
 import { Votes } from './pages/Votes'
 import { Directory } from './pages/Directory'
 import { Info } from './pages/Info'
-import { NotificationItem } from './components/NotificationItem'
+import { NotificationsList } from './components/NotificationsList'
 
 export function App() {
   return (
@@ -17,7 +17,6 @@ export function App() {
         <GlobalStyle />
         <TopBar />
         <PageContent>
-          <NotificationItem />
           <Switch>
             <Route exact path="/votes" component={Votes} />
             <Route exact path="/directory" component={Directory} />
@@ -26,6 +25,7 @@ export function App() {
           <Redirect exact from="/" to="/votes" />
         </PageContent>
       </BrowserRouter>
+      <NotificationsList />
     </Page>
   )
 }

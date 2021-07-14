@@ -1,22 +1,29 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
 import { Colors } from '../constants/styles'
+import { useCommunities } from '../hooks/useCommunities'
 import { LinkExternal } from './Link'
 import { CloseButton } from './Modal'
 
-export function NotificationItem() {
-  const [show, setShow] = useState(true)
+interface NotificationItemProps {
+  publicKey: string
+  text: string
+}
 
-  if (show) {
+export function NotificationItem({ publicKey, text }: NotificationItemProps) {
+  const [show, setShow] = useState(true)
+  const [communityDetails] = useCommunities([publicKey])
+
+  if (show && communityDetails) {
     return (
       <NotificationBlock>
         <NotificationLogoWrap>
-          <NotificationLogo src={'https://www.cryptokitties.co/icons/logo.svg'} />
+          <NotificationLogo src={communityDetails.icon} />
         </NotificationLogoWrap>
 
         <NotificationContent>
           <NotificationText>
-            <span>CryptoKitties</span> is now in the communities directory!
+            <span>{communityDetails.name}</span> {text}
           </NotificationText>
           <NotificationLink>View on Etherscan</NotificationLink>
         </NotificationContent>
@@ -29,10 +36,6 @@ export function NotificationItem() {
 
 const NotificationBlock = styled.div`
   display: flex;
-  justify-content: space-between;
-  position: fixed;
-  top: 116px;
-  right: 16px;
   background: ${Colors.VioletSecondaryLight};
   padding: 16px 47px 16px 16px;
   width: 345px;

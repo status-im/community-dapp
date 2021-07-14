@@ -17,6 +17,10 @@ const config = {
     1337: '0x049e017b504F85d3c07AFE712fC79501aa1DB712',
   },
   supportedChains: [...DEFAULT_CONFIG.supportedChains, 1337],
+  notifications: {
+    checkInterval: 500,
+    expirationPeriod: 50000,
+  },
 }
 
 render(
