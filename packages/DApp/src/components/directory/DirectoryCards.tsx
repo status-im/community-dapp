@@ -101,9 +101,13 @@ export function DirectoryCards() {
       </PageBar>
       <WeeklyFeature endDate={new Date('07/26/2021')} />
       <Voting>
-        {communities.map((community) => (
-          <DirectoryCard key={community.publicKey} community={community} />
-        ))}
+        {communities.map((community, idx) => {
+          if (community) {
+            return <DirectoryCard key={community.publicKey} community={community} />
+          } else {
+            return <DirectoryCardSkeleton key={idx} />
+          }
+        })}
         {communities.length === 0 && <DirectoryCardSkeleton />}
       </Voting>
     </>

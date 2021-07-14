@@ -26,63 +26,65 @@ export function isTypeInRoom(voteType: string, room: any) {
 }
 
 export function sortVotingFunction(sortedBy: VotingSortingEnum) {
-  switch (sortedBy) {
-    case VotingSortingEnum.AtoZ:
-      return (a: DetailedVotingRoom, b: DetailedVotingRoom) => (a.details.name < b.details.name ? -1 : 1)
-    case VotingSortingEnum.ZtoA:
-      return (a: DetailedVotingRoom, b: DetailedVotingRoom) => (a.details.name < b.details.name ? 1 : -1)
-    case VotingSortingEnum.EndingLatest:
-      return (a: DetailedVotingRoom, b: DetailedVotingRoom) => {
+  return (a: DetailedVotingRoom | undefined, b: DetailedVotingRoom | undefined) => {
+    if (!a) {
+      return 1
+    }
+    if (!b) {
+      return -1
+    }
+    let aSum
+    let bSum
+    switch (sortedBy) {
+      case VotingSortingEnum.AtoZ:
+        return a.details.name < b.details.name ? -1 : 1
+      case VotingSortingEnum.ZtoA:
+        return a.details.name < b.details.name ? 1 : -1
+      case VotingSortingEnum.EndingLatest:
         return a.endAt < b.endAt ? -1 : 1
-      }
-    case VotingSortingEnum.EndingSoonest:
-      return (a: DetailedVotingRoom, b: DetailedVotingRoom) => {
+      case VotingSortingEnum.EndingSoonest:
         return a.endAt < b.endAt ? 1 : -1
-      }
-    case VotingSortingEnum.MostVotes:
-      return (a: DetailedVotingRoom, b: DetailedVotingRoom) => {
-        const aSum = a.totalVotesAgainst.add(a.totalVotesFor)
-        const bSum = b.totalVotesAgainst.add(b.totalVotesFor)
+      case VotingSortingEnum.MostVotes:
+        aSum = a.totalVotesAgainst.add(a.totalVotesFor)
+        bSum = b.totalVotesAgainst.add(b.totalVotesFor)
         return aSum < bSum ? 1 : -1
-      }
-    case VotingSortingEnum.LeastVotes:
-      return (a: DetailedVotingRoom, b: DetailedVotingRoom) => {
-        const aSum = a.totalVotesAgainst.add(a.totalVotesFor)
-        const bSum = b.totalVotesAgainst.add(b.totalVotesFor)
+      case VotingSortingEnum.LeastVotes:
+        aSum = a.totalVotesAgainst.add(a.totalVotesFor)
+        bSum = b.totalVotesAgainst.add(b.totalVotesFor)
         return aSum < bSum ? -1 : 1
-      }
+    }
   }
 }
 
 export function sortDirectoryFunction(sortedBy: DirectorySortingEnum) {
-  switch (sortedBy) {
-    case DirectorySortingEnum.AtoZ:
-      return (a: CommunityDetail, b: CommunityDetail) => (a.name < b.name ? -1 : 1)
-    case DirectorySortingEnum.ZtoA:
-      return (a: CommunityDetail, b: CommunityDetail) => (a.name < b.name ? 1 : -1)
-    case DirectorySortingEnum.IncludedLongAgo:
-      return (a: CommunityDetail, b: CommunityDetail) => {
+  return (a: CommunityDetail | undefined, b: CommunityDetail | undefined) => {
+    if (!a) {
+      return 1
+    }
+    if (!b) {
+      return -1
+    }
+    switch (sortedBy) {
+      case DirectorySortingEnum.AtoZ:
+        return a.name < b.name ? -1 : 1
+      case DirectorySortingEnum.ZtoA:
+        return a.name < b.name ? 1 : -1
+      case DirectorySortingEnum.IncludedLongAgo:
         if (!a.directoryInfo) return 1
         if (!b.directoryInfo) return -1
         return a?.directoryInfo?.additionDate < b?.directoryInfo?.additionDate ? -1 : 1
-      }
-    case DirectorySortingEnum.IncludedRecently:
-      return (a: CommunityDetail, b: CommunityDetail) => {
+      case DirectorySortingEnum.IncludedRecently:
         if (!a.directoryInfo) return -1
         if (!b.directoryInfo) return 1
         return a?.directoryInfo?.additionDate < b?.directoryInfo?.additionDate ? 1 : -1
-      }
-    case DirectorySortingEnum.MostVotes:
-      return (a: CommunityDetail, b: CommunityDetail) => {
+      case DirectorySortingEnum.MostVotes:
         if (!a.directoryInfo?.featureVotes) return 1
         if (!b.directoryInfo?.featureVotes) return -1
         return a?.directoryInfo?.featureVotes < b?.directoryInfo?.featureVotes ? 1 : -1
-      }
-    case DirectorySortingEnum.LeastVotes:
-      return (a: CommunityDetail, b: CommunityDetail) => {
+      case DirectorySortingEnum.LeastVotes:
         if (!a.directoryInfo?.featureVotes) return 1
         if (!b.directoryInfo?.featureVotes) return -1
         return a?.directoryInfo?.featureVotes < b?.directoryInfo?.featureVotes ? -1 : 1
-      }
+    }
   }
 }

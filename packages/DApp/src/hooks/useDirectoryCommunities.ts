@@ -1,8 +1,8 @@
 import { useContractCall } from '@usedapp/core'
 import { useEffect, useState } from 'react'
-import { getCommunityDetails } from '../helpers/apiMock'
 import { isTextInDetails, sortDirectoryFunction } from '../helpers/communityFiltering'
 import { CommunityDetail, DirectorySortingEnum } from '../models/community'
+import { useCommunities } from './useCommunities'
 import { useContracts } from './useContracts'
 
 export function useDirectoryCommunities(filterKeyword: string, sortedBy: DirectorySortingEnum) {
@@ -14,28 +14,18 @@ export function useDirectoryCommunities(filterKeyword: string, sortedBy: Directo
     args: [],
   }) ?? [[]]
 
-  const [unfilteredComm, setUnfilteredComm] = useState(communities)
-  const [filteredCommunities, setFilteredCommunities] = useState<CommunityDetail[]>([])
+  const unfilteredComm = useCommunities(communities)
+  const [filteredCommunities, setFilteredCommunities] = useState<(CommunityDetail | undefined)[]>([])
 
   useEffect(() => {
-    const getDetails = async () => {
-      if (communities.length > 0) {
-        const detailedComm = await Promise.all(communities.map(async (key: string) => await getCommunityDetails(key)))
-        setUnfilteredComm(detailedComm)
-      }
-    }
-    getDetails()
-  }, [JSON.stringify(communities)])
-
-  useEffect(() => {
-    const filterCommunities = unfilteredComm.filter((comm: CommunityDetail) => {
+    const filterCommunities = unfilteredComm.filter((comm: CommunityDetail | undefined) => {
       if (comm) {
         return isTextInDetails(filterKeyword, comm)
       }
-      return false
+      return true
     })
     setFilteredCommunities(filterCommunities.sort(sortDirectoryFunction(sortedBy)))
-  }, [unfilteredComm, sortedBy, filterKeyword])
+  }, [JSON.stringify(unfilteredComm), sortedBy, filterKeyword])
 
   return filteredCommunities
 }

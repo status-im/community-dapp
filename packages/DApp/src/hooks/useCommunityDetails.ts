@@ -1,27 +1,14 @@
-import { useEffect, useRef, useState } from 'react'
-import { getCommunityDetails } from '../helpers/apiMock'
+import { useEffect } from 'react'
 import { CommunityDetail } from '../models/community'
+import { useCommunities } from './useCommunities'
 
 export function useCommunityDetails(publicKey: string, setCommunityDetail: (val: CommunityDetail | undefined) => void) {
-  const [loading, setLoading] = useState(false)
-  const loadingIdx = useRef(0)
+  const [CommunityDetail] = useCommunities([publicKey])
 
   useEffect(() => {
-    const getDetails = async (key: string) => {
-      const idx = ++loadingIdx.current
-      setLoading(true)
-      setCommunityDetail(await getCommunityDetails(key))
-      if (idx === loadingIdx.current) {
-        setLoading(false)
-      }
-    }
-    setCommunityDetail(undefined)
-    if (publicKey) {
-      getDetails(publicKey)
-    }
-  }, [publicKey])
+    setCommunityDetail(CommunityDetail)
+    return () => setCommunityDetail(undefined)
+  }, [JSON.stringify(CommunityDetail)])
 
-  useEffect(() => setCommunityDetail(undefined), [])
-
-  return loading
+  return !CommunityDetail
 }

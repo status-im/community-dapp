@@ -45,9 +45,13 @@ export function VotingCards() {
         </VoteFilter>
         <FilterList value={sortedBy} setValue={setSortedBy} options={VotingSortingOptions} />
       </PageBar>
-      {roomsToShow.map((room: any) => (
-        <VotingCard key={room.roomNumber.toString()} room={room} />
-      ))}
+      {roomsToShow.map((room: any, idx) => {
+        if (room?.details) {
+          return <VotingCard key={room.roomNumber.toString()} room={room} />
+        } else {
+          return <VotingCardSkeleton key={idx} />
+        }
+      })}
       {roomsToShow.length === 0 && <VotingCardSkeleton />}
     </div>
   )

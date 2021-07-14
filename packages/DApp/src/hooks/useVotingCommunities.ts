@@ -1,10 +1,10 @@
 import { useContractCall, useContractCalls } from '@usedapp/core'
 import { useEffect, useState } from 'react'
-import { getCommunityDetails } from '../helpers/apiMock'
 import { VotingSortingEnum } from '../models/community'
 import { DetailedVotingRoom } from '../models/smartContract'
 import { useContracts } from './useContracts'
 import { isTextInDetails, isTypeInRoom, sortVotingFunction } from '../helpers/communityFiltering'
+import { useCommunities } from './useCommunities'
 
 export function useVotingCommunities(
   filterKeyword: string,
@@ -32,31 +32,28 @@ export function useVotingCommunities(
   })
 
   const votingRooms = useContractCalls(contractCalls)
+  const publicKeys = votingRooms.map((votingRoom: any) => votingRoom?.community)
+  const communitiesDetails = useCommunities(publicKeys)
 
   useEffect(() => {
     if (votingRooms.length > 0) {
-      const getPromises = async () => {
-        const rooms = await Promise.all(
-          votingRooms.map(async (el: any) => {
-            if (el) {
-              return { ...el, details: await getCommunityDetails(el.community) }
-            }
-            return undefined
-          })
-        )
-        setRoomsWithCommunity(rooms)
-      }
-      getPromises()
+      const rooms = votingRooms.map((el: any) => {
+        if (el) {
+          return { ...el, details: communitiesDetails.find((comm) => comm?.publicKey === el.community) }
+        }
+        return undefined
+      })
+      setRoomsWithCommunity(rooms)
     }
-  }, [JSON.stringify(votingRooms)])
+  }, [JSON.stringify(votingRooms), JSON.stringify(communitiesDetails)])
 
   useEffect(() => {
     const filteredRooms = roomsWithCommunity.filter((room: any) => {
-      if (room) {
+      if (room && room.details) {
         return isTextInDetails(filterKeyword, room.details) && isTypeInRoom(voteType, room)
       }
-      return false
-    })
+      return true
+    }) as (any | undefined)[]
     setFilteredRooms(filteredRooms.sort(sortVotingFunction(sortedBy)))
   }, [roomsWithCommunity, filterKeyword, voteType, sortedBy])
 
