@@ -82,7 +82,11 @@ contract MockContract {
         return votingRoomMap[roomId].voters;
     }
 
-    function initializeVotingRoom(VoteType voteType, address publicKey) public {
+    function initializeVotingRoom(
+        VoteType voteType,
+        address publicKey,
+        uint256 voteAmount
+    ) public {
         require(communityVotingId[publicKey] == 0, 'vote already ongoing');
         if (voteType == VoteType.REMOVE) {
             require(directory.isCommunityInDirectory(publicKey), 'Community not in directory');
@@ -96,6 +100,9 @@ contract MockContract {
         newVotingRoom.voteType = voteType;
         newVotingRoom.community = publicKey;
         newVotingRoom.roomNumber = latestVoting;
+        newVotingRoom.totalVotesFor = voteAmount;
+        newVotingRoom.voted[msg.sender] = true;
+        newVotingRoom.voters.push(msg.sender);
         communityVotingId[publicKey] = latestVoting;
 
         activeVotingRooms.push(latestVoting);

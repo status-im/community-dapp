@@ -94,31 +94,33 @@ describe('Contract', () => {
     describe('initialization', () => {
       it('initializes', async () => {
         const { contract, firstAddress, secondAddress } = await loadFixture(fixture)
-        expect(await contract.initializeVotingRoom(1, firstAddress.address))
+        expect(await contract.initializeVotingRoom(1, firstAddress.address, BigNumber.from(100)))
           .to.emit(contract, 'VotingRoomStarted')
           .withArgs(1, firstAddress.address)
-        expect(await contract.initializeVotingRoom(1, secondAddress.address))
+        expect(await contract.initializeVotingRoom(1, secondAddress.address, BigNumber.from(100)))
           .to.emit(contract, 'VotingRoomStarted')
           .withArgs(2, secondAddress.address)
-        await expect(contract.initializeVotingRoom(1, secondAddress.address)).to.be.revertedWith('vote already ongoing')
+        await expect(contract.initializeVotingRoom(1, secondAddress.address, BigNumber.from(100))).to.be.revertedWith(
+          'vote already ongoing'
+        )
       })
 
       describe('directory interaction', () => {
         it('remove missing', async () => {
           const { contract } = await loadFixture(fixture)
           await expect(
-            contract.initializeVotingRoom(0, '0xAcdd71e5Ef3Ab3356d62da78A941aAc08a18CF2b')
+            contract.initializeVotingRoom(0, '0xAcdd71e5Ef3Ab3356d62da78A941aAc08a18CF2b', BigNumber.from(100))
           ).to.be.revertedWith('Community not in directory')
         })
 
         it('add already in', async () => {
           const { contract, directory, alice, provider } = await loadFixture(fixture)
-          await contract.initializeVotingRoom(1, '0xAcdd71e5Ef3Ab3356d62da78A941aAc08a18CF2b')
+          await contract.initializeVotingRoom(1, '0xAcdd71e5Ef3Ab3356d62da78A941aAc08a18CF2b', BigNumber.from(100))
           await voteAndFinalize(1, 1, alice, contract, provider)
 
           expect(await directory.getCommunities()).to.deep.eq(['0xAcdd71e5Ef3Ab3356d62da78A941aAc08a18CF2b'])
           await expect(
-            contract.initializeVotingRoom(1, '0xAcdd71e5Ef3Ab3356d62da78A941aAc08a18CF2b')
+            contract.initializeVotingRoom(1, '0xAcdd71e5Ef3Ab3356d62da78A941aAc08a18CF2b', BigNumber.from(100))
           ).to.be.revertedWith('Community already in directory')
         })
       })
@@ -126,22 +128,22 @@ describe('Contract', () => {
 
     it('gets', async () => {
       const { contract, firstAddress, secondAddress } = await loadFixture(fixture)
-      await contract.initializeVotingRoom(1, firstAddress.address)
+      await contract.initializeVotingRoom(1, firstAddress.address, BigNumber.from(100))
       expect((await contract.votingRoomMap(1)).slice(2)).to.deep.eq([
         1,
         false,
         firstAddress.address,
-        BigNumber.from(0),
+        BigNumber.from(100),
         BigNumber.from(0),
         BigNumber.from(1),
       ])
 
-      await contract.initializeVotingRoom(1, secondAddress.address)
+      await contract.initializeVotingRoom(1, secondAddress.address, BigNumber.from(100))
       expect((await contract.votingRoomMap(2)).slice(2)).to.deep.eq([
         1,
         false,
         secondAddress.address,
-        BigNumber.from(0),
+        BigNumber.from(100),
         BigNumber.from(0),
         BigNumber.from(2),
       ])
@@ -149,7 +151,7 @@ describe('Contract', () => {
         1,
         false,
         firstAddress.address,
-        BigNumber.from(0),
+        BigNumber.from(100),
         BigNumber.from(0),
         BigNumber.from(1),
       ])
@@ -157,24 +159,24 @@ describe('Contract', () => {
     describe('finalization', () => {
       it('finalizes', async () => {
         const { contract, firstAddress, provider } = await loadFixture(fixture)
-        await contract.initializeVotingRoom(1, firstAddress.address)
+        await contract.initializeVotingRoom(1, firstAddress.address, BigNumber.from(100))
         expect((await contract.votingRoomMap(1)).slice(2)).to.deep.eq([
           1,
           false,
           firstAddress.address,
-          BigNumber.from(0),
+          BigNumber.from(100),
           BigNumber.from(0),
           BigNumber.from(1),
         ])
         await provider.send('evm_mine', [Math.floor(Date.now() / 1000 + 2000)])
         expect(await contract.finalizeVotingRoom(1))
           .to.emit(contract, 'VotingRoomFinalized')
-          .withArgs(1, firstAddress.address, false, 1)
+          .withArgs(1, firstAddress.address, true, 1)
         expect((await contract.votingRoomMap(1)).slice(2)).to.deep.eq([
           1,
           true,
           firstAddress.address,
-          BigNumber.from(0),
+          BigNumber.from(100),
           BigNumber.from(0),
           BigNumber.from(1),
         ])
@@ -182,14 +184,14 @@ describe('Contract', () => {
 
       describe('directory interaction', () => {
         it('add community', async () => {
-          const { contract, directory, alice, provider } = await loadFixture(fixture)
-          await contract.initializeVotingRoom(1, '0xAcdd71e5Ef3Ab3356d62da78A941aAc08a18CF2b')
-          await voteAndFinalize(1, 1, alice, contract, provider)
+          const { contract, directory, alice, provider, firstAddress } = await loadFixture(fixture)
+          await contract.initializeVotingRoom(1, '0xAcdd71e5Ef3Ab3356d62da78A941aAc08a18CF2b', BigNumber.from(100))
+          await voteAndFinalize(1, 1, firstAddress, contract, provider)
           expect((await contract.votingRoomMap(1)).slice(2)).to.deep.eq([
             1,
             true,
             '0xAcdd71e5Ef3Ab3356d62da78A941aAc08a18CF2b',
-            BigNumber.from(100),
+            BigNumber.from(200),
             BigNumber.from(0),
             BigNumber.from(1),
           ])
@@ -197,34 +199,34 @@ describe('Contract', () => {
         })
 
         it('remove community', async () => {
-          const { contract, directory, alice, provider } = await loadFixture(fixture)
-          await contract.initializeVotingRoom(1, '0xAcdd71e5Ef3Ab3356d62da78A941aAc08a18CF2b')
-          await voteAndFinalize(1, 1, alice, contract, provider)
+          const { contract, directory, alice, provider, firstAddress } = await loadFixture(fixture)
+          await contract.initializeVotingRoom(1, '0xAcdd71e5Ef3Ab3356d62da78A941aAc08a18CF2b', BigNumber.from(100))
+          await voteAndFinalize(1, 1, firstAddress, contract, provider)
 
           expect(await directory.getCommunities()).to.deep.eq(['0xAcdd71e5Ef3Ab3356d62da78A941aAc08a18CF2b'])
 
-          await contract.initializeVotingRoom(0, '0xAcdd71e5Ef3Ab3356d62da78A941aAc08a18CF2b')
-          await voteAndFinalize(2, 1, alice, contract, provider)
+          await contract.initializeVotingRoom(0, '0xAcdd71e5Ef3Ab3356d62da78A941aAc08a18CF2b', BigNumber.from(100))
+          await voteAndFinalize(2, 1, firstAddress, contract, provider)
           expect(await directory.getCommunities()).to.deep.eq([])
         })
 
         it('failed add vote', async () => {
-          const { contract, directory, alice, provider } = await loadFixture(fixture)
-          await contract.initializeVotingRoom(1, '0xAcdd71e5Ef3Ab3356d62da78A941aAc08a18CF2b')
-          await voteAndFinalize(1, 0, alice, contract, provider)
+          const { contract, directory, alice, provider, firstAddress } = await loadFixture(fixture)
+          await contract.initializeVotingRoom(1, '0xAcdd71e5Ef3Ab3356d62da78A941aAc08a18CF2b', BigNumber.from(100))
+          await voteAndFinalize(1, 0, firstAddress, contract, provider)
 
           expect(await directory.getCommunities()).to.deep.eq([])
         })
 
         it('failed remove vote', async () => {
-          const { contract, directory, alice, provider } = await loadFixture(fixture)
-          await contract.initializeVotingRoom(1, '0xAcdd71e5Ef3Ab3356d62da78A941aAc08a18CF2b')
-          await voteAndFinalize(1, 1, alice, contract, provider)
+          const { contract, directory, alice, provider, firstAddress } = await loadFixture(fixture)
+          await contract.initializeVotingRoom(1, '0xAcdd71e5Ef3Ab3356d62da78A941aAc08a18CF2b', BigNumber.from(100))
+          await voteAndFinalize(1, 1, firstAddress, contract, provider)
 
           expect(await directory.getCommunities()).to.deep.eq(['0xAcdd71e5Ef3Ab3356d62da78A941aAc08a18CF2b'])
 
-          await contract.initializeVotingRoom(0, '0xAcdd71e5Ef3Ab3356d62da78A941aAc08a18CF2b')
-          await voteAndFinalize(2, 0, alice, contract, provider)
+          await contract.initializeVotingRoom(0, '0xAcdd71e5Ef3Ab3356d62da78A941aAc08a18CF2b', BigNumber.from(100))
+          await voteAndFinalize(2, 0, firstAddress, contract, provider)
           expect(await directory.getCommunities()).to.deep.eq(['0xAcdd71e5Ef3Ab3356d62da78A941aAc08a18CF2b'])
         })
       })
@@ -234,23 +236,23 @@ describe('Contract', () => {
   describe('helpers', () => {
     it('getCommunityVoting', async () => {
       const { contract, firstAddress, secondAddress, provider } = await loadFixture(fixture)
-      await contract.initializeVotingRoom(1, firstAddress.address)
+      await contract.initializeVotingRoom(1, firstAddress.address, BigNumber.from(100))
       expect((await contract.getCommunityVoting(firstAddress.address)).slice(2)).to.deep.eq([
         1,
         false,
         firstAddress.address,
-        BigNumber.from(0),
+        BigNumber.from(100),
         BigNumber.from(0),
         BigNumber.from(1),
       ])
 
       await provider.send('evm_mine', [Math.floor(Date.now() / 1000 + 10000)])
-      await contract.initializeVotingRoom(1, secondAddress.address)
+      await contract.initializeVotingRoom(1, secondAddress.address, BigNumber.from(100))
       expect((await contract.getCommunityVoting(secondAddress.address)).slice(2)).to.deep.eq([
         1,
         false,
         secondAddress.address,
-        BigNumber.from(0),
+        BigNumber.from(100),
         BigNumber.from(0),
         BigNumber.from(2),
       ])
@@ -258,18 +260,16 @@ describe('Contract', () => {
 
     it('get active votes', async () => {
       const { contract, firstAddress, secondAddress, provider } = await loadFixture(fixture)
-      await contract.initializeVotingRoom(1, firstAddress.address)
+      await contract.initializeVotingRoom(1, firstAddress.address, BigNumber.from(100))
       expect(await contract.getActiveVotingRooms()).to.deep.eq([BigNumber.from(1)])
 
-      await contract.initializeVotingRoom(1, secondAddress.address)
+      await contract.initializeVotingRoom(1, secondAddress.address, BigNumber.from(100))
       expect(await contract.getActiveVotingRooms()).to.deep.eq([BigNumber.from(1), BigNumber.from(2)])
       await provider.send('evm_mine', [Math.floor(Date.now() / 1000 + 2000)])
       await contract.finalizeVotingRoom(1)
       expect(await contract.getActiveVotingRooms()).to.deep.eq([BigNumber.from(2)])
       await contract.finalizeVotingRoom(2)
       expect(await contract.getActiveVotingRooms()).to.deep.eq([])
-      await contract.initializeVotingRoom(1, secondAddress.address)
-      expect(await contract.getActiveVotingRooms()).to.deep.eq([BigNumber.from(3)])
     })
   })
 
@@ -277,19 +277,17 @@ describe('Contract', () => {
     it('check voters', async () => {
       const { contract, alice, firstAddress, secondAddress } = await loadFixture(fixture)
       const { signedMessages } = await getSignedMessages(alice, firstAddress, secondAddress)
-      await contract.initializeVotingRoom(1, '0xabA1eF51ef4aE360a9e8C9aD2d787330B602eb24')
+      await contract.initializeVotingRoom(1, '0xabA1eF51ef4aE360a9e8C9aD2d787330B602eb24', BigNumber.from(100))
 
-      expect(await contract.listRoomVoters(1)).to.deep.eq([])
+      expect(await contract.listRoomVoters(1)).to.deep.eq([alice.address])
       await contract.castVotes(signedMessages.slice(2))
-      expect(await contract.listRoomVoters(1)).to.deep.eq([secondAddress.address])
-      await contract.castVotes(signedMessages.slice(0, 1))
-      expect(await contract.listRoomVoters(1)).to.deep.eq([secondAddress.address, alice.address])
+      expect(await contract.listRoomVoters(1)).to.deep.eq([alice.address, secondAddress.address])
     })
 
     it('success', async () => {
       const { contract, alice, firstAddress, secondAddress } = await loadFixture(fixture)
       const { signedMessages } = await getSignedMessages(alice, firstAddress, secondAddress)
-      await contract.initializeVotingRoom(1, '0xabA1eF51ef4aE360a9e8C9aD2d787330B602eb24')
+      await contract.initializeVotingRoom(1, '0xabA1eF51ef4aE360a9e8C9aD2d787330B602eb24', BigNumber.from(100))
       await contract.castVotes(signedMessages)
       expect((await contract.votingRoomMap(1)).slice(2)).to.deep.eq([
         1,
@@ -304,7 +302,7 @@ describe('Contract', () => {
     it('double vote', async () => {
       const { contract, alice, firstAddress, secondAddress } = await loadFixture(fixture)
       const { signedMessages } = await getSignedMessages(alice, firstAddress, secondAddress)
-      await contract.initializeVotingRoom(1, '0xabA1eF51ef4aE360a9e8C9aD2d787330B602eb24')
+      await contract.initializeVotingRoom(1, '0xabA1eF51ef4aE360a9e8C9aD2d787330B602eb24', BigNumber.from(100))
       await contract.castVotes(signedMessages)
       await contract.castVotes(signedMessages)
       expect((await contract.votingRoomMap(1)).slice(2)).to.deep.eq([
@@ -319,7 +317,7 @@ describe('Contract', () => {
 
     it('random bytes', async () => {
       const { contract } = await loadFixture(fixture)
-      await contract.initializeVotingRoom(1, '0xabA1eF51ef4aE360a9e8C9aD2d787330B602eb24')
+      await contract.initializeVotingRoom(1, '0xabA1eF51ef4aE360a9e8C9aD2d787330B602eb24', BigNumber.from(100))
       await expect(contract.castVotes([new Uint8Array([12, 12, 12])])).to.be.reverted
     })
 
@@ -332,7 +330,7 @@ describe('Contract', () => {
     it('old room', async () => {
       const { contract, alice, firstAddress, secondAddress, provider } = await loadFixture(fixture)
       const { signedMessages } = await getSignedMessages(alice, firstAddress, secondAddress)
-      await contract.initializeVotingRoom(1, '0xabA1eF51ef4aE360a9e8C9aD2d787330B602eb24')
+      await contract.initializeVotingRoom(1, '0xabA1eF51ef4aE360a9e8C9aD2d787330B602eb24', BigNumber.from(100))
       await provider.send('evm_mine', [Math.floor(Date.now() / 1000 + 2000)])
       await expect(contract.castVotes(signedMessages)).to.be.reverted
     })
@@ -341,7 +339,7 @@ describe('Contract', () => {
       const { contract, alice, firstAddress, secondAddress, provider } = await loadFixture(fixture)
       const { messages } = await getSignedMessages(alice, firstAddress, secondAddress)
       const types = ['address', 'uint256', 'uint256']
-      await contract.initializeVotingRoom(1, '0xabA1eF51ef4aE360a9e8C9aD2d787330B602eb24')
+      await contract.initializeVotingRoom(1, '0xabA1eF51ef4aE360a9e8C9aD2d787330B602eb24', BigNumber.from(100))
       await provider.send('evm_mine', [Math.floor(Date.now() / 1000 + 2000)])
 
       const signedMessages = await Promise.all(

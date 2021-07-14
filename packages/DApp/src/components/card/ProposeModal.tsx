@@ -12,6 +12,7 @@ import { CommunityDetail } from '../../models/community'
 import { CommunitySkeleton } from '../skeleton/CommunitySkeleton'
 import { useCommunityDetails } from '../../hooks/useCommunityDetails'
 import { ColumnFlexDiv } from '../../constants/styles'
+import { BigNumber } from 'ethers'
 
 interface PublicKeyInputProps {
   publicKey: string
@@ -93,7 +94,10 @@ export function ProposeModal({
           OK, let’s move on! <span>🤙</span>
         </ConfirmBtn>
       ) : (
-        <ProposingBtn disabled={!communityFound || !proposingAmount} onClick={() => send(1, publicKey)}>
+        <ProposingBtn
+          disabled={!communityFound || !proposingAmount}
+          onClick={() => send(1, publicKey, BigNumber.from(proposingAmount))}
+        >
           Confirm vote to add community
         </ProposingBtn>
       )}
