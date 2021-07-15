@@ -9,7 +9,7 @@ export const DirectoryCardSkeleton = () => {
   return (
     <Card>
       <CardCommunityWrap>
-        <CommunitySkeleton />
+        <CommunitySkeleton customStyle={true} />
       </CardCommunityWrap>
       <CardVoteWrap>
         <CardVoteBlock>
@@ -32,6 +32,10 @@ const CardHeader = styled.div`
   justify-content: center;
   width: 100%;
   margin-bottom: 54px;
+
+  @media (max-width: 768px) {
+    margin-bottom: 32px;
+  }
 `
 
 const SkeletonButton = styled(Skeleton)`
@@ -51,5 +55,9 @@ const Column = styled(ColumnFlexDiv)`
     align-items: center;
     margin-bottom: 8px;
     mix-blend-mode: luminosity;
+  }
+
+  @media (max-width: 768px) {
+    display: none;
   }
 `
