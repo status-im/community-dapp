@@ -7,7 +7,6 @@ export function useCommunityDetails(publicKey: string, setCommunityDetail: (val:
 
   useEffect(() => {
     setCommunityDetail(CommunityDetail)
-    return () => setCommunityDetail(undefined)
   }, [JSON.stringify(CommunityDetail)])
 
   return !CommunityDetail

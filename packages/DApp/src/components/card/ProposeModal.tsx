@@ -52,8 +52,9 @@ export function ProposeModal({
   const loading = useCommunityDetails(publicKey, setCommunityFound)
   const { votingContract } = useContracts()
   const { send, state } = useContractFunction(votingContract, 'initializeVotingRoom')
+
   useEffect(() => {
-    if (state.status === 'Mining' || state.status === 'Success') {
+    if (state.status === 'Mining') {
       setShowConfirmModal(true)
     }
   }, [state])
