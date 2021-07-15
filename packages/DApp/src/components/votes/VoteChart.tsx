@@ -43,7 +43,7 @@ export function VoteChart({
 
   return (
     <Votes>
-      <VotesChart>
+      <VotesChart className={selectedVote || tabletMode ? '' : 'notModal'}>
         <VoteBox style={{ filter: voteWinner && voteWinner === 2 ? 'grayscale(1)' : 'none' }}>
           <p style={{ fontSize: voteWinner === 1 ? '42px' : '24px', marginTop: voteWinner === 2 ? '18px' : '0' }}>
             {voteConstants.against.icon}
@@ -99,6 +99,12 @@ const VotesChart = styled.div`
   align-items: center;
   position: relative;
   margin-bottom: 13px;
+
+  &.notModal {
+    @media (max-width: 768px) {
+      margin-bottom: 0;
+    }
+  }
 `
 
 const VoteBox = styled.div`
@@ -132,13 +138,15 @@ const TimeLeft = styled.div`
 
   &.notModal {
     @media (max-width: 768px) {
-      top: 0;
+      top: -16px;
     }
   }
 `
 
 const VoteGraphBarWrap = styled.div`
   position: static;
+  display: flex;
+  justify-content: center;
 
   &.notModal {
     @media (max-width: 768px) {

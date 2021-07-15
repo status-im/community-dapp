@@ -142,6 +142,8 @@ const CardHeadingEndedVote = styled.p`
 
   @media (max-width: 768px) {
     max-width: 100%;
+    margin-bottom: 26px;
+    margin-top: -30px;
   }
 `
 

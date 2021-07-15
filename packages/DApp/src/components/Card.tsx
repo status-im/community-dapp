@@ -40,6 +40,7 @@ export const CardVoteWrap = styled.div`
 
   @media (max-width: 768px) {
     width: 100%;
+    padding-top: 56px;
     box-shadow: none;
     border-radius: unset;
     border-bottom: 1px solid #e0e0e0;

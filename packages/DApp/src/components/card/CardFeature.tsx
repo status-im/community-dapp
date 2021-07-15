@@ -36,14 +36,14 @@ export const CardFeature = ({ community, heading, icon, sum, timeLeft, currentVo
 
   return (
     <CardVoteBlock>
-      <CardHeading style={{ fontWeight: timeLeft ? 'normal' : 'bold', fontSize: timeLeft ? '15px' : '17px' }}>
+      <CardHeadingFeature style={{ fontWeight: timeLeft ? 'normal' : 'bold', fontSize: timeLeft ? '15px' : '17px' }}>
         {heading}
-      </CardHeading>
+      </CardHeadingFeature>
 
       <FeatureVote>
         <FeatureIcon>{icon}</FeatureIcon>
 
-        {timeLeft && <span>{timeLeft}</span>}
+        {timeLeft && !sum && <span>{timeLeft}</span>}
 
         {sum && (
           <FeatureText>
@@ -51,6 +51,21 @@ export const CardFeature = ({ community, heading, icon, sum, timeLeft, currentVo
           </FeatureText>
         )}
       </FeatureVote>
+
+      <FeatureVoteMobile>
+        {timeLeft && !sum && (
+          <FeatureText>
+            {icon} {heading}: <span>{timeLeft}</span>
+          </FeatureText>
+        )}
+
+        {sum && (
+          <FeatureTextWeekly>
+            {icon} <span style={{ color: '#676868', fontWeight: 'normal' }}>Weekly Feature Vote: </span>
+            <span>{addCommas(sum)}</span> SNT
+          </FeatureTextWeekly>
+        )}
+      </FeatureVoteMobile>
       <div>
         {showFeatureModal && (
           <Modal heading="Feature in “Weekly Featured”?" setShowModal={setShowFeatureModal}>
@@ -78,6 +93,11 @@ export const CardFeature = ({ community, heading, icon, sum, timeLeft, currentVo
   )
 }
 
+const CardHeadingFeature = styled(CardHeading)`
+  @media (max-width: 768px) {
+    display: none;
+  }
+`
 const FeatureBottom = styled.div`
   display: flex;
   justify-content: space-between;
@@ -102,9 +122,31 @@ const FeatureVote = styled(ColumnFlexDiv)`
     font-size: 15px;
     line-height: 22px;
   }
+
+  @media (max-width: 768px) {
+    display: none;
+  }
+`
+
+const FeatureVoteMobile = styled(ColumnFlexDiv)`
+  display: none;
+  text-align: center;
+  margin-bottom: 32px;
+  margin-top: -14px;
+
+  @media (max-width: 768px) {
+    display: flex;
+  }
 `
 
 const FeatureText = styled.p`
+  & > span {
+    font-weight: bold;
+    font-size: 15px;
+    line-height: 22px;
+  }
+`
+const FeatureTextWeekly = styled(FeatureText)`
   & > span {
     font-weight: bold;
     font-size: 15px;
