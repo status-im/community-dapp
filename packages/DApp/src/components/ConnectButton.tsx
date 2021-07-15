@@ -1,5 +1,5 @@
-import React, { ReactNode, useState } from 'react'
-import { ButtonPrimary } from './Button'
+import React, { useState } from 'react'
+import { ProposeButton } from './Button'
 import { useEthers } from '@usedapp/core'
 import styled from 'styled-components'
 import { Modal } from './Modal'
@@ -7,12 +7,12 @@ import { LinkExternal } from './Link'
 import statusLogo from '../assets/images/statusLogo.svg'
 import { ColumnFlexDiv } from '../constants/styles'
 
-export type StatusConnectButtonProps = {
-  children: ReactNode
+export type ConnectButtonProps = {
+  text?: string
   className?: string
 }
 
-export function StatusConnectButton({ children, className }: StatusConnectButtonProps) {
+export function ConnectButton({ text, className }: ConnectButtonProps) {
   const [showModal, setShowModal] = useState(false)
   const { activateBrowserWallet } = useEthers()
 
@@ -31,9 +31,9 @@ export function StatusConnectButton({ children, className }: StatusConnectButton
           <StatusModal />{' '}
         </Modal>
       )}
-      <ButtonPrimary className={className} onClick={activateStatusWallet}>
-        {children}
-      </ButtonPrimary>
+      <ProposeButton className={className} onClick={activateStatusWallet}>
+        {!text ? 'Connect to Vote' : text}
+      </ProposeButton>
     </div>
   )
 }

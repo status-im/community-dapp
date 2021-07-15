@@ -1,10 +1,12 @@
 import React, { useState } from 'react'
-import { InfoWrap, ConnectButton, ProposeButton, PageInfo } from '../PageInfo'
+import { InfoWrap, PageInfo } from '../PageInfo'
 import { useEthers } from '@usedapp/core'
 import { Modal } from '../Modal'
 import { ProposeModal } from '../card/ProposeModal'
 import { VoteConfirmModal } from '../card/VoteConfirmModal'
 import { CommunityDetail } from '../../models/community'
+import { ProposeButton } from '../Button'
+import { ConnectButton } from '../ConnectButton'
 
 export function VotesInfo() {
   const { account } = useEthers()
@@ -43,7 +45,11 @@ export function VotesInfo() {
         </Modal>
       )}
 
-      {account ? <ProposeButton onClick={() => setShowProposeModal(true)} /> : <ConnectButton />}
+      {account ? (
+        <ProposeButton onClick={() => setShowProposeModal(true)}>Propose community</ProposeButton>
+      ) : (
+        <ConnectButton />
+      )}
     </InfoWrap>
   )
 }

@@ -1,6 +1,7 @@
 import React from 'react'
-import { ConnectButton, InfoWrap, PageInfo } from '../PageInfo'
+import { InfoWrap, PageInfo } from '../PageInfo'
 import { useEthers } from '@usedapp/core'
+import { ConnectButton } from '../ConnectButton'
 
 export function DirectoryInfo() {
   const { account } = useEthers()

@@ -27,6 +27,12 @@ export const ButtonPrimary = styled(Button)`
     filter: grayscale(1);
   }
 `
+
+export const ProposeButton = styled(ButtonPrimary)`
+  padding: 10px 0;
+  width: 343px;
+`
+
 export const ButtonSecondary = styled(Button)`
   background: ${Colors.VioletSecondary};
   color: ${Colors.VioletDark};

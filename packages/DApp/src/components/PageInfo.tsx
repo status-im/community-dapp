@@ -1,8 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
-import { ButtonPrimary } from '../components/Button'
 import { ColumnFlexDiv } from '../constants/styles'
-import { StatusConnectButton } from './StatusConnectButton'
 
 interface PageInfoProps {
   heading: string
@@ -15,18 +13,6 @@ export const PageInfo = ({ heading, text }: PageInfoProps) => (
     <InfoText>{text}</InfoText>
   </ColumnFlexDiv>
 )
-
-interface ProposeButtonProps {
-  onClick: () => void
-}
-
-export function ProposeButton({ onClick }: ProposeButtonProps) {
-  return <ProposeButtonStyled onClick={onClick}>Propose community</ProposeButtonStyled>
-}
-
-export function ConnectButton() {
-  return <ConnectButtonStyled>Connect to Vote</ConnectButtonStyled>
-}
 
 export const InfoWrap = styled(ColumnFlexDiv)`
   max-width: 630px;
@@ -47,13 +33,4 @@ const InfoText = styled.p`
   text-align: center;
   line-height: 32px;
   margin-bottom: 24px;
-`
-const ProposeButtonStyled = styled(ButtonPrimary)`
-  padding: 10px 0;
-  width: 343px;
-`
-
-const ConnectButtonStyled = styled(StatusConnectButton)`
-  padding: 10px 0;
-  width: 343px;
 `

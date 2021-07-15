@@ -5,7 +5,7 @@ import { useEthers, shortenAddress } from '@usedapp/core'
 import { Logo } from './Logo'
 import { Colors } from '../../constants/styles'
 import { Animation } from '../../constants/animation'
-import { StatusConnectButton } from '../StatusConnectButton'
+import { ConnectButton } from '../ConnectButton'
 
 export function TopBar() {
   const { account, deactivate } = useEthers()
@@ -58,7 +58,7 @@ export function TopBar() {
               </ButtonDisconnect>
             </AccountWrap>
           ) : (
-            <ButtonConnect>Connect</ButtonConnect>
+            <ButtonConnect text={'Connect'} />
           )}
         </MenuContent>
       </HeaderWrapper>
@@ -163,8 +163,10 @@ const StyledNavLink = styled(NavLink)`
     }
   }
 `
-const ButtonConnect = styled(StatusConnectButton)`
+
+const ButtonConnect = styled(ConnectButton)`
   padding: 10px 27px;
+  width: auto;
 `
 
 const AccountWrap = styled.div`
