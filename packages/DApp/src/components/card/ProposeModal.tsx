@@ -13,6 +13,7 @@ import { CommunitySkeleton } from '../skeleton/CommunitySkeleton'
 import { useCommunityDetails } from '../../hooks/useCommunityDetails'
 import { ColumnFlexDiv } from '../../constants/styles'
 import { BigNumber } from 'ethers'
+import { timespan } from '../../helpers/timespan'
 
 interface PublicKeyInputProps {
   publicKey: string
@@ -53,6 +54,12 @@ export function ProposeModal({
   const { votingContract } = useContracts()
   const { send, state } = useContractFunction(votingContract, 'initializeVotingRoom')
 
+  const lastVote =
+    communityFound && communityFound.votingHistory
+      ? communityFound.votingHistory[communityFound.votingHistory.length - 1]
+      : undefined
+  const lastVoteDate = lastVote ? lastVote.date : undefined
+
   useEffect(() => {
     if (state.status === 'Mining') {
       setShowConfirmModal(true)
@@ -66,13 +73,46 @@ export function ProposeModal({
         {communityFound ? <CardCommunity community={communityFound} /> : loading && publicKey && <CommunitySkeleton />}
         {communityFound && !communityFound.validForAddition && (
           <WarningWrap>
-            <Warning
-              icon="🤏"
-              text={`${communityFound.name} currently only has ${communityFound.numberOfMembers} members. A community needs more than 42 members before a vote to be added to the Status community directory can be proposed.`}
-            />
+            {communityFound.numberOfMembers < 42 && (
+              <Warning
+                icon="🤏"
+                text={`${communityFound.name} currently only has ${communityFound.numberOfMembers} members. A community needs more than 42 members before a vote to be added to the Status community directory can be proposed.`}
+              />
+            )}
+            {availableAmount < 10000 && (
+              <Warning
+                icon="💰"
+                text={`Not enough SNT to start a vote for this community. A new vote for ${communityFound.name} requires at least 10,000 SNT available.`}
+              />
+            )}
+            {!communityFound.ens && (
+              <Warning
+                icon="⚠️"
+                text={`${communityFound.name} is not registered in Ethereum Name Service. Only communities with ENS name can be included in the directory.`}
+              />
+            )}
+            {communityFound.directoryInfo && (
+              <Warning
+                icon="⚠️"
+                text={`${communityFound.name} is already in the communities directory! No need to start a new vote.`}
+              />
+            )}
+            {communityFound.currentVoting && (
+              <Warning
+                icon="⚠️"
+                text={`There’s already an ongoing vote to add ${communityFound.name} in the directory!`}
+              />
+            )}
+            {lastVoteDate && timespan(lastVoteDate) < 30 && (
+              <Warning
+                icon="⚠️"
+                text={`There’s already an ongoing vote to add ${communityFound.name} in the directory!`}
+              />
+            )}
           </WarningWrap>
         )}
-        {((communityFound && communityFound.validForAddition) || loading) && publicKey && (
+
+        {communityFound && communityFound.validForAddition && publicKey && (
           <VoteProposeWrap>
             <VotePropose
               availableAmount={availableAmount}
@@ -131,7 +171,6 @@ const ProposingInfo = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 32px;
 
   & > span {
     font-size: 24px;
@@ -149,6 +188,7 @@ const InfoText = styled.div`
 const ProposingBtn = styled(ButtonPrimary)`
   width: 100%;
   padding: 11px 0;
+  margin-top: 32px;
 `
 const WarningWrap = styled.div`
   margin: 24px 0;
