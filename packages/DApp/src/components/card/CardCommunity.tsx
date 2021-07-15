@@ -222,6 +222,10 @@ export const CardLinks = styled.div`
   font-size: 15px;
   line-height: 22px;
 
+  @media (max-width: 900px) {
+    flex-wrap: wrap;
+  }
+
   &.notModal {
     @media (max-width: 768px) {
       max-width: calc(100% - 60px);
