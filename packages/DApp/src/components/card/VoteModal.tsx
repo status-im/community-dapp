@@ -58,4 +58,5 @@ const VoteConfirmBtn = styled(ButtonSecondary)`
   font-weight: 500;
   font-size: 15px;
   line-height: 22px;
+  margin-top: 32px;
 `

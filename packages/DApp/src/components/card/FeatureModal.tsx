@@ -42,4 +42,5 @@ const VoteProposeWrap = styled.div`
 const VoteConfirmBtn = styled(ButtonPrimary)`
   width: 100%;
   padding: 11px 0;
+  margin-top: 32px;
 `

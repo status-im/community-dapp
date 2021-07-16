@@ -125,7 +125,6 @@ const VoteProposingAmount = styled(Input)`
 
 const VoteProposingRangeWrap = styled.div`
   width: 294px;
-  margin-bottom: 32px;
 `
 
 const VoteProposingRange = styled.input<{ isDisabled?: boolean }>`
