@@ -7,7 +7,6 @@ import { VoteType, voteTypes } from './../../constants/voteTypes'
 import { CurrentVoting } from '../../models/community'
 import { VoteGraphBar } from './VoteGraphBar'
 import { formatTimeLeft } from '../../helpers/fomatTimeLeft'
-
 export interface VoteChartProps {
   vote: CurrentVoting
   voteWinner?: number
@@ -51,7 +50,7 @@ export function VoteChart({
           <span>
             {' '}
             {isAnimation && proposingAmount && selectedVote && selectedVote.type === 0 ? (
-              <CountUp end={votesAgainst + proposingAmount} />
+              <CountUp end={votesAgainst + proposingAmount} separator="," />
             ) : (
               addCommas(votesAgainst)
             )}{' '}
@@ -66,7 +65,7 @@ export function VoteChart({
           <span>
             {' '}
             {isAnimation && proposingAmount && selectedVote && selectedVote.type === 1 ? (
-              <CountUp end={votesFor + proposingAmount} />
+              <CountUp end={votesFor + proposingAmount} separator="," />
             ) : (
               addCommas(votesFor)
             )}{' '}
