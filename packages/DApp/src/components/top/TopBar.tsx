@@ -89,6 +89,10 @@ const HeaderWrapper = styled.div`
   @media (max-width: 900px) {
     padding: 0 32px;
   }
+
+  @media (max-width: 650px) {
+    padding: 0 16px;
+  }
 `
 
 const MenuContent = styled.div`
@@ -128,6 +132,10 @@ const NavItem = styled.li`
   @media (max-width: 768px) {
     width: 80px;
   }
+
+  @media (max-width: 650px) {
+    width: 70px;
+  }
 `
 
 const StyledNavLink = styled(NavLink)`
@@ -161,6 +169,14 @@ const StyledNavLink = styled(NavLink)`
     @media (max-width: 768px) {
       width: 80px;
     }
+
+    @media (max-width: 650px) {
+      width: 70px;
+    }
+  }
+
+  @media (max-width: 650px) {
+    font-size: 15px;
   }
 `
 

@@ -73,10 +73,6 @@ const VoteGraph = styled.div<VoteGraphBarProps>`
       left: 50%;
     }
   }
-
-  @media (max-width: 768px) {
-    width: 420px;
-  }
 `
 
 const VoteGraphAgainst = styled.div<VoteGraphBarProps>`

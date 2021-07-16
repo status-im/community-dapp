@@ -123,6 +123,10 @@ const VoteBox = styled.div`
     font-weight: bold;
     margin-top: 8px;
   }
+
+  @media (max-width: 768px) {
+    min-width: 70px;
+  }
 `
 
 const TimeLeft = styled.div`
@@ -150,6 +154,7 @@ const VoteGraphBarWrap = styled.div`
   &.notModal {
     @media (max-width: 768px) {
       position: absolute;
+      width: 65%;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
