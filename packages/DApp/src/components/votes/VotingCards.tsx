@@ -10,6 +10,7 @@ import { Search } from '../Input'
 import { VotingSortingOptions } from '../../constants/SortingOptions'
 import { VotingCardSkeleton } from './VotingCardSkeleton'
 import { useVotingCommunities } from '../../hooks/useVotingCommunities'
+import { VotingEmpty } from './VotingEmpty'
 
 export function VotingCards() {
   const [sortedBy, setSortedBy] = useState(VotingSortingEnum.EndingSoonest)
@@ -52,7 +53,7 @@ export function VotingCards() {
           return <VotingCardSkeleton key={idx} />
         }
       })}
-      {roomsToShow.length === 0 && <div>No communities in Voting</div>}
+      {roomsToShow.length === 0 && <VotingEmpty />}
     </div>
   )
 }

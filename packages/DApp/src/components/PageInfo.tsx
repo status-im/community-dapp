@@ -26,6 +26,7 @@ const InfoHeading = styled.h1`
   line-height: 38px;
   letter-spacing: -0.4px;
   margin-bottom: 8px;
+  text-align: center;
 `
 
 const InfoText = styled.p`
