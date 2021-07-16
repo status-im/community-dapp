@@ -16,7 +16,7 @@ export function VotingCards() {
   const [sortedBy, setSortedBy] = useState(VotingSortingEnum.EndingSoonest)
   const [voteType, setVoteType] = useState('')
   const [filterKeyword, setFilterKeyword] = useState('')
-  const roomsToShow = useVotingCommunities(filterKeyword, voteType, sortedBy)
+  const { roomsToShow, empty } = useVotingCommunities(filterKeyword, voteType, sortedBy)
 
   return (
     <div>
@@ -53,7 +53,8 @@ export function VotingCards() {
           return <VotingCardSkeleton key={idx} />
         }
       })}
-      {roomsToShow.length === 0 && <VotingEmpty />}
+      {roomsToShow.length === 0 && empty && <VotingEmpty />}
+      {roomsToShow.length === 0 && !empty && <div>Community not found</div>}
     </div>
   )
 }

@@ -10,10 +10,10 @@ export function useVotingCommunities(
   filterKeyword: string,
   voteType: string,
   sortedBy: VotingSortingEnum
-): DetailedVotingRoom[] {
+): { roomsToShow: DetailedVotingRoom[]; empty: boolean } {
   const [roomsWithCommunity, setRoomsWithCommunity] = useState<any[]>([])
   const [filteredRooms, setFilteredRooms] = useState<any[]>([])
-
+  const [empty, setEmpty] = useState(false)
   const { votingContract } = useContracts()
   const [roomList] = useContractCall({
     abi: votingContract.interface,
@@ -21,6 +21,15 @@ export function useVotingCommunities(
     method: 'getActiveVotingRooms',
     args: [],
   }) ?? [[]]
+
+  useEffect(() => {
+    if (roomList.length === 0 && empty == false) {
+      setEmpty(true)
+    }
+    if (roomList.length > 0 && empty == true) {
+      setEmpty(false)
+    }
+  }, [JSON.stringify(roomList)])
 
   const contractCalls = roomList.map((el: any) => {
     return {
@@ -57,5 +66,5 @@ export function useVotingCommunities(
     setFilteredRooms(filteredRooms.sort(sortVotingFunction(sortedBy)))
   }, [roomsWithCommunity, filterKeyword, voteType, sortedBy])
 
-  return filteredRooms
+  return { roomsToShow: filteredRooms, empty }
 }
