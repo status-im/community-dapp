@@ -1,6 +1,6 @@
 import { expect, use } from 'chai'
 import { loadFixture, deployContract, MockProvider, solidity } from 'ethereum-waffle'
-import MockContract from '../build/MockContract.json'
+import VotingContract from '../build/VotingContract.json'
 import Directory from '../build/Directory.json'
 import { utils, BigNumber, Wallet, Contract } from 'ethers'
 
@@ -72,7 +72,7 @@ const voteAndFinalize = async (
 
 describe('Contract', () => {
   async function fixture([alice, firstAddress, secondAddress]: any[], provider: any) {
-    const contract = await deployContract(alice, MockContract)
+    const contract = await deployContract(alice, VotingContract)
     const directory = await deployContract(alice, Directory, [contract.address])
     await contract.setDirectory(directory.address)
     await provider.send('evm_mine', [Math.floor(Date.now() / 1000)])

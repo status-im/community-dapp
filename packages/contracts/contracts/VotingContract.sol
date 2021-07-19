@@ -4,7 +4,7 @@ import '@openzeppelin/contracts/utils/cryptography/ECDSA.sol';
 import '@openzeppelin/contracts/utils/math/SafeMath.sol';
 import './Directory.sol';
 
-contract MockContract {
+contract VotingContract {
     using ECDSA for bytes32;
     using SafeMath for uint256;
 
