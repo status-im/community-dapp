@@ -185,7 +185,8 @@ export const ButtonConnect = styled(ConnectButton)`
   width: auto;
 
   @media (max-width: 600px) {
-    padding: 3px 27px;
+    padding: 7px 27px;
+    margin-top: -9px;
   }
 `
 
@@ -204,6 +205,11 @@ export const Account = styled.button`
   border: 1px solid ${Colors.GrayBorder};
   border-radius: 21px;
   outline: none;
+
+  @media (max-width: 600px) {
+    padding: 7px 12px 7px 28px;
+    margin-top: -9px;
+  }
 
   &:focus,
   &:active {
@@ -234,7 +240,7 @@ export const ButtonDisconnect = styled.button`
   font-size: 15px;
   line-height: 22px;
   text-align: center;
-  padding: 12px 32px;
+  padding: 15px 32px;
   cursor: pointer;
   color: ${Colors.VioletDark};
   background: ${Colors.White};
