@@ -66,7 +66,7 @@ export function TopBar() {
   )
 }
 
-const Header = styled.header`
+export const Header = styled.header`
   position: fixed;
   top: 0;
   left: 0;
@@ -138,7 +138,7 @@ const NavItem = styled.li`
   }
 `
 
-const StyledNavLink = styled(NavLink)`
+export const StyledNavLink = styled(NavLink)`
   position: relative;
   color: ${Colors.Black};
   font-size: 17px;
@@ -180,16 +180,20 @@ const StyledNavLink = styled(NavLink)`
   }
 `
 
-const ButtonConnect = styled(ConnectButton)`
+export const ButtonConnect = styled(ConnectButton)`
   padding: 10px 27px;
   width: auto;
+
+  @media (max-width: 600px) {
+    padding: 3px 27px;
+  }
 `
 
-const AccountWrap = styled.div`
+export const AccountWrap = styled.div`
   position: relative;
 `
 
-const Account = styled.button`
+export const Account = styled.button`
   position: relative;
   font-weight: 500;
   font-size: 13px;
@@ -219,7 +223,7 @@ const Account = styled.button`
     border-radius: 50%;
   }
 `
-const ButtonDisconnect = styled.button`
+export const ButtonDisconnect = styled.button`
   position: absolute;
   top: calc(100% + 4px);
   right: 0;

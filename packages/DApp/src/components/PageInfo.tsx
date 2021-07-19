@@ -27,6 +27,11 @@ const InfoHeading = styled.h1`
   letter-spacing: -0.4px;
   margin-bottom: 8px;
   text-align: center;
+
+  @media (max-width: 600px) {
+    font-size: 22px;
+    line-height: 30px;
+  }
 `
 
 const InfoText = styled.p`
@@ -34,4 +39,10 @@ const InfoText = styled.p`
   text-align: center;
   line-height: 32px;
   margin-bottom: 24px;
+
+  @media (max-width: 600px) {
+    font-size: 13px;
+    line-height: 18px;
+    margin: 0 21px 8px 21px;
+  }
 `
