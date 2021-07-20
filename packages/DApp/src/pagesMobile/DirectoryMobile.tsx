@@ -1,16 +1,65 @@
-import React from 'react'
-import { DirectoryCards } from '../components/directory/DirectoryCards'
+import React, { useState } from 'react'
+import { DirectoryCard } from '../components/directory/DirectoryCards'
 import { TopBarMobile } from '../componentsMobile/TopBarMobile'
+import { useDirectoryCommunities } from '../hooks/useDirectoryCommunities'
+import { DirectorySortingEnum } from '../models/community'
+import styled from 'styled-components'
+import { Search } from '../components/Input'
+import { DirectorySortingOptions } from '../constants/SortingOptions'
+import { DirectoryCardSkeleton } from '../components/directory/DirectoryCardSkeleton'
+import { SearchEmpty } from '../components/SearchEmpty'
+import { WeeklyFeature } from '../components/WeeklyFeature'
+import { FilterList } from '../components/Filter'
 
 export function DirectoryMobile() {
+  const [filterKeyword, setFilterKeyword] = useState('')
+  const [sortedBy, setSortedBy] = useState(DirectorySortingEnum.IncludedRecently)
+  const communities = useDirectoryCommunities(filterKeyword, sortedBy)
   return (
     <div>
       <TopBarMobile
         heading="Current directory"
         text="Vote on your favourite communities being included in 
        Weekly Featured Communities"
-      />
-      <DirectoryCards />
+      >
+        <PageBar>
+          <Search
+            type="text"
+            placeholder="Search communities..."
+            value={filterKeyword}
+            onChange={(e) => setFilterKeyword(e.currentTarget.value)}
+          />
+          <FilterList value={sortedBy} setValue={setSortedBy} options={DirectorySortingOptions} />
+        </PageBar>
+      </TopBarMobile>
+      <WeeklyFeature endDate={new Date('07/26/2021')} />
+      <Voting>
+        {communities.map((community, idx) => {
+          if (community) {
+            return <DirectoryCard key={community.publicKey} community={community} />
+          } else {
+            return <DirectoryCardSkeleton key={idx} />
+          }
+        })}
+        {communities.length === 0 && <SearchEmpty />}
+      </Voting>
     </div>
   )
 }
+
+const Voting = styled.div`
+  padding-top: 176px;
+  display: flex;
+  flex-direction: column;
+`
+
+const PageBar = styled.div`
+  justify-content: space-between;
+  align-items: center;
+  display: flex;
+  width: 100%;
+  padding: 24px 0 16px;
+  background: #fff;
+  padding: 16px;
+  box-shadow: 0px 6px 6px -6px rgba(0, 0, 0, 0.15);
+`

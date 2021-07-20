@@ -11,7 +11,7 @@ export type VoteFilterProps = {
 export const VoteFilter = ({ voteType, setVoteType }: VoteFilterProps) => {
   return (
     <VoteFilterBlock>
-      <span>Vote types:</span>
+      <VoteFilterHeading>Vote types:</VoteFilterHeading>
       <VoteTypeWrapper>
         <VoteType className={voteType == '' ? 'selected' : 'notSelected'} onClick={() => setVoteType('')}>
           All
@@ -35,7 +35,13 @@ export const VoteFilterBlock = styled.div`
   color: ${Colors.VioletDark};
 
   @media (max-width: 900px) {
-    display: none;
+    width: 450px;
+    margin-top: 16px;
+  }
+
+  @media (max-width: 500px) {
+    justify-content: center;
+    width: 100%;
   }
 `
 
@@ -49,6 +55,12 @@ export const VoteTypeWrapper = styled.div`
 
   @media (max-width: 900px) {
     width: 343px;
+  }
+`
+
+const VoteFilterHeading = styled.span`
+  @media (max-width: 500px) {
+    display: none;
   }
 `
 

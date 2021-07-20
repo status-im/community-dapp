@@ -20,7 +20,7 @@ interface DirectoryCardProps {
   community: CommunityDetail
 }
 
-function DirectoryCard({ community }: DirectoryCardProps) {
+export function DirectoryCard({ community }: DirectoryCardProps) {
   const [customStyle, setCustomStyle] = useState(true)
 
   useEffect(() => {

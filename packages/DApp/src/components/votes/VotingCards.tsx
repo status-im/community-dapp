@@ -11,7 +11,6 @@ import { useVotingCommunities } from '../../hooks/useVotingCommunities'
 import { VotingEmpty } from './VotingEmpty'
 import { SearchEmpty } from '../SearchEmpty'
 import { VoteFilter } from './VoteFilter'
-import { VoteFilterMobile } from '../../componentsMobile/VoteFilterMobile'
 import { VotingCardMobile } from '../../componentsMobile/VotingCardMobile'
 
 export function VotingCards() {
@@ -49,7 +48,6 @@ export function VotingCards() {
             <VoteFilter voteType={voteType} setVoteType={setVoteType} />
             <FilterList value={sortedBy} setValue={setSortedBy} options={VotingSortingOptions} />
           </PageDesktopBar>
-          <VoteFilterMobile voteType={voteType} setVoteType={setVoteType} />
         </VoteBar>
       </PageBar>
       {roomsToShow.map((room: any, idx) => {

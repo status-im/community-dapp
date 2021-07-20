@@ -1,18 +1,40 @@
-import React from 'react'
+import React, { ReactNode, useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 import { Colors } from '../constants/styles'
-import { Header, StyledNavLink } from '../components/top/TopBar'
+import { StyledNavLink } from '../components/top/TopBar'
 import { PageInfo } from '../components/PageInfo'
 import { ConnectMobile } from './ConnectMobile'
 
 interface TopBarMobileProps {
   heading: string
   text: string
+  children?: ReactNode
 }
 
-export const TopBarMobile = ({ heading, text }: TopBarMobileProps) => {
+export const TopBarMobile = ({ heading, text, children }: TopBarMobileProps) => {
+  const scrollHeight = useRef(document.documentElement.scrollTop)
+  const [scrollingUp, setScrollingUp] = useState(0)
+
+  useEffect(() => {
+    const onScroll = () => {
+      const newScrollHeight = document.documentElement.scrollTop
+      setScrollingUp((prev) => {
+        const newPos = prev + scrollHeight.current - newScrollHeight
+
+        if (newPos > 0) return 0
+        if (newPos < -186) {
+          return -186
+        }
+        return newPos
+      })
+      scrollHeight.current = newScrollHeight
+    }
+    window.addEventListener('scroll', onScroll)
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
   return (
-    <HeaderMobile>
+    <HeaderMobile style={{ top: scrollingUp }}>
       <HeaderWrapperMobile>
         <ConnectMobile />
         <PageInfo heading={heading} text={text} />
@@ -31,13 +53,18 @@ export const TopBarMobile = ({ heading, text }: TopBarMobileProps) => {
           </NavLinks>
         </NavigationMobile>
       </HeaderWrapperMobile>
+      {children}
     </HeaderMobile>
   )
 }
 
-const HeaderMobile = styled(Header)`
-  height: 186px;
+const HeaderMobile = styled.header`
+  position: fixed;
+  width: 100%;
+  background-color: ${Colors.GrayLight};
 
+  z-index: 100;
+  height: 186px;
   @media (max-width: 340px) {
     height: 205px;
   }
@@ -46,15 +73,14 @@ const HeaderMobile = styled(Header)`
 const HeaderWrapperMobile = styled.div`
   display: flex;
   flex-direction: column;
+  border-bottom: 1px solid rgba(189, 93, 226, 0.15);
   width: 100%;
   height: 100%;
-  position: relative;
 `
 
 const NavigationMobile = styled.nav`
   width: 100%;
   height: 41px;
-  position: absolute;
   bottom: 0;
 `
 
@@ -82,7 +108,6 @@ const StyledNavLinkMobile = styled(StyledNavLink)`
     content: '';
     width: 100%;
     height: 2px;
-    position: absolute;
     bottom: 2px;
     left: 50%;
     transform: translateX(-50%);

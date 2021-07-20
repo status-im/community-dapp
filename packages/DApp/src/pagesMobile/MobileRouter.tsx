@@ -21,6 +21,7 @@ export const MobileRouter = () => (
 
 const PageContentMobile = styled.div`
   height: 100%;
-  padding: 196px 16px 16px;
+  padding: 0px 16px 16px;
+  padding-left: 0px;
   position: relative;
 `
