@@ -6,14 +6,13 @@ import { Input } from '../Input'
 import { VotePropose } from '../votes/VotePropose'
 import { Warning } from '../votes/VoteWarning'
 import { ConfirmBtn } from './VoteConfirmModal'
-import { useContractFunction } from '@usedapp/core'
+import { useContractCall, useContractFunction } from '@usedapp/core'
 import { useContracts } from '../../hooks/useContracts'
 import { CommunityDetail } from '../../models/community'
 import { CommunitySkeleton } from '../skeleton/CommunitySkeleton'
 import { useCommunityDetails } from '../../hooks/useCommunityDetails'
 import { ColumnFlexDiv } from '../../constants/styles'
 import { BigNumber } from 'ethers'
-import { timespan } from '../../helpers/timespan'
 
 interface PublicKeyInputProps {
   publicKey: string
@@ -50,15 +49,25 @@ export function ProposeModal({
 }: ProposeModalProps) {
   const [proposingAmount, setProposingAmount] = useState(0)
   const [publicKey, setPublicKey] = useState('')
+  const [communityInDirectory, setCommunityInDirectory] = useState(false)
+  const [communityUnderVote, setCommunityUnderVote] = useState(false)
   const loading = useCommunityDetails(publicKey, setCommunityFound)
-  const { votingContract } = useContracts()
+  const { votingContract, directoryContract } = useContracts()
   const { send, state } = useContractFunction(votingContract, 'initializeVotingRoom')
 
-  const lastVote =
-    communityFound && communityFound.votingHistory
-      ? communityFound.votingHistory[communityFound.votingHistory.length - 1]
-      : undefined
-  const lastVoteDate = lastVote ? lastVote.date : undefined
+  const [isCommunityInDirectory] = useContractCall({
+    abi: directoryContract.interface,
+    address: directoryContract.address,
+    method: 'isCommunityInDirectory',
+    args: [publicKey],
+  }) ?? [undefined]
+
+  const [isCommunityUnderVote] = useContractCall({
+    abi: votingContract.interface,
+    address: votingContract.address,
+    method: 'communityVotingId',
+    args: [publicKey],
+  }) ?? [undefined]
 
   useEffect(() => {
     if (state.status === 'Mining') {
@@ -66,12 +75,28 @@ export function ProposeModal({
     }
   }, [state])
 
+  useEffect(() => {
+    if (isCommunityInDirectory) {
+      setCommunityInDirectory(true)
+    } else {
+      setCommunityInDirectory(false)
+    }
+  }, [isCommunityInDirectory])
+
+  useEffect(() => {
+    if (isCommunityUnderVote && isCommunityUnderVote.toNumber() > 0) {
+      setCommunityUnderVote(true)
+    } else {
+      setCommunityUnderVote(false)
+    }
+  }, [isCommunityUnderVote?.toNumber()])
+
   return (
     <ColumnFlexDiv>
       <PublicKeyInput publicKey={publicKey} setPublicKey={setPublicKey} />
       <ProposingData>
         {communityFound ? <CardCommunity community={communityFound} /> : loading && publicKey && <CommunitySkeleton />}
-        {communityFound && !communityFound.validForAddition && (
+        {communityFound && (
           <WarningWrap>
             {communityFound.numberOfMembers < 42 && (
               <Warning
@@ -91,19 +116,13 @@ export function ProposeModal({
                 text={`${communityFound.name} is not registered in Ethereum Name Service. Only communities with ENS name can be included in the directory.`}
               />
             )}
-            {communityFound.directoryInfo && (
+            {communityInDirectory && (
               <Warning
                 icon="⚠️"
                 text={`${communityFound.name} is already in the communities directory! No need to start a new vote.`}
               />
             )}
-            {communityFound.currentVoting && (
-              <Warning
-                icon="⚠️"
-                text={`There’s already an ongoing vote to add ${communityFound.name} in the directory!`}
-              />
-            )}
-            {lastVoteDate && timespan(lastVoteDate) < 30 && (
+            {communityUnderVote && (
               <Warning
                 icon="⚠️"
                 text={`There’s already an ongoing vote to add ${communityFound.name} in the directory!`}
