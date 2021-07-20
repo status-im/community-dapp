@@ -14,6 +14,7 @@ import { useDirectoryCommunities } from '../../hooks/useDirectoryCommunities'
 import { useContracts } from '../../hooks/useContracts'
 import { useContractCall } from '@usedapp/core'
 import { votingFromRoom } from '../../helpers/voting'
+import { SearchEmpty } from '../SearchEmpty'
 
 interface DirectoryCardProps {
   community: CommunityDetail
@@ -108,7 +109,7 @@ export function DirectoryCards() {
             return <DirectoryCardSkeleton key={idx} />
           }
         })}
-        {communities.length === 0 && <div>No Communities in Directory</div>}
+        {communities.length === 0 && <SearchEmpty />}
       </Voting>
     </>
   )
