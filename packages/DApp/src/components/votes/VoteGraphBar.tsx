@@ -56,6 +56,10 @@ const VoteGraph = styled.div<VoteGraphBarProps>`
   border-left: 13px solid ${({ theme }) => (theme.voteWinner === 0 ? Colors.GrayDisabledLight : Colors.Orange)};
   border-right: 13px solid ${({ theme }) => (theme.voteWinner === 1 ? Colors.GrayDisabledLight : Colors.BlueBar)};
 
+  @media (max-width: 600px) {
+    height: 13px;
+  }
+
   &::before {
     content: '';
     width: 16px;
@@ -72,6 +76,10 @@ const VoteGraph = styled.div<VoteGraphBarProps>`
       height: 3px;
       left: 50%;
     }
+
+    @media (max-width: 768px) {
+      top: -4px;
+    }
   }
 `
 
@@ -83,6 +91,10 @@ const VoteGraphAgainst = styled.div<VoteGraphBarProps>`
   background-color: ${({ theme }) => (theme.voteWinner === 2 ? Colors.GrayDisabledLight : Colors.Orange)};
   transition: width 2s;
   z-index: 2;
+
+  @media (max-width: 600px) {
+    height: 13px;
+  }
 `
 
 const VoteBalance = styled.div`
@@ -93,4 +105,8 @@ const VoteBalance = styled.div`
   background-color: transparent;
   border-right: 2px solid ${Colors.VioletLight};
   z-index: 2;
+
+  @media (max-width: 600px) {
+    height: 13px;
+  }
 `

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import CountUp from 'react-countup'
 import styled from 'styled-components'
 import { Colors } from '../../constants/styles'
@@ -24,6 +24,21 @@ export function VoteChart({
   isAnimation,
   tabletMode,
 }: VoteChartProps) {
+  const [mobileVersion, setMobileVersion] = useState(false)
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 600) {
+        setMobileVersion(true)
+      } else {
+        setMobileVersion(false)
+      }
+    }
+    handleResize()
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
   const voteConstants = voteTypes[vote.type]
 
   const votesFor = vote.voteFor.toNumber()
@@ -40,11 +55,20 @@ export function VoteChart({
         : (100 * votesAgainst) / (voteSum + proposingAmount)
   }
 
+  const iconWinnerFont = mobileVersion ? '36px' : '42px'
+
   return (
     <Votes>
       <VotesChart className={selectedVote || tabletMode ? '' : 'notModal'}>
-        <VoteBox style={{ filter: voteWinner && voteWinner === 2 ? 'grayscale(1)' : 'none' }}>
-          <p style={{ fontSize: voteWinner === 1 ? '42px' : '24px', marginTop: voteWinner === 2 ? '18px' : '0' }}>
+        <VoteBox
+          style={{
+            filter: voteWinner && voteWinner === 2 ? 'grayscale(1)' : 'none',
+            textAlign: mobileVersion ? 'start' : 'center',
+          }}
+        >
+          <p
+            style={{ fontSize: voteWinner === 1 ? iconWinnerFont : '24px', marginTop: voteWinner === 2 ? '18px' : '0' }}
+          >
             {voteConstants.against.icon}
           </p>
           <span>
@@ -58,8 +82,15 @@ export function VoteChart({
           </span>
         </VoteBox>
         <TimeLeft className={selectedVote ? '' : 'notModal'}>{formatTimeLeft(vote.timeLeft)}</TimeLeft>
-        <VoteBox style={{ filter: voteWinner && voteWinner === 1 ? 'grayscale(1)' : 'none' }}>
-          <p style={{ fontSize: voteWinner === 2 ? '42px' : '24px', marginTop: voteWinner === 1 ? '18px' : '0' }}>
+        <VoteBox
+          style={{
+            filter: voteWinner && voteWinner === 1 ? 'grayscale(1)' : 'none',
+            textAlign: mobileVersion ? 'end' : 'center',
+          }}
+        >
+          <p
+            style={{ fontSize: voteWinner === 2 ? iconWinnerFont : '24px', marginTop: voteWinner === 1 ? '18px' : '0' }}
+          >
             {voteConstants.for.icon}
           </p>
           <span>
@@ -80,6 +111,7 @@ export function VoteChart({
           voteWinner={voteWinner}
           isAnimation={isAnimation}
         />
+        <TimeLeftMobile className={selectedVote ? '' : 'notModal'}>{formatTimeLeft(vote.timeLeft)}</TimeLeftMobile>
       </VoteGraphBarWrap>
     </Votes>
   )
@@ -91,6 +123,10 @@ const Votes = styled.div`
   margin-bottom: 32px;
   width: 100%;
   position: relative;
+
+  @media (max-width: 600px) {
+    margin-bottom: 0;
+  }
 `
 const VotesChart = styled.div`
   display: flex;
@@ -127,6 +163,10 @@ const VoteBox = styled.div`
   @media (max-width: 768px) {
     min-width: 70px;
   }
+
+  @media (max-width: 600px) {
+    min-width: unset;
+  }
 `
 
 const TimeLeft = styled.div`
@@ -143,6 +183,25 @@ const TimeLeft = styled.div`
     @media (max-width: 768px) {
       top: -16px;
     }
+
+    @media (max-width: 600px) {
+      top: unset;
+    }
+  }
+`
+
+const TimeLeftMobile = styled.div`
+  position: absolute;
+  bottom: -23px;
+  left: calc(50%);
+  transform: translateX(-50%);
+  font-size: 0;
+  line-height: 16px;
+  letter-spacing: 0.1px;
+  color: ${Colors.GreyText};
+
+  @media (max-width: 600px) {
+    font-size: 12px;
   }
 `
 
@@ -158,6 +217,10 @@ const VoteGraphBarWrap = styled.div`
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
+    }
+
+    @media (max-width: 600px) {
+      width: 70%;
     }
   }
 `

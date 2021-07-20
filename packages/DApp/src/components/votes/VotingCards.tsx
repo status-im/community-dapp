@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { VotingSortingEnum } from '../../models/community'
 import styled from 'styled-components'
 import { FilterList } from '../Filter'
@@ -12,12 +12,28 @@ import { VotingEmpty } from './VotingEmpty'
 import { SearchEmpty } from '../SearchEmpty'
 import { VoteFilter } from './VoteFilter'
 import { VoteFilterMobile } from '../../componentsMobile/VoteFilterMobile'
+import { VotingCardMobile } from '../../componentsMobile/VotingCardMobile'
 
 export function VotingCards() {
   const [sortedBy, setSortedBy] = useState(VotingSortingEnum.EndingSoonest)
   const [voteType, setVoteType] = useState('')
   const [filterKeyword, setFilterKeyword] = useState('')
   const { roomsToShow, empty } = useVotingCommunities(filterKeyword, voteType, sortedBy)
+
+  const [mobileVersion, setMobileVersion] = useState(false)
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 600) {
+        setMobileVersion(true)
+      } else {
+        setMobileVersion(false)
+      }
+    }
+    handleResize()
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   return (
     <div>
@@ -38,7 +54,7 @@ export function VotingCards() {
       </PageBar>
       {roomsToShow.map((room: any, idx) => {
         if (room?.details) {
-          return <VotingCard key={idx} room={room} />
+          return mobileVersion ? <VotingCardMobile key={idx} room={room} /> : <VotingCard key={idx} room={room} />
         } else {
           return <VotingCardSkeleton key={idx} />
         }

@@ -9,6 +9,8 @@ export const Card = styled.div`
   @media (max-width: 768px) {
     flex-direction: column;
     margin-top: 0;
+    padding: 16px 0;
+    border-top: 1px solid #e0e0e0;
   }
 `
 
@@ -27,6 +29,10 @@ export const CardCommunityWrap = styled.div`
     border: none;
     box-shadow: none;
     padding-bottom: 0;
+  }
+
+  @media (max-width: 600px) {
+    padding: 0;
   }
 `
 export const CardVoteWrap = styled.div`

@@ -130,6 +130,10 @@ export const CardCommunityBlock = styled.div`
 const Community = styled.div`
   display: flex;
   margin-bottom: 16px;
+
+  @media (max-width: 600px) {
+    margin-bottom: 0;
+  }
 `
 
 const CommunityInfo = styled.div`
@@ -224,6 +228,10 @@ export const CardLinks = styled.div`
 
   @media (max-width: 900px) {
     flex-wrap: wrap;
+  }
+
+  @media (max-width: 600px) {
+    display: none;
   }
 
   &.notModal {
