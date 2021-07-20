@@ -47,7 +47,6 @@ const PageBarPlaceholder = styled.div<PageBarPlaceholderProps>`
 const PageBarContainer = styled.div`
   display: flex;
   justify-content: space-between;
-  align-items: center;
   margin: 0 auto;
 `
 
@@ -64,7 +63,12 @@ const StyledPageBar = styled.div`
     box-shadow: 0px 6px 6px -6px rgba(0, 0, 0, 0.15);
 
     @media (max-width: 1024px) {
-      padding: 24px 24px 16px;
+      padding: 24px 32px 16px;
+    }
+
+    @media (max-width: 600px) {
+      top: 186px;
+      padding: 16px;
     }
 
     ${PageBarContainer} {

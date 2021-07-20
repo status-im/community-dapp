@@ -106,7 +106,6 @@ const RuleIcon = styled.p`
   font-size: 24px;
   line-height: 30px;
   margin-right: 16px;
-
 }
 
 `
@@ -116,6 +115,5 @@ const RuleText = styled.p`
 
   @media (max-width: 600px) {
     font-size: 13px;
-line-height: 18px;
-  
+    line-height: 18px;
 `

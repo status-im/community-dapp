@@ -31,7 +31,11 @@ export const FilterList = ({ value, setValue, options }: FilterListProps) => {
         <SelectTrigger>{options.find((option) => option.value === value)?.text}</SelectTrigger>
         <SelectOptions className={isOpened ? 'opened' : undefined}>
           {options.map((option, key) => (
-            <SelectOption key={key} onClick={() => setValue(option.value)}>
+            <SelectOption
+              className={option.value === value ? 'selected' : ''}
+              key={key}
+              onClick={() => setValue(option.value)}
+            >
               {option.text}
             </SelectOption>
           ))}
@@ -73,6 +77,11 @@ const SelectTrigger = styled.div`
   min-width: 167px;
   padding: 0 28px;
   box-sizing: border-box;
+
+  @media (max-width: 600px) {
+    font-size: 0;
+    min-width: unset;
+  }
 
   &::before {
     content: '';
@@ -136,5 +145,12 @@ const SelectOption = styled.span`
   &:hover {
     background: ${Colors.Violet};
     color: ${Colors.White};
+  }
+
+  &.selected {
+    @media (max-width: 600px) {
+      background: ${Colors.Violet};
+      color: ${Colors.White};
+    }
   }
 `
