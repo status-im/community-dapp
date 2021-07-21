@@ -5,6 +5,7 @@ import { CardCommunity } from '../components/card/CardCommunity'
 import voting from '../helpers/voting'
 import { getVotingWinner } from '../helpers/voting'
 import { VoteChart } from '../components/votes/VoteChart'
+import { useHistory } from 'react-router'
 
 interface VotingCardMobileProps {
   room: DetailedVotingRoom
@@ -13,8 +14,10 @@ interface VotingCardMobileProps {
 export function VotingCardMobile({ room }: VotingCardMobileProps) {
   const vote = voting.fromRoom(room)
   const winner = getVotingWinner(vote)
+  const history = useHistory()
+
   return (
-    <Card>
+    <Card onClick={() => history.push(`/votingRoom/${room.roomNumber.toString()}`)}>
       <CardCommunityWrap>
         {' '}
         <CardCommunity

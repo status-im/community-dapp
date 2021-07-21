@@ -14,6 +14,7 @@ module.exports = (env) => {
         output: {
             filename: 'index.[fullhash].js',
             path: path.join(__dirname, 'dist'),
+            publicPath: "/",
         },
         devtool: 'source-map',
         resolve: {

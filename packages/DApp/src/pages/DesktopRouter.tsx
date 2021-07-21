@@ -7,16 +7,16 @@ import { Votes } from './Votes'
 import { Info } from './Info'
 import { TopBar } from '../components/top/TopBar'
 
-export const DekstopRouter = () => (
+export const DesktopRouter = () => (
   <BrowserRouter>
     <TopBar />
     <PageContent>
       <Switch>
+        <Route exact path="/" render={() => <Redirect to="/votes" />} />
         <Route exact path="/votes" component={Votes} />
         <Route exact path="/directory" component={Directory} />
         <Route exact path="/info" component={Info} />
       </Switch>
-      <Redirect exact from="/" to="/votes" />
     </PageContent>
   </BrowserRouter>
 )
