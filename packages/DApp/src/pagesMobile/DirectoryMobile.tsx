@@ -21,6 +21,7 @@ export function DirectoryMobile() {
         heading="Current directory"
         text="Vote on your favourite communities being included in 
        Weekly Featured Communities"
+        type={1}
       >
         <PageBar>
           <Search
@@ -32,8 +33,8 @@ export function DirectoryMobile() {
           <FilterList value={sortedBy} setValue={setSortedBy} options={DirectorySortingOptions} />
         </PageBar>
       </TopBarMobile>
-      <WeeklyFeature endDate={new Date('07/26/2021')} />
       <Voting>
+        <WeeklyFeature endDate={new Date('07/26/2021')} />
         {communities.map((community, idx) => {
           if (community) {
             return <DirectoryCard key={community.publicKey} community={community} />
@@ -48,7 +49,14 @@ export function DirectoryMobile() {
 }
 
 const Voting = styled.div`
-  padding-top: 176px;
+  @media (max-width: 600px) {
+    padding-top: 256px;
+  }
+
+  @media (max-width: 556px) {
+    padding-top: 266px;
+  }
+
   display: flex;
   flex-direction: column;
 `

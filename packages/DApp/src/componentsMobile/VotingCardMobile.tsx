@@ -13,12 +13,15 @@ interface VotingCardMobileProps {
 export function VotingCardMobile({ room }: VotingCardMobileProps) {
   const vote = voting.fromRoom(room)
   const winner = getVotingWinner(vote)
-
   return (
     <Card>
       <CardCommunityWrap>
         {' '}
-        <CardCommunity community={room.details} customHeading={`Add ${room.details.name}?`} customStyle={true} />
+        <CardCommunity
+          community={room.details}
+          customHeading={`${room.voteType == 1 ? 'Add' : 'Remove'} ${room.details.name}?`}
+          customStyle={true}
+        />
       </CardCommunityWrap>
       <VoteChart vote={vote} voteWinner={winner} />
     </Card>

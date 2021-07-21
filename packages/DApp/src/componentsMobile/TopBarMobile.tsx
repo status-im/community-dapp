@@ -8,10 +8,11 @@ import { ConnectMobile } from './ConnectMobile'
 interface TopBarMobileProps {
   heading: string
   text: string
+  type: number
   children?: ReactNode
 }
 
-export const TopBarMobile = ({ heading, text, children }: TopBarMobileProps) => {
+export const TopBarMobile = ({ heading, text, children, type }: TopBarMobileProps) => {
   const scrollHeight = useRef(document.documentElement.scrollTop)
   const [scrollingUp, setScrollingUp] = useState(0)
 
@@ -22,6 +23,24 @@ export const TopBarMobile = ({ heading, text, children }: TopBarMobileProps) => 
         const newPos = prev + scrollHeight.current - newScrollHeight
 
         if (newPos > 0) return 0
+        if (type == 0) {
+          if (window.innerWidth < 340) {
+            if (newPos < -206) {
+              return -206
+            } else {
+              return newPos
+            }
+          }
+        }
+        if (type == 1) {
+          if (window.innerWidth > 554) {
+            if (newPos < -169) {
+              return -169
+            } else {
+              return newPos
+            }
+          }
+        }
         if (newPos < -186) {
           return -186
         }
@@ -62,7 +81,7 @@ const HeaderMobile = styled.header`
   position: fixed;
   width: 100%;
   background-color: ${Colors.GrayLight};
-
+  left: 0px;
   z-index: 100;
   height: 186px;
   @media (max-width: 340px) {
@@ -75,7 +94,6 @@ const HeaderWrapperMobile = styled.div`
   flex-direction: column;
   border-bottom: 1px solid rgba(189, 93, 226, 0.15);
   width: 100%;
-  height: 100%;
 `
 
 const NavigationMobile = styled.nav`

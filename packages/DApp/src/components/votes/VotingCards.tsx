@@ -11,7 +11,6 @@ import { useVotingCommunities } from '../../hooks/useVotingCommunities'
 import { VotingEmpty } from './VotingEmpty'
 import { SearchEmpty } from '../SearchEmpty'
 import { VoteFilter } from './VoteFilter'
-import { VotingCardMobile } from '../../componentsMobile/VotingCardMobile'
 
 export function VotingCards() {
   const [sortedBy, setSortedBy] = useState(VotingSortingEnum.EndingSoonest)
@@ -23,7 +22,7 @@ export function VotingCards() {
 
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth < 600) {
+      if (window.innerWidth < 900) {
         setMobileVersion(true)
       } else {
         setMobileVersion(false)
@@ -45,14 +44,15 @@ export function VotingCards() {
               value={filterKeyword}
               onChange={(e) => setFilterKeyword(e.currentTarget.value)}
             />
-            <VoteFilter voteType={voteType} setVoteType={setVoteType} />
+            {!mobileVersion && <VoteFilter voteType={voteType} setVoteType={setVoteType} />}
             <FilterList value={sortedBy} setValue={setSortedBy} options={VotingSortingOptions} />
           </PageDesktopBar>
+          {mobileVersion && <VoteFilter voteType={voteType} setVoteType={setVoteType} />}
         </VoteBar>
       </PageBar>
       {roomsToShow.map((room: any, idx) => {
         if (room?.details) {
-          return mobileVersion ? <VotingCardMobile key={idx} room={room} /> : <VotingCard key={idx} room={room} />
+          return <VotingCard key={idx} room={room} />
         } else {
           return <VotingCardSkeleton key={idx} />
         }

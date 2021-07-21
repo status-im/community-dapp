@@ -3,7 +3,6 @@ import { FilterList } from '../components/Filter'
 import { Search } from '../components/Input'
 import { SearchEmpty } from '../components/SearchEmpty'
 import { VoteFilter } from '../components/votes/VoteFilter'
-import { VotingCard } from '../components/votes/VotingCard'
 import { VotingEmpty } from '../components/votes/VotingEmpty'
 import { TopBarMobile } from '../componentsMobile/TopBarMobile'
 import { useVotingCommunities } from '../hooks/useVotingCommunities'
@@ -11,6 +10,7 @@ import { VotingSortingEnum } from '../models/community'
 import styled from 'styled-components'
 import { VotingCardSkeleton } from '../components/votes/VotingCardSkeleton'
 import { VotingSortingOptions } from '../constants/SortingOptions'
+import { VotingCardMobile } from '../componentsMobile/VotingCardMobile'
 
 export function VotesMobile() {
   const [sortedBy, setSortedBy] = useState(VotingSortingEnum.EndingSoonest)
@@ -23,6 +23,7 @@ export function VotesMobile() {
       <TopBarMobile
         heading="Ongoing Votes"
         text="Help curate the Status Communities directory by voting which communities should be included"
+        type={0}
       >
         <VoteBar>
           <PageDesktopBar>
@@ -40,7 +41,7 @@ export function VotesMobile() {
       <VotingCardsWrapper>
         {roomsToShow.map((room: any, idx) => {
           if (room?.details) {
-            return <VotingCard key={idx} room={room} />
+            return <VotingCardMobile key={idx} room={room} />
           } else {
             return <VotingCardSkeleton key={idx} />
           }
@@ -53,7 +54,10 @@ export function VotesMobile() {
 }
 
 const VotingCardsWrapper = styled.div`
-  padding-top: 310px;
+  padding-top: 307px;
+  @media (max-width: 340px) {
+    padding-top: 320px;
+  }
 `
 const PageDesktopBar = styled.div`
   display: flex;
