@@ -102,6 +102,10 @@ const FeatureBottom = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+
+  @media (max-width: 600px) {
+    display: none;
+  }
 `
 
 const FeatureIcon = styled.p`
@@ -111,6 +115,10 @@ const FeatureIcon = styled.p`
 
 const FeatureBtn = styled(VoteBtn)`
   width: 100%;
+
+  @media (max-width: 600px) {
+    display: none;
+  }
 `
 const FeatureVote = styled(ColumnFlexDiv)`
   margin: 32px auto;
@@ -127,7 +135,6 @@ const FeatureVote = styled(ColumnFlexDiv)`
     display: none;
   }
 `
-
 const FeatureVoteMobile = styled(ColumnFlexDiv)`
   display: none;
   text-align: center;
@@ -136,6 +143,10 @@ const FeatureVoteMobile = styled(ColumnFlexDiv)`
 
   @media (max-width: 768px) {
     display: flex;
+  }
+
+  @media (max-width: 600px) {
+    margin: 0;
   }
 `
 

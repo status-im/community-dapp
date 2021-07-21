@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { DirectoryCard } from '../components/directory/DirectoryCards'
+import { DirectoryCard } from '../components/directory/DirectoryCard'
 import { TopBarMobile } from '../componentsMobile/TopBarMobile'
 import { useDirectoryCommunities } from '../hooks/useDirectoryCommunities'
 import { DirectorySortingEnum } from '../models/community'

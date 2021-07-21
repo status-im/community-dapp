@@ -12,6 +12,12 @@ export const Card = styled.div`
     padding: 16px 0;
     border-top: 1px solid #e0e0e0;
   }
+
+  &:last-child {
+    @media (max-width: 768px) {
+      border-bottom: 1px solid #e0e0e0;
+    }
+  }
 `
 
 export const CardCommunityWrap = styled.div`
@@ -51,6 +57,11 @@ export const CardVoteWrap = styled.div`
     border-radius: unset;
     border-bottom: 1px solid #e0e0e0;
     background-color: unset;
+  }
+
+  @media (max-width: 768px) {
+    padding: 16px 0 0;
+    border-bottom: none;
   }
 `
 export const CardVoteBlock = styled.div`
