@@ -76,7 +76,9 @@ export async function createWakuMessage(
         nonce: 1,
         sessionID: room,
       }),
-      topic + room.toString()
+      {
+        contentTopic: topic + room.toString(),
+      }
     )
     return msg
   }
