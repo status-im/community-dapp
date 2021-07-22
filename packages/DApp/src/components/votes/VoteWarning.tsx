@@ -25,6 +25,10 @@ const VoteWarning = styled.div`
   border-radius: 6px;
   margin-top: 32px;
 
+  @media (max-width: 600px) {
+    margin-top: 0;
+  }
+
   & > span {
     font-size: 24px;
     line-height: 32px;
@@ -36,4 +40,9 @@ const WarningText = styled.div`
   font-size: 12px;
   line-height: 16px;
   letter-spacing: 0.1px;
+
+  @media (max-width: 600px) {
+    margin-left: 10px;
+    max-width: 100%;
+  }
 `

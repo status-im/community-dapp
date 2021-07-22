@@ -20,6 +20,7 @@ import { useContracts } from '../hooks/useContracts'
 import { DetailedVotingRoom } from '../models/smartContract'
 import arrowDown from '../assets/images/arrowDown.svg'
 import { useSendWakuVote } from '../hooks/useSendWakuVote'
+import { WrapperBottom, WrapperTop } from '../constants/styles'
 
 interface CardVoteMobileProps {
   room: DetailedVotingRoom
@@ -44,7 +45,7 @@ export const CardVoteMobile = ({ room }: CardVoteMobileProps) => {
   const initialProposing = vote?.type === 'Remove' && availableAmount > 2000000 ? 2000000 : 0
   const [proposingAmount, setProposingAmount] = useState(initialProposing)
 
-  const [showHistoryModal, setShowHistoryModal] = useState(false)
+  const [showHistory, setShowHistory] = useState(false)
   const isDisabled = room.details.votingHistory.length === 0
   const sendWakuVote = useSendWakuVote()
 
@@ -63,9 +64,9 @@ export const CardVoteMobile = ({ room }: CardVoteMobileProps) => {
         <CardHeadingMobile>{voteConstants.question}</CardHeadingMobile>
       )}
       <div>
-        <Wrapper>
+        <WrapperBottom>
           <VoteChart vote={vote} voteWinner={winner} isAnimation={true} />
-        </Wrapper>
+        </WrapperBottom>
         {!winner && (
           <WrapperTop>
             <VotePropose
@@ -97,15 +98,15 @@ export const CardVoteMobile = ({ room }: CardVoteMobileProps) => {
       </div>
       {!isDisabled && (
         <HistoryLink
-          className={showHistoryModal ? 'opened' : ''}
-          onClick={() => setShowHistoryModal(!showHistoryModal)}
+          className={showHistory ? 'opened' : ''}
+          onClick={() => setShowHistory(!showHistory)}
           disabled={isDisabled}
         >
           Voting history
         </HistoryLink>
       )}
 
-      {showHistoryModal && (
+      {showHistory && (
         <VoteHistoryTable>
           <tbody>
             <tr>
@@ -142,15 +143,7 @@ const CardVoteBottom = styled.div`
   align-items: center;
 `
 
-const Wrapper = styled.div`
-  margin-bottom: 24px;
-`
-
-const WrapperTop = styled.div`
-  margin-top: 32px;
-`
-
-const HistoryLink = styled(LinkInternal)`
+export const HistoryLink = styled(LinkInternal)`
   width: 120px;
   position: relative;
   margin: 24px 0;

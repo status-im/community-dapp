@@ -60,12 +60,15 @@ export function VotesMobile() {
 
 const ProposeButton = styled(ButtonPrimary)`
   margin: auto;
+  width: 100%;
+  padding: 10px 0;
+  text-align: center;
 `
 const ProposeButtonWrapper = styled.div`
   display: flex;
   position: fixed;
-  bottom: 10px;
-  left: 0px;
+  padding: 0 16px;
+  bottom: 15px;
   width: 100%;
 `
 

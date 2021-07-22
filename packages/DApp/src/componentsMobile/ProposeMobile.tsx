@@ -1,18 +1,28 @@
 import { useContractFunction } from '@usedapp/core'
 import React, { useState } from 'react'
 import styled from 'styled-components'
-import { CardCommunity } from '../components/card/CardCommunity'
+import {
+  CardCommunity,
+  VoteHistoryTable,
+  VoteHistoryTableCell,
+  VoteHistoryTableColumnCell,
+  VoteHistoryTableColumnCellDate,
+} from '../components/card/CardCommunity'
 import { PublicKeyInput } from '../components/PublicKeyInput'
 import { CommunitySkeleton } from '../components/skeleton/CommunitySkeleton'
 import { VotePropose } from '../components/votes/VotePropose'
 import { Warning } from '../components/votes/VoteWarning'
-import { ColumnFlexDiv } from '../constants/styles'
+import { ColumnFlexDiv, WrapperTopSmall } from '../constants/styles'
 import { useCommunityDetails } from '../hooks/useCommunityDetails'
 import { useContracts } from '../hooks/useContracts'
 import { useProposeWarning } from '../hooks/useProposeWarning'
 import { CommunityDetail } from '../models/community'
 import { BigNumber } from 'ethers'
 import { ButtonPrimary } from '../components/Button'
+import { HeaderVotingMobile } from './VotingMobile'
+import { ConnectMobile } from './ConnectMobile'
+import { InfoText, ProposingInfo, VoteProposeWrap, WarningWrap } from '../components/card/ProposeModal'
+import { HistoryLink } from './CardVoteMobile'
 
 export function ProposeMobile() {
   const availableAmount = 60000000
@@ -25,14 +35,36 @@ export function ProposeMobile() {
 
   const warning = useProposeWarning(communityFound, availableAmount)
 
+  const [showHistory, setShowHistory] = useState(false)
+  const isDisabled = communityFound ? communityFound.votingHistory.length === 0 : false
+
   return (
     <ColumnFlexDiv>
-      <PublicKeyInput publicKey={publicKey} setPublicKey={setPublicKey} />
+      <HeaderVotingMobile>
+        <ConnectMobile />
+        <ProposingTop>
+          <ProposingHeading>Add community to directory</ProposingHeading>
+          <PublicKeyInput publicKey={publicKey} setPublicKey={setPublicKey} />
+          {communityFound ? (
+            <WrapperTopSmall>
+              <CardCommunity community={communityFound} />
+            </WrapperTopSmall>
+          ) : (
+            loading &&
+            publicKey && (
+              <WrapperTopSmall>
+                <CommunitySkeleton />
+              </WrapperTopSmall>
+            )
+          )}
+        </ProposingTop>
+      </HeaderVotingMobile>
+
       <ProposingData>
-        {communityFound ? <CardCommunity community={communityFound} /> : loading && publicKey && <CommunitySkeleton />}
         <WarningWrap>{warning.text && <Warning icon={warning.icon} text={warning.text} />}</WarningWrap>
         {communityFound && communityFound.validForAddition && publicKey && (
           <VoteProposeWrap>
+            <ProposingHeadingMobile>{` Add ${communityFound.name}?`}</ProposingHeadingMobile>
             <VotePropose
               availableAmount={availableAmount}
               setProposingAmount={setProposingAmount}
@@ -48,47 +80,75 @@ export function ProposeMobile() {
           </ProposingInfo>
         )}
       </ProposingData>
-      <ProposingBtn
-        disabled={!communityFound || !proposingAmount || !!warning.text}
-        onClick={() => send(1, publicKey, BigNumber.from(proposingAmount))}
-      >
-        Confirm vote to add community
-      </ProposingBtn>
+      {communityFound && communityFound.validForAddition && (
+        <ProposingBtn
+          disabled={!communityFound || !proposingAmount || !!warning.text}
+          onClick={() => send(1, publicKey, BigNumber.from(proposingAmount))}
+        >
+          Confirm vote to add community
+        </ProposingBtn>
+      )}
+      <HistoryWrap>
+        {!isDisabled && communityFound && (
+          <HistoryLink
+            className={showHistory ? 'opened' : ''}
+            onClick={() => setShowHistory(!showHistory)}
+            disabled={isDisabled}
+          >
+            Voting history
+          </HistoryLink>
+        )}
+        {showHistory && communityFound && (
+          <VoteHistoryTable>
+            <tbody>
+              <tr>
+                <VoteHistoryTableColumnCellDate>Date</VoteHistoryTableColumnCellDate>
+                <VoteHistoryTableColumnCell>Type</VoteHistoryTableColumnCell>
+                <VoteHistoryTableColumnCell>Result</VoteHistoryTableColumnCell>
+              </tr>
+              {communityFound.votingHistory.map((vote) => {
+                return (
+                  <tr key={vote.ID}>
+                    <VoteHistoryTableCell>{vote.date.toLocaleDateString()}</VoteHistoryTableCell>
+                    <VoteHistoryTableCell>{vote.type}</VoteHistoryTableCell>
+                    <VoteHistoryTableCell>{vote.result}</VoteHistoryTableCell>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </VoteHistoryTable>
+        )}
+      </HistoryWrap>
     </ColumnFlexDiv>
   )
 }
 
-const VoteProposeWrap = styled.div`
-  margin-top: 32px;
+const ProposingTop = styled.div`
+  padding: 0 16px;
+`
+
+const ProposingHeading = styled.h2`
+  margin-bottom: 8px;
+  font-weight: bold;
+  font-size: 17px;
+  line-height: 24px;
+`
+
+const ProposingHeadingMobile = styled(ProposingHeading)`
+  margin-bottom: 16px;
 `
 
 const ProposingData = styled.div`
   width: 100%;
-`
-
-const ProposingInfo = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-
-  & > span {
-    font-size: 24px;
-    line-height: 32px;
-    margin-right: 16px;
-  }
-`
-
-const InfoText = styled.div`
-  font-size: 12px;
-  line-height: 16px;
-  letter-spacing: 0.1px;
+  padding: 16px;
 `
 
 const ProposingBtn = styled(ButtonPrimary)`
-  width: 100%;
-  padding: 11px 0;
-  margin-top: 32px;
+  width: calc(100% - 32px);
+  padding: 10px 0;
 `
-const WarningWrap = styled.div`
-  margin: 24px 0;
+const HistoryWrap = styled.div`
+  width: 100%;
+  padding: 0 16px;
+  align-self: flex-start;
 `

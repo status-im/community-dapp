@@ -10,7 +10,7 @@ import { useContracts } from '../../hooks/useContracts'
 import { CommunityDetail } from '../../models/community'
 import { CommunitySkeleton } from '../skeleton/CommunitySkeleton'
 import { useCommunityDetails } from '../../hooks/useCommunityDetails'
-import { ColumnFlexDiv } from '../../constants/styles'
+import { ColumnFlexDiv, WrapperBottomMid } from '../../constants/styles'
 import { BigNumber } from 'ethers'
 import { useProposeWarning } from '../../hooks/useProposeWarning'
 import { PublicKeyInput } from '../PublicKeyInput'
@@ -44,7 +44,10 @@ export function ProposeModal({
 
   return (
     <ColumnFlexDiv>
-      <PublicKeyInput publicKey={publicKey} setPublicKey={setPublicKey} />
+      <WrapperBottomMid>
+        <PublicKeyInput publicKey={publicKey} setPublicKey={setPublicKey} />
+      </WrapperBottomMid>
+
       <ProposingData>
         {communityFound ? <CardCommunity community={communityFound} /> : loading && publicKey && <CommunitySkeleton />}
         <WarningWrap>{warning.text && <Warning icon={warning.icon} text={warning.text} />}</WarningWrap>
@@ -82,15 +85,19 @@ export function ProposeModal({
   )
 }
 
-const VoteProposeWrap = styled.div`
+export const VoteProposeWrap = styled.div`
   margin-top: 32px;
+
+  @media (max-width: 600px) {
+    margin-top: 0;
+  }
 `
 
 const ProposingData = styled.div`
   width: 100%;
 `
 
-const ProposingInfo = styled.div`
+export const ProposingInfo = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -102,7 +109,7 @@ const ProposingInfo = styled.div`
   }
 `
 
-const InfoText = styled.div`
+export const InfoText = styled.div`
   font-size: 12px;
   line-height: 16px;
   letter-spacing: 0.1px;
@@ -113,6 +120,6 @@ const ProposingBtn = styled(ButtonPrimary)`
   padding: 11px 0;
   margin-top: 32px;
 `
-const WarningWrap = styled.div`
-  margin: 24px 0;
+export const WarningWrap = styled.div`
+  margin: 0;
 `

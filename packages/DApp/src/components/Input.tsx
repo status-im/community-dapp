@@ -16,6 +16,10 @@ export const Input = styled.input`
     border: 1px solid ${Colors.Violet};
     caret-color: ${Colors.Violet};
   }
+
+  @media (max-width: 600px) {
+    max-width: 100%;
+  }
 `
 
 export const Search = styled(Input)`

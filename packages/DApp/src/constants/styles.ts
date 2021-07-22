@@ -30,3 +30,19 @@ export const ColumnFlexDiv = styled.div`
   flex-direction: column;
   align-items: center;
 `
+
+export const WrapperBottom = styled.div`
+  margin-bottom: 24px;
+`
+
+export const WrapperBottomMid = styled.div`
+  margin-bottom: 32px;
+  width: 100%;
+`
+
+export const WrapperTopSmall = styled.div`
+  margin-top: 16px;
+`
+export const WrapperTop = styled.div`
+  margin-top: 32px;
+`

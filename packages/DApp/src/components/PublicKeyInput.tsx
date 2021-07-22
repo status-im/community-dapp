@@ -25,7 +25,6 @@ export function PublicKeyInput({ publicKey, setPublicKey }: PublicKeyInputProps)
 const CommunityKey = styled(Input)`
   width: 100%;
   margin-top: 10px;
-  margin-bottom: 32px;
   font-size: 15px;
   line-height: 22px;
 `

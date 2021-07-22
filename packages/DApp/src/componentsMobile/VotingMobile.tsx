@@ -33,7 +33,7 @@ export const VotingMobile = ({ room }: VotingMobileProps) => {
 const TopVoting = styled.div`
   height: 100%;
 `
-const HeaderVotingMobile = styled(HeaderWrapperMobile)`
+export const HeaderVotingMobile = styled(HeaderWrapperMobile)`
   background-color: ${Colors.GrayLight};
   padding-bottom: 12px;
 `
