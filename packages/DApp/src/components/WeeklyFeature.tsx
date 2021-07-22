@@ -11,9 +11,9 @@ export const WeeklyFeature = ({ endDate }: { endDate: Date }) => {
 
   return (
     <View>
-      ⭐ <span>Weekly Feature vote:</span>
+      ⭐ <span>Weekly Feature vote {window.innerWidth < 600 ? 'ends' : ''}:</span>
       {daysLeft}&nbsp;
-      {daysLeft.toString().endsWith('1') ? 'day ' : ' days'} left
+      {daysLeft.toString().endsWith('1') ? 'day ' : ' days'} {window.innerWidth < 600 ? '' : 'left'}
     </View>
   )
 }
@@ -31,9 +31,23 @@ const View = styled.div`
   text-align: center;
   color: ${Colors.White};
 
+  @media (max-width: 600px) {
+    padding: 16px 30px;
+    font-size: 15px;
+    line-height: 22px;
+  }
+
+  @media (max-width: 365px) {
+    padding: 9px;
+  }
+
   span {
     font-weight: 400;
     margin: 0 6px 0 8px;
     color: rgba(255, 255, 255, 0.5);
+
+    @media (max-width: 365px) {
+      margin: 0 5px;
+    }
   }
 `
