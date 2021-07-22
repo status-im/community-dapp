@@ -11,13 +11,15 @@ import styled from 'styled-components'
 import { VotingCardSkeleton } from '../components/votes/VotingCardSkeleton'
 import { VotingSortingOptions } from '../constants/SortingOptions'
 import { VotingCardCover } from '../componentsMobile/VotingCardCover'
+import { ButtonPrimary } from '../components/Button'
+import { useHistory } from 'react-router'
 
 export function VotesMobile() {
   const [sortedBy, setSortedBy] = useState(VotingSortingEnum.EndingSoonest)
   const [voteType, setVoteType] = useState('')
   const [filterKeyword, setFilterKeyword] = useState('')
   const { roomsToShow, empty } = useVotingCommunities(filterKeyword, voteType, sortedBy)
-
+  const history = useHistory()
   return (
     <div>
       <TopBarMobile
@@ -49,9 +51,23 @@ export function VotesMobile() {
         {roomsToShow.length === 0 && empty && <VotingEmpty />}
         {roomsToShow.length === 0 && !empty && <SearchEmpty />}
       </VotingCardsWrapper>
+      <ProposeButtonWrapper>
+        <ProposeButton onClick={() => history.push('/propose')}>Propose community</ProposeButton>
+      </ProposeButtonWrapper>
     </div>
   )
 }
+
+const ProposeButton = styled(ButtonPrimary)`
+  margin: auto;
+`
+const ProposeButtonWrapper = styled.div`
+  display: flex;
+  position: fixed;
+  bottom: 10px;
+  left: 0px;
+  width: 100%;
+`
 
 const VotingCardsWrapper = styled.div`
   padding: 307px 16px 16px;

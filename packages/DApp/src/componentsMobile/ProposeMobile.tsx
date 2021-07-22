@@ -1,46 +1,29 @@
-import React, { useEffect, useState } from 'react'
-import styled from 'styled-components'
-import { ButtonPrimary } from '../Button'
-import { CardCommunity } from './CardCommunity'
-import { VotePropose } from '../votes/VotePropose'
-import { Warning } from '../votes/VoteWarning'
-import { ConfirmBtn } from './VoteConfirmModal'
 import { useContractFunction } from '@usedapp/core'
-import { useContracts } from '../../hooks/useContracts'
-import { CommunityDetail } from '../../models/community'
-import { CommunitySkeleton } from '../skeleton/CommunitySkeleton'
-import { useCommunityDetails } from '../../hooks/useCommunityDetails'
-import { ColumnFlexDiv } from '../../constants/styles'
+import React, { useState } from 'react'
+import styled from 'styled-components'
+import { CardCommunity } from '../components/card/CardCommunity'
+import { PublicKeyInput } from '../components/PublicKeyInput'
+import { CommunitySkeleton } from '../components/skeleton/CommunitySkeleton'
+import { VotePropose } from '../components/votes/VotePropose'
+import { Warning } from '../components/votes/VoteWarning'
+import { ColumnFlexDiv } from '../constants/styles'
+import { useCommunityDetails } from '../hooks/useCommunityDetails'
+import { useContracts } from '../hooks/useContracts'
+import { useProposeWarning } from '../hooks/useProposeWarning'
+import { CommunityDetail } from '../models/community'
 import { BigNumber } from 'ethers'
-import { useProposeWarning } from '../../hooks/useProposeWarning'
-import { PublicKeyInput } from '../PublicKeyInput'
+import { ButtonPrimary } from '../components/Button'
 
-interface ProposeModalProps {
-  availableAmount: number
-  setShowConfirmModal: (val: boolean) => void
-  setCommunityFound: (community: CommunityDetail | undefined) => void
-  communityFound: CommunityDetail | undefined
-}
-
-export function ProposeModal({
-  availableAmount,
-  setShowConfirmModal,
-  setCommunityFound,
-  communityFound,
-}: ProposeModalProps) {
+export function ProposeMobile() {
+  const availableAmount = 60000000
   const [proposingAmount, setProposingAmount] = useState(0)
+  const [communityFound, setCommunityFound] = useState<CommunityDetail | undefined>(undefined)
   const [publicKey, setPublicKey] = useState('')
   const loading = useCommunityDetails(publicKey, setCommunityFound)
   const { votingContract } = useContracts()
-  const { send, state } = useContractFunction(votingContract, 'initializeVotingRoom')
+  const { send } = useContractFunction(votingContract, 'initializeVotingRoom')
 
   const warning = useProposeWarning(communityFound, availableAmount)
-
-  useEffect(() => {
-    if (state.status === 'Mining') {
-      setShowConfirmModal(true)
-    }
-  }, [state])
 
   return (
     <ColumnFlexDiv>
@@ -65,19 +48,12 @@ export function ProposeModal({
           </ProposingInfo>
         )}
       </ProposingData>
-
-      {communityFound && !communityFound.validForAddition ? (
-        <ConfirmBtn onClick={() => setShowConfirmModal(false)}>
-          OK, let’s move on! <span>🤙</span>
-        </ConfirmBtn>
-      ) : (
-        <ProposingBtn
-          disabled={!communityFound || !proposingAmount || !!warning.text}
-          onClick={() => send(1, publicKey, BigNumber.from(proposingAmount))}
-        >
-          Confirm vote to add community
-        </ProposingBtn>
-      )}
+      <ProposingBtn
+        disabled={!communityFound || !proposingAmount || !!warning.text}
+        onClick={() => send(1, publicKey, BigNumber.from(proposingAmount))}
+      >
+        Confirm vote to add community
+      </ProposingBtn>
     </ColumnFlexDiv>
   )
 }
