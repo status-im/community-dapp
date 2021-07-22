@@ -19,6 +19,7 @@ import voting, { getVotingWinner } from '../helpers/voting'
 import { useContracts } from '../hooks/useContracts'
 import { DetailedVotingRoom } from '../models/smartContract'
 import arrowDown from '../assets/images/arrowDown.svg'
+import { useSendWakuVote } from '../hooks/useSendWakuVote'
 
 interface CardVoteMobileProps {
   room: DetailedVotingRoom
@@ -45,6 +46,7 @@ export const CardVoteMobile = ({ room }: CardVoteMobileProps) => {
 
   const [showHistoryModal, setShowHistoryModal] = useState(false)
   const isDisabled = room.details.votingHistory.length === 0
+  const sendWakuVote = useSendWakuVote()
 
   if (!vote) {
     return <CardVoteBlock />
@@ -82,10 +84,10 @@ export const CardVoteMobile = ({ room }: CardVoteMobileProps) => {
           </VoteBtnFinal>
         ) : (
           <VotesBtns>
-            <VoteBtn disabled={!account}>
+            <VoteBtn disabled={!account} onClick={() => sendWakuVote(proposingAmount, room.roomNumber, 0)}>
               {voteConstants.against.text} <span>{voteConstants.against.icon}</span>
             </VoteBtn>
-            <VoteBtn disabled={!account}>
+            <VoteBtn disabled={!account} onClick={() => sendWakuVote(proposingAmount, room.roomNumber, 1)}>
               {voteConstants.for.text} <span>{voteConstants.for.icon}</span>
             </VoteBtn>
           </VotesBtns>
