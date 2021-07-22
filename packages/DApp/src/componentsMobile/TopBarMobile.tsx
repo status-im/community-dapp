@@ -84,12 +84,13 @@ const HeaderMobile = styled.header`
   left: 0px;
   z-index: 100;
   height: 186px;
+
   @media (max-width: 340px) {
     height: 205px;
   }
 `
 
-const HeaderWrapperMobile = styled.div`
+export const HeaderWrapperMobile = styled.div`
   display: flex;
   flex-direction: column;
   border-bottom: 1px solid rgba(189, 93, 226, 0.15);

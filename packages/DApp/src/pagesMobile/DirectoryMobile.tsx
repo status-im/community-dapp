@@ -49,9 +49,7 @@ export function DirectoryMobile() {
 }
 
 const Voting = styled.div`
-  @media (max-width: 600px) {
-    padding-top: 256px;
-  }
+  padding: 256px 16px 16px;
 
   @media (max-width: 556px) {
     padding-top: 266px;

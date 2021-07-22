@@ -1,13 +1,11 @@
 import { useContractCall } from '@usedapp/core'
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router'
-import styled from 'styled-components'
-import { VotingCard } from '../components/votes/VotingCard'
 import { VotingCardSkeleton } from '../components/votes/VotingCardSkeleton'
-import { getCommunityDetails } from '../helpers/apiMock'
 import { useCommunities } from '../hooks/useCommunities'
 import { useContracts } from '../hooks/useContracts'
 import { DetailedVotingRoom } from '../models/smartContract'
+import { VotingMobile } from './VotingMobile'
 
 export function VotingRoomMobile() {
   const { id } = useParams<{ id: string }>()
@@ -28,5 +26,5 @@ export function VotingRoomMobile() {
     }
   }, [votingRoom?.roomNumber?.toString(), details?.publicKey])
 
-  return <div>{detailedVotingRoom ? <VotingCard room={detailedVotingRoom} /> : <VotingCardSkeleton />}</div>
+  return <div>{detailedVotingRoom ? <VotingMobile room={detailedVotingRoom} /> : <VotingCardSkeleton />}</div>
 }

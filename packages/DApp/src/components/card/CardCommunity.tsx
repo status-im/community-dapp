@@ -45,7 +45,7 @@ export const CardCommunity = ({
           <VoteHistoryTable>
             <tbody>
               <tr>
-                <VoteHistoryTableColumnCell>Date</VoteHistoryTableColumnCell>
+                <VoteHistoryTableColumnCellDate>Date</VoteHistoryTableColumnCellDate>
                 <VoteHistoryTableColumnCell>Type</VoteHistoryTableColumnCell>
                 <VoteHistoryTableColumnCell>Result</VoteHistoryTableColumnCell>
               </tr>
@@ -106,9 +106,9 @@ export const CardCommunity = ({
       <CardLinks className={customStyle ? 'notModal' : ''}>
         <LinkExternal>Visit community</LinkExternal>
         <LinkExternal>Etherscan</LinkExternal>
-        <LinkInternal onClick={() => setShowHistoryModal(true)} disabled={isDisabled}>
+        <HistoryLink onClick={() => setShowHistoryModal(true)} disabled={isDisabled}>
           Voting history
-        </LinkInternal>
+        </HistoryLink>
       </CardLinks>
     </CardCommunityBlock>
   )
@@ -231,29 +231,39 @@ export const CardLinks = styled.div`
   }
 
   @media (max-width: 600px) {
-    display: none;
+    padding: 12px 20px 0;
   }
 
   &.notModal {
     @media (max-width: 768px) {
       max-width: calc(100% - 60px);
     }
+
+    @media (max-width: 600px) {
+      display: none;
+    }
   }
 `
 
-const VoteHistoryTable = styled.table`
+const HistoryLink = styled(LinkInternal)`
+  @media (max-width: 600px) {
+    display: none;
+  }
+`
+
+export const VoteHistoryTable = styled.table`
   width: 100%;
 `
 
-const VoteHistoryTableColumnCell = styled.td`
+export const VoteHistoryTableColumnCell = styled.td`
+  width: 33.3%;
   font-weight: bold;
   padding-bottom: 24px;
-  padding-right: 112px;
-  width: 65px;
 `
-
-const VoteHistoryTableCell = styled.td`
-  width: 65px;
+export const VoteHistoryTableColumnCellDate = styled(VoteHistoryTableColumnCell)`
+  width: 40%;
+`
+export const VoteHistoryTableCell = styled.td`
+  width: 33.3%;
   padding-bottom: 18px;
-  padding-right: 112px;
 `

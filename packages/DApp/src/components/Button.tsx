@@ -73,6 +73,10 @@ export const VotesBtns = styled.div`
   display: flex;
   justify-content: space-between;
   width: 100%;
+
+  @media (max-width: 600px) {
+    margin-top: 24px;
+  }
 `
 export const VoteBtn = styled(ButtonSecondary)`
   width: 44%;

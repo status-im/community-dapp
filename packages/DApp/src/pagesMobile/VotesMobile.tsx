@@ -10,7 +10,7 @@ import { VotingSortingEnum } from '../models/community'
 import styled from 'styled-components'
 import { VotingCardSkeleton } from '../components/votes/VotingCardSkeleton'
 import { VotingSortingOptions } from '../constants/SortingOptions'
-import { VotingCardMobile } from '../componentsMobile/VotingCardMobile'
+import { VotingCardCover } from '../componentsMobile/VotingCardCover'
 
 export function VotesMobile() {
   const [sortedBy, setSortedBy] = useState(VotingSortingEnum.EndingSoonest)
@@ -41,7 +41,7 @@ export function VotesMobile() {
       <VotingCardsWrapper>
         {roomsToShow.map((room: any, idx) => {
           if (room?.details) {
-            return <VotingCardMobile key={idx} room={room} />
+            return <VotingCardCover key={idx} room={room} />
           } else {
             return <VotingCardSkeleton key={idx} />
           }
@@ -54,7 +54,8 @@ export function VotesMobile() {
 }
 
 const VotingCardsWrapper = styled.div`
-  padding-top: 307px;
+  padding: 307px 16px 16px;
+
   @media (max-width: 340px) {
     padding-top: 320px;
   }

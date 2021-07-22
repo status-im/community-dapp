@@ -131,7 +131,7 @@ export const CardVote = ({ room, hideModalFunction }: CardVoteProps) => {
   )
 }
 
-const CardHeadingEndedVote = styled.p`
+export const CardHeadingEndedVote = styled.p`
   max-width: 290px;
   align-self: center;
   font-weight: normal;
@@ -142,12 +142,16 @@ const CardHeadingEndedVote = styled.p`
 
   @media (max-width: 768px) {
     max-width: 100%;
-    margin-bottom: 26px;
+    margin-bottom: 24px;
   }
 `
 
 const VoteBtnFinal = styled(VoteBtn)`
   width: 100%;
+
+  @media (max-width: 600px) {
+    margin-top: 24px;
+  }
 `
 
 const CardVoteBottom = styled.div`

@@ -7,11 +7,11 @@ import { getVotingWinner } from '../helpers/voting'
 import { VoteChart } from '../components/votes/VoteChart'
 import { useHistory } from 'react-router'
 
-interface VotingCardMobileProps {
+interface VotingCardCoverProps {
   room: DetailedVotingRoom
 }
 
-export function VotingCardMobile({ room }: VotingCardMobileProps) {
+export function VotingCardCover({ room }: VotingCardCoverProps) {
   const vote = voting.fromRoom(room)
   const winner = getVotingWinner(vote)
   const history = useHistory()

@@ -52,14 +52,14 @@ export const CardVoteWrap = styled.div`
 
   @media (max-width: 768px) {
     width: 100%;
-    padding-top: 56px;
     box-shadow: none;
     border-radius: unset;
     border-bottom: 1px solid #e0e0e0;
     background-color: unset;
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: 600px) {
+    flex-direction: column;
     padding: 16px 0 0;
     border-bottom: none;
   }
@@ -82,4 +82,8 @@ export const CardHeading = styled.h2`
   font-size: 17px;
   line-height: 24px;
   text-align: center;
+
+  @media (max-width: 600px) {
+    text-align: start;
+  }
 `
