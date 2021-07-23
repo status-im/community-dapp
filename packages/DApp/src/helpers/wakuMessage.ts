@@ -40,7 +40,6 @@ export function filterVerifiedMessages(messages: any[] | undefined, alreadyVoted
 
 export async function receiveWakuMessages(waku: Waku, topic: string, room: number) {
   const messages = await waku.store.queryHistory({
-    peerId: waku.libp2p.peerStore.peers.entries().next().value[1].id,
     contentTopics: [topic + room.toString()],
   })
   return messages?.map((msg) => JSON.parse(msg.payloadAsUtf8))

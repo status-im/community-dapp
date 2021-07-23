@@ -13,6 +13,7 @@ export const DesktopRouter = () => (
     <PageContent>
       <Switch>
         <Route exact path="/" render={() => <Redirect to="/votes" />} />
+        <Route path="/votingRoom" render={() => <Redirect to="/votes" />} />
         <Route exact path="/votes" component={Votes} />
         <Route exact path="/directory" component={Directory} />
         <Route exact path="/info" component={Info} />
