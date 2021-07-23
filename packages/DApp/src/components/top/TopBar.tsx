@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { NavLink } from 'react-router-dom'
 import { useEthers, shortenAddress } from '@usedapp/core'
-import { Logo } from './Logo'
+import logo from '../../assets/images/logo.svg'
 import { Colors } from '../../constants/styles'
 import { Animation } from '../../constants/animation'
 import { ConnectButton } from '../ConnectButton'
@@ -93,6 +93,14 @@ const HeaderWrapper = styled.div`
   @media (max-width: 650px) {
     padding: 0 16px;
   }
+`
+
+const Logo = styled.div`
+  width: 200px;
+  height: 47px;
+  background-image: url(${logo});
+  background-size: contain;
+  background-repeat: no-repeat;
 `
 
 const MenuContent = styled.div`
