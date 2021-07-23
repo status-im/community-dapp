@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import styled from 'styled-components'
 import { Colors } from '../../constants/styles'
 import { CommunityDetail, CurrentVoting } from '../../models/community'
@@ -9,6 +9,7 @@ import binIcon from '../../assets/images/bin.svg'
 import { RemoveModal } from './RemoveModal'
 import { CardHeading } from '../Card'
 import { useEthers } from '@usedapp/core'
+import { useHistory } from 'react-router'
 
 interface CardCommunityProps {
   community: CommunityDetail
@@ -37,6 +38,12 @@ export const CardCommunity = ({
     setShowConfirmModal(val)
     setShowRemoveModal(false)
   }
+  const history = useHistory()
+
+  const handleMobileRemove = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation()
+    history.push(`/removal/${community.publicKey}`)
+  }, [])
 
   return (
     <CardCommunityBlock className={customStyle ? 'notModal' : ''}>
@@ -81,9 +88,7 @@ export const CardCommunity = ({
         <CardLogoWrap>
           {' '}
           <CardLogo src={community.icon} alt={`${community.name} logo`} />
-          {showRemoveButton && !currentVoting && (
-            <RemoveBtnMobile onClick={() => setShowRemoveModal(true)} disabled={!account} />
-          )}
+          {showRemoveButton && !currentVoting && <RemoveBtnMobile onClick={handleMobileRemove} disabled={!account} />}
         </CardLogoWrap>
 
         <CommunityInfo>
