@@ -102,6 +102,10 @@ export const ProposingInfo = styled.div`
   justify-content: space-between;
   align-items: center;
 
+  @media (max-width: 600px) {
+    max-width: 525px;
+  }
+
   & > span {
     font-size: 24px;
     line-height: 32px;

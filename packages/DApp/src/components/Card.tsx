@@ -9,13 +9,17 @@ export const Card = styled.div`
   @media (max-width: 768px) {
     flex-direction: column;
     margin-top: 0;
-    padding: 16px 0;
-    border-top: 1px solid #e0e0e0;
+    padding: 16px 0 32px;
+    border-bottom: 1px solid #e0e0e0;
   }
 
-  &:last-child {
+  @media (max-width: 600px) {
+    padding-bottom: 16px;
+  }
+
+  &:not:first-child {
     @media (max-width: 768px) {
-      border-bottom: 1px solid #e0e0e0;
+      border-top: 1px solid #e0e0e0;
     }
   }
 `
@@ -54,8 +58,8 @@ export const CardVoteWrap = styled.div`
     width: 100%;
     box-shadow: none;
     border-radius: unset;
-    border-bottom: 1px solid #e0e0e0;
     background-color: unset;
+    padding-bottom: 0;
   }
 
   @media (max-width: 600px) {

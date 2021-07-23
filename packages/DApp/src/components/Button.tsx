@@ -31,6 +31,10 @@ export const ButtonPrimary = styled(Button)`
 export const ProposeButton = styled(ButtonPrimary)`
   padding: 10px 0;
   width: 343px;
+
+  @media (max-width: 600px) {
+    width: 100%;
+  }
 `
 
 export const ButtonSecondary = styled(Button)`

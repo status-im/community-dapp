@@ -32,4 +32,9 @@ export const Search = styled(Input)`
   background-size: 24px 24px;
   background-repeat: no-repeat;
   background-position: center left 10px;
+
+  @media (max-width: 375px) {
+    width: 80%;
+    margin-right: 8px;
+  }
 `

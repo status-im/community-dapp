@@ -13,8 +13,11 @@ import { VotingSortingOptions } from '../constants/SortingOptions'
 import { VotingCardCover } from '../componentsMobile/VotingCardCover'
 import { ButtonPrimary } from '../components/Button'
 import { useHistory } from 'react-router'
+import { useEthers } from '@usedapp/core'
+import { ConnectButton } from '../components/ConnectButton'
 
 export function VotesMobile() {
+  const { account } = useEthers()
   const [sortedBy, setSortedBy] = useState(VotingSortingEnum.EndingSoonest)
   const [voteType, setVoteType] = useState('')
   const [filterKeyword, setFilterKeyword] = useState('')
@@ -51,29 +54,34 @@ export function VotesMobile() {
         {roomsToShow.length === 0 && empty && <VotingEmpty />}
         {roomsToShow.length === 0 && !empty && <SearchEmpty />}
       </VotingCardsWrapper>
+
       <ProposeButtonWrapper>
-        <ProposeButton onClick={() => history.push('/propose')}>Propose community</ProposeButton>
+        {account ? (
+          <ProposeButton onClick={() => history.push('/propose')}>Propose community</ProposeButton>
+        ) : (
+          <ConnectButton />
+        )}
       </ProposeButtonWrapper>
     </div>
   )
 }
 
-const ProposeButton = styled(ButtonPrimary)`
-  margin: auto;
-  width: 100%;
-  padding: 10px 0;
-  text-align: center;
-`
-const ProposeButtonWrapper = styled.div`
-  display: flex;
+export const ProposeButtonWrapper = styled.div`
   position: fixed;
   padding: 0 16px;
   bottom: 15px;
   width: 100%;
 `
 
+export const ProposeButton = styled(ButtonPrimary)`
+  margin: auto;
+  width: 100%;
+  padding: 10px 0;
+  text-align: center;
+`
+
 const VotingCardsWrapper = styled.div`
-  padding: 307px 16px 16px;
+  padding: 307px 16px 68px;
 
   @media (max-width: 340px) {
     padding-top: 320px;

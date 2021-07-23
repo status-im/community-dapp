@@ -75,7 +75,7 @@ const VotingRules = styled.div`
   }
 
   @media (max-width: 600px) {
-    padding: 0;
+    padding: 182px 16px 16px;
     background-color: unset;
     border: none;
     box-shadow: none;
