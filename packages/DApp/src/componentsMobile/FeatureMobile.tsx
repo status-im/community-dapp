@@ -9,15 +9,14 @@ import {
 import { VotePropose } from '../components/votes/VotePropose'
 import styled from 'styled-components'
 import { useCommunities } from '../hooks/useCommunities'
-import { useParams } from 'react-router'
+import { useHistory, useParams } from 'react-router'
 import { ButtonSecondary, VoteSendingBtn } from '../components/Button'
 import { CommunitySkeleton } from '../components/skeleton/CommunitySkeleton'
 import { HeaderVotingMobile } from './VotingMobile'
 import { ConnectMobile } from './ConnectMobile'
 import { HistoryLink } from './CardVoteMobile'
-import { VoteSubmitButton } from '../components/card/VoteSubmitButton'
-import { FeatureBottom } from '../components/card/CardFeature'
 import { useEthers } from '@usedapp/core'
+import { useGetCurrentVoting } from '../hooks/useGetCurrentVoting'
 
 export function FeatureMobile() {
   const { publicKey } = useParams<{ publicKey: string }>()
@@ -28,6 +27,9 @@ export function FeatureMobile() {
 
   const [showHistory, setShowHistory] = useState(false)
   const isDisabled = community ? community.votingHistory.length === 0 : false
+
+  const { currentVoting } = useGetCurrentVoting(community?.publicKey)
+  const history = useHistory()
 
   if (!community) {
     return <CommunitySkeleton />
@@ -51,11 +53,12 @@ export function FeatureMobile() {
           <FeatureBtn disabled={disabled}>
             Feature this community! <span style={{ fontSize: '20px' }}>⭐️</span>
           </FeatureBtn>
-          {community.currentVoting && community && (
-            <FeatureBottom>
-              <VoteSendingBtn>Removal vote in progress</VoteSendingBtn>
-              {community.currentVoting && <VoteSubmitButton vote={community.currentVoting} />}
-            </FeatureBottom>
+          {currentVoting && (
+            <div>
+              <VoteSendingBtn onClick={() => history.push(`/votingRoom/${currentVoting.ID}`)}>
+                Removal vote in progress
+              </VoteSendingBtn>
+            </div>
           )}
           {!isDisabled && (
             <HistoryLink
@@ -66,7 +69,6 @@ export function FeatureMobile() {
               Voting history
             </HistoryLink>
           )}
-
           {showHistory && (
             <VoteHistoryTable>
               <tbody>

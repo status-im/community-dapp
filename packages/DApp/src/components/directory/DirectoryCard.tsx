@@ -3,9 +3,7 @@ import { Card, CardCommunityWrap, CardVoteWrap } from '../Card'
 import { CardCommunity } from '../card/CardCommunity'
 import { CardFeature } from '../card/CardFeature'
 import { CommunityDetail } from '../../models/community'
-import { useContracts } from '../../hooks/useContracts'
-import { useContractCall } from '@usedapp/core'
-import { votingFromRoom } from '../../helpers/voting'
+import { useGetCurrentVoting } from '../../hooks/useGetCurrentVoting'
 
 export interface DirectoryCardProps {
   community: CommunityDetail
@@ -33,22 +31,7 @@ export function DirectoryCard({ community }: DirectoryCardProps) {
     timeLeft = `1 weeks left`
   }
 
-  const { votingContract } = useContracts()
-  let votingRoom = useContractCall({
-    abi: votingContract.interface,
-    address: votingContract.address,
-    method: 'getCommunityVoting',
-    args: [community.publicKey],
-  }) as any
-
-  if (votingRoom && (votingRoom.roomNumber.toNumber() === 0 || votingRoom.finalized == true)) {
-    votingRoom = undefined
-  }
-
-  let currentVoting
-  if (votingRoom) {
-    currentVoting = votingFromRoom(votingRoom)
-  }
+  const { currentVoting, votingRoom } = useGetCurrentVoting(community?.publicKey)
 
   return (
     <Card>
