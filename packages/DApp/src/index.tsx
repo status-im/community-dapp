@@ -14,7 +14,7 @@ const config = {
   },
   multicallAddresses: {
     ...DEFAULT_CONFIG.multicallAddresses,
-    1337: '0x049e017b504F85d3c07AFE712fC79501aa1DB712',
+    1337: process.env.GANACHE_MULTICALL_CONTRACT ?? '0x0000000000000000000000000000000000000000',
   },
   supportedChains: [...DEFAULT_CONFIG.supportedChains, 1337],
   notifications: {
