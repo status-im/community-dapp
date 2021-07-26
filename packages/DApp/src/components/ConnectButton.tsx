@@ -42,8 +42,11 @@ function StatusModal() {
   return (
     <StatusInfo>
       <p>This DApp is only available for</p>
-      <StatusLogo src={statusLogo} />
-      <p>Secure Crypto Wallet & Messenger</p>
+      <StatusTextBlock>
+        <StatusLogo src={statusLogo} />
+        <p>{window.innerWidth > 600 ? 'Secure Crypto' : ''} Wallet & Messenger</p>
+      </StatusTextBlock>
+
       <StatusLink href="https://status.im/get/" target="_blank">
         Get Status
       </StatusLink>
@@ -58,11 +61,38 @@ const StatusInfo = styled(ColumnFlexDiv)`
     line-height: 22px;
   }
 `
+
+const StatusTextBlock = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  @media (max-width: 600px) {
+    flex-direction: row;
+  }
+
+  @media (max-width: 340px) {
+    flex-direction: column;
+  }
+`
 const StatusLogo = styled.img`
+  width: 120px;
+  height: 45px;
   margin: 16px 0;
+
+  @media (max-width: 600px) {
+    width: 83px;
+    height: 31px;
+    margin: 8px 0;
+    margin-right: 8px;
+  }
 `
 
 const StatusLink = styled(LinkExternal)`
   margin-top: 45px;
   margin-bottom: 13px;
+
+  @media (max-width: 600px) {
+    margin-top: 16px;
+  }
 `

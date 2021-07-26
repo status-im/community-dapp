@@ -39,6 +39,10 @@ const PopUpOverlay = styled.div`
   z-index: 9999;
   transition: all 0.3s;
   overflow: auto;
+
+  @media (max-width: 600px) {
+    background-color: #898989;
+  }
 `
 
 const PopUpWindow = styled.div`
@@ -50,11 +54,24 @@ const PopUpWindow = styled.div`
   background-color: ${Colors.GrayLight};
   box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.1);
   border-radius: 6px;
+
+  @media (max-width: 600px) {
+    max-width: 320px;
+    padding: 16px;
+  }
+
+  @media (max-width: 375px) {
+    margin: 20vh 32px 2vh;
+  }
 `
 const PopUpHeader = styled.div`
   display: flex;
   position: relative;
   margin-bottom: 32px;
+
+  @media (max-width: 600px) {
+    justify-content: center;
+  }
 `
 const PopUpHeading = styled.p`
   font-weight: bold;
