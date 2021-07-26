@@ -1,32 +1,92 @@
 import React, { useState } from 'react'
-import { CardCommunity } from '../components/card/CardCommunity'
+import {
+  CardCommunity,
+  VoteHistoryTable,
+  VoteHistoryTableCell,
+  VoteHistoryTableColumnCell,
+  VoteHistoryTableColumnCellDate,
+} from '../components/card/CardCommunity'
 import { VotePropose } from '../components/votes/VotePropose'
 import styled from 'styled-components'
 import { useCommunities } from '../hooks/useCommunities'
 import { useParams } from 'react-router'
-import { ButtonPrimary } from '../components/Button'
+import { ButtonSecondary, VoteSendingBtn } from '../components/Button'
 import { CommunitySkeleton } from '../components/skeleton/CommunitySkeleton'
+import { HeaderVotingMobile } from './VotingMobile'
+import { ConnectMobile } from './ConnectMobile'
+import { HistoryLink } from './CardVoteMobile'
+import { VoteSubmitButton } from '../components/card/VoteSubmitButton'
+import { FeatureBottom } from '../components/card/CardFeature'
+import { useEthers } from '@usedapp/core'
 
 export function FeatureMobile() {
   const { publicKey } = useParams<{ publicKey: string }>()
   const [community] = useCommunities([publicKey])
   const [proposingAmount, setProposingAmount] = useState(0)
-  const disabled = proposingAmount === 0
+  const { account } = useEthers()
+  const disabled = proposingAmount === 0 || !account
+
+  const [showHistory, setShowHistory] = useState(false)
+  const isDisabled = community ? community.votingHistory.length === 0 : false
 
   if (!community) {
     return <CommunitySkeleton />
   } else {
     return (
       <FeatureWrap>
-        <CardCommunity community={community} />
+        <HeaderVotingMobile>
+          <ConnectMobile />
+          <FeatureTop>
+            <CardCommunity community={community} />
+          </FeatureTop>
+        </HeaderVotingMobile>
+
         <VoteProposeWrap>
+          <FeatureHeading>{`Feature ${community.name}?`}</FeatureHeading>
           <VotePropose
             availableAmount={60000000}
             setProposingAmount={setProposingAmount}
             proposingAmount={proposingAmount}
-            disabled={disabled}
           />
-          <VoteConfirmBtn disabled={disabled}>Confirm vote to feature community</VoteConfirmBtn>
+          <FeatureBtn disabled={disabled}>
+            Feature this community! <span style={{ fontSize: '20px' }}>⭐️</span>
+          </FeatureBtn>
+          {community.currentVoting && community && (
+            <FeatureBottom>
+              <VoteSendingBtn>Removal vote in progress</VoteSendingBtn>
+              {community.currentVoting && <VoteSubmitButton vote={community.currentVoting} />}
+            </FeatureBottom>
+          )}
+          {!isDisabled && (
+            <HistoryLink
+              className={showHistory ? 'opened' : ''}
+              onClick={() => setShowHistory(!showHistory)}
+              disabled={isDisabled}
+            >
+              Voting history
+            </HistoryLink>
+          )}
+
+          {showHistory && (
+            <VoteHistoryTable>
+              <tbody>
+                <tr>
+                  <VoteHistoryTableColumnCellDate>Date</VoteHistoryTableColumnCellDate>
+                  <VoteHistoryTableColumnCell>Type</VoteHistoryTableColumnCell>
+                  <VoteHistoryTableColumnCell>Result</VoteHistoryTableColumnCell>
+                </tr>
+                {community.votingHistory.map((vote) => {
+                  return (
+                    <tr key={vote.ID}>
+                      <VoteHistoryTableCell>{vote.date.toLocaleDateString()}</VoteHistoryTableCell>
+                      <VoteHistoryTableCell>{vote.type}</VoteHistoryTableCell>
+                      <VoteHistoryTableCell>{vote.result}</VoteHistoryTableCell>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </VoteHistoryTable>
+          )}
         </VoteProposeWrap>
       </FeatureWrap>
     )
@@ -34,16 +94,30 @@ export function FeatureMobile() {
 }
 
 const FeatureWrap = styled.div`
-  padding: 20px;
+  padding: 0 0 16px;
+`
+
+const FeatureTop = styled.div`
+  padding: 0 16px;
+`
+
+const FeatureHeading = styled.h2`
+  margin-bottom: 16px;
+  font-weight: bold;
+  font-size: 17px;
+  line-height: 24px;
+`
+
+const FeatureBtn = styled(ButtonSecondary)`
+  width: 100%;
+  padding: 11px 0;
+  font-weight: 500;
+  font-size: 15px;
+  line-height: 22px;
+  margin-top: 32px;
 `
 
 const VoteProposeWrap = styled.div`
-  margin-top: 32px;
+  padding: 16px;
   width: 100%;
-`
-
-const VoteConfirmBtn = styled(ButtonPrimary)`
-  width: 100%;
-  padding: 11px 0;
-  margin-top: 32px;
 `

@@ -98,7 +98,7 @@ const CardHeadingFeature = styled(CardHeading)`
     display: none;
   }
 `
-const FeatureBottom = styled.div`
+export const FeatureBottom = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
