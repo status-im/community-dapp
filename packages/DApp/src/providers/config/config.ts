@@ -20,8 +20,8 @@ const contracts = {
     directoryContract: '0xfEB894511bC1B92EFA4f7fa050fC0BF7697Df6a2',
   },
   1337: {
-    votingContract: '0xd862f2550F37bE4DCb42Ec684b3D2528635d2Bc9',
-    directoryContract: '0xbb8243e9f5b55C9e7E64e118c99EE78a7080fbf9',
+    votingContract: process.env.GANACHE_VOTING_CONTRACT ?? '0x0000000000000000000000000000000000000000',
+    directoryContract: process.env.GANACHE_DIRECTORY_CONTRACT ?? '0x0000000000000000000000000000000000000000',
   },
 }
 

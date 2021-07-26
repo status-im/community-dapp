@@ -67,6 +67,8 @@ module.exports = (env) => {
             }),
             new webpack.DefinePlugin({
                 'process.env.ENV': JSON.stringify(environment),
+                'process.env.GANACHE_VOTING_CONTRACT': JSON.stringify(process.env.GANACHE_VOTING_CONTRACT),
+                'process.env.GANACHE_DIRECTORY_CONTRACT': JSON.stringify(process.env.GANACHE_DIRECTORY_CONTRACT),
             }),
             new webpack.ProvidePlugin({
                 process: 'process/browser.js',
