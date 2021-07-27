@@ -17,7 +17,7 @@ import { ConnectMobile } from './ConnectMobile'
 import { HistoryLink } from './CardVoteMobile'
 import { useEthers } from '@usedapp/core'
 import { useGetCurrentVoting } from '../hooks/useGetCurrentVoting'
-import { ColumnFlexDiv } from '../constants/styles'
+import { MobileHeading, MobileBlock, MobileTop, MobileWrap, ColumnFlexDiv } from '../constants/styles'
 
 export function FeatureMobile() {
   const { publicKey } = useParams<{ publicKey: string }>()
@@ -36,15 +36,15 @@ export function FeatureMobile() {
     return <CommunitySkeleton />
   } else {
     return (
-      <FeatureWrap>
+      <MobileWrap>
         <HeaderVotingMobile>
           <ConnectMobile />
-          <FeatureTop>
+          <MobileTop>
             <CardCommunity community={community} />
-          </FeatureTop>
+          </MobileTop>
         </HeaderVotingMobile>
 
-        <VoteProposeWrap>
+        <MobileBlock>
           <FeatureHeading>{`Feature ${community.name}?`}</FeatureHeading>
           <VotePropose
             availableAmount={60000000}
@@ -90,25 +90,14 @@ export function FeatureMobile() {
               </tbody>
             </VoteHistoryTable>
           )}
-        </VoteProposeWrap>
-      </FeatureWrap>
+        </MobileBlock>
+      </MobileWrap>
     )
   }
 }
 
-const FeatureWrap = styled.div`
-  padding: 0 0 16px;
-`
-
-const FeatureTop = styled.div`
-  padding: 0 16px;
-`
-
-const FeatureHeading = styled.h2`
+const FeatureHeading = styled(MobileHeading)`
   margin-bottom: 16px;
-  font-weight: bold;
-  font-size: 17px;
-  line-height: 24px;
 `
 
 const FeatureBtn = styled(ButtonSecondary)`
@@ -118,9 +107,4 @@ const FeatureBtn = styled(ButtonSecondary)`
   font-size: 15px;
   line-height: 22px;
   margin-top: 32px;
-`
-
-const VoteProposeWrap = styled.div`
-  padding: 16px;
-  width: 100%;
 `

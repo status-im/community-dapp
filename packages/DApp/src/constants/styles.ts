@@ -46,3 +46,20 @@ export const WrapperTopSmall = styled.div`
 export const WrapperTop = styled.div`
   margin-top: 32px;
 `
+export const MobileWrap = styled.div`
+  padding: 0 0 16px;
+`
+
+export const MobileTop = styled.div`
+  padding: 0 16px;
+`
+
+export const MobileBlock = styled.div`
+  padding: 16px;
+  width: 100%;
+`
+export const MobileHeading = styled.h2`
+  font-weight: bold;
+  font-size: 17px;
+  line-height: 24px;
+`

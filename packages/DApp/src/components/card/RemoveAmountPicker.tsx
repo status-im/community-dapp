@@ -87,6 +87,10 @@ export function RemoveAmountPicker({ community, availableAmount, setShowConfirmM
 const VoteProposeWrap = styled.div`
   margin-top: 32px;
   width: 100%;
+
+  @media (max-width: 600px) {
+    margin-bottom: 0;
+  }
 `
 
 const WarningWrapRemoval = styled.div`

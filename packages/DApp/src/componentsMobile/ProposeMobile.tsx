@@ -12,7 +12,7 @@ import { PublicKeyInput } from '../components/PublicKeyInput'
 import { CommunitySkeleton } from '../components/skeleton/CommunitySkeleton'
 import { VotePropose } from '../components/votes/VotePropose'
 import { Warning } from '../components/votes/VoteWarning'
-import { ColumnFlexDiv, WrapperTopSmall } from '../constants/styles'
+import { ColumnFlexDiv, MobileBlock, MobileHeading, MobileTop, WrapperTopSmall } from '../constants/styles'
 import { useCommunityDetails } from '../hooks/useCommunityDetails'
 import { useContracts } from '../hooks/useContracts'
 import { useProposeWarning } from '../hooks/useProposeWarning'
@@ -42,7 +42,7 @@ export function ProposeMobile() {
     <ColumnFlexDiv>
       <HeaderVotingMobile>
         <ConnectMobile />
-        <ProposingTop>
+        <MobileTop>
           <ProposingHeading>Add community to directory</ProposingHeading>
           <PublicKeyInput publicKey={publicKey} setPublicKey={setPublicKey} />
           {communityFound ? (
@@ -57,10 +57,10 @@ export function ProposeMobile() {
               </WrapperTopSmall>
             )
           )}
-        </ProposingTop>
+        </MobileTop>
       </HeaderVotingMobile>
 
-      <ProposingData>
+      <MobileBlock>
         <WarningWrap>{warning.text && <Warning icon={warning.icon} text={warning.text} />}</WarningWrap>
         {communityFound && communityFound.validForAddition && publicKey && (
           <VoteProposeWrap>
@@ -79,7 +79,7 @@ export function ProposeMobile() {
             <InfoText>To propose a community, it must have at least 42 members and have a ENS domain.</InfoText>
           </ProposingInfo>
         )}
-      </ProposingData>
+      </MobileBlock>
       {communityFound && communityFound.validForAddition && (
         <ProposingBtn
           disabled={!communityFound || !proposingAmount || !!warning.text}
@@ -123,24 +123,12 @@ export function ProposeMobile() {
   )
 }
 
-const ProposingTop = styled.div`
-  padding: 0 16px;
-`
-
-const ProposingHeading = styled.h2`
+const ProposingHeading = styled(MobileHeading)`
   margin-bottom: 8px;
-  font-weight: bold;
-  font-size: 17px;
-  line-height: 24px;
 `
 
 const ProposingHeadingMobile = styled(ProposingHeading)`
   margin-bottom: 16px;
-`
-
-const ProposingData = styled.div`
-  width: 100%;
-  padding: 16px;
 `
 
 const ProposingBtn = styled(ButtonPrimary)`
