@@ -1,6 +1,7 @@
 import { useNotifications } from '@usedapp/core'
 import React from 'react'
 import styled from 'styled-components'
+import { AnimationNotification, AnimationNotificationMobile } from '../constants/animation'
 import { useContracts } from '../hooks/useContracts'
 import { NotificationItem } from './NotificationItem'
 
@@ -44,7 +45,18 @@ const NotificationsWrapper = styled.div`
   display: flex;
   justify-content: space-between;
   position: fixed;
-  top: 180px;
+  top: 115px;
   right: 16px;
   flex-direction: column;
+  transition: all 0.3s;
+  animation: ${AnimationNotification} 2s ease;
+
+  @media (max-width: 600px) {
+    top: unset;
+    right: unset;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    animation: ${AnimationNotificationMobile} 2s ease;
+  }
 `
