@@ -139,7 +139,7 @@ const VoteBtnFinal = styled(VoteBtn)`
 
 const CardVoteBottom = styled.div`
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
   align-items: center;
 `
 

@@ -17,6 +17,7 @@ import { ConnectMobile } from './ConnectMobile'
 import { HistoryLink } from './CardVoteMobile'
 import { useEthers } from '@usedapp/core'
 import { useGetCurrentVoting } from '../hooks/useGetCurrentVoting'
+import { ColumnFlexDiv } from '../constants/styles'
 
 export function FeatureMobile() {
   const { publicKey } = useParams<{ publicKey: string }>()
@@ -54,11 +55,11 @@ export function FeatureMobile() {
             Feature this community! <span style={{ fontSize: '20px' }}>⭐️</span>
           </FeatureBtn>
           {currentVoting && (
-            <div>
+            <ColumnFlexDiv>
               <VoteSendingBtn onClick={() => history.push(`/votingRoom/${currentVoting.ID}`)}>
                 Removal vote in progress
               </VoteSendingBtn>
-            </div>
+            </ColumnFlexDiv>
           )}
           {!isDisabled && (
             <HistoryLink

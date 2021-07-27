@@ -26,7 +26,8 @@ const VoteWarning = styled.div`
   margin-top: 32px;
 
   @media (max-width: 600px) {
-    margin-top: 0;
+    justify-content: flex-start;
+    margin-top: 24px;
   }
 
   & > span {

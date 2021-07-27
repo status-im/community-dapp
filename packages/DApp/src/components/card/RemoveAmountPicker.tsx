@@ -58,13 +58,15 @@ export function RemoveAmountPicker({ community, availableAmount, setShowConfirmM
           icon="💰"
           text={`Not enough SNT to start a vote for this community. A new vote for ${community.name} requires at least 10,000 SNT available.`}
         />
-        <ConfirmBtn
-          onClick={() => {
-            setShowConfirmModal(false)
-          }}
-        >
-          OK, let’s move on! <span>🤙</span>
-        </ConfirmBtn>
+        {window.innerWidth > 600 && (
+          <ConfirmBtn
+            onClick={() => {
+              setShowConfirmModal(false)
+            }}
+          >
+            OK, let’s move on! <span>🤙</span>
+          </ConfirmBtn>
+        )}
       </WarningWrapRemoval>
     )
   }
