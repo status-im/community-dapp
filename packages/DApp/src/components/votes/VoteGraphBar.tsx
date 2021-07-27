@@ -108,5 +108,6 @@ const VoteBalance = styled.div`
 
   @media (max-width: 600px) {
     height: 13px;
+    transition: width 2s;
   }
 `
