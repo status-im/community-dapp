@@ -19,7 +19,7 @@ export const CommunitySkeleton = ({ customStyle }: CommunitySkeletonProps) => {
         <CardContent>
           <TitleSkeleton />
           <TextBlock />
-          <TagsSkeleton />
+          <TagsSkeleton tags={window.innerWidth < 375 ? 3 : 4} />
         </CardContent>
       </CardRow>
       <CardLinks className={customStyle ? 'notModal' : ''}>
@@ -74,4 +74,8 @@ const StyledExternalLink = styled(LinkExternal)`
 
 const StyledInternalink = styled(LinkInternal)`
   color: #525252;
+
+  @media (max-width: 600px) {
+    display: none;
+  }
 `

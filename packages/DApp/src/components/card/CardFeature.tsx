@@ -61,7 +61,8 @@ export const CardFeature = ({ community, heading, icon, sum, timeLeft, currentVo
 
         {sum && (
           <FeatureTextWeekly>
-            {icon} <span style={{ color: '#676868', fontWeight: 'normal' }}>Weekly Feature Vote: </span>
+            {icon}{' '}
+            <span style={{ color: '#676868', fontWeight: 'normal', marginLeft: '4px' }}>Weekly Feature Vote: </span>
             <span>{addCommas(sum)}</span> SNT
           </FeatureTextWeekly>
         )}

@@ -8,13 +8,13 @@ import { TopBarMobile } from '../componentsMobile/TopBarMobile'
 import { useVotingCommunities } from '../hooks/useVotingCommunities'
 import { VotingSortingEnum } from '../models/community'
 import styled from 'styled-components'
-import { VotingCardSkeleton } from '../components/votes/VotingCardSkeleton'
 import { VotingSortingOptions } from '../constants/SortingOptions'
 import { VotingCardCover } from '../componentsMobile/VotingCardCover'
 import { ButtonPrimary } from '../components/Button'
 import { useHistory } from 'react-router'
 import { useEthers } from '@usedapp/core'
 import { ConnectButton } from '../components/ConnectButton'
+import { VotingSkeletonMobile } from '../componentsMobile/VotingSkeletonMobile'
 
 export function VotesMobile() {
   const { account } = useEthers()
@@ -48,7 +48,7 @@ export function VotesMobile() {
           if (room?.details) {
             return <VotingCardCover key={idx} room={room} />
           } else {
-            return <VotingCardSkeleton key={idx} />
+            return <VotingSkeletonMobile key={idx} />
           }
         })}
         {roomsToShow.length === 0 && empty && <VotingEmpty />}

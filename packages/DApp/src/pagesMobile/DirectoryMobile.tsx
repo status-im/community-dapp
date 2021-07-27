@@ -6,11 +6,11 @@ import { DirectorySortingEnum } from '../models/community'
 import styled from 'styled-components'
 import { Search } from '../components/Input'
 import { DirectorySortingOptions } from '../constants/SortingOptions'
-import { DirectoryCardSkeleton } from '../components/directory/DirectoryCardSkeleton'
 import { SearchEmpty } from '../components/SearchEmpty'
 import { WeeklyFeature } from '../components/WeeklyFeature'
 import { FilterList } from '../components/Filter'
 import { useHistory } from 'react-router'
+import { DirectorySkeletonMobile } from '../componentsMobile/DirectorySkeletonMobile'
 
 export function DirectoryMobile() {
   const [filterKeyword, setFilterKeyword] = useState('')
@@ -46,7 +46,7 @@ export function DirectoryMobile() {
               </div>
             )
           } else {
-            return <DirectoryCardSkeleton key={idx} />
+            return <DirectorySkeletonMobile key={idx} />
           }
         })}
         {communities.length === 0 && <SearchEmpty />}

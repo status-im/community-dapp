@@ -80,7 +80,7 @@ const SkeletonButton = styled(Skeleton)`
   }
 `
 
-const Row = styled.div`
+export const Row = styled.div`
   display: flex;
   justify-content: space-between;
 
