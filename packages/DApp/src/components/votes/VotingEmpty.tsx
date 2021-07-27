@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { PageInfo } from '../PageInfo'
+import React, { useEffect, useState } from 'react'
+import { InfoHeading, InfoText } from '../PageInfo'
 import { useEthers } from '@usedapp/core'
 import { Modal } from '../Modal'
 import { ProposeModal } from '../card/ProposeModal'
@@ -8,26 +8,44 @@ import { CommunityDetail } from '../../models/community'
 import { ProposeButton } from '../Button'
 import { ConnectButton } from '../ConnectButton'
 import styled from 'styled-components'
-import { Colors } from '../../constants/styles'
+import { Colors, ColumnFlexDiv } from '../../constants/styles'
 
 export function VotingEmpty() {
   const { account } = useEthers()
   const [showProposeModal, setShowProposeModal] = useState(false)
   const [showConfirmModal, setShowConfirmModal] = useState(false)
   const [communityFound, setCommunityFound] = useState<undefined | CommunityDetail>(undefined)
+  const [mobileVersion, setMobileVersion] = useState(false)
 
   const setNext = (val: boolean) => {
     setShowConfirmModal(val)
     setShowProposeModal(false)
   }
 
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 600) {
+        setMobileVersion(true)
+      } else {
+        setMobileVersion(false)
+      }
+    }
+    handleResize()
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
   return (
     <VotingEmptyWrap>
       <p>😲</p>
-      <PageInfo
-        heading="There are no ongoing votes at the moment!"
-        text="If you know of a community that you think should be added to the Community Directory, feel free to propose it's addition by starting a vote"
-      />
+
+      <ColumnFlexDiv>
+        <EmptyHeading>There are no ongoing votes at the moment!</EmptyHeading>
+        <EmptyText>
+          If you know of a community that you think should be added to the Community Directory, feel free to propose
+          it's addition by starting a vote
+        </EmptyText>
+      </ColumnFlexDiv>
       {showProposeModal && (
         <Modal heading="Add community to directory" setShowModal={setShowProposeModal}>
           <ProposeModal
@@ -48,10 +66,14 @@ export function VotingEmpty() {
         </Modal>
       )}
 
-      {account ? (
-        <ProposeButton onClick={() => setShowProposeModal(true)}>Propose community</ProposeButton>
-      ) : (
-        <ConnectButton />
+      {!mobileVersion && (
+        <div>
+          {account ? (
+            <ProposeButton onClick={() => setShowProposeModal(true)}>Propose community</ProposeButton>
+          ) : (
+            <ConnectButton />
+          )}
+        </div>
       )}
     </VotingEmptyWrap>
   )
@@ -72,10 +94,36 @@ const VotingEmptyWrap = styled.div`
   background: ${Colors.White};
   z-index: 99;
 
+  @media (max-width: 600px) {
+    height: 250px;
+    top: 50vh;
+    padding: 0 16px;
+  }
+
   & > p {
     font-weight: bold;
     font-size: 64px;
     line-height: 64%;
     margin-bottom: 24px;
+
+    @media (max-width: 600px) {
+      font-size: 44px;
+    }
+
+    @media (max-width: 375px) {
+      font-size: 34px;
+    }
+  }
+`
+
+const EmptyHeading = styled(InfoHeading)`
+  @media (max-width: 375px) {
+    font-size: 20px;
+  }
+`
+
+const EmptyText = styled(InfoText)`
+  @media (max-width: 340px) {
+    font-size: 12px;
   }
 `

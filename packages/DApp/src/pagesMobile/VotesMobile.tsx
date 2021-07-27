@@ -71,6 +71,7 @@ export const ProposeButtonWrapper = styled.div`
   padding: 0 16px;
   bottom: 15px;
   width: 100%;
+  z-index: 100;
 `
 
 export const ProposeButton = styled(ButtonPrimary)`

@@ -20,7 +20,7 @@ export const InfoWrap = styled(ColumnFlexDiv)`
   margin: 0 auto;
 `
 
-const InfoHeading = styled.h1`
+export const InfoHeading = styled.h1`
   font-weight: bold;
   font-size: 28px;
   line-height: 38px;
@@ -30,11 +30,11 @@ const InfoHeading = styled.h1`
 
   @media (max-width: 600px) {
     font-size: 22px;
-    line-height: 30px;
+    line-height: 22px;
   }
 `
 
-const InfoText = styled.p`
+export const InfoText = styled.p`
   font-size: 22px;
   text-align: center;
   line-height: 32px;
@@ -43,6 +43,6 @@ const InfoText = styled.p`
   @media (max-width: 600px) {
     font-size: 13px;
     line-height: 18px;
-    margin: 0 21px 8px 21px;
+    margin: 0;
   }
 `
