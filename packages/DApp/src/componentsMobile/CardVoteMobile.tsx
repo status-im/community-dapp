@@ -1,5 +1,5 @@
 import { useContractFunction, useEthers } from '@usedapp/core'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { VotesBtns, VoteBtn } from '../components/Button'
 import { CardVoteBlock, CardHeading } from '../components/Card'
@@ -21,12 +21,14 @@ import { DetailedVotingRoom } from '../models/smartContract'
 import arrowDown from '../assets/images/arrowDown.svg'
 import { useSendWakuVote } from '../hooks/useSendWakuVote'
 import { WrapperBottom, WrapperTop } from '../constants/styles'
+import { useRoomAggregateVotes } from '../hooks/useRoomAggregateVotes'
 
 interface CardVoteMobileProps {
   room: DetailedVotingRoom
 }
 
 export const CardVoteMobile = ({ room }: CardVoteMobileProps) => {
+  const [vote, setVote] = useState(voting.fromRoom(room))
   const { account } = useEthers()
 
   const selectedVoted = voteTypes['Add'].for
@@ -34,8 +36,7 @@ export const CardVoteMobile = ({ room }: CardVoteMobileProps) => {
   const { votingContract } = useContracts()
 
   const finalizeVoting = useContractFunction(votingContract, 'finalizeVotingRoom')
-
-  const vote = voting.fromRoom(room)
+  room = useRoomAggregateVotes(room, false)
 
   const voteConstants = voteTypes[vote.type]
 
@@ -49,10 +50,13 @@ export const CardVoteMobile = ({ room }: CardVoteMobileProps) => {
   const isDisabled = room.details.votingHistory.length === 0
   const sendWakuVote = useSendWakuVote()
 
+  useEffect(() => {
+    setVote(voting.fromRoom(room))
+  }, [JSON.stringify(room)])
+
   if (!vote) {
     return <CardVoteBlock />
   }
-
   return (
     <CardVoteBlock>
       {winner ? (
@@ -85,10 +89,26 @@ export const CardVoteMobile = ({ room }: CardVoteMobileProps) => {
           </VoteBtnFinal>
         ) : (
           <VotesBtns>
-            <VoteBtn disabled={!account} onClick={() => sendWakuVote(proposingAmount, room.roomNumber, 0)}>
+            <VoteBtn
+              disabled={!account}
+              onClick={async () => {
+                await sendWakuVote(proposingAmount, room.roomNumber, 0)
+                setVote((vote) => {
+                  return { ...vote, voteAgainst: vote.voteAgainst.add(proposingAmount) }
+                })
+              }}
+            >
               {voteConstants.against.text} <span>{voteConstants.against.icon}</span>
             </VoteBtn>
-            <VoteBtn disabled={!account} onClick={() => sendWakuVote(proposingAmount, room.roomNumber, 1)}>
+            <VoteBtn
+              disabled={!account}
+              onClick={async () => {
+                await sendWakuVote(proposingAmount, room.roomNumber, 1)
+                setVote((vote) => {
+                  return { ...vote, voteFor: vote.voteFor.add(proposingAmount) }
+                })
+              }}
+            >
               {voteConstants.for.text} <span>{voteConstants.for.icon}</span>
             </VoteBtn>
           </VotesBtns>

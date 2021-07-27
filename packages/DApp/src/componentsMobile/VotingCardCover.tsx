@@ -6,12 +6,14 @@ import voting from '../helpers/voting'
 import { getVotingWinner } from '../helpers/voting'
 import { VoteChart } from '../components/votes/VoteChart'
 import { useHistory } from 'react-router'
+import { useRoomAggregateVotes } from '../hooks/useRoomAggregateVotes'
 
 interface VotingCardCoverProps {
   room: DetailedVotingRoom
 }
 
 export function VotingCardCover({ room }: VotingCardCoverProps) {
+  room = useRoomAggregateVotes(room, false)
   const vote = voting.fromRoom(room)
   const winner = getVotingWinner(vote)
   const history = useHistory()
