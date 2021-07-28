@@ -15,7 +15,7 @@ export const CommunitySkeleton = ({ customStyle }: CommunitySkeletonProps) => {
     <CardCommunityBlock className={customStyle ? 'notModal' : ''}>
       {' '}
       <CardRow>
-        <AvatarSkeleton />
+        <AvatarSkeleton borderRadius="50%" />
         <CardContent>
           <TitleSkeleton />
           <TextBlock />

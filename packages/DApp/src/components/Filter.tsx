@@ -138,6 +138,14 @@ const SelectOption = styled.span`
   cursor: pointer;
   transition: all 0.3s;
 
+  &:first-child {
+    border-radius: 16px 4px 0 0;
+  }
+
+  &:last-child {
+    border-radius: 0 0 16px 16px;
+  }
+
   &:not(:last-child) {
     border-bottom: 1px solid ${Colors.GrayBorder};
   }

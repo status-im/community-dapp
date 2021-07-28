@@ -31,6 +31,7 @@ export const InfoHeading = styled.h1`
   @media (max-width: 600px) {
     font-size: 22px;
     line-height: 22px;
+    padding: 0 16px;
   }
 `
 
@@ -44,5 +45,6 @@ export const InfoText = styled.p`
     font-size: 13px;
     line-height: 18px;
     margin: 0;
+    padding: 0 16px;
   }
 `

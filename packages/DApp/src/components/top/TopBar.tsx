@@ -166,7 +166,7 @@ export const StyledNavLink = styled(NavLink)`
     width: 124px;
     height: 2px;
     position: absolute;
-    bottom: 0;
+    bottom: -1px;
     left: 50%;
     transform: translateX(-50%);
     background-color: ${Colors.Violet};

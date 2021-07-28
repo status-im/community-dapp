@@ -162,7 +162,7 @@ const CardLogoWrap = styled.div`
     justify-content: space-between;
     align-items: center;
     width: 40px;
-    height: 76px;
+    height: 78px;
   }
 `
 const CardLogo = styled.img`
@@ -188,7 +188,8 @@ const RemoveBtn = styled.button`
   height: 16px;
   margin-left: 16px;
   background-image: url(${binIcon});
-  background-size: cover;
+  background-size: contain;
+  background-repeat: no-repeat;
 
   &:disabled {
     filter: grayscale(1);
