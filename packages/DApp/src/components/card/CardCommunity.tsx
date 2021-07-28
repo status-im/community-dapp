@@ -42,7 +42,11 @@ export const CardCommunity = ({
 
   const handleMobileRemove = useCallback((e: React.MouseEvent) => {
     e.stopPropagation()
-    history.push(`/removal/${community.publicKey}`)
+    if (window.innerWidth < 600) {
+      history.push(`/removal/${community.publicKey}`)
+    } else {
+      setShowRemoveModal(true)
+    }
   }, [])
 
   return (
