@@ -64,16 +64,16 @@ export function getCommunitiesInDirectorySync(
       break
     case DirectorySortingEnum.MostVotes:
       sortFunction = (a: CommunityDetail, b: CommunityDetail) => {
-        if (!a.directoryInfo?.featureVotes) return 1
-        if (!b.directoryInfo?.featureVotes) return -1
-        return a?.directoryInfo?.featureVotes < b?.directoryInfo?.featureVotes ? 1 : -1
+        if (!a?.featureVotes) return 1
+        if (!b?.featureVotes) return -1
+        return a?.featureVotes < b?.featureVotes ? 1 : -1
       }
       break
     case DirectorySortingEnum.LeastVotes:
       sortFunction = (a: CommunityDetail, b: CommunityDetail) => {
-        if (!a.directoryInfo?.featureVotes) return 1
-        if (!b.directoryInfo?.featureVotes) return -1
-        return a?.directoryInfo?.featureVotes < b?.directoryInfo?.featureVotes ? -1 : 1
+        if (!a?.featureVotes) return 1
+        if (!b?.featureVotes) return -1
+        return a?.featureVotes < b?.featureVotes ? -1 : 1
       }
       break
   }

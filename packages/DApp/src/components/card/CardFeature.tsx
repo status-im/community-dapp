@@ -12,6 +12,7 @@ import { useEthers } from '@usedapp/core'
 import { VoteSubmitButton } from './VoteSubmitButton'
 import { VoteSendingBtn, VoteBtn } from '../Button'
 import { VotingRoom } from '../../models/smartContract'
+import { useWakuFeature } from '../../providers/wakuFeature/provider'
 
 interface CardFeatureProps {
   community: CommunityDetail
@@ -28,12 +29,11 @@ export const CardFeature = ({ community, heading, icon, sum, timeLeft, currentVo
   const [showFeatureModal, setShowFeatureModal] = useState(false)
   const [showConfirmModal, setShowConfirmModal] = useState(false)
   const [showOngoingVote, setShowOngoingVote] = useState(false)
-
+  const { featured } = useWakuFeature()
   const setNewModal = (val: boolean) => {
     setShowConfirmModal(val)
     setShowFeatureModal(false)
   }
-
   return (
     <CardVoteBlock>
       <CardHeadingFeature style={{ fontWeight: timeLeft ? 'normal' : 'bold', fontSize: timeLeft ? '15px' : '17px' }}>
@@ -78,7 +78,10 @@ export const CardFeature = ({ community, heading, icon, sum, timeLeft, currentVo
             <VoteConfirmModal community={community} selectedVote={{ verb: 'to feature' }} setShowModal={setNewModal} />
           </Modal>
         )}
-        <FeatureBtn disabled={Boolean(timeLeft) || !account} onClick={() => setShowFeatureModal(true)}>
+        <FeatureBtn
+          disabled={!account || featured.find((el) => el[0] === community.publicKey)}
+          onClick={() => setShowFeatureModal(true)}
+        >
           Feature this community! <span style={{ fontSize: '20px' }}>⭐️</span>
         </FeatureBtn>
       </div>

@@ -78,13 +78,13 @@ export function sortDirectoryFunction(sortedBy: DirectorySortingEnum) {
         if (!b.directoryInfo) return 1
         return a?.directoryInfo?.additionDate < b?.directoryInfo?.additionDate ? 1 : -1
       case DirectorySortingEnum.MostVotes:
-        if (!a.directoryInfo?.featureVotes) return 1
-        if (!b.directoryInfo?.featureVotes) return -1
-        return a?.directoryInfo?.featureVotes < b?.directoryInfo?.featureVotes ? 1 : -1
+        if (!a?.featureVotes) return 1
+        if (!b?.featureVotes) return -1
+        return a?.featureVotes < b?.featureVotes ? 1 : -1
       case DirectorySortingEnum.LeastVotes:
-        if (!a.directoryInfo?.featureVotes) return 1
-        if (!b.directoryInfo?.featureVotes) return -1
-        return a?.directoryInfo?.featureVotes < b?.directoryInfo?.featureVotes ? -1 : 1
+        if (!a?.featureVotes) return 1
+        if (!b?.featureVotes) return -1
+        return a?.featureVotes < b?.featureVotes ? -1 : 1
     }
   }
 }

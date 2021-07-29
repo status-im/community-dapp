@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from 'uuid'
 export interface Config {
   numberPerPage: number
   wakuTopic: string
+  wakuFeatureTopic: string
   contracts: {
     [chainID: number]: {
       [name: string]: string
@@ -28,16 +29,19 @@ const contracts = {
 export const config: EnvConfigs = {
   localhost: {
     wakuTopic: `/myApp/localhost/${uuidv4()}/0.0.5/votingRoom/`,
+    wakuFeatureTopic: `/myApp/localhost/${uuidv4()}/0.0.5/feature/`,
     numberPerPage: 2,
     contracts,
   },
   development: {
     wakuTopic: '/myApp/development/0.0.5/votingRoom/',
+    wakuFeatureTopic: `/myApp/development/0.0.5/feature/`,
     numberPerPage: 3,
     contracts,
   },
   production: {
     wakuTopic: '/myApp/production/0.0.5/votingRoom/',
+    wakuFeatureTopic: `/myApp/production/0.0.5/feature/`,
     numberPerPage: 4,
     contracts,
   },

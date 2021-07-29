@@ -29,10 +29,10 @@ export type CommunityDetail = {
       }[]
     | []
   currentVoting: CurrentVoting | undefined
+  featureVotes?: BigNumber // number of votes for featuring community undefined if community can't be voted on
   directoryInfo?: {
     // if community is in directory this object describes additional directory info
     additionDate: Date // date of addition to directory
-    featureVotes?: BigNumber // number of votes for featuring community undefined if community can't be voted on
     untilNextFeature?: number // number of seconds until community can be featured again
   }
 }

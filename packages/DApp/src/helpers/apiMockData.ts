@@ -56,9 +56,9 @@ export const communities: Array<CommunityDetail> = [
       voteFor: BigNumber.from(16740235),
       voteAgainst: BigNumber.from(6740235),
     },
+    featureVotes: BigNumber.from(62142321),
     directoryInfo: {
       additionDate: new Date(1622802882000),
-      featureVotes: BigNumber.from(62142321),
     },
   },
   {
@@ -91,9 +91,9 @@ export const communities: Array<CommunityDetail> = [
     validForAddition: true,
     votingHistory: [],
     currentVoting: undefined,
+    featureVotes: BigNumber.from(5214321),
     directoryInfo: {
       additionDate: new Date(1622630082000),
-      featureVotes: BigNumber.from(5214321),
     },
   },
   {
@@ -108,9 +108,9 @@ export const communities: Array<CommunityDetail> = [
     validForAddition: false,
     votingHistory: [],
     currentVoting: undefined,
+    featureVotes: BigNumber.from(314321),
     directoryInfo: {
       additionDate: new Date(1622543682000),
-      featureVotes: BigNumber.from(314321),
     },
   },
   {

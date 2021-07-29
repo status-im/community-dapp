@@ -48,9 +48,9 @@ export function DirectoryCard({ community }: DirectoryCardProps) {
         <CardFeature
           community={community}
           heading={timeLeft ? 'This community has to wait until it can be featured again' : 'Weekly Feature vote'}
-          icon={community?.directoryInfo?.featureVotes ? '⭐' : '⏳'}
-          sum={community?.directoryInfo?.featureVotes?.toNumber()}
-          timeLeft={timeLeft}
+          icon={community?.featureVotes ? '⭐' : '⏳'}
+          sum={community?.featureVotes?.toNumber()}
+          timeLeft={''}
           currentVoting={currentVoting}
           room={votingRoom}
         />

@@ -10,7 +10,6 @@ import { DirectoryCardSkeleton } from './DirectoryCardSkeleton'
 import { useDirectoryCommunities } from '../../hooks/useDirectoryCommunities'
 import { SearchEmpty } from '../SearchEmpty'
 import { DirectoryCard } from './DirectoryCard'
-
 export function DirectoryCards() {
   const [filterKeyword, setFilterKeyword] = useState('')
   const [sortedBy, setSortedBy] = useState(DirectorySortingEnum.IncludedRecently)
@@ -27,7 +26,7 @@ export function DirectoryCards() {
         />
         <FilterList value={sortedBy} setValue={setSortedBy} options={DirectorySortingOptions} />
       </PageBar>
-      <WeeklyFeature endDate={new Date('07/26/2021')} />
+      <WeeklyFeature endDate={new Date('07/30/2021')} />
       <Voting>
         {communities.map((community, idx) => {
           if (community) {

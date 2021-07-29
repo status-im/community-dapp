@@ -45,6 +45,74 @@ export async function receiveWakuMessages(waku: Waku, topic: string, room: numbe
   return messages?.map((msg) => JSON.parse(msg.payloadAsUtf8))
 }
 
+export async function receiveWakuFeatureMsg(waku: Waku | undefined, topic: string) {
+  if (waku) {
+    const messages = await waku.store.queryHistory({ contentTopics: [topic] })
+    if (messages) {
+      return messages.filter(verifyWakuFeatureMsg).map((msg) => {
+        const data = JSON.parse(msg.payloadAsUtf8)
+        return { ...data, timestamp: new Date(data.timestamp) }
+      })
+    }
+  }
+  return []
+}
+
+export function verifyWakuFeatureMsg(msg: WakuMessage) {
+  const wakuTimestamp = msg.timestamp
+  const data = JSON.parse(msg.payloadAsUtf8)
+  const timestamp = new Date(data.timestamp)
+  const types = ['address', 'uint256', 'address', 'uint256']
+  const message = [data.voter, data.sntAmount, data.publicKey, BigNumber.from(timestamp.getTime())]
+
+  const verifiedAddress = utils.verifyMessage(packAndArrayify(types, message), data.sign)
+
+  if (wakuTimestamp?.getTime() != timestamp.getTime() || verifiedAddress != data.voter) {
+    return false
+  }
+  return true
+}
+
+export async function createWakuFeatureMsg(
+  account: string | null | undefined,
+  signer: JsonRpcSigner | undefined,
+  sntAmount: BigNumber,
+  publicKey: string,
+  contentTopic: string
+) {
+  if (!account || !signer) {
+    return undefined
+  }
+
+  const signerAddress = await signer?.getAddress()
+  if (signerAddress != account) {
+    return undefined
+  }
+  const timestamp = new Date()
+
+  const types = ['address', 'uint256', 'address', 'uint256']
+  const message = [account, sntAmount, publicKey, BigNumber.from(timestamp.getTime())]
+  const sign = await signer.signMessage(packAndArrayify(types, message))
+
+  if (sign) {
+    const msg = WakuMessage.fromUtf8String(
+      JSON.stringify({
+        voter: account,
+        sntAmount,
+        publicKey,
+        timestamp,
+        sign,
+      }),
+      {
+        contentTopic,
+        timestamp,
+      }
+    )
+    return msg
+  }
+  return undefined
+}
+
 export async function createWakuMessage(
   account: string | null | undefined,
   signer: JsonRpcSigner | undefined,

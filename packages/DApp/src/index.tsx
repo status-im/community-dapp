@@ -6,6 +6,7 @@ import { DEFAULT_CONFIG } from '@usedapp/core/dist/cjs/src/model/config/default'
 import { ConfigProvider } from './providers/config/provider'
 import { WakuProvider } from './providers/waku/provider'
 import { CommunitiesProvider } from './providers/communities/provider'
+import { WakuFeatureProvider } from './providers/wakuFeature/provider'
 
 const config = {
   readOnlyChainId: ChainId.Ropsten,
@@ -29,7 +30,9 @@ render(
       <DAppProvider config={config}>
         <ConfigProvider>
           <CommunitiesProvider>
-            <App />
+            <WakuFeatureProvider>
+              <App />
+            </WakuFeatureProvider>
           </CommunitiesProvider>
         </ConfigProvider>
       </DAppProvider>

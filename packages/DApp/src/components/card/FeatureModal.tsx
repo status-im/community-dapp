@@ -5,6 +5,7 @@ import { CardCommunity } from './CardCommunity'
 import { ButtonPrimary } from '../Button'
 import { VotePropose } from '../votes/VotePropose'
 import { ColumnFlexDiv } from '../../constants/styles'
+import { useSendWakuFeature } from '../../hooks/useSendWakuFeature'
 
 interface FeatureModalProps {
   community: CommunityDetail
@@ -14,6 +15,7 @@ interface FeatureModalProps {
 
 export function FeatureModal({ community, availableAmount, setShowConfirmModal }: FeatureModalProps) {
   const [proposingAmount, setProposingAmount] = useState(0)
+  const sendWaku = useSendWakuFeature()
   const disabled = proposingAmount === 0
 
   return (
@@ -26,7 +28,13 @@ export function FeatureModal({ community, availableAmount, setShowConfirmModal }
           proposingAmount={proposingAmount}
           disabled={disabled}
         />
-        <VoteConfirmBtn disabled={disabled} onClick={() => setShowConfirmModal(true)}>
+        <VoteConfirmBtn
+          disabled={disabled}
+          onClick={async () => {
+            await sendWaku(proposingAmount, community.publicKey)
+            setShowConfirmModal(true)
+          }}
+        >
           Confirm vote to feature community
         </VoteConfirmBtn>
       </VoteProposeWrap>
