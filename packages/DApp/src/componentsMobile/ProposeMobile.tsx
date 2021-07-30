@@ -25,7 +25,6 @@ import { InfoText, ProposingInfo, VoteProposeWrap, WarningWrap } from '../compon
 import { HistoryLink } from './CardVoteMobile'
 
 export function ProposeMobile() {
-  const availableAmount = 60000000
   const [proposingAmount, setProposingAmount] = useState(0)
   const [communityFound, setCommunityFound] = useState<CommunityDetail | undefined>(undefined)
   const [publicKey, setPublicKey] = useState('')
@@ -33,7 +32,7 @@ export function ProposeMobile() {
   const { votingContract } = useContracts()
   const { send } = useContractFunction(votingContract, 'initializeVotingRoom')
 
-  const warning = useProposeWarning(communityFound, availableAmount)
+  const warning = useProposeWarning(communityFound)
 
   const [showHistory, setShowHistory] = useState(false)
   const isDisabled = communityFound ? communityFound.votingHistory.length === 0 : false
@@ -66,7 +65,6 @@ export function ProposeMobile() {
           <VoteProposeWrap>
             <ProposingHeadingMobile>{` Add ${communityFound.name}?`}</ProposingHeadingMobile>
             <VotePropose
-              availableAmount={availableAmount}
               setProposingAmount={setProposingAmount}
               proposingAmount={proposingAmount}
               disabled={!communityFound}

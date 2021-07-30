@@ -80,7 +80,7 @@ export const CardCommunity = ({
             setShowRemoveModal(val)
           }}
         >
-          <RemoveModal community={community} availableAmount={549739700} setShowConfirmModal={setNewModal} />{' '}
+          <RemoveModal community={community} setShowConfirmModal={setNewModal} />{' '}
         </Modal>
       )}
       {showConfirmModal && (

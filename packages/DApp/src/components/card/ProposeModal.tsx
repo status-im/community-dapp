@@ -16,25 +16,19 @@ import { useProposeWarning } from '../../hooks/useProposeWarning'
 import { PublicKeyInput } from '../PublicKeyInput'
 
 interface ProposeModalProps {
-  availableAmount: number
   setShowConfirmModal: (val: boolean) => void
   setCommunityFound: (community: CommunityDetail | undefined) => void
   communityFound: CommunityDetail | undefined
 }
 
-export function ProposeModal({
-  availableAmount,
-  setShowConfirmModal,
-  setCommunityFound,
-  communityFound,
-}: ProposeModalProps) {
+export function ProposeModal({ setShowConfirmModal, setCommunityFound, communityFound }: ProposeModalProps) {
   const [proposingAmount, setProposingAmount] = useState(0)
   const [publicKey, setPublicKey] = useState('')
   const loading = useCommunityDetails(publicKey, setCommunityFound)
   const { votingContract } = useContracts()
   const { send, state } = useContractFunction(votingContract, 'initializeVotingRoom')
 
-  const warning = useProposeWarning(communityFound, availableAmount)
+  const warning = useProposeWarning(communityFound)
 
   useEffect(() => {
     if (state.status === 'Mining') {
@@ -54,7 +48,6 @@ export function ProposeModal({
         {communityFound && communityFound.validForAddition && publicKey && (
           <VoteProposeWrap>
             <VotePropose
-              availableAmount={availableAmount}
               setProposingAmount={setProposingAmount}
               proposingAmount={proposingAmount}
               disabled={!communityFound}

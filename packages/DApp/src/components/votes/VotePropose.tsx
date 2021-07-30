@@ -1,8 +1,9 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useState } from 'react'
 import styled from 'styled-components'
 import { Colors, ColumnFlexDiv } from '../../constants/styles'
 import { addCommas } from '../../helpers/addCommas'
+import { useAvailableAmount } from '../../hooks/useAvailableAmount'
 import { CurrentVoting } from '../../models/community'
 import { Input } from '../Input'
 import { Warning } from './VoteWarning'
@@ -12,21 +13,20 @@ export interface VoteProposingProps {
   selectedVote?: {
     noun: string
   }
-  availableAmount: number
   setProposingAmount: (show: number) => void
   proposingAmount: number
   disabled?: boolean
 }
 
-export function VotePropose({
-  vote,
-  selectedVote,
-  availableAmount,
-  proposingAmount,
-  disabled,
-  setProposingAmount,
-}: VoteProposingProps) {
+export function VotePropose({ vote, selectedVote, proposingAmount, disabled, setProposingAmount }: VoteProposingProps) {
+  const availableAmount = useAvailableAmount()
+
   const [displayAmount, setDisplayAmount] = useState(addCommas(proposingAmount) + ' SNT')
+
+  useEffect(() => {
+    const initialProposing = vote?.type === 'Remove' && availableAmount > 2000000 ? 2000000 : 0
+    setProposingAmount(initialProposing)
+  }, [])
 
   let step = 10 ** (Math.floor(Math.log10(availableAmount)) - 2)
   if (availableAmount < 100) {

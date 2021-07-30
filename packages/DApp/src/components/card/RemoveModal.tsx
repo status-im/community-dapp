@@ -6,19 +6,14 @@ import { RemoveAmountPicker } from '../card/RemoveAmountPicker'
 
 interface RemoveModalProps {
   community: CommunityDetail
-  availableAmount: number
   setShowConfirmModal: (val: boolean) => void
 }
 
-export function RemoveModal({ community, availableAmount, setShowConfirmModal }: RemoveModalProps) {
+export function RemoveModal({ community, setShowConfirmModal }: RemoveModalProps) {
   return (
     <ColumnFlexDiv>
       <CardCommunity community={community} />
-      <RemoveAmountPicker
-        community={community}
-        availableAmount={availableAmount}
-        setShowConfirmModal={setShowConfirmModal}
-      />
+      <RemoveAmountPicker community={community} setShowConfirmModal={setShowConfirmModal} />
     </ColumnFlexDiv>
   )
 }

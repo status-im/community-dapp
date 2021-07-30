@@ -1,9 +1,12 @@
 import { useContractCall } from '@usedapp/core'
 import { useEffect, useState } from 'react'
 import { CommunityDetail } from '../models/community'
+import { useAvailableAmount } from './useAvailableAmount'
 import { useContracts } from './useContracts'
 
-export function useProposeWarning(communityFound: CommunityDetail | undefined, availableAmount: number) {
+export function useProposeWarning(communityFound: CommunityDetail | undefined) {
+  const availableAmount = useAvailableAmount()
+
   const [warning, setWarning] = useState({ icon: '', text: '' })
 
   const { directoryContract, votingContract } = useContracts()

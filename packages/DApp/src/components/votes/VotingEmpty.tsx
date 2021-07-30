@@ -36,20 +36,10 @@ export function VotingEmpty() {
   }, [])
 
   return (
-    <VotingEmptyWrap>
-      <p>😲</p>
-
-      <ColumnFlexDiv>
-        <EmptyHeading>There are no ongoing votes at the moment!</EmptyHeading>
-        <EmptyText>
-          If you know of a community that you think should be added to the Community Directory, feel free to propose
-          it's addition by starting a vote
-        </EmptyText>
-      </ColumnFlexDiv>
+    <div>
       {showProposeModal && (
         <Modal heading="Add community to directory" setShowModal={setShowProposeModal}>
           <ProposeModal
-            availableAmount={65245346}
             setShowConfirmModal={setNext}
             setCommunityFound={setCommunityFound}
             communityFound={communityFound}
@@ -65,17 +55,28 @@ export function VotingEmpty() {
           />
         </Modal>
       )}
+      <VotingEmptyWrap>
+        <p>😲</p>
 
-      {!mobileVersion && (
-        <div>
-          {account ? (
-            <ProposeButton onClick={() => setShowProposeModal(true)}>Propose community</ProposeButton>
-          ) : (
-            <ConnectButton />
-          )}
-        </div>
-      )}
-    </VotingEmptyWrap>
+        <ColumnFlexDiv>
+          <EmptyHeading>There are no ongoing votes at the moment!</EmptyHeading>
+          <EmptyText>
+            If you know of a community that you think should be added to the Community Directory, feel free to propose
+            it's addition by starting a vote
+          </EmptyText>
+        </ColumnFlexDiv>
+
+        {!mobileVersion && (
+          <div>
+            {account ? (
+              <ProposeButton onClick={() => setShowProposeModal(true)}>Propose community</ProposeButton>
+            ) : (
+              <ConnectButton />
+            )}
+          </div>
+        )}
+      </VotingEmptyWrap>
+    </div>
   )
 }
 

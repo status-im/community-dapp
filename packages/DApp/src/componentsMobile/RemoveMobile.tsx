@@ -31,7 +31,6 @@ export function RemoveMobile() {
 
         <RemoveAmountPicker
           community={community}
-          availableAmount={60000000}
           setShowConfirmModal={(val: boolean) => {
             val
           }}

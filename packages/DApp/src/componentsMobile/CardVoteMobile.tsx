@@ -41,10 +41,7 @@ export const CardVoteMobile = ({ room }: CardVoteMobileProps) => {
   const voteConstants = voteTypes[vote.type]
 
   const winner = getVotingWinner(vote)
-  const availableAmount = 65800076
-
-  const initialProposing = vote?.type === 'Remove' && availableAmount > 2000000 ? 2000000 : 0
-  const [proposingAmount, setProposingAmount] = useState(initialProposing)
+  const [proposingAmount, setProposingAmount] = useState(0)
 
   const [showHistory, setShowHistory] = useState(false)
   const isDisabled = room.details.votingHistory.length === 0
@@ -76,7 +73,6 @@ export const CardVoteMobile = ({ room }: CardVoteMobileProps) => {
             <VotePropose
               vote={vote}
               selectedVote={selectedVoted}
-              availableAmount={availableAmount}
               proposingAmount={proposingAmount}
               setProposingAmount={setProposingAmount}
             />

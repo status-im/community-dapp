@@ -11,7 +11,6 @@ import { ColumnFlexDiv } from '../../constants/styles'
 export interface VoteModalProps {
   vote: CurrentVoting
   selectedVote: VoteType
-  availableAmount: number
   proposingAmount: number
   room: number
   setShowConfirmModal: (show: boolean) => void
@@ -22,7 +21,6 @@ export function VoteModal({
   vote,
   room,
   selectedVote,
-  availableAmount,
   proposingAmount,
   setShowConfirmModal,
   setProposingAmount,
@@ -36,7 +34,6 @@ export function VoteModal({
       <VotePropose
         vote={vote}
         selectedVote={selectedVote}
-        availableAmount={availableAmount}
         setProposingAmount={setProposingAmount}
         proposingAmount={proposingAmount}
       />

@@ -9,11 +9,10 @@ import { useSendWakuFeature } from '../../hooks/useSendWakuFeature'
 
 interface FeatureModalProps {
   community: CommunityDetail
-  availableAmount: number
   setShowConfirmModal: (val: boolean) => void
 }
 
-export function FeatureModal({ community, availableAmount, setShowConfirmModal }: FeatureModalProps) {
+export function FeatureModal({ community, setShowConfirmModal }: FeatureModalProps) {
   const [proposingAmount, setProposingAmount] = useState(0)
   const sendWaku = useSendWakuFeature()
   const disabled = proposingAmount === 0
@@ -22,12 +21,7 @@ export function FeatureModal({ community, availableAmount, setShowConfirmModal }
     <ColumnFlexDiv>
       <CardCommunity community={community} />
       <VoteProposeWrap>
-        <VotePropose
-          availableAmount={availableAmount}
-          setProposingAmount={setProposingAmount}
-          proposingAmount={proposingAmount}
-          disabled={disabled}
-        />
+        <VotePropose setProposingAmount={setProposingAmount} proposingAmount={proposingAmount} disabled={disabled} />
         <VoteConfirmBtn
           disabled={disabled}
           onClick={async () => {

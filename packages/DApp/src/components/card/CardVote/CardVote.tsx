@@ -25,7 +25,7 @@ export const CardVote = ({ room, hideModalFunction }: CardVoteProps) => {
   const { account } = useEthers()
   const [showVoteModal, setShowVoteModal] = useState(false)
   const [showConfirmModal, setShowConfirmModal] = useState(false)
-
+  const [proposingAmount, setProposingAmount] = useState(0)
   const [selectedVoted, setSelectedVoted] = useState(voteTypes['Add'].for)
 
   const { votingContract } = useContracts()
@@ -51,10 +51,6 @@ export const CardVote = ({ room, hideModalFunction }: CardVoteProps) => {
   const voteConstants = voteTypes[vote.type]
 
   const winner = getVotingWinner(vote)
-  const availableAmount = 65800076
-
-  const initialProposing = vote?.type === 'Remove' && availableAmount > 2000000 ? 2000000 : 0
-  const [proposingAmount, setProposingAmount] = useState(initialProposing)
 
   if (!vote) {
     return <CardVoteBlock />
@@ -67,7 +63,6 @@ export const CardVote = ({ room, hideModalFunction }: CardVoteProps) => {
             vote={vote}
             room={room.roomNumber}
             selectedVote={selectedVoted}
-            availableAmount={availableAmount}
             proposingAmount={proposingAmount}
             setShowConfirmModal={setNext}
             setProposingAmount={setProposingAmount}

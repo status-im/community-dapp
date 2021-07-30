@@ -8,15 +8,16 @@ import { ButtonPrimary } from '../Button'
 import { VotePropose } from '../votes/VotePropose'
 import { Warning } from '../votes/VoteWarning'
 import { ConfirmBtn } from './VoteConfirmModal'
+import { useAvailableAmount } from '../../hooks/useAvailableAmount'
 import { BigNumber } from 'ethers'
-
 interface RemoveAmountPickerProps {
   community: CommunityDetail
-  availableAmount: number
   setShowConfirmModal: (val: boolean) => void
 }
 
-export function RemoveAmountPicker({ community, availableAmount, setShowConfirmModal }: RemoveAmountPickerProps) {
+export function RemoveAmountPicker({ community, setShowConfirmModal }: RemoveAmountPickerProps) {
+  const availableAmount = useAvailableAmount()
+
   const [proposingAmount, setProposingAmount] = useState(0)
   const disabled = proposingAmount === 0
   const { votingContract } = useContracts()
@@ -72,11 +73,7 @@ export function RemoveAmountPicker({ community, availableAmount, setShowConfirmM
   }
   return (
     <VoteProposeWrap>
-      <VotePropose
-        availableAmount={availableAmount}
-        setProposingAmount={setProposingAmount}
-        proposingAmount={proposingAmount}
-      />
+      <VotePropose setProposingAmount={setProposingAmount} proposingAmount={proposingAmount} />
       <VoteConfirmBtn disabled={disabled} onClick={() => send(0, community.publicKey, BigNumber.from(proposingAmount))}>
         Confirm vote to remove community
       </VoteConfirmBtn>

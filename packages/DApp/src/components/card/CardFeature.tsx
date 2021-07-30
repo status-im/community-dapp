@@ -70,7 +70,7 @@ export const CardFeature = ({ community, heading, icon, sum, timeLeft, currentVo
       <div>
         {showFeatureModal && (
           <Modal heading="Feature in “Weekly Featured”?" setShowModal={setShowFeatureModal}>
-            <FeatureModal community={community} availableAmount={549739700} setShowConfirmModal={setNewModal} />{' '}
+            <FeatureModal community={community} setShowConfirmModal={setNewModal} />{' '}
           </Modal>
         )}
         {showConfirmModal && (

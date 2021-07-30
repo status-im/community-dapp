@@ -28,7 +28,6 @@ export function VotesInfo() {
       {showProposeModal && (
         <Modal heading="Add community to directory" setShowModal={setShowProposeModal}>
           <ProposeModal
-            availableAmount={65245346}
             setShowConfirmModal={setNext}
             setCommunityFound={setCommunityFound}
             communityFound={communityFound}

@@ -51,6 +51,7 @@ const PopUpWindow = styled.div`
   max-width: 475px;
   margin: 20vh auto 2vh;
   padding: 24px;
+  margin-bottom: 100px;
   background-color: ${Colors.GrayLight};
   box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.1);
   border-radius: 6px;

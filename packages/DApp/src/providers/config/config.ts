@@ -17,31 +17,35 @@ interface EnvConfigs {
 
 const contracts = {
   3: {
-    votingContract: '0xb3bb261Ac080059A46879d3B3f8B5779b9AF26dF',
-    directoryContract: '0xfEB894511bC1B92EFA4f7fa050fC0BF7697Df6a2',
+    votingContract: '0xF6fb0EBfa21958440e2AA8ee603DFDc885C4F694',
+    directoryContract: '0x56dF4644483Dbb5607d0eB162Aa64536bD5c2C24',
+    tokenContract: '0x80ee48b5ba5c3EA556b7fF6D850d2fB2c4bc7412',
   },
   1337: {
     votingContract: process.env.GANACHE_VOTING_CONTRACT ?? '0x0000000000000000000000000000000000000000',
     directoryContract: process.env.GANACHE_DIRECTORY_CONTRACT ?? '0x0000000000000000000000000000000000000000',
+    tokenContract: process.env.GANACHE_TOKEN_CONTRACT ?? '0x0000000000000000000000000000000000000000',
   },
 }
 
+const version = '0.0.6'
+
 export const config: EnvConfigs = {
   localhost: {
-    wakuTopic: `/myApp/localhost/${uuidv4()}/0.0.5/votingRoom/`,
-    wakuFeatureTopic: `/myApp/localhost/${uuidv4()}/0.0.5/feature/`,
+    wakuTopic: `/myApp/localhost/${uuidv4()}/${version}/votingRoom/`,
+    wakuFeatureTopic: `/myApp/localhost/${uuidv4()}/${version}/feature/`,
     numberPerPage: 2,
     contracts,
   },
   development: {
-    wakuTopic: '/myApp/development/0.0.5/votingRoom/',
-    wakuFeatureTopic: `/myApp/development/0.0.5/feature/`,
+    wakuTopic: `/myApp/development/${version}/votingRoom/`,
+    wakuFeatureTopic: `/myApp/development/${version}/feature/`,
     numberPerPage: 3,
     contracts,
   },
   production: {
-    wakuTopic: '/myApp/production/0.0.5/votingRoom/',
-    wakuFeatureTopic: `/myApp/production/0.0.5/feature/`,
+    wakuTopic: `/myApp/production/${version}/votingRoom/`,
+    wakuFeatureTopic: `/myApp/production/${version}/feature/`,
     numberPerPage: 4,
     contracts,
   },
