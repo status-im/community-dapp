@@ -1,6 +1,6 @@
 import { BigNumber, ethers } from 'ethers'
 import { deployContract } from 'ethereum-waffle'
-import {VotingContract, Directory, MultiCall, ERC20Mock} from '../abi'
+import {VotingContract, Directory, ERC20Mock} from '../abi'
 
 const deploy = async () => {
     const providerName = process.env.ETHEREUM_PROVIDER
@@ -22,10 +22,6 @@ const deploy = async () => {
         const directoryContract = await deployContract(wallet,Directory,[votingContract.address])
         await votingContract.setDirectory(directoryContract.address)
         console.log(`Directory contract deployed with address: ${directoryContract.address}`)
-
-        const multiCall = await deployContract(wallet, MultiCall)
-        console.log(`MultiCall deployed with address: ${multiCall.address}`)
-
     }
 }
 
