@@ -1,5 +1,6 @@
 pragma solidity ^0.8.5;
 
+import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import '@openzeppelin/contracts/utils/cryptography/ECDSA.sol';
 import '@openzeppelin/contracts/utils/math/SafeMath.sol';
 import './Directory.sol';
@@ -33,6 +34,7 @@ contract VotingContract {
 
     address public owner;
     Directory public directory;
+    IERC20 public token;
 
     uint256 private latestVoting = 1;
     mapping(uint256 => VotingRoom) public votingRoomMap;
@@ -41,8 +43,9 @@ contract VotingContract {
     uint256[] public activeVotingRooms;
     mapping(uint256 => uint256) private indexOfActiveVotingRooms;
 
-    constructor() {
+    constructor(IERC20 _address) {
         owner = msg.sender;
+        token = _address;
     }
 
     function setDirectory(Directory _address) public {
@@ -94,6 +97,7 @@ contract VotingContract {
         if (voteType == VoteType.ADD) {
             require(!directory.isCommunityInDirectory(publicKey), 'Community already in directory');
         }
+        require(token.balanceOf(msg.sender) >= voteAmount, 'not enough token');
         VotingRoom storage newVotingRoom = votingRoomMap[latestVoting];
         newVotingRoom.startBlock = block.number;
         newVotingRoom.endAt = block.timestamp.add(VOTING_LENGTH);
@@ -140,6 +144,9 @@ contract VotingContract {
         emit VotingRoomFinalized(roomId, community, passed, votingRoomMap[roomId].voteType);
     }
 
+    event VoteCast(uint256 roomId, address voter);
+    event NotEnoughToken(uint256 roomId, address voter);
+
     struct SignedVote {
         address voter;
         uint256 roomIdAndType;
@@ -147,7 +154,6 @@ contract VotingContract {
         bytes32 r;
         bytes32 vs;
     }
-    event VoteCast(uint256 roomId, address voter);
 
     function castVotes(SignedVote[] calldata votes) public {
         for (uint256 i = 0; i < votes.length; i++) {
@@ -162,14 +168,18 @@ contract VotingContract {
                 VotingRoom storage room = votingRoomMap[roomId];
                 require(room.endAt > block.timestamp, 'vote closed');
                 if (room.voted[vote.voter] == false) {
-                    if (vote.roomIdAndType & 1 == 1) {
-                        room.totalVotesFor = room.totalVotesFor.add(vote.sntAmount);
+                    if (token.balanceOf(vote.voter) >= vote.sntAmount) {
+                        if (vote.roomIdAndType & 1 == 1) {
+                            room.totalVotesFor = room.totalVotesFor.add(vote.sntAmount);
+                        } else {
+                            room.totalVotesAgainst = room.totalVotesAgainst.add(vote.sntAmount);
+                        }
+                        room.voters.push(vote.voter);
+                        room.voted[vote.voter] = true;
+                        emit VoteCast(roomId, vote.voter);
                     } else {
-                        room.totalVotesAgainst = room.totalVotesAgainst.add(vote.sntAmount);
+                        emit NotEnoughToken(roomId, vote.voter);
                     }
-                    room.voters.push(vote.voter);
-                    room.voted[vote.voter] = true;
-                    emit VoteCast(roomId, vote.voter);
                 }
             }
         }

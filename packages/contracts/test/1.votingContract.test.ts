@@ -1,7 +1,6 @@
 import { expect, use } from 'chai'
 import { loadFixture, deployContract, MockProvider, solidity } from 'ethereum-waffle'
-import VotingContract from '../build/VotingContract.json'
-import Directory from '../build/Directory.json'
+import { VotingContract, Directory, ERC20Mock } from '../abi'
 import { utils, BigNumber, Wallet, Contract } from 'ethers'
 
 use(solidity)
@@ -72,13 +71,17 @@ const voteAndFinalize = async (
 
 describe('Contract', () => {
   async function fixture([alice, firstAddress, secondAddress]: any[], provider: any) {
-    const contract = await deployContract(alice, VotingContract)
+    const erc20 = await deployContract(alice, ERC20Mock, ['MSNT', 'Mock SNT', alice.address, 100000])
+    await erc20.transfer(firstAddress.address, 10000)
+    await erc20.transfer(secondAddress.address, 10000)
+    const contract = await deployContract(alice, VotingContract, [erc20.address])
     const directory = await deployContract(alice, Directory, [contract.address])
     await contract.setDirectory(directory.address)
     await provider.send('evm_mine', [Math.floor(Date.now() / 1000)])
     return { contract, directory, alice, firstAddress, secondAddress, provider }
   }
   loadFixture(fixture)
+
   it('deploys properly', async () => {
     const { contract, directory } = await loadFixture(fixture)
     expect(await contract.directory()).to.eq(directory.address)
@@ -94,15 +97,22 @@ describe('Contract', () => {
     describe('initialization', () => {
       it('initializes', async () => {
         const { contract, firstAddress, secondAddress } = await loadFixture(fixture)
-        expect(await contract.initializeVotingRoom(1, firstAddress.address, BigNumber.from(100)))
+        await expect(await contract.initializeVotingRoom(1, firstAddress.address, BigNumber.from(100)))
           .to.emit(contract, 'VotingRoomStarted')
           .withArgs(1, firstAddress.address)
-        expect(await contract.initializeVotingRoom(1, secondAddress.address, BigNumber.from(100)))
+        await expect(await contract.initializeVotingRoom(1, secondAddress.address, BigNumber.from(100)))
           .to.emit(contract, 'VotingRoomStarted')
           .withArgs(2, secondAddress.address)
         await expect(contract.initializeVotingRoom(1, secondAddress.address, BigNumber.from(100))).to.be.revertedWith(
           'vote already ongoing'
         )
+      })
+
+      it('not enough token', async () => {
+        const { contract } = await loadFixture(fixture)
+        await expect(
+          contract.initializeVotingRoom(1, '0xAcdd71e5Ef3Ab3356d62da78A941aAc08a18CF2b', BigNumber.from(10000000000000))
+        ).to.be.revertedWith('not enough token')
       })
 
       describe('directory interaction', () => {
@@ -169,7 +179,7 @@ describe('Contract', () => {
           BigNumber.from(1),
         ])
         await provider.send('evm_mine', [Math.floor(Date.now() / 1000 + 2000)])
-        expect(await contract.finalizeVotingRoom(1))
+        await expect(await contract.finalizeVotingRoom(1))
           .to.emit(contract, 'VotingRoomFinalized')
           .withArgs(1, firstAddress.address, true, 1)
         expect((await contract.votingRoomMap(1)).slice(2)).to.deep.eq([
@@ -184,7 +194,7 @@ describe('Contract', () => {
 
       describe('directory interaction', () => {
         it('add community', async () => {
-          const { contract, directory, alice, provider, firstAddress } = await loadFixture(fixture)
+          const { contract, directory, provider, firstAddress } = await loadFixture(fixture)
           await contract.initializeVotingRoom(1, '0xAcdd71e5Ef3Ab3356d62da78A941aAc08a18CF2b', BigNumber.from(100))
           await voteAndFinalize(1, 1, firstAddress, contract, provider)
           expect((await contract.votingRoomMap(1)).slice(2)).to.deep.eq([
@@ -199,7 +209,7 @@ describe('Contract', () => {
         })
 
         it('remove community', async () => {
-          const { contract, directory, alice, provider, firstAddress } = await loadFixture(fixture)
+          const { contract, directory, provider, firstAddress } = await loadFixture(fixture)
           await contract.initializeVotingRoom(1, '0xAcdd71e5Ef3Ab3356d62da78A941aAc08a18CF2b', BigNumber.from(100))
           await voteAndFinalize(1, 1, firstAddress, contract, provider)
 
@@ -211,7 +221,7 @@ describe('Contract', () => {
         })
 
         it('failed add vote', async () => {
-          const { contract, directory, alice, provider, firstAddress } = await loadFixture(fixture)
+          const { contract, directory, provider, firstAddress } = await loadFixture(fixture)
           await contract.initializeVotingRoom(1, '0xAcdd71e5Ef3Ab3356d62da78A941aAc08a18CF2b', BigNumber.from(100))
           await voteAndFinalize(1, 0, firstAddress, contract, provider)
 
@@ -219,7 +229,7 @@ describe('Contract', () => {
         })
 
         it('failed remove vote', async () => {
-          const { contract, directory, alice, provider, firstAddress } = await loadFixture(fixture)
+          const { contract, directory, provider, firstAddress } = await loadFixture(fixture)
           await contract.initializeVotingRoom(1, '0xAcdd71e5Ef3Ab3356d62da78A941aAc08a18CF2b', BigNumber.from(100))
           await voteAndFinalize(1, 1, firstAddress, contract, provider)
 
@@ -282,6 +292,34 @@ describe('Contract', () => {
       expect(await contract.listRoomVoters(1)).to.deep.eq([alice.address])
       await contract.castVotes(signedMessages.slice(2))
       expect(await contract.listRoomVoters(1)).to.deep.eq([alice.address, secondAddress.address])
+    })
+
+    it('not enough tokens', async () => {
+      const { contract, firstAddress } = await loadFixture(fixture)
+      await contract.initializeVotingRoom(1, '0xabA1eF51ef4aE360a9e8C9aD2d787330B602eb24', BigNumber.from(100))
+
+      const types = ['address', 'uint256', 'uint256']
+      const message = [firstAddress.address, BigNumber.from(1).mul(2).add(1), BigNumber.from(100000000000)]
+
+      const signedMessage = [...message]
+      const signature = utils.splitSignature(
+        await firstAddress.signMessage(utils.arrayify(utils.solidityPack(types, message)))
+      )
+      signedMessage.push(signature.r)
+      signedMessage.push(signature._vs)
+
+      await expect(await contract.castVotes([signedMessage]))
+        .to.emit(contract, 'NotEnoughToken')
+        .withArgs(1, firstAddress.address)
+
+      await expect((await contract.votingRoomMap(1)).slice(2)).to.deep.eq([
+        1,
+        false,
+        '0xabA1eF51ef4aE360a9e8C9aD2d787330B602eb24',
+        BigNumber.from(100),
+        BigNumber.from(0),
+        BigNumber.from(1),
+      ])
     })
 
     it('success', async () => {
