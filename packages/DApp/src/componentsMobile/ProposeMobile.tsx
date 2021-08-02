@@ -24,6 +24,42 @@ import { ConnectMobile } from './ConnectMobile'
 import { InfoText, ProposingInfo, VoteProposeWrap, WarningWrap } from '../components/card/ProposeModal'
 import { HistoryLink } from './CardVoteMobile'
 
+interface ProposeBlockProps {
+  communityFound: CommunityDetail
+  proposingAmount: number
+  setProposingAmount: (amount: number) => void
+  send: (...args: any) => void
+}
+
+function ProposeBlock({ communityFound, proposingAmount, setProposingAmount, send }: ProposeBlockProps) {
+  const warning = useProposeWarning(communityFound)
+  return (
+    <>
+      <MobileBlock>
+        <WarningWrap>{warning.text && <Warning icon={warning.icon} text={warning.text} />}</WarningWrap>
+        {communityFound.validForAddition && (
+          <VoteProposeWrap>
+            <ProposingHeadingMobile>{` Add ${communityFound.name}?`}</ProposingHeadingMobile>
+            <VotePropose
+              setProposingAmount={setProposingAmount}
+              proposingAmount={proposingAmount}
+              disabled={!communityFound}
+            />
+          </VoteProposeWrap>
+        )}
+      </MobileBlock>
+      {communityFound.validForAddition && (
+        <ProposingBtn
+          disabled={!communityFound || !proposingAmount || !!warning.text}
+          onClick={() => send(1, communityFound.publicKey, BigNumber.from(proposingAmount))}
+        >
+          Confirm vote to add community
+        </ProposingBtn>
+      )}
+    </>
+  )
+}
+
 export function ProposeMobile() {
   const [proposingAmount, setProposingAmount] = useState(0)
   const [communityFound, setCommunityFound] = useState<CommunityDetail | undefined>(undefined)
@@ -31,8 +67,6 @@ export function ProposeMobile() {
   const loading = useCommunityDetails(publicKey, setCommunityFound)
   const { votingContract } = useContracts()
   const { send } = useContractFunction(votingContract, 'initializeVotingRoom')
-
-  const warning = useProposeWarning(communityFound)
 
   const [showHistory, setShowHistory] = useState(false)
   const isDisabled = communityFound ? communityFound.votingHistory.length === 0 : false
@@ -59,32 +93,22 @@ export function ProposeMobile() {
         </MobileTop>
       </HeaderVotingMobile>
 
-      <MobileBlock>
-        <WarningWrap>{warning.text && <Warning icon={warning.icon} text={warning.text} />}</WarningWrap>
-        {communityFound && communityFound.validForAddition && publicKey && (
-          <VoteProposeWrap>
-            <ProposingHeadingMobile>{` Add ${communityFound.name}?`}</ProposingHeadingMobile>
-            <VotePropose
-              setProposingAmount={setProposingAmount}
-              proposingAmount={proposingAmount}
-              disabled={!communityFound}
-            />
-          </VoteProposeWrap>
-        )}
-        {!publicKey && (
+      {!publicKey && (
+        <MobileBlock>
           <ProposingInfo>
             <span>ℹ️</span>
             <InfoText>To propose a community, it must have at least 42 members and have a ENS domain.</InfoText>
           </ProposingInfo>
-        )}
-      </MobileBlock>
-      {communityFound && communityFound.validForAddition && (
-        <ProposingBtn
-          disabled={!communityFound || !proposingAmount || !!warning.text}
-          onClick={() => send(1, publicKey, BigNumber.from(proposingAmount))}
-        >
-          Confirm vote to add community
-        </ProposingBtn>
+        </MobileBlock>
+      )}
+
+      {communityFound && (
+        <ProposeBlock
+          communityFound={communityFound}
+          proposingAmount={proposingAmount}
+          send={send}
+          setProposingAmount={setProposingAmount}
+        />
       )}
       <HistoryWrap>
         {!isDisabled && communityFound && (

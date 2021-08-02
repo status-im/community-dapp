@@ -1,0 +1,233 @@
+[
+  { "inputs": [], "stateMutability": "nonpayable", "type": "constructor" },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "roomId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "voter",
+        "type": "address"
+      }
+    ],
+    "name": "VoteCast",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "roomId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "publicKey",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "passed",
+        "type": "bool"
+      },
+      {
+        "indexed": false,
+        "internalType": "enum VotingContract.VoteType",
+        "name": "voteType",
+        "type": "uint8"
+      }
+    ],
+    "name": "VotingRoomFinalized",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "roomId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "publicKey",
+        "type": "address"
+      }
+    ],
+    "name": "VotingRoomStarted",
+    "type": "event"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "name": "activeVotingRooms",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          { "internalType": "address", "name": "voter", "type": "address" },
+          {
+            "internalType": "uint256",
+            "name": "roomIdAndType",
+            "type": "uint256"
+          },
+          { "internalType": "uint256", "name": "sntAmount", "type": "uint256" },
+          { "internalType": "bytes32", "name": "r", "type": "bytes32" },
+          { "internalType": "bytes32", "name": "vs", "type": "bytes32" }
+        ],
+        "internalType": "struct VotingContract.SignedVote[]",
+        "name": "votes",
+        "type": "tuple[]"
+      }
+    ],
+    "name": "castVotes",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "name": "communityVotingId",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "directory",
+    "outputs": [
+      { "internalType": "contract Directory", "name": "", "type": "address" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "roomId", "type": "uint256" }
+    ],
+    "name": "finalizeVotingRoom",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getActiveVotingRooms",
+    "outputs": [
+      { "internalType": "uint256[]", "name": "", "type": "uint256[]" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "publicKey", "type": "address" }
+    ],
+    "name": "getCommunityVoting",
+    "outputs": [
+      { "internalType": "uint256", "name": "startBlock", "type": "uint256" },
+      { "internalType": "uint256", "name": "endAt", "type": "uint256" },
+      {
+        "internalType": "enum VotingContract.VoteType",
+        "name": "voteType",
+        "type": "uint8"
+      },
+      { "internalType": "bool", "name": "finalized", "type": "bool" },
+      { "internalType": "address", "name": "community", "type": "address" },
+      { "internalType": "uint256", "name": "totalVotesFor", "type": "uint256" },
+      {
+        "internalType": "uint256",
+        "name": "totalVotesAgainst",
+        "type": "uint256"
+      },
+      { "internalType": "uint256", "name": "roomNumber", "type": "uint256" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "enum VotingContract.VoteType",
+        "name": "voteType",
+        "type": "uint8"
+      },
+      { "internalType": "address", "name": "publicKey", "type": "address" },
+      { "internalType": "uint256", "name": "voteAmount", "type": "uint256" }
+    ],
+    "name": "initializeVotingRoom",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "roomId", "type": "uint256" }
+    ],
+    "name": "listRoomVoters",
+    "outputs": [
+      { "internalType": "address[]", "name": "", "type": "address[]" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "owner",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "contract Directory",
+        "name": "_address",
+        "type": "address"
+      }
+    ],
+    "name": "setDirectory",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "name": "votingRoomMap",
+    "outputs": [
+      { "internalType": "uint256", "name": "startBlock", "type": "uint256" },
+      { "internalType": "uint256", "name": "endAt", "type": "uint256" },
+      {
+        "internalType": "enum VotingContract.VoteType",
+        "name": "voteType",
+        "type": "uint8"
+      },
+      { "internalType": "bool", "name": "finalized", "type": "bool" },
+      { "internalType": "address", "name": "community", "type": "address" },
+      { "internalType": "uint256", "name": "totalVotesFor", "type": "uint256" },
+      {
+        "internalType": "uint256",
+        "name": "totalVotesAgainst",
+        "type": "uint256"
+      },
+      { "internalType": "uint256", "name": "roomNumber", "type": "uint256" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]

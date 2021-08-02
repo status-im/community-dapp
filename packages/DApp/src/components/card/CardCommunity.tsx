@@ -32,8 +32,6 @@ export const CardCommunity = ({
   const [showRemoveModal, setShowRemoveModal] = useState(false)
   const [showConfirmModal, setShowConfirmModal] = useState(false)
 
-  const isDisabled = community.votingHistory.length === 0
-
   const setNewModal = (val: boolean) => {
     setShowConfirmModal(val)
     setShowRemoveModal(false)
@@ -48,6 +46,7 @@ export const CardCommunity = ({
       setShowRemoveModal(true)
     }
   }, [])
+  const isDisabled = community.votingHistory.length === 0
 
   return (
     <CardCommunityBlock className={customStyle ? 'notModal' : ''}>

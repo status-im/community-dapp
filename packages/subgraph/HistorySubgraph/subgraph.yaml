@@ -1,0 +1,29 @@
+specVersion: 0.0.2
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: VotingContract
+    network: ganache
+    source:
+      address: "0x49affC885564c28B317237232a8bc3628989dD7B"
+      abi: VotingContract
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - VoteCast
+        - VotingRoomFinalized
+        - VotingRoomStarted
+      abis:
+        - name: VotingContract
+          file: ./abis/VotingContract.json
+      eventHandlers:
+        - event: VoteCast(uint256,address)
+          handler: handleVoteCast
+        - event: VotingRoomFinalized(uint256,address,bool,uint8)
+          handler: handleVotingRoomFinalized
+        - event: VotingRoomStarted(uint256,address)
+          handler: handleVotingRoomStarted
+      file: ./src/mapping.ts

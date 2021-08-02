@@ -4,7 +4,7 @@ import { CommunityDetail } from '../models/community'
 import { useAvailableAmount } from './useAvailableAmount'
 import { useContracts } from './useContracts'
 
-export function useProposeWarning(communityFound: CommunityDetail | undefined) {
+export function useProposeWarning(communityFound: CommunityDetail) {
   const availableAmount = useAvailableAmount()
 
   const [warning, setWarning] = useState({ icon: '', text: '' })

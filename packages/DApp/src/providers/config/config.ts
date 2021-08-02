@@ -17,11 +17,13 @@ interface EnvConfigs {
 
 const contracts = {
   3: {
+    subgraph: '',
     votingContract: '0xF6fb0EBfa21958440e2AA8ee603DFDc885C4F694',
     directoryContract: '0x56dF4644483Dbb5607d0eB162Aa64536bD5c2C24',
     tokenContract: '0x80ee48b5ba5c3EA556b7fF6D850d2fB2c4bc7412',
   },
   1337: {
+    subgraph: 'http://localhost:8000/subgraphs/name/HistorySubgraph',
     votingContract: process.env.GANACHE_VOTING_CONTRACT ?? '0x0000000000000000000000000000000000000000',
     directoryContract: process.env.GANACHE_DIRECTORY_CONTRACT ?? '0x0000000000000000000000000000000000000000',
     tokenContract: process.env.GANACHE_TOKEN_CONTRACT ?? '0x0000000000000000000000000000000000000000',
