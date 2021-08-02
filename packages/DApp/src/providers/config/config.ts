@@ -30,7 +30,7 @@ const contracts = {
   },
 }
 
-const version = '0.0.6'
+const version = '0.0.5'
 
 export const config: EnvConfigs = {
   localhost: {

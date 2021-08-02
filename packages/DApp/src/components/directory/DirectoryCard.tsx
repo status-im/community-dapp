@@ -24,13 +24,6 @@ export function DirectoryCard({ community }: DirectoryCardProps) {
     return () => window.removeEventListener('resize', handleResize)
   }, [window.innerWidth])
 
-  let timeLeft: string | undefined = undefined
-  if (community?.directoryInfo?.untilNextFeature) {
-    timeLeft = `${community.directoryInfo.untilNextFeature / (3600 * 24 * 7)} weeks left`
-  } else {
-    timeLeft = `1 weeks left`
-  }
-
   const { currentVoting, votingRoom } = useGetCurrentVoting(community?.publicKey)
 
   return (
@@ -45,15 +38,7 @@ export function DirectoryCard({ community }: DirectoryCardProps) {
         />
       </CardCommunityWrap>
       <CardVoteWrap>
-        <CardFeature
-          community={community}
-          heading={timeLeft ? 'This community has to wait until it can be featured again' : 'Weekly Feature vote'}
-          icon={community?.featureVotes ? '⭐' : '⏳'}
-          sum={community?.featureVotes?.toNumber()}
-          timeLeft={''}
-          currentVoting={currentVoting}
-          room={votingRoom}
-        />
+        <CardFeature community={community} currentVoting={currentVoting} room={votingRoom} />
       </CardVoteWrap>
     </Card>
   )

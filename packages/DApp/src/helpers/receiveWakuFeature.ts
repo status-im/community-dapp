@@ -41,6 +41,13 @@ export async function receiveWakuFeature(waku: Waku | undefined, topic: string) 
         prevWeek = getWeek(el.timestamp)
       }
     })
+    if (getWeek(messages[messages.length - 1].timestamp) < getWeek(new Date())) {
+      top5 = getTop(wakuFeatured, 5)
+      top5.forEach((featuredComm) => {
+        wakuFeatured[featuredComm[0]].votes = {}
+        wakuFeatured[featuredComm[0]].sum = BigNumber.from(0)
+      })
+    }
     sumVotes(wakuFeatured)
   }
   return { wakuFeatured, top5 }

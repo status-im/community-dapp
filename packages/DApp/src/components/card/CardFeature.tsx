@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { ColumnFlexDiv } from '../../constants/styles'
 import { addCommas } from '../../helpers/addCommas'
@@ -16,20 +16,28 @@ import { useWakuFeature } from '../../providers/wakuFeature/provider'
 
 interface CardFeatureProps {
   community: CommunityDetail
-  heading: string
-  icon: string
-  sum?: number
-  timeLeft?: string
   currentVoting?: CurrentVoting
   room?: VotingRoom
 }
 
-export const CardFeature = ({ community, heading, icon, sum, timeLeft, currentVoting, room }: CardFeatureProps) => {
+export const CardFeature = ({ community, currentVoting, room }: CardFeatureProps) => {
   const { account } = useEthers()
   const [showFeatureModal, setShowFeatureModal] = useState(false)
   const [showConfirmModal, setShowConfirmModal] = useState(false)
   const [showOngoingVote, setShowOngoingVote] = useState(false)
   const { featured } = useWakuFeature()
+  const inFeatured = Boolean(featured.find((el) => el[0] === community.publicKey))
+
+  const [heading, setHeading] = useState('Weekly Feature vote')
+  const [icon, setIcon] = useState('⭐')
+  const [timeLeft, setTimeLeft] = useState('')
+
+  useEffect(() => {
+    setHeading(inFeatured ? 'This community has been featured last week' : 'Weekly Feature vote')
+    setIcon(inFeatured ? '⏳' : '⭐')
+    setTimeLeft(inFeatured ? '1 week' : '')
+  }, [inFeatured])
+
   const setNewModal = (val: boolean) => {
     setShowConfirmModal(val)
     setShowFeatureModal(false)
@@ -43,27 +51,27 @@ export const CardFeature = ({ community, heading, icon, sum, timeLeft, currentVo
       <FeatureVote>
         <FeatureIcon>{icon}</FeatureIcon>
 
-        {timeLeft && !sum && <span>{timeLeft}</span>}
+        {timeLeft && <span>{timeLeft}</span>}
 
-        {sum && (
+        {!inFeatured && community?.featureVotes && (
           <FeatureText>
-            <span>{addCommas(sum)}</span> SNT votes for this community
+            <span>{addCommas(community?.featureVotes.toNumber())}</span> SNT votes for this community
           </FeatureText>
         )}
       </FeatureVote>
 
       <FeatureVoteMobile>
-        {timeLeft && !sum && (
+        {timeLeft && (
           <FeatureText>
             {icon} {heading}: <span>{timeLeft}</span>
           </FeatureText>
         )}
 
-        {sum && (
+        {!inFeatured && community?.featureVotes && (
           <FeatureTextWeekly>
             {icon}{' '}
             <span style={{ color: '#676868', fontWeight: 'normal', marginLeft: '4px' }}>Weekly Feature Vote: </span>
-            <span>{addCommas(sum)}</span> SNT
+            <span>{addCommas(community.featureVotes.toNumber())}</span> SNT
           </FeatureTextWeekly>
         )}
       </FeatureVoteMobile>
@@ -78,10 +86,7 @@ export const CardFeature = ({ community, heading, icon, sum, timeLeft, currentVo
             <VoteConfirmModal community={community} selectedVote={{ verb: 'to feature' }} setShowModal={setNewModal} />
           </Modal>
         )}
-        <FeatureBtn
-          disabled={!account || featured.find((el) => el[0] === community.publicKey)}
-          onClick={() => setShowFeatureModal(true)}
-        >
+        <FeatureBtn disabled={!account || inFeatured} onClick={() => setShowFeatureModal(true)}>
           Feature this community! <span style={{ fontSize: '20px' }}>⭐️</span>
         </FeatureBtn>
       </div>
