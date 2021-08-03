@@ -1,16 +1,20 @@
+import type { TransactionResponse } from '@ethersproject/providers'
+
 import React, { useState } from 'react'
 import styled from 'styled-components'
 import { Colors } from '../constants/styles'
 import { useCommunities } from '../hooks/useCommunities'
 import { LinkExternal } from './Link'
 import { CloseButton } from './Modal'
+import { getExplorerTransactionLink } from '@usedapp/core'
 
 interface NotificationItemProps {
+  transaction: TransactionResponse
   publicKey: string
   text: string
 }
 
-export function NotificationItem({ publicKey, text }: NotificationItemProps) {
+export function NotificationItem({ publicKey, text, transaction }: NotificationItemProps) {
   const [show, setShow] = useState(true)
   const [communityDetails] = useCommunities([publicKey])
 
@@ -25,7 +29,9 @@ export function NotificationItem({ publicKey, text }: NotificationItemProps) {
           <NotificationText>
             <span>{communityDetails.name}</span> {text}
           </NotificationText>
-          <NotificationLink>View on Etherscan</NotificationLink>
+          <NotificationLink href={getExplorerTransactionLink(transaction.hash, transaction.chainId)}>
+            View on Etherscan
+          </NotificationLink>
         </NotificationContent>
         <NotificationCloseButton onClick={() => setShow(false)} />
       </NotificationBlock>

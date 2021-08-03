@@ -105,7 +105,7 @@ export const communities: Array<CommunityDetail> = [
     tags: ['nfts', 'collectables', 'name', 'quite long', 'funny', 'very long tag', 'short'],
     description: 'Owners of Name Baazar, marketplace. Nullam mattis mattis mattis fermentum libero.',
     numberOfMembers: 150,
-    validForAddition: false,
+    validForAddition: true,
     votingHistory: [],
     currentVoting: undefined,
     featureVotes: BigNumber.from(314321),

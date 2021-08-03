@@ -32,7 +32,14 @@ export function NotificationsList() {
               }
             }
             if (text) {
-              return <NotificationItem key={log.transactionHash} publicKey={parsedLog.args.publicKey} text={text} />
+              return (
+                <NotificationItem
+                  key={log.transactionHash}
+                  publicKey={parsedLog.args.publicKey}
+                  text={text}
+                  transaction={notification.transaction}
+                />
+              )
             }
           })
         }
@@ -45,7 +52,7 @@ const NotificationsWrapper = styled.div`
   display: flex;
   justify-content: space-between;
   position: fixed;
-  top: 115px;
+  top: 191px;
   right: 16px;
   flex-direction: column;
   transition: all 0.3s;

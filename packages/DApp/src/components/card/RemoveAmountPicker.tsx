@@ -32,7 +32,7 @@ export function RemoveAmountPicker({ community, setShowConfirmModal }: RemoveAmo
   if (community.votingHistory && community.votingHistory.length > 0) {
     const lastVote = community.votingHistory[community.votingHistory.length - 1]
     const lastVoteDate = lastVote.date
-    if (timespan(lastVoteDate) < 30) {
+    if (timespan(lastVoteDate) < 30 && lastVote.type === 'Remove') {
       return (
         <WarningWrapRemoval>
           <Warning
@@ -90,9 +90,7 @@ const VoteProposeWrap = styled.div`
   }
 `
 
-const WarningWrapRemoval = styled.div`
-  margin-top: 32px;
-`
+const WarningWrapRemoval = styled.div``
 
 const VoteConfirmBtn = styled(ButtonPrimary)`
   width: 100%;
