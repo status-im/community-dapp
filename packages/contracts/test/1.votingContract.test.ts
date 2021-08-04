@@ -1,7 +1,9 @@
 import { expect, use } from 'chai'
 import { loadFixture, deployContract, MockProvider, solidity } from 'ethereum-waffle'
 import { VotingContract, Directory, ERC20Mock } from '../abi'
-import { utils, BigNumber, Wallet, Contract } from 'ethers'
+import { utils, Wallet, Contract } from 'ethers'
+
+import { BigNumber } from '@ethersproject/bignumber'
 
 use(solidity)
 

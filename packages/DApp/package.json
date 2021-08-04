@@ -15,7 +15,7 @@
     "lint:prettier": "yarn prettier './{src,test}/**/*.{ts,tsx}'"
   },
   "dependencies": {
-    "@usedapp/core": "^0.3.24",
+    "@usedapp/core": "^0.4.3",
     "buffer": "^6.0.3",
     "crypto-browserify": "^3.12.0",
     "humanize-duration": "^3.27.0",
@@ -68,5 +68,8 @@
     "webpack": "^5.38.1",
     "webpack-cli": "^4.7.0",
     "webpack-dev-server": "^3.11.2"
+  },
+  "resolutions": {
+    "ethers": "5.4.1"
   }
 }
