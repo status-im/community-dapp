@@ -34,20 +34,20 @@ const version = '0.0.5'
 
 export const config: EnvConfigs = {
   localhost: {
-    wakuTopic: `/myApp/localhost/${uuidv4()}/${version}/votingRoom/`,
-    wakuFeatureTopic: `/myApp/localhost/${uuidv4()}/${version}/feature/`,
+    wakuTopic: `/myApp/localhost/${uuidv4()}/${version}/votingRoom/proto/`,
+    wakuFeatureTopic: `/myApp/localhost/${uuidv4()}/${version}/feature/proto/`,
     numberPerPage: 2,
     contracts,
   },
   development: {
-    wakuTopic: `/myApp/development/${version}/votingRoom/`,
-    wakuFeatureTopic: `/myApp/development/${version}/feature/`,
+    wakuTopic: `/myApp/development/${version}/votingRoom/proto/`,
+    wakuFeatureTopic: `/myApp/development/${version}/feature/proto/`,
     numberPerPage: 3,
     contracts,
   },
   production: {
-    wakuTopic: `/myApp/production/${version}/votingRoom/`,
-    wakuFeatureTopic: `/myApp/production/${version}/feature/`,
+    wakuTopic: `/myApp/production/${version}/votingRoom/proto/`,
+    wakuFeatureTopic: `/myApp/production/${version}/feature/proto/`,
     numberPerPage: 4,
     contracts,
   },

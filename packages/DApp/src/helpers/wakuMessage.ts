@@ -4,6 +4,7 @@ import { packAndArrayify } from './ethMessage'
 import { Waku, WakuMessage } from 'js-waku'
 import { recoverAddress } from './ethMessage'
 import { utils } from 'ethers'
+import proto from './loadProtons'
 
 function getContractParameters(address: string, room: number, type: number, sntAmount: number) {
   return [address, BigNumber.from(room).mul(2).add(type), BigNumber.from(sntAmount)]
@@ -39,18 +40,29 @@ export function filterVerifiedMessages(messages: any[] | undefined, alreadyVoted
 }
 
 export async function receiveWakuMessages(waku: Waku, topic: string, room: number) {
+  if (!proto) {
+    return undefined
+  }
   const messages = await waku.store.queryHistory({
     contentTopics: [topic + room.toString()],
   })
-  return messages?.map((msg) => JSON.parse(msg.payloadAsUtf8))
+  return messages
+    ?.map((msg) => proto.WakuVote.decode(msg.payload))
+    .map((msg) => {
+      return { ...msg, sntAmount: BigNumber.from(msg.sntAmount) }
+    })
 }
 
 export async function receiveWakuFeatureMsg(waku: Waku | undefined, topic: string) {
+  if (!proto) {
+    return undefined
+  }
   if (waku) {
     const messages = await waku.store.queryHistory({ contentTopics: [topic] })
     if (messages) {
       return messages.filter(verifyWakuFeatureMsg).map((msg) => {
-        const data = JSON.parse(msg.payloadAsUtf8)
+        const data = proto.WakuFeature.decode(msg.payload)
+        data.sntAmount = BigNumber.from(data.sntAmount)
         return { ...data, timestamp: new Date(data.timestamp) }
       })
     }
@@ -59,8 +71,12 @@ export async function receiveWakuFeatureMsg(waku: Waku | undefined, topic: strin
 }
 
 export function verifyWakuFeatureMsg(msg: WakuMessage) {
+  if (!proto) {
+    return false
+  }
   const wakuTimestamp = msg.timestamp
-  const data = JSON.parse(msg.payloadAsUtf8)
+  const data = proto.WakuFeature.decode(msg.payload)
+  data.sntAmount = BigNumber.from(data.sntAmount)
   const timestamp = new Date(data.timestamp)
   const types = ['address', 'uint256', 'address', 'uint256']
   const message = [data.voter, data.sntAmount, data.publicKey, BigNumber.from(timestamp.getTime())]
@@ -83,7 +99,9 @@ export async function createWakuFeatureMsg(
   if (!account || !signer) {
     return undefined
   }
-
+  if (!proto) {
+    return undefined
+  }
   const signerAddress = await signer?.getAddress()
   if (signerAddress != account) {
     return undefined
@@ -95,19 +113,18 @@ export async function createWakuFeatureMsg(
   const sign = await signer.signMessage(packAndArrayify(types, message))
 
   if (sign) {
-    const msg = WakuMessage.fromUtf8String(
-      JSON.stringify({
-        voter: account,
-        sntAmount,
-        publicKey,
-        timestamp,
-        sign,
-      }),
-      {
-        contentTopic,
-        timestamp,
-      }
-    )
+    const payload = proto.WakuFeature.encode({
+      voter: account,
+      sntAmount: utils.arrayify(sntAmount),
+      publicKey,
+      timestamp,
+      sign,
+    })
+
+    const msg = WakuMessage.fromUtf8String(payload, {
+      contentTopic,
+      timestamp,
+    })
     return msg
   }
   return undefined
@@ -124,7 +141,9 @@ export async function createWakuMessage(
   if (!account || !signer) {
     return undefined
   }
-
+  if (!proto) {
+    return undefined
+  }
   const signerAddress = await signer?.getAddress()
   if (signerAddress != account) {
     return undefined
@@ -134,19 +153,16 @@ export async function createWakuMessage(
   const message = getContractParameters(account, room, type, voteAmount)
   const signature = await signer.signMessage(packAndArrayify(types, message))
   if (signature) {
-    const msg = WakuMessage.fromUtf8String(
-      JSON.stringify({
-        address: account,
-        vote: type == 1 ? 'yes' : 'no',
-        sntAmount: BigNumber.from(voteAmount),
-        sign: signature,
-        nonce: 1,
-        sessionID: room,
-      }),
-      {
-        contentTopic: topic + room.toString(),
-      }
-    )
+    const payload = proto.WakuVote.encode({
+      address: account,
+      vote: type == 1 ? 'yes' : 'no',
+      sntAmount: utils.arrayify(BigNumber.from(voteAmount)),
+      sign: signature,
+      nonce: 1,
+      sessionID: room,
+    })
+
+    const msg = WakuMessage.fromBytes(payload, { contentTopic: topic + room.toString() })
     return msg
   }
   return undefined
