@@ -3,7 +3,7 @@ import { VotingRoom } from '../models/smartContract'
 
 export function getVotingWinner(vote: CurrentVoting) {
   if (vote?.timeLeft <= 0) {
-    return vote.voteAgainst < vote.voteFor ? 2 : 1
+    return vote.voteFor.gt(vote.voteAgainst) ? 2 : 1
   }
   return undefined
 }
