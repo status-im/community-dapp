@@ -5,6 +5,7 @@ import { Waku, WakuMessage } from 'js-waku'
 import { recoverAddress } from './ethMessage'
 import { utils } from 'ethers'
 import proto from './loadProtons'
+import { WakuFeatureData, WakuVoteData } from '../models/waku'
 
 function getContractParameters(address: string, room: number, type: number, sntAmount: number) {
   return [address, BigNumber.from(room).mul(2).add(type), BigNumber.from(sntAmount)]
@@ -39,51 +40,73 @@ export function filterVerifiedMessages(messages: any[] | undefined, alreadyVoted
   return verifiedMessages
 }
 
-export async function receiveWakuMessages(waku: Waku, topic: string, room: number) {
-  if (!proto) {
+function decodeWakuVote(msg: WakuMessage): WakuVoteData | undefined {
+  try {
+    if (!msg.payload) {
+      return undefined
+    }
+    const data = proto.WakuVote.decode(msg.payload)
+    if (data && data.address && data.nonce && data.sessionID && data.sign && data.sntAmount && data.vote) {
+      return { ...data, sntAmount: BigNumber.from(data.sntAmount) }
+    } else {
+      return undefined
+    }
+  } catch {
     return undefined
   }
-  const messages = await waku.store.queryHistory({
-    contentTopics: [topic + room.toString()],
-  })
-  return messages
-    ?.map((msg) => proto.WakuVote.decode(msg.payload))
-    .map((msg) => {
-      return { ...msg, sntAmount: BigNumber.from(msg.sntAmount) }
-    })
+}
+
+export function decodeWakuVotes(messages: WakuMessage[] | null) {
+  return messages?.map(decodeWakuVote).filter((e): e is WakuVoteData => !!e)
+}
+
+export async function receiveWakuMessages(waku: Waku, topic: string, room: number) {
+  const contentTopics = [topic + room.toString()]
+  const messages = await waku.store.queryHistory({ contentTopics })
+  return decodeWakuVotes(messages)
+}
+
+function decodeWakuFeature(msg: WakuMessage): WakuFeatureData | undefined {
+  try {
+    if (!msg.payload) {
+      return undefined
+    }
+    const data = proto.WakuFeature.decode(msg.payload)
+    if (data && data.publicKey && data.sign && data.sntAmount && data.timestamp && data.voter) {
+      return {
+        ...data,
+        msgTimestamp: msg.timestamp ?? new Date(0),
+        timestamp: new Date(data.timestamp),
+        sntAmount: BigNumber.from(data.sntAmount),
+      }
+    } else {
+      return undefined
+    }
+  } catch {
+    return undefined
+  }
+}
+
+export function decodeWakuFeatures(messages: WakuMessage[] | null) {
+  return messages?.map(decodeWakuFeature).filter(verifyWakuFeatureMsg)
 }
 
 export async function receiveWakuFeatureMsg(waku: Waku | undefined, topic: string) {
-  if (!proto) {
-    return undefined
-  }
   if (waku) {
     const messages = await waku.store.queryHistory({ contentTopics: [topic] })
-    if (messages) {
-      return messages.filter(verifyWakuFeatureMsg).map((msg) => {
-        const data = proto.WakuFeature.decode(msg.payload)
-        data.sntAmount = BigNumber.from(data.sntAmount)
-        return { ...data, timestamp: new Date(data.timestamp) }
-      })
-    }
+    return decodeWakuFeatures(messages)
   }
-  return []
 }
 
-export function verifyWakuFeatureMsg(msg: WakuMessage) {
-  if (!proto) {
+function verifyWakuFeatureMsg(data: WakuFeatureData | undefined): data is WakuFeatureData {
+  if (!data) {
     return false
   }
-  const wakuTimestamp = msg.timestamp
-  const data = proto.WakuFeature.decode(msg.payload)
-  data.sntAmount = BigNumber.from(data.sntAmount)
-  const timestamp = new Date(data.timestamp)
   const types = ['address', 'uint256', 'address', 'uint256']
-  const message = [data.voter, data.sntAmount, data.publicKey, BigNumber.from(timestamp.getTime())]
-
+  const message = [data.voter, data.sntAmount, data.publicKey, data.timestamp.getTime()]
   const verifiedAddress = utils.verifyMessage(packAndArrayify(types, message), data.sign)
 
-  if (wakuTimestamp?.getTime() != timestamp.getTime() || verifiedAddress != data.voter) {
+  if (data.msgTimestamp?.getTime() != data.timestamp.getTime() || verifiedAddress != data.voter) {
     return false
   }
   return true
@@ -99,9 +122,7 @@ export async function createWakuFeatureMsg(
   if (!account || !signer) {
     return undefined
   }
-  if (!proto) {
-    return undefined
-  }
+
   const signerAddress = await signer?.getAddress()
   if (signerAddress != account) {
     return undefined
@@ -121,7 +142,7 @@ export async function createWakuFeatureMsg(
       sign,
     })
 
-    const msg = WakuMessage.fromUtf8String(payload, {
+    const msg = WakuMessage.fromBytes(payload, {
       contentTopic,
       timestamp,
     })
@@ -141,9 +162,7 @@ export async function createWakuMessage(
   if (!account || !signer) {
     return undefined
   }
-  if (!proto) {
-    return undefined
-  }
+
   const signerAddress = await signer?.getAddress()
   if (signerAddress != account) {
     return undefined
