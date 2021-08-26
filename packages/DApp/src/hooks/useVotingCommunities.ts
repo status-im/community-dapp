@@ -35,7 +35,7 @@ export function useVotingCommunities(
     return {
       abi: votingContract.interface,
       address: votingContract.address,
-      method: 'votingRoomMap',
+      method: 'votingRooms',
       args: [el],
     }
   })

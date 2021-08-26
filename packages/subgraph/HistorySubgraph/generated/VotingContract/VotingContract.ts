@@ -10,6 +10,28 @@ import {
   BigInt
 } from "@graphprotocol/graph-ts";
 
+export class NotEnoughToken extends ethereum.Event {
+  get params(): NotEnoughToken__Params {
+    return new NotEnoughToken__Params(this);
+  }
+}
+
+export class NotEnoughToken__Params {
+  _event: NotEnoughToken;
+
+  constructor(event: NotEnoughToken) {
+    this._event = event;
+  }
+
+  get roomId(): BigInt {
+    return this._event.parameters[0].value.toBigInt();
+  }
+
+  get voter(): Address {
+    return this._event.parameters[1].value.toAddress();
+  }
+}
+
 export class VoteCast extends ethereum.Event {
   get params(): VoteCast__Params {
     return new VoteCast__Params(this);
@@ -49,8 +71,8 @@ export class VotingRoomFinalized__Params {
     return this._event.parameters[0].value.toBigInt();
   }
 
-  get publicKey(): Address {
-    return this._event.parameters[1].value.toAddress();
+  get publicKey(): Bytes {
+    return this._event.parameters[1].value.toBytes();
   }
 
   get passed(): boolean {
@@ -79,17 +101,55 @@ export class VotingRoomStarted__Params {
     return this._event.parameters[0].value.toBigInt();
   }
 
-  get publicKey(): Address {
-    return this._event.parameters[1].value.toAddress();
+  get publicKey(): Bytes {
+    return this._event.parameters[1].value.toBytes();
   }
 }
 
-export class VotingContract__getCommunityVotingResult {
+export class VotingContract__getCommunityVotingResultValue0Struct extends ethereum.Tuple {
+  get startBlock(): BigInt {
+    return this[0].toBigInt();
+  }
+
+  get endAt(): BigInt {
+    return this[1].toBigInt();
+  }
+
+  get voteType(): i32 {
+    return this[2].toI32();
+  }
+
+  get finalized(): boolean {
+    return this[3].toBoolean();
+  }
+
+  get community(): Bytes {
+    return this[4].toBytes();
+  }
+
+  get totalVotesFor(): BigInt {
+    return this[5].toBigInt();
+  }
+
+  get totalVotesAgainst(): BigInt {
+    return this[6].toBigInt();
+  }
+
+  get roomNumber(): BigInt {
+    return this[7].toBigInt();
+  }
+
+  get voters(): Array<Address> {
+    return this[8].toAddressArray();
+  }
+}
+
+export class VotingContract__votingRoomsResult {
   value0: BigInt;
   value1: BigInt;
   value2: i32;
   value3: boolean;
-  value4: Address;
+  value4: Bytes;
   value5: BigInt;
   value6: BigInt;
   value7: BigInt;
@@ -99,7 +159,7 @@ export class VotingContract__getCommunityVotingResult {
     value1: BigInt,
     value2: i32,
     value3: boolean,
-    value4: Address,
+    value4: Bytes,
     value5: BigInt,
     value6: BigInt,
     value7: BigInt
@@ -123,54 +183,7 @@ export class VotingContract__getCommunityVotingResult {
       ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(this.value2))
     );
     map.set("value3", ethereum.Value.fromBoolean(this.value3));
-    map.set("value4", ethereum.Value.fromAddress(this.value4));
-    map.set("value5", ethereum.Value.fromUnsignedBigInt(this.value5));
-    map.set("value6", ethereum.Value.fromUnsignedBigInt(this.value6));
-    map.set("value7", ethereum.Value.fromUnsignedBigInt(this.value7));
-    return map;
-  }
-}
-
-export class VotingContract__votingRoomMapResult {
-  value0: BigInt;
-  value1: BigInt;
-  value2: i32;
-  value3: boolean;
-  value4: Address;
-  value5: BigInt;
-  value6: BigInt;
-  value7: BigInt;
-
-  constructor(
-    value0: BigInt,
-    value1: BigInt,
-    value2: i32,
-    value3: boolean,
-    value4: Address,
-    value5: BigInt,
-    value6: BigInt,
-    value7: BigInt
-  ) {
-    this.value0 = value0;
-    this.value1 = value1;
-    this.value2 = value2;
-    this.value3 = value3;
-    this.value4 = value4;
-    this.value5 = value5;
-    this.value6 = value6;
-    this.value7 = value7;
-  }
-
-  toMap(): TypedMap<string, ethereum.Value> {
-    let map = new TypedMap<string, ethereum.Value>();
-    map.set("value0", ethereum.Value.fromUnsignedBigInt(this.value0));
-    map.set("value1", ethereum.Value.fromUnsignedBigInt(this.value1));
-    map.set(
-      "value2",
-      ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(this.value2))
-    );
-    map.set("value3", ethereum.Value.fromBoolean(this.value3));
-    map.set("value4", ethereum.Value.fromAddress(this.value4));
+    map.set("value4", ethereum.Value.fromBytes(this.value4));
     map.set("value5", ethereum.Value.fromUnsignedBigInt(this.value5));
     map.set("value6", ethereum.Value.fromUnsignedBigInt(this.value6));
     map.set("value7", ethereum.Value.fromUnsignedBigInt(this.value7));
@@ -198,29 +211,6 @@ export class VotingContract extends ethereum.SmartContract {
       "activeVotingRooms",
       "activeVotingRooms(uint256):(uint256)",
       [ethereum.Value.fromUnsignedBigInt(param0)]
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
-  }
-
-  communityVotingId(param0: Address): BigInt {
-    let result = super.call(
-      "communityVotingId",
-      "communityVotingId(address):(uint256)",
-      [ethereum.Value.fromAddress(param0)]
-    );
-
-    return result[0].toBigInt();
-  }
-
-  try_communityVotingId(param0: Address): ethereum.CallResult<BigInt> {
-    let result = super.tryCall(
-      "communityVotingId",
-      "communityVotingId(address):(uint256)",
-      [ethereum.Value.fromAddress(param0)]
     );
     if (result.reverted) {
       return new ethereum.CallResult();
@@ -268,49 +258,31 @@ export class VotingContract extends ethereum.SmartContract {
   }
 
   getCommunityVoting(
-    publicKey: Address
-  ): VotingContract__getCommunityVotingResult {
+    publicKey: Bytes
+  ): VotingContract__getCommunityVotingResultValue0Struct {
     let result = super.call(
       "getCommunityVoting",
-      "getCommunityVoting(address):(uint256,uint256,uint8,bool,address,uint256,uint256,uint256)",
-      [ethereum.Value.fromAddress(publicKey)]
+      "getCommunityVoting(bytes):((uint256,uint256,uint8,bool,bytes,uint256,uint256,uint256,address[]))",
+      [ethereum.Value.fromBytes(publicKey)]
     );
 
-    return new VotingContract__getCommunityVotingResult(
-      result[0].toBigInt(),
-      result[1].toBigInt(),
-      result[2].toI32(),
-      result[3].toBoolean(),
-      result[4].toAddress(),
-      result[5].toBigInt(),
-      result[6].toBigInt(),
-      result[7].toBigInt()
-    );
+    return result[0].toTuple() as VotingContract__getCommunityVotingResultValue0Struct;
   }
 
   try_getCommunityVoting(
-    publicKey: Address
-  ): ethereum.CallResult<VotingContract__getCommunityVotingResult> {
+    publicKey: Bytes
+  ): ethereum.CallResult<VotingContract__getCommunityVotingResultValue0Struct> {
     let result = super.tryCall(
       "getCommunityVoting",
-      "getCommunityVoting(address):(uint256,uint256,uint8,bool,address,uint256,uint256,uint256)",
-      [ethereum.Value.fromAddress(publicKey)]
+      "getCommunityVoting(bytes):((uint256,uint256,uint8,bool,bytes,uint256,uint256,uint256,address[]))",
+      [ethereum.Value.fromBytes(publicKey)]
     );
     if (result.reverted) {
       return new ethereum.CallResult();
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(
-      new VotingContract__getCommunityVotingResult(
-        value[0].toBigInt(),
-        value[1].toBigInt(),
-        value[2].toI32(),
-        value[3].toBoolean(),
-        value[4].toAddress(),
-        value[5].toBigInt(),
-        value[6].toBigInt(),
-        value[7].toBigInt()
-      )
+      value[0].toTuple() as VotingContract__getCommunityVotingResultValue0Struct
     );
   }
 
@@ -352,31 +324,46 @@ export class VotingContract extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toAddress());
   }
 
-  votingRoomMap(param0: BigInt): VotingContract__votingRoomMapResult {
+  token(): Address {
+    let result = super.call("token", "token():(address)", []);
+
+    return result[0].toAddress();
+  }
+
+  try_token(): ethereum.CallResult<Address> {
+    let result = super.tryCall("token", "token():(address)", []);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toAddress());
+  }
+
+  votingRooms(param0: BigInt): VotingContract__votingRoomsResult {
     let result = super.call(
-      "votingRoomMap",
-      "votingRoomMap(uint256):(uint256,uint256,uint8,bool,address,uint256,uint256,uint256)",
+      "votingRooms",
+      "votingRooms(uint256):(uint256,uint256,uint8,bool,bytes,uint256,uint256,uint256)",
       [ethereum.Value.fromUnsignedBigInt(param0)]
     );
 
-    return new VotingContract__votingRoomMapResult(
+    return new VotingContract__votingRoomsResult(
       result[0].toBigInt(),
       result[1].toBigInt(),
       result[2].toI32(),
       result[3].toBoolean(),
-      result[4].toAddress(),
+      result[4].toBytes(),
       result[5].toBigInt(),
       result[6].toBigInt(),
       result[7].toBigInt()
     );
   }
 
-  try_votingRoomMap(
+  try_votingRooms(
     param0: BigInt
-  ): ethereum.CallResult<VotingContract__votingRoomMapResult> {
+  ): ethereum.CallResult<VotingContract__votingRoomsResult> {
     let result = super.tryCall(
-      "votingRoomMap",
-      "votingRoomMap(uint256):(uint256,uint256,uint8,bool,address,uint256,uint256,uint256)",
+      "votingRooms",
+      "votingRooms(uint256):(uint256,uint256,uint8,bool,bytes,uint256,uint256,uint256)",
       [ethereum.Value.fromUnsignedBigInt(param0)]
     );
     if (result.reverted) {
@@ -384,12 +371,12 @@ export class VotingContract extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(
-      new VotingContract__votingRoomMapResult(
+      new VotingContract__votingRoomsResult(
         value[0].toBigInt(),
         value[1].toBigInt(),
         value[2].toI32(),
         value[3].toBoolean(),
-        value[4].toAddress(),
+        value[4].toBytes(),
         value[5].toBigInt(),
         value[6].toBigInt(),
         value[7].toBigInt()
@@ -413,6 +400,10 @@ export class ConstructorCall__Inputs {
 
   constructor(call: ConstructorCall) {
     this._call = call;
+  }
+
+  get _address(): Address {
+    return this._call.inputValues[0].value.toAddress();
   }
 }
 
@@ -529,8 +520,8 @@ export class InitializeVotingRoomCall__Inputs {
     return this._call.inputValues[0].value.toI32();
   }
 
-  get publicKey(): Address {
-    return this._call.inputValues[1].value.toAddress();
+  get publicKey(): Bytes {
+    return this._call.inputValues[1].value.toBytes();
   }
 
   get voteAmount(): BigInt {

@@ -14,7 +14,7 @@ export function VotingRoomMobile() {
   const votingRoom = useContractCall({
     abi: votingContract.interface,
     address: votingContract.address,
-    method: 'votingRoomMap',
+    method: 'votingRooms',
     args: [Number(id)],
   }) as any
   const [details] = useCommunities([votingRoom?.community])

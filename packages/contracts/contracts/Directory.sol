@@ -3,18 +3,18 @@ pragma solidity ^0.8.5;
 contract Directory {
     address public votingContract;
 
-    address[] public communities;
-    mapping(address => uint256) private communitiesIdx;
+    bytes[] public communities;
+    mapping(bytes => uint256) private communitiesIdx;
 
     constructor(address _votingContract) {
         votingContract = _votingContract;
     }
 
-    function isCommunityInDirectory(address community) public view returns (bool) {
+    function isCommunityInDirectory(bytes calldata community) public view returns (bool) {
         return communitiesIdx[community] > 0;
     }
 
-    function getCommunities() public view returns (address[] memory) {
+    function getCommunities() public view returns (bytes[] memory) {
         return communities;
     }
 
@@ -23,13 +23,13 @@ contract Directory {
         _;
     }
 
-    function addCommunity(address community) public onlyVotingContract {
+    function addCommunity(bytes calldata community) public onlyVotingContract {
         require(communitiesIdx[community] == 0, 'Community already exist');
         communities.push(community);
         communitiesIdx[community] = communities.length;
     }
 
-    function removeCommunity(address community) public onlyVotingContract {
+    function removeCommunity(bytes calldata community) public onlyVotingContract {
         uint256 index = communitiesIdx[community];
         if (index == 0) return;
         index--;

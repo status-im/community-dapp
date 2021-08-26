@@ -6,7 +6,7 @@ dataSources:
     name: VotingContract
     network: ganache
     source:
-      address: "0x49affC885564c28B317237232a8bc3628989dD7B"
+      address: "0xb12F82fd2656362B8A3d2440Bc274ce669dBe6b3"
       abi: VotingContract
     mapping:
       kind: ethereum/events
@@ -22,8 +22,8 @@ dataSources:
       eventHandlers:
         - event: VoteCast(uint256,address)
           handler: handleVoteCast
-        - event: VotingRoomFinalized(uint256,address,bool,uint8)
+        - event: VotingRoomFinalized(uint256,bytes,bool,uint8)
           handler: handleVotingRoomFinalized
-        - event: VotingRoomStarted(uint256,address)
+        - event: VotingRoomStarted(uint256,bytes)
           handler: handleVotingRoomStarted
       file: ./src/mapping.ts

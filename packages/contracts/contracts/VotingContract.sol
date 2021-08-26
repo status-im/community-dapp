@@ -21,31 +21,31 @@ contract VotingContract {
         uint256 endAt;
         VoteType voteType;
         bool finalized;
-        address community;
+        bytes community;
         uint256 totalVotesFor;
         uint256 totalVotesAgainst;
         uint256 roomNumber;
-        mapping(address => bool) voted;
         address[] voters;
     }
 
-    event VotingRoomStarted(uint256 roomId, address publicKey);
-    event VotingRoomFinalized(uint256 roomId, address publicKey, bool passed, VoteType voteType);
+    event VotingRoomStarted(uint256 roomId, bytes publicKey);
+    event VotingRoomFinalized(uint256 roomId, bytes publicKey, bool passed, VoteType voteType);
 
     address public owner;
     Directory public directory;
     IERC20 public token;
 
-    uint256 private latestVoting = 1;
-    mapping(uint256 => VotingRoom) public votingRoomMap;
-    mapping(address => uint256) public communityVotingId;
-
+    VotingRoom[] public votingRooms;
+    mapping(bytes => uint256) public communityVotingId;
+    mapping(uint256 => mapping(address => bool)) private voted;
     uint256[] public activeVotingRooms;
     mapping(uint256 => uint256) private indexOfActiveVotingRooms;
 
     constructor(IERC20 _address) {
         owner = msg.sender;
         token = _address;
+        VotingRoom memory newVotingRoom;
+        votingRooms.push(newVotingRoom);
     }
 
     function setDirectory(Directory _address) public {
@@ -53,28 +53,8 @@ contract VotingContract {
         directory = _address;
     }
 
-    function getCommunityVoting(address publicKey)
-        public
-        view
-        returns (
-            uint256 startBlock,
-            uint256 endAt,
-            VoteType voteType,
-            bool finalized,
-            address community,
-            uint256 totalVotesFor,
-            uint256 totalVotesAgainst,
-            uint256 roomNumber
-        )
-    {
-        startBlock = votingRoomMap[communityVotingId[publicKey]].startBlock;
-        endAt = votingRoomMap[communityVotingId[publicKey]].endAt;
-        voteType = votingRoomMap[communityVotingId[publicKey]].voteType;
-        finalized = votingRoomMap[communityVotingId[publicKey]].finalized;
-        community = votingRoomMap[communityVotingId[publicKey]].community;
-        totalVotesFor = votingRoomMap[communityVotingId[publicKey]].totalVotesFor;
-        totalVotesAgainst = votingRoomMap[communityVotingId[publicKey]].totalVotesAgainst;
-        roomNumber = votingRoomMap[communityVotingId[publicKey]].roomNumber;
+    function getCommunityVoting(bytes calldata publicKey) public view returns (VotingRoom memory) {
+        return votingRooms[communityVotingId[publicKey]];
     }
 
     function getActiveVotingRooms() public view returns (uint256[] memory) {
@@ -82,12 +62,12 @@ contract VotingContract {
     }
 
     function listRoomVoters(uint256 roomId) public view returns (address[] memory) {
-        return votingRoomMap[roomId].voters;
+        return votingRooms[roomId].voters;
     }
 
     function initializeVotingRoom(
         VoteType voteType,
-        address publicKey,
+        bytes calldata publicKey,
         uint256 voteAmount
     ) public {
         require(communityVotingId[publicKey] == 0, 'vote already ongoing');
@@ -98,30 +78,32 @@ contract VotingContract {
             require(!directory.isCommunityInDirectory(publicKey), 'Community already in directory');
         }
         require(token.balanceOf(msg.sender) >= voteAmount, 'not enough token');
-        VotingRoom storage newVotingRoom = votingRoomMap[latestVoting];
+        communityVotingId[publicKey] = votingRooms.length;
+        activeVotingRooms.push(votingRooms.length);
+        indexOfActiveVotingRooms[votingRooms.length] = activeVotingRooms.length;
+
+        VotingRoom memory newVotingRoom;
         newVotingRoom.startBlock = block.number;
         newVotingRoom.endAt = block.timestamp.add(VOTING_LENGTH);
         newVotingRoom.voteType = voteType;
         newVotingRoom.community = publicKey;
-        newVotingRoom.roomNumber = latestVoting;
+        newVotingRoom.roomNumber = votingRooms.length;
         newVotingRoom.totalVotesFor = voteAmount;
-        newVotingRoom.voted[msg.sender] = true;
-        newVotingRoom.voters.push(msg.sender);
-        communityVotingId[publicKey] = latestVoting;
+        voted[votingRooms.length][msg.sender] = true;
 
-        activeVotingRooms.push(latestVoting);
-        indexOfActiveVotingRooms[latestVoting] = activeVotingRooms.length;
+        votingRooms.push(newVotingRoom);
+        votingRooms[votingRooms.length - 1].voters.push(msg.sender);
 
-        emit VotingRoomStarted(latestVoting++, publicKey);
+        emit VotingRoomStarted(votingRooms.length - 1, publicKey);
     }
 
     function finalizeVotingRoom(uint256 roomId) public {
         require(roomId > 0, 'vote not found');
-        require(roomId < latestVoting, 'vote not found');
-        require(votingRoomMap[roomId].finalized == false, 'vote already finalized');
-        require(votingRoomMap[roomId].endAt < block.timestamp, 'vote still ongoing');
-        votingRoomMap[roomId].finalized = true;
-        address community = votingRoomMap[roomId].community;
+        require(roomId < votingRooms.length, 'vote not found');
+        require(votingRooms[roomId].finalized == false, 'vote already finalized');
+        require(votingRooms[roomId].endAt < block.timestamp, 'vote still ongoing');
+        votingRooms[roomId].finalized = true;
+        bytes memory community = votingRooms[roomId].community;
         communityVotingId[community] = 0;
 
         uint256 index = indexOfActiveVotingRooms[roomId];
@@ -132,16 +114,16 @@ contract VotingContract {
             indexOfActiveVotingRooms[activeVotingRooms[index]] = index + 1;
         }
         activeVotingRooms.pop();
-        bool passed = votingRoomMap[roomId].totalVotesFor > votingRoomMap[roomId].totalVotesAgainst;
+        bool passed = votingRooms[roomId].totalVotesFor > votingRooms[roomId].totalVotesAgainst;
         if (passed) {
-            if (votingRoomMap[roomId].voteType == VoteType.ADD) {
+            if (votingRooms[roomId].voteType == VoteType.ADD) {
                 directory.addCommunity(community);
             }
-            if (votingRoomMap[roomId].voteType == VoteType.REMOVE) {
+            if (votingRooms[roomId].voteType == VoteType.REMOVE) {
                 directory.removeCommunity(community);
             }
         }
-        emit VotingRoomFinalized(roomId, community, passed, votingRoomMap[roomId].voteType);
+        emit VotingRoomFinalized(roomId, community, passed, votingRooms[roomId].voteType);
     }
 
     event VoteCast(uint256 roomId, address voter);
@@ -164,10 +146,10 @@ contract VotingContract {
             if (hashed.recover(abi.encode(vote.r, vote.vs)) == vote.voter) {
                 uint256 roomId = vote.roomIdAndType >> 1;
                 require(roomId > 0, 'vote not found');
-                require(roomId < latestVoting, 'vote not found');
-                VotingRoom storage room = votingRoomMap[roomId];
+                require(roomId < votingRooms.length, 'vote not found');
+                VotingRoom storage room = votingRooms[roomId];
                 require(room.endAt > block.timestamp, 'vote closed');
-                if (room.voted[vote.voter] == false) {
+                if (voted[roomId][vote.voter] == false) {
                     if (token.balanceOf(vote.voter) >= vote.sntAmount) {
                         if (vote.roomIdAndType & 1 == 1) {
                             room.totalVotesFor = room.totalVotesFor.add(vote.sntAmount);
@@ -175,7 +157,7 @@ contract VotingContract {
                             room.totalVotesAgainst = room.totalVotesAgainst.add(vote.sntAmount);
                         }
                         room.voters.push(vote.voter);
-                        room.voted[vote.voter] = true;
+                        voted[roomId][vote.voter] = true;
                         emit VoteCast(roomId, vote.voter);
                     } else {
                         emit NotEnoughToken(roomId, vote.voter);

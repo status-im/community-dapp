@@ -6,9 +6,9 @@ use(solidity)
 
 describe('directory contract', () => {
   const communities = [
-    '0xAcdd71e5Ef3Ab3356d62da78A941aAc08a18CF2b',
-    '0xF1B65D4b7e5D6aE45c66Bc015e2556f228A6968f',
-    '0xadd590e785c0Da8B7A39A344e76fCF02193b3641',
+    '0x0d9cb350e1dc415303e2816a21b0a439530725b4b2b42d2948e967cb211eab89d5',
+    '0xe84e64498172551d998a220e1d8e5893c818ee9aa90bdb855aec0c9e65e89014b8',
+    '0x04bbb77ea11ee6dc4585efa2617ec90b8ee4051ade4fcf7261ae6cd4cdf33e54e3',
   ]
   async function fixture([alice, bob]: any[], provider: any) {
     const contract = await deployContract(alice, Directory, [alice.address])

@@ -1,21 +1,9 @@
 import { BigNumber } from 'ethers'
 import { CommunityDetail } from '../models/community'
 
-export const communitiesUnderVote = [
-  '0x344C19E3040Ec63A96b7aeB708C82a066315604B',
-  '0x0FA1A5CC3911A5697B625EF1C75eF4caE764bd34',
-  '0x95863d16bA2fb60B7d9Ca725f22df76fA5dEe61D',
-]
-export const communitiesInDirectory = [
-  '0x344C19E3040Ec63A96b7aeB708C82a066315604B',
-  '0xABA1EF51EF4bc360A9E8c9Ad2d787330b602EB24',
-  '0xabA1EF51eF4Bc36ED9e8C9ad2d787330b602EB24',
-  '0x9Ac2b2E23eb62fa70fc7f31c0895AC46230C241e',
-]
-
 export const communities: Array<CommunityDetail> = [
   {
-    publicKey: '0x344C19E3040Ec63A96b7aeB708C82a066315604B',
+    publicKey: '0x0d9cb350e1dc415303e2816a21b0a439530725b4b2b42d2948e967cb211eab89d5',
     ens: 'CryptoPunks',
     name: 'CryptoPunks',
     link: 'cryptopunks.com',
@@ -62,7 +50,7 @@ export const communities: Array<CommunityDetail> = [
     },
   },
   {
-    publicKey: '0xABA1EF51EF4bc360A9E8c9Ad2d787330b602EB24',
+    publicKey: '0x9ac2b2e23eb62fa70fc7f31c0895ac46230c241e',
     ens: 'MakerDAO Community',
     name: 'MakerDAO Community',
     link: 'MakerDAOCommunity.com',
@@ -80,7 +68,7 @@ export const communities: Array<CommunityDetail> = [
     },
   },
   {
-    publicKey: '0xabA1EF51eF4Bc36ED9e8C9ad2d787330b602EB24',
+    publicKey: '0x04bbb77ea11ee6dc4585efa2617ec90b8ee4051ade4fcf7261ae6cd4cdf33e54e3',
     ens: 'DDEX',
     name: 'DDEX',
     link: 'ddex.com',
@@ -97,7 +85,7 @@ export const communities: Array<CommunityDetail> = [
     },
   },
   {
-    publicKey: '0x9Ac2b2E23eb62fa70fc7f31c0895AC46230C241e',
+    publicKey: '0xadfcf42e083e71d8c755da07a2b1bad754d7ca97c35fbd407da6bde9844580ad55',
     ens: 'Name Baazar',
     name: 'Name Baazar',
     link: 'NameBaazar.com',
@@ -114,7 +102,7 @@ export const communities: Array<CommunityDetail> = [
     },
   },
   {
-    publicKey: '0x0FA1A5CC3911A5697B625EF1C75eF4caE764bd34',
+    publicKey: '0xec62724b6828954a705eb3b531c30a69503d3561d4283fb8b60835ff34205c64d8',
     ens: 'CryptoKitties',
     name: 'CryptoKitties',
     link: 'CryptoKitties.com',
@@ -158,7 +146,7 @@ export const communities: Array<CommunityDetail> = [
     },
   },
   {
-    publicKey: '0x95863d16bA2fb60B7d9Ca725f22df76fA5dEe61D',
+    publicKey: '0xb8def1f5e7160e5e1a6440912b7e633ad923030352f23abb54226020bff781b7e6',
     ens: 'Awesome Community',
     name: 'Awesome Community',
     link: 'Awesome Community.com',
