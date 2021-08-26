@@ -26,7 +26,7 @@ export function VoteGraphBar({ graphWidth, balanceWidth, voteWinner, isAnimation
   const markerWidth: number = balanceWidth ? balanceWidth : 0
   const votesWidth: number = graphWidth ? graphWidth : 0
   const [keyFrames, setKeyFrames] = useState('')
-  const [style, setStyle] = useState<any>({ width: `${votesWidth}%` })
+  const [style, setStyle] = useState<{ width: string; animation?: string }>({ width: `${votesWidth}%` })
 
   useEffect(() => {
     if (isAnimation) {

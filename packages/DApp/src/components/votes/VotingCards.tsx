@@ -11,6 +11,7 @@ import { useVotingCommunities } from '../../hooks/useVotingCommunities'
 import { VotingEmpty } from './VotingEmpty'
 import { SearchEmpty } from '../SearchEmpty'
 import { VoteFilter } from './VoteFilter'
+import { DetailedVotingRoom } from '../../models/smartContract'
 
 export function VotingCards() {
   const [sortedBy, setSortedBy] = useState(VotingSortingEnum.EndingSoonest)
@@ -50,7 +51,7 @@ export function VotingCards() {
           {mobileVersion && <VoteFilter voteType={voteType} setVoteType={setVoteType} />}
         </VoteBar>
       </PageBar>
-      {roomsToShow.map((room: any, idx) => {
+      {roomsToShow.map((room: DetailedVotingRoom, idx) => {
         if (room?.details) {
           return <VotingCard key={idx} room={room} />
         } else {

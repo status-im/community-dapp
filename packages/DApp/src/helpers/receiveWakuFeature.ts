@@ -4,8 +4,21 @@ import { merge } from 'lodash'
 import { BigNumber } from 'ethers'
 import { Waku } from 'js-waku'
 
-function sumVotes(map: any) {
-  for (const [publicKey, community] of Object.entries(map) as any[]) {
+type CommunityFeatureVote = {
+  [voter: string]: BigNumber
+}
+
+type CommunityFeatureVotes = {
+  sum: BigNumber
+  votes: CommunityFeatureVote
+}
+
+type CommunitiesFeatureVotes = {
+  [publicKey: string]: CommunityFeatureVotes
+}
+
+function sumVotes(map: CommunitiesFeatureVotes) {
+  for (const [publicKey, community] of Object.entries(map)) {
     map[publicKey]['sum'] = BigNumber.from(0)
     for (const votes of Object.entries(community['votes'])) {
       map[publicKey]['sum'] = map[publicKey]['sum'].add(votes[1])
@@ -13,21 +26,21 @@ function sumVotes(map: any) {
   }
 }
 
-function getTop(map: any, top: number) {
+function getTop(map: CommunitiesFeatureVotes, top: number) {
   sumVotes(map)
   return Object.entries(map)
-    .sort((a: any, b: any) => (a[1].sum > b[1].sum ? -1 : 1))
+    .sort((a, b) => (a[1].sum > b[1].sum ? -1 : 1))
     .slice(0, top)
 }
 
 export async function receiveWakuFeature(waku: Waku | undefined, topic: string) {
   let messages = await receiveWakuFeatureMsg(waku, topic)
-  const wakuFeatured: any = {}
-  let top5: any[] = []
+  const wakuFeatured: CommunitiesFeatureVotes = {}
+  let top5: [string, CommunityFeatureVotes][] = []
   if (messages && messages?.length > 0) {
     messages = messages.sort((a, b) => (a.timestamp > b.timestamp ? 1 : -1))
     let prevWeek = getWeek(messages[0].timestamp)
-    messages.forEach((el: any) => {
+    messages.forEach((el) => {
       if (prevWeek === getWeek(el.timestamp)) {
         if (!top5.find((featuredComm) => featuredComm[0] === el.publicKey)) {
           merge(wakuFeatured, { [el.publicKey]: { votes: { [el.voter]: el.sntAmount } } })

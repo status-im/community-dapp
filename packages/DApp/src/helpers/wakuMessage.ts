@@ -11,7 +11,7 @@ function getContractParameters(address: string, room: number, type: number, sntA
   return [address, BigNumber.from(room).mul(2).add(type), BigNumber.from(sntAmount)]
 }
 
-export function filterVerifiedMessages(messages: any[] | undefined, alreadyVoted: any[]) {
+export function filterVerifiedMessages(messages: WakuVoteData[] | undefined, alreadyVoted: string[]) {
   if (!messages) {
     return []
   }
@@ -23,7 +23,7 @@ export function filterVerifiedMessages(messages: any[] | undefined, alreadyVoted
       data.address,
       data.sessionID,
       data.vote == 'yes' ? 1 : 0,
-      data.sntAmount
+      data.sntAmount.toNumber()
     )
 
     if (recoverAddress(types, contractMessage, data.sign) == data.address) {

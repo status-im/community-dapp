@@ -1,18 +1,18 @@
 import { CommunityDetail, DirectorySortingEnum, VotingSortingEnum } from '../models/community'
-import { DetailedVotingRoom } from '../models/smartContract'
+import { DetailedVotingRoom, VotingRoom } from '../models/smartContract'
 
-export function isTextInDetails(filterKeyword: string, details: any) {
+export function isTextInDetails(filterKeyword: string, details: CommunityDetail) {
   if (!details || !details.name || !details.description || !details.tags) {
     return false
   }
   return (
     details.name.toLowerCase().includes(filterKeyword.toLowerCase()) ||
     details.description.toLowerCase().includes(filterKeyword.toLowerCase()) ||
-    details.tags.findIndex((item: any) => filterKeyword.toLowerCase() === item.toLowerCase()) > -1
+    details.tags.findIndex((item: string) => filterKeyword.toLowerCase() === item.toLowerCase()) > -1
   )
 }
 
-export function isTypeInRoom(voteType: string, room: any) {
+export function isTypeInRoom(voteType: string, room: VotingRoom) {
   if (!voteType) {
     return true
   }
