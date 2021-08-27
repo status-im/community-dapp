@@ -129,7 +129,16 @@ describe('wakuMessage', () => {
 
   describe('create', () => {
     it('success', async () => {
-      const msg = await wakuMessage.create(alice.address, alice as unknown as JsonRpcSigner, 1, 100, 1, '/test/')
+      const msg = await wakuMessage.create(
+        alice.address,
+        alice as unknown as JsonRpcSigner,
+        1,
+        100,
+        1,
+        '/test/',
+        () => [],
+        '0x01'
+      )
 
       expect(msg?.payload).to.not.be.undefined
       if (msg?.payload) {
@@ -143,7 +152,16 @@ describe('wakuMessage', () => {
     })
 
     it('different payload', async () => {
-      const msg = await wakuMessage.create(alice.address, alice as unknown as JsonRpcSigner, 2, 1000, 0, '/test/')
+      const msg = await wakuMessage.create(
+        alice.address,
+        alice as unknown as JsonRpcSigner,
+        2,
+        1000,
+        0,
+        '/test/',
+        () => [],
+        '0x01'
+      )
 
       expect(msg?.payload).to.not.be.undefined
       if (msg?.payload) {
@@ -157,17 +175,25 @@ describe('wakuMessage', () => {
     })
 
     it('no address', async () => {
-      const msg = await wakuMessage.create(undefined, alice as unknown as JsonRpcSigner, 1, 100, 1, '/test/')
+      const msg = await wakuMessage.create(undefined, alice as unknown as JsonRpcSigner, 1, 100, 1, '/test/', () => [])
       expect(msg?.payloadAsUtf8).to.be.undefined
     })
 
     it('no signer', async () => {
-      const msg = await wakuMessage.create(alice.address, undefined, 1, 100, 1, '/test/')
+      const msg = await wakuMessage.create(alice.address, undefined, 1, 100, 1, '/test/', () => [])
       expect(msg?.payloadAsUtf8).to.be.undefined
     })
 
     it('different signer', async () => {
-      const msg = await wakuMessage.create(alice.address, bob as unknown as JsonRpcSigner, 1, 100, 1, '/test/')
+      const msg = await wakuMessage.create(
+        alice.address,
+        bob as unknown as JsonRpcSigner,
+        1,
+        100,
+        1,
+        '/test/',
+        () => []
+      )
       expect(msg?.payloadAsUtf8).to.be.undefined
     })
   })

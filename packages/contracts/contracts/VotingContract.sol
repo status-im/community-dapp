@@ -41,11 +41,59 @@ contract VotingContract {
     uint256[] public activeVotingRooms;
     mapping(uint256 => uint256) private indexOfActiveVotingRooms;
 
+    bytes32 private constant EIP712DOMAIN_TYPEHASH =
+        keccak256('EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)');
+
+    struct EIP712Domain {
+        string name;
+        string version;
+        uint256 chainId;
+        address verifyingContract;
+    }
+
+    bytes32 private DOMAIN_SEPARATOR;
+
+    function hash(EIP712Domain memory eip712Domain) internal pure returns (bytes32) {
+        return
+            keccak256(
+                abi.encode(
+                    EIP712DOMAIN_TYPEHASH,
+                    keccak256(bytes(eip712Domain.name)),
+                    keccak256(bytes(eip712Domain.version)),
+                    eip712Domain.chainId,
+                    eip712Domain.verifyingContract
+                )
+            );
+    }
+
+    bytes32 public constant VOTE_TYPEHASH = keccak256('Vote(uint256 roomIdAndType,uint256 sntAmount,address voter)');
+
+    function hash(Vote calldata vote) internal pure returns (bytes32) {
+        return keccak256(abi.encode(VOTE_TYPEHASH, vote.roomIdAndType, vote.sntAmount, vote.voter));
+    }
+
+    function verify(
+        Vote calldata vote,
+        bytes32 r,
+        bytes32 vs
+    ) internal view returns (bool) {
+        bytes32 digest = keccak256(abi.encodePacked('\x19\x01', DOMAIN_SEPARATOR, hash(vote)));
+        return digest.recover(abi.encode(r, vs)) == vote.voter;
+    }
+
     constructor(IERC20 _address) {
         owner = msg.sender;
         token = _address;
         VotingRoom memory newVotingRoom;
         votingRooms.push(newVotingRoom);
+        DOMAIN_SEPARATOR = hash(
+            EIP712Domain({
+                name: 'Voting Contract',
+                version: '1',
+                chainId: block.chainid,
+                verifyingContract: address(this)
+            })
+        );
     }
 
     function setDirectory(Directory _address) public {
@@ -129,7 +177,7 @@ contract VotingContract {
     event VoteCast(uint256 roomId, address voter);
     event NotEnoughToken(uint256 roomId, address voter);
 
-    struct SignedVote {
+    struct Vote {
         address voter;
         uint256 roomIdAndType;
         uint256 sntAmount;
@@ -137,13 +185,10 @@ contract VotingContract {
         bytes32 vs;
     }
 
-    function castVotes(SignedVote[] calldata votes) public {
+    function castVotes(Vote[] calldata votes) public {
         for (uint256 i = 0; i < votes.length; i++) {
-            SignedVote calldata vote = votes[i];
-            bytes32 hashed = keccak256(
-                abi.encodePacked('\x19Ethereum Signed Message:\n84', vote.voter, vote.roomIdAndType, vote.sntAmount)
-            );
-            if (hashed.recover(abi.encode(vote.r, vote.vs)) == vote.voter) {
+            Vote calldata vote = votes[i];
+            if (verify(vote, vote.r, vote.vs)) {
                 uint256 roomId = vote.roomIdAndType >> 1;
                 require(roomId > 0, 'vote not found');
                 require(roomId < votingRooms.length, 'vote not found');

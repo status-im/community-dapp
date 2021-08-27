@@ -6,38 +6,45 @@ import { recoverAddress } from './ethMessage'
 import { utils } from 'ethers'
 import proto from './loadProtons'
 import { WakuFeatureData, WakuVoteData } from '../models/waku'
+import { TypedVote } from '../models/TypedData'
 
-function getContractParameters(address: string, room: number, type: number, sntAmount: number) {
+function getContractParameters(
+  address: string,
+  room: number,
+  type: number,
+  sntAmount: number
+): [string, BigNumber, BigNumber] {
   return [address, BigNumber.from(room).mul(2).add(type), BigNumber.from(sntAmount)]
 }
 
-export function filterVerifiedMessages(messages: WakuVoteData[] | undefined, alreadyVoted: string[]) {
+export function filterVerifiedMessages(
+  messages: WakuVoteData[] | undefined,
+  alreadyVoted: string[],
+  getTypedData: (data: [string, BigNumber, BigNumber]) => TypedVote
+) {
   if (!messages) {
     return []
   }
-  const types = ['address', 'uint256', 'uint256']
-  const verifiedMessages: any[] = []
+  const verified: [string, BigNumber, BigNumber, string, string][] = []
 
-  messages.forEach((data) => {
-    const contractMessage = getContractParameters(
-      data.address,
-      data.sessionID,
-      data.vote == 'yes' ? 1 : 0,
-      data.sntAmount.toNumber()
+  messages.forEach((msg) => {
+    const params = getContractParameters(
+      msg.address,
+      msg.sessionID,
+      msg.vote == 'yes' ? 1 : 0,
+      msg.sntAmount.toNumber()
     )
 
-    if (recoverAddress(types, contractMessage, data.sign) == data.address) {
-      const addressInVerified = verifiedMessages.find((el) => el[0] === data.address)
-      const addressInVoted = alreadyVoted.find((el: string) => el === data.address)
-
+    if (utils.getAddress(recoverAddress(getTypedData(params), msg.sign)) == msg.address) {
+      const addressInVerified = verified.find((el) => el[0] === msg.address)
+      const addressInVoted = alreadyVoted.find((el: string) => el === msg.address)
+      const splitSig = utils.splitSignature(msg.sign)
       if (!addressInVerified && !addressInVoted) {
-        contractMessage.push(utils.splitSignature(data.sign).r)
-        contractMessage.push(utils.splitSignature(data.sign)._vs)
-        verifiedMessages.push(contractMessage)
+        verified.push([...params, splitSig.r, splitSig._vs])
       }
     }
   })
-  return verifiedMessages
+  return verified
 }
 
 function decodeWakuVote(msg: WakuMessage): WakuVoteData | undefined {
@@ -157,20 +164,24 @@ export async function createWakuMessage(
   room: number,
   voteAmount: number,
   type: number,
-  topic: string
+  topic: string,
+  getTypedData: (data: [string, BigNumber, BigNumber]) => any,
+  sig?: string
 ) {
   if (!account || !signer) {
     return undefined
   }
+  const provider = signer.provider
 
   const signerAddress = await signer?.getAddress()
   if (signerAddress != account) {
     return undefined
   }
 
-  const types = ['address', 'uint256', 'uint256']
   const message = getContractParameters(account, room, type, voteAmount)
-  const signature = await signer.signMessage(packAndArrayify(types, message))
+  const data = getTypedData(message)
+
+  const signature = sig ? sig : await provider?.send('eth_signTypedData_v3', [account, JSON.stringify(data)])
   if (signature) {
     const payload = proto.WakuVote.encode({
       address: account,

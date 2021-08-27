@@ -16,8 +16,10 @@
   },
   "dependencies": {
     "@usedapp/core": "^0.4.6",
+    "assert": "^2.0.0",
     "buffer": "^6.0.3",
     "crypto-browserify": "^3.12.0",
+    "eth-sig-util": "^3.0.1",
     "humanize-duration": "^3.27.0",
     "js-waku": "^0.9.0",
     "protons": "^2.0.1",

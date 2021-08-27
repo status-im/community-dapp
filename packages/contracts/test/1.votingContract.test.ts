@@ -2,7 +2,7 @@ import { expect, use } from 'chai'
 import { loadFixture, deployContract, MockProvider, solidity } from 'ethereum-waffle'
 import { VotingContract, Directory, ERC20Mock } from '../abi'
 import { utils, Wallet, Contract } from 'ethers'
-
+import { signTypedMessage } from 'eth-sig-util'
 import { BigNumber } from '@ethersproject/bignumber'
 
 use(solidity)
@@ -27,11 +27,34 @@ const publicKeys = [
   '0x09bda2799a0a05274f03dec5fb0ea93775af5fb5e5d62fb807bfeca075301e9760',
 ]
 
+const typedData = {
+  types: {
+    EIP712Domain: [
+      { name: 'name', type: 'string' },
+      { name: 'version', type: 'string' },
+      { name: 'chainId', type: 'uint256' },
+      { name: 'verifyingContract', type: 'address' },
+    ],
+    Vote: [
+      { name: 'roomIdAndType', type: 'uint256' },
+      { name: 'sntAmount', type: 'uint256' },
+      { name: 'voter', type: 'address' },
+    ],
+  },
+  primaryType: 'Vote',
+  domain: {
+    name: 'Voting Contract',
+    version: '1',
+    chainId: 0,
+    verifyingContract: '',
+  },
+}
+
 const getSignedMessages = async (
   alice: Wallet,
   firstAddress: Wallet,
   secondAddress: Wallet
-): Promise<{ messages: any[]; signedMessages: any[] }> => {
+): Promise<[string, BigNumber, BigNumber, string, string][]> => {
   const votes = [
     {
       voter: alice,
@@ -52,26 +75,24 @@ const getSignedMessages = async (
       sessionID: 1,
     },
   ]
-  const types = ['address', 'uint256', 'uint256']
-  const messages = votes.map((vote) => [
+  const messages: [string, BigNumber, BigNumber][] = votes.map((vote) => [
     vote.voter.address,
     BigNumber.from(vote.sessionID).mul(2).add(vote.vote),
     vote.sntAmount,
   ])
 
-  const signedMessages = await Promise.all(
-    messages.map(async (message, idx) => {
-      const returnArray = [...message]
-      const signature = utils.splitSignature(
-        await votes[idx].voter.signMessage(utils.arrayify(utils.solidityPack(types, message)))
-      )
-      returnArray.push(signature.r)
-      returnArray.push(signature._vs)
-      return returnArray
-    })
-  )
+  const signedMessages = messages.map((msg, idx) => {
+    const t = {
+      ...typedData,
+      message: { roomIdAndType: msg[1].toHexString(), sntAmount: msg[2].toHexString(), voter: msg[0] },
+    }
+    const sig = utils.splitSignature(
+      signTypedMessage(Buffer.from(utils.arrayify(votes[idx].voter.privateKey)), { data: t as any }, 'V3')
+    )
+    return [...msg, sig.r, sig._vs] as [string, BigNumber, BigNumber, string, string]
+  })
 
-  return { messages, signedMessages }
+  return signedMessages
 }
 
 const voteAndFinalize = async (
@@ -81,17 +102,27 @@ const voteAndFinalize = async (
   contract: Contract,
   provider: MockProvider
 ) => {
-  const types = ['address', 'uint256', 'uint256']
-  const vote = [signer.address, BigNumber.from(room).mul(2).add(type), BigNumber.from(100)]
-  const signature = utils.splitSignature(await signer.signMessage(utils.arrayify(utils.solidityPack(types, vote))))
-  const votes = [[...vote, signature.r, signature._vs]]
-  await contract.castVotes(votes)
+  const vote: [string, BigNumber, BigNumber] = [
+    signer.address,
+    BigNumber.from(room).mul(2).add(type),
+    BigNumber.from(100),
+  ]
+
+  const t = {
+    ...typedData,
+    message: { roomIdAndType: vote[1].toHexString(), sntAmount: vote[2].toHexString(), voter: vote[0] },
+  }
+  const sig = utils.splitSignature(
+    signTypedMessage(Buffer.from(utils.arrayify(signer.privateKey)), { data: t as any }, 'V3')
+  )
+
+  await contract.castVotes([[...vote, sig.r, sig._vs]])
   await provider.send('evm_mine', [Math.floor(Date.now() / 1000 + 10000)])
   await contract.finalizeVotingRoom(room)
   await provider.send('evm_mine', [Math.floor(Date.now() / 1000)])
 }
 
-async function fixture([alice, firstAddress, secondAddress]: any[], provider: any) {
+async function fixture([alice, firstAddress, secondAddress]: any[], provider: MockProvider) {
   const erc20 = await deployContract(alice, ERC20Mock, ['MSNT', 'Mock SNT', alice.address, 100000])
   await erc20.transfer(firstAddress.address, 10000)
   await erc20.transfer(secondAddress.address, 10000)
@@ -103,7 +134,9 @@ async function fixture([alice, firstAddress, secondAddress]: any[], provider: an
 
 describe('Contract', () => {
   before(async () => {
-    await loadFixture(fixture)
+    const { contract } = await loadFixture(fixture)
+    typedData.domain.chainId = 1
+    typedData.domain.verifyingContract = contract.address
   })
   it('deploys properly', async () => {
     const { contract, directory } = await loadFixture(fixture)
@@ -312,11 +345,11 @@ describe('Contract', () => {
   describe('voting', () => {
     it('check voters', async () => {
       const { contract, alice, firstAddress, secondAddress } = await loadFixture(fixture)
-      const { signedMessages } = await getSignedMessages(alice, firstAddress, secondAddress)
+      const messages = await getSignedMessages(alice, firstAddress, secondAddress)
       await contract.initializeVotingRoom(1, publicKeys[0], BigNumber.from(100))
 
       expect(await contract.listRoomVoters(1)).to.deep.eq([alice.address])
-      await contract.castVotes(signedMessages.slice(2))
+      await contract.castVotes(messages.slice(2))
       expect(await contract.listRoomVoters(1)).to.deep.eq([alice.address, secondAddress.address])
     })
 
@@ -324,17 +357,17 @@ describe('Contract', () => {
       const { contract, firstAddress } = await loadFixture(fixture)
       await contract.initializeVotingRoom(1, publicKeys[0], BigNumber.from(100))
 
-      const types = ['address', 'uint256', 'uint256']
-      const message = [firstAddress.address, BigNumber.from(1).mul(2).add(1), BigNumber.from(100000000000)]
+      const msg = [firstAddress.address, BigNumber.from(1).mul(2).add(1), BigNumber.from(100000000000)]
 
-      const signedMessage = [...message]
-      const signature = utils.splitSignature(
-        await firstAddress.signMessage(utils.arrayify(utils.solidityPack(types, message)))
+      const t = {
+        ...typedData,
+        message: { roomIdAndType: msg[1].toHexString(), sntAmount: msg[2].toHexString(), voter: msg[0] },
+      }
+      const sig = utils.splitSignature(
+        signTypedMessage(Buffer.from(utils.arrayify(firstAddress.privateKey)), { data: t as any }, 'V3')
       )
-      signedMessage.push(signature.r)
-      signedMessage.push(signature._vs)
 
-      await expect(await contract.castVotes([signedMessage]))
+      await expect(await contract.castVotes([[...msg, sig.r, sig._vs]]))
         .to.emit(contract, 'NotEnoughToken')
         .withArgs(1, firstAddress.address)
 
@@ -350,9 +383,9 @@ describe('Contract', () => {
 
     it('success', async () => {
       const { contract, alice, firstAddress, secondAddress } = await loadFixture(fixture)
-      const { signedMessages } = await getSignedMessages(alice, firstAddress, secondAddress)
+      const messages = await getSignedMessages(alice, firstAddress, secondAddress)
       await contract.initializeVotingRoom(1, publicKeys[0], BigNumber.from(100))
-      await contract.castVotes(signedMessages)
+      await contract.castVotes(messages)
       expect((await contract.votingRooms(1)).slice(2)).to.deep.eq([
         1,
         false,
@@ -365,10 +398,10 @@ describe('Contract', () => {
 
     it('double vote', async () => {
       const { contract, alice, firstAddress, secondAddress } = await loadFixture(fixture)
-      const { signedMessages } = await getSignedMessages(alice, firstAddress, secondAddress)
+      const messages = await getSignedMessages(alice, firstAddress, secondAddress)
       await contract.initializeVotingRoom(1, publicKeys[0], BigNumber.from(100))
-      await contract.castVotes(signedMessages)
-      await contract.castVotes(signedMessages)
+      await contract.castVotes(messages)
+      await contract.castVotes(messages)
       expect((await contract.votingRooms(1)).slice(2)).to.deep.eq([
         1,
         false,
@@ -387,38 +420,31 @@ describe('Contract', () => {
 
     it('none existent room', async () => {
       const { contract, alice, firstAddress, secondAddress } = await loadFixture(fixture)
-      const { signedMessages } = await getSignedMessages(alice, firstAddress, secondAddress)
-      await expect(contract.castVotes(signedMessages)).to.be.reverted
+      const messages = await getSignedMessages(alice, firstAddress, secondAddress)
+      await expect(contract.castVotes(messages)).to.be.reverted
     })
 
     it('old room', async () => {
       const { contract, alice, firstAddress, secondAddress, provider } = await loadFixture(fixture)
-      const { signedMessages } = await getSignedMessages(alice, firstAddress, secondAddress)
+      const messages = await getSignedMessages(alice, firstAddress, secondAddress)
       await contract.initializeVotingRoom(1, publicKeys[0], BigNumber.from(100))
       await provider.send('evm_mine', [Math.floor(Date.now() / 1000 + 2000)])
-      await expect(contract.castVotes(signedMessages)).to.be.reverted
+      await expect(contract.castVotes(messages)).to.be.reverted
     })
 
     it('wrong signature', async () => {
       const { contract, alice, firstAddress, secondAddress, provider } = await loadFixture(fixture)
-      const { messages } = await getSignedMessages(alice, firstAddress, secondAddress)
-      const types = ['address', 'uint256', 'uint256']
+      const messages = await getSignedMessages(alice, firstAddress, secondAddress)
       await contract.initializeVotingRoom(1, publicKeys[0], BigNumber.from(100))
       await provider.send('evm_mine', [Math.floor(Date.now() / 1000 + 2000)])
 
-      const signedMessages = await Promise.all(
-        messages.map(async (message) => {
-          const returnArray = [...message]
-          const signature = utils.splitSignature(
-            await alice.signMessage(utils.arrayify(utils.solidityPack(types, message)))
-          )
-          returnArray.push(signature.r)
-          returnArray.push(signature._vs)
-          return returnArray
-        })
-      )
-
-      await expect(contract.castVotes(signedMessages)).to.be.reverted
+      const signedMessages = messages.map((msg) => [
+        ...msg.slice(0, 3),
+        '0x2d63286985277c440b9f01a987fbbc9bc9ca32cb4e9e55ee3ffcab4e67c211e6',
+        '0x2d63286985277c440b9f01a987fbbc9bc9ca32cb4e9e55ee3ffcab4e67c211e6',
+      ])
+      await contract.castVotes(signedMessages)
+      await expect(await contract.listRoomVoters(1)).to.deep.eq([alice.address])
     })
   })
 })
