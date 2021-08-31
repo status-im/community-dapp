@@ -2,7 +2,7 @@ import { useCallback } from 'react'
 import { useWaku } from '../providers/waku/provider'
 import { useEthers } from '@usedapp/core'
 import { useConfig } from '../providers/config'
-import { createWakuMessage } from '../helpers/wakuMessage'
+import { createWakuVote } from '../helpers/wakuVote'
 import { useTypedVote } from './useTypedVote'
 
 export function useSendWakuVote() {
@@ -13,7 +13,7 @@ export function useSendWakuVote() {
 
   const sendWakuVote = useCallback(
     async (voteAmount: number, room: number, type: number) => {
-      const msg = await createWakuMessage(
+      const msg = await createWakuVote(
         account,
         library?.getSigner(),
         room,

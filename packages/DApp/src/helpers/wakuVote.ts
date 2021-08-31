@@ -1,11 +1,10 @@
 import { JsonRpcSigner } from '@ethersproject/providers'
 import { BigNumber } from 'ethers'
-import { packAndArrayify } from './ethMessage'
 import { Waku, WakuMessage } from 'js-waku'
 import { recoverAddress } from './ethMessage'
 import { utils } from 'ethers'
 import proto from './loadProtons'
-import { WakuFeatureData, WakuVoteData } from '../models/waku'
+import { WakuVoteData } from '../models/waku'
 import { TypedVote } from '../models/TypedData'
 
 function getContractParameters(
@@ -17,7 +16,7 @@ function getContractParameters(
   return [address, BigNumber.from(room).mul(2).add(type), BigNumber.from(sntAmount)]
 }
 
-export function filterVerifiedMessages(
+export function filterVerifiedVotes(
   messages: WakuVoteData[] | undefined,
   alreadyVoted: string[],
   getTypedData: (data: [string, BigNumber, BigNumber]) => TypedVote
@@ -67,98 +66,13 @@ export function decodeWakuVotes(messages: WakuMessage[] | null) {
   return messages?.map(decodeWakuVote).filter((e): e is WakuVoteData => !!e)
 }
 
-export async function receiveWakuMessages(waku: Waku, topic: string, room: number) {
+export async function receiveWakuVotes(waku: Waku, topic: string, room: number) {
   const contentTopics = [topic + room.toString()]
   const messages = await waku.store.queryHistory({ contentTopics })
   return decodeWakuVotes(messages)
 }
 
-function decodeWakuFeature(msg: WakuMessage): WakuFeatureData | undefined {
-  try {
-    if (!msg.payload) {
-      return undefined
-    }
-    const data = proto.WakuFeature.decode(msg.payload)
-    if (data && data.publicKey && data.sign && data.sntAmount && data.timestamp && data.voter) {
-      return {
-        ...data,
-        msgTimestamp: msg.timestamp ?? new Date(0),
-        timestamp: new Date(data.timestamp),
-        sntAmount: BigNumber.from(data.sntAmount),
-      }
-    } else {
-      return undefined
-    }
-  } catch {
-    return undefined
-  }
-}
-
-export function decodeWakuFeatures(messages: WakuMessage[] | null) {
-  return messages?.map(decodeWakuFeature).filter(verifyWakuFeatureMsg)
-}
-
-export async function receiveWakuFeatureMsg(waku: Waku | undefined, topic: string) {
-  if (waku) {
-    const messages = await waku.store.queryHistory({ contentTopics: [topic] })
-    return decodeWakuFeatures(messages)
-  }
-}
-
-function verifyWakuFeatureMsg(data: WakuFeatureData | undefined): data is WakuFeatureData {
-  if (!data) {
-    return false
-  }
-  const types = ['address', 'uint256', 'address', 'uint256']
-  const message = [data.voter, data.sntAmount, data.publicKey, data.timestamp.getTime()]
-  const verifiedAddress = utils.verifyMessage(packAndArrayify(types, message), data.sign)
-
-  if (data.msgTimestamp?.getTime() != data.timestamp.getTime() || verifiedAddress != data.voter) {
-    return false
-  }
-  return true
-}
-
-export async function createWakuFeatureMsg(
-  account: string | null | undefined,
-  signer: JsonRpcSigner | undefined,
-  sntAmount: BigNumber,
-  publicKey: string,
-  contentTopic: string
-) {
-  if (!account || !signer) {
-    return undefined
-  }
-
-  const signerAddress = await signer?.getAddress()
-  if (signerAddress != account) {
-    return undefined
-  }
-  const timestamp = new Date()
-
-  const types = ['address', 'uint256', 'address', 'uint256']
-  const message = [account, sntAmount, publicKey, BigNumber.from(timestamp.getTime())]
-  const sign = await signer.signMessage(packAndArrayify(types, message))
-
-  if (sign) {
-    const payload = proto.WakuFeature.encode({
-      voter: account,
-      sntAmount: utils.arrayify(sntAmount),
-      publicKey,
-      timestamp,
-      sign,
-    })
-
-    const msg = WakuMessage.fromBytes(payload, {
-      contentTopic,
-      timestamp,
-    })
-    return msg
-  }
-  return undefined
-}
-
-export async function createWakuMessage(
+export async function createWakuVote(
   account: string | null | undefined,
   signer: JsonRpcSigner | undefined,
   room: number,
@@ -198,4 +112,4 @@ export async function createWakuMessage(
   return undefined
 }
 
-export default { create: createWakuMessage, receive: receiveWakuMessages, filterVerified: filterVerifiedMessages }
+export default { create: createWakuVote, receive: receiveWakuVotes, filterVerified: filterVerifiedVotes }

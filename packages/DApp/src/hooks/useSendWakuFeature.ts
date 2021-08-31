@@ -2,7 +2,7 @@ import { useCallback } from 'react'
 import { useWaku } from '../providers/waku/provider'
 import { useEthers } from '@usedapp/core'
 import { useConfig } from '../providers/config'
-import { createWakuFeatureMsg } from '../helpers/wakuMessage'
+import { createWakuFeatureMsg } from '../helpers/wakuFeature'
 import { BigNumber } from 'ethers'
 
 export function useSendWakuFeature() {

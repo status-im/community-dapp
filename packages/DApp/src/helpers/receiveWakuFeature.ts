@@ -1,4 +1,4 @@
-import { receiveWakuFeatureMsg } from '../helpers/wakuMessage'
+import { receiveWakuFeatureMsg } from './wakuFeature'
 import { getWeek } from '../helpers/getWeek'
 import { merge } from 'lodash'
 import { BigNumber } from 'ethers'

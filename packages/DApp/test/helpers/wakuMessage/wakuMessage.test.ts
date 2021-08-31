@@ -1,9 +1,6 @@
 import { expect } from 'chai'
-import wakuMessage, {
-  decodeWakuVotes,
-  decodeWakuFeatures,
-  createWakuFeatureMsg,
-} from '../../../src/helpers/wakuMessage'
+import wakuMessage, { decodeWakuVotes } from '../../../src/helpers/wakuVote'
+import { decodeWakuFeatures, createWakuFeatureMsg } from '../../../src/helpers/wakuFeature'
 import { MockProvider } from 'ethereum-waffle'
 import { JsonRpcSigner } from '@ethersproject/providers'
 import proto from '../../../src/helpers/loadProtons'
