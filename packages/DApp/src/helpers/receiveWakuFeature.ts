@@ -33,8 +33,8 @@ function getTop(map: CommunitiesFeatureVotes, top: number) {
     .slice(0, top)
 }
 
-export async function receiveWakuFeature(waku: Waku | undefined, topic: string) {
-  let messages = await receiveWakuFeatureMsg(waku, topic)
+export async function receiveWakuFeature(waku: Waku | undefined, topic: string, chainId: number) {
+  let messages = await receiveWakuFeatureMsg(waku, topic, chainId)
   const wakuFeatured: CommunitiesFeatureVotes = {}
   let top5: [string, CommunityFeatureVotes][] = []
   if (messages && messages?.length > 0) {

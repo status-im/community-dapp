@@ -1,22 +1,56 @@
 import { Waku, WakuMessage } from 'js-waku'
 import { WakuFeatureData } from '../models/waku'
-import { packAndArrayify } from './ethMessage'
+import { recoverAddress } from './ethMessage'
 import { utils, BigNumber } from 'ethers'
 import { JsonRpcSigner } from '@ethersproject/providers'
 import proto from './loadProtons'
+import { TypedFeature } from '../models/TypedData'
 
-function verifyWakuFeatureMsg(data: WakuFeatureData | undefined): data is WakuFeatureData {
+function createTypedData(chainId: number, voter: string, sntAmount: BigNumber, publicKey: string, timestamp: Date) {
+  return {
+    types: {
+      EIP712Domain: [
+        { name: 'name', type: 'string' },
+        { name: 'version', type: 'string' },
+        { name: 'chainId', type: 'uint256' },
+      ],
+      Feature: [
+        { name: 'voter', type: 'address' },
+        { name: 'sntAmount', type: 'uint256' },
+        { name: 'publicKey', type: 'bytes' },
+        { name: 'timestamp', type: 'uint64' },
+        { name: 'chainId', type: 'uint64' },
+      ],
+    },
+    primaryType: 'Feature',
+    domain: {
+      name: 'Featuring vote',
+      version: '1',
+      chainId: chainId,
+    },
+    message: {
+      voter: voter,
+      sntAmount: sntAmount.toHexString(),
+      publicKey: publicKey,
+      timestamp: timestamp.getTime(),
+    },
+  } as TypedFeature
+}
+
+function verifyWakuFeatureMsg(data: WakuFeatureData | undefined, chainId: number): data is WakuFeatureData {
   if (!data) {
     return false
   }
-  const types = ['address', 'uint256', 'address', 'uint256']
-  const message = [data.voter, data.sntAmount, data.publicKey, data.timestamp.getTime()]
-  const verifiedAddress = utils.verifyMessage(packAndArrayify(types, message), data.sign)
-
-  if (data.msgTimestamp?.getTime() != data.timestamp.getTime() || verifiedAddress != data.voter) {
+  const typedData = createTypedData(chainId, data.voter, data.sntAmount, data.publicKey, data.timestamp)
+  try {
+    const verifiedAddress = utils.getAddress(recoverAddress(typedData, data.sign))
+    if (data.msgTimestamp?.getTime() != data.timestamp.getTime() || verifiedAddress != data.voter) {
+      return false
+    }
+    return true
+  } catch {
     return false
   }
-  return true
 }
 
 function decodeWakuFeature(msg: WakuMessage): WakuFeatureData | undefined {
@@ -40,14 +74,14 @@ function decodeWakuFeature(msg: WakuMessage): WakuFeatureData | undefined {
   }
 }
 
-export function decodeWakuFeatures(messages: WakuMessage[] | null) {
-  return messages?.map(decodeWakuFeature).filter(verifyWakuFeatureMsg)
+export function decodeWakuFeatures(messages: WakuMessage[] | null, chainId: number) {
+  return messages?.map(decodeWakuFeature).filter((e): e is WakuFeatureData => verifyWakuFeatureMsg(e, chainId))
 }
 
-export async function receiveWakuFeatureMsg(waku: Waku | undefined, topic: string) {
+export async function receiveWakuFeatureMsg(waku: Waku | undefined, topic: string, chainId: number) {
   if (waku) {
     const messages = await waku.store.queryHistory({ contentTopics: [topic] })
-    return decodeWakuFeatures(messages)
+    return decodeWakuFeatures(messages, chainId)
   }
 }
 
@@ -56,29 +90,30 @@ export async function createWakuFeatureMsg(
   signer: JsonRpcSigner | undefined,
   sntAmount: BigNumber,
   publicKey: string,
-  contentTopic: string
+  contentTopic: string,
+  chainId: number,
+  sig?: string,
+  time?: Date
 ) {
   if (!account || !signer) {
     return undefined
   }
-
+  const provider = signer.provider
   const signerAddress = await signer?.getAddress()
   if (signerAddress != account) {
     return undefined
   }
-  const timestamp = new Date()
+  const timestamp = time ? time : new Date()
+  const data = createTypedData(chainId, account, sntAmount, publicKey, timestamp)
+  const signature = sig ? sig : await provider?.send('eth_signTypedData_v3', [account, JSON.stringify(data)])
 
-  const types = ['address', 'uint256', 'address', 'uint256']
-  const message = [account, sntAmount, publicKey, BigNumber.from(timestamp.getTime())]
-  const sign = await signer.signMessage(packAndArrayify(types, message))
-
-  if (sign) {
+  if (signature) {
     const payload = proto.WakuFeature.encode({
       voter: account,
       sntAmount: utils.arrayify(sntAmount),
       publicKey,
       timestamp,
-      sign,
+      sign: signature,
     })
 
     const msg = WakuMessage.fromBytes(payload, {

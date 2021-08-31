@@ -12,3 +12,18 @@ export interface TypedVote extends TypedMessage<VoteType> {
     voter: string
   }
 }
+
+type FeatureType = {
+  EIP712Domain: { name: string; type: string }[]
+  Feature: { name: string; type: string }[]
+}
+
+export interface TypedFeature extends TypedMessage<FeatureType> {
+  message: {
+    voter: string
+    sntAmount: string
+    publicKey: string
+    timestamp: number
+    chainId: number
+  }
+}

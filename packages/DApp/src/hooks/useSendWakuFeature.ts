@@ -7,17 +7,21 @@ import { BigNumber } from 'ethers'
 
 export function useSendWakuFeature() {
   const { waku } = useWaku()
-  const { account, library } = useEthers()
+  const { account, library, chainId } = useEthers()
   const { config } = useConfig()
 
   const sendWakuFeature = useCallback(
     async (voteAmount: number, publicKey: string) => {
+      if (!chainId) {
+        return
+      }
       const msg = await createWakuFeatureMsg(
         account,
         library?.getSigner(),
         BigNumber.from(voteAmount),
         publicKey,
-        config.wakuFeatureTopic
+        config.wakuFeatureTopic,
+        chainId
       )
       if (msg) {
         if (waku) {
@@ -27,7 +31,7 @@ export function useSendWakuFeature() {
         }
       }
     },
-    [waku, library, account]
+    [waku, library, account, chainId]
   )
 
   return sendWakuFeature

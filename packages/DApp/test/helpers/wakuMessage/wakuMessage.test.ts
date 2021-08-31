@@ -99,28 +99,31 @@ describe('wakuMessage', () => {
       })
       const msg = await WakuMessage.fromBytes(payload)
       const msg2 = await createWakuFeatureMsg(
-        alice.address,
+        '0x17ec8597ff92C3F44523bDc65BF0f1bE632917ff',
         alice as unknown as JsonRpcSigner,
-        BigNumber.from(123),
-        bob.address,
-        '/test/'
+        BigNumber.from('0x10'),
+        '0x1234',
+        '/test/',
+        1337,
+        '0x4e744a50da20c547a4adf888d2bc411efcf3b833cfc79c461b340e6145c34dc314d7a1a82127fff63a34efec0ff11be48929bb6a020ed30dfdeab8ac8c32fffa1c',
+        new Date(1)
       )
 
       expect(msg2).to.not.be.undefined
       if (msg2) {
-        const response = decodeWakuFeatures([msg, msg2]) ?? []
+        const response = decodeWakuFeatures([msg, msg2], 1337) ?? []
 
         expect(response.length).to.eq(1)
         const data = response[0]
         expect(data).to.not.be.undefined
-        expect(data?.voter).to.eq(alice.address)
-        expect(data?.publicKey).to.eq(bob.address)
-        expect(data?.sntAmount).to.deep.eq(BigNumber.from(123))
+        expect(data?.voter).to.eq('0x17ec8597ff92C3F44523bDc65BF0f1bE632917ff')
+        expect(data?.publicKey).to.eq('0x1234')
+        expect(data?.sntAmount).to.deep.eq(BigNumber.from('0x10'))
       }
     })
 
     it('empty', async () => {
-      expect(decodeWakuFeatures([])).to.deep.eq([])
+      expect(decodeWakuFeatures([], 1337)).to.deep.eq([])
     })
   })
 

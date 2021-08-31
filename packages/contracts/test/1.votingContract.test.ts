@@ -132,12 +132,13 @@ async function fixture([alice, firstAddress, secondAddress]: any[], provider: Mo
   return { contract, directory, alice, firstAddress, secondAddress, provider }
 }
 
+before(async () => {
+  const { contract } = await loadFixture(fixture)
+  typedData.domain.chainId = 1
+  typedData.domain.verifyingContract = contract.address
+})
+
 describe('Contract', () => {
-  before(async () => {
-    const { contract } = await loadFixture(fixture)
-    typedData.domain.chainId = 1
-    typedData.domain.verifyingContract = contract.address
-  })
   it('deploys properly', async () => {
     const { contract, directory } = await loadFixture(fixture)
     await expect(await contract.directory()).to.eq(directory.address)
