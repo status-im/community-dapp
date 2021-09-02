@@ -41,7 +41,7 @@ export function useVotingCommunities(
   })
 
   const votingRooms = useContractCalls(contractCalls)
-  const publicKeys = votingRooms.map((votingRoom: any) => votingRoom?.community)
+  const publicKeys = votingRooms.map((votingRoom: any) => votingRoom?.community).filter(Boolean)
   const communitiesDetails = useCommunities(publicKeys)
 
   useEffect(() => {

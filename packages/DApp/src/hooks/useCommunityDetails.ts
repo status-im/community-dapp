@@ -3,7 +3,7 @@ import { CommunityDetail } from '../models/community'
 import { useCommunities } from './useCommunities'
 
 export function useCommunityDetails(publicKey: string, setCommunityDetail: (val: CommunityDetail | undefined) => void) {
-  const [CommunityDetail] = useCommunities([publicKey])
+  const [CommunityDetail] = useCommunities(publicKey ? [publicKey] : [])
 
   useEffect(() => {
     setCommunityDetail(CommunityDetail)

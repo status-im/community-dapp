@@ -18,8 +18,8 @@ interface EnvConfigs {
 const contracts = {
   3: {
     subgraph: '',
-    votingContract: '0xF356dd7a4b1675700aAeC2bbb6523D94B9DeA7f0',
-    directoryContract: '0xA6C592a08FBDe619Ae487ddf1ae048f5E59197a1',
+    votingContract: '0x120aEb4726F8B188DFBd7733E6A0Af85a445c8Bf',
+    directoryContract: '0x950071851cB75F56BA90Fe718C3dDb723Bf852e2',
     tokenContract: '0x80ee48b5ba5c3EA556b7fF6D850d2fB2c4bc7412',
   },
   1337: {
