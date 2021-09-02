@@ -10,7 +10,7 @@ contract VotingContract {
     using SafeMath for uint256;
 
     uint256 private constant VOTING_LENGTH = 1000;
-
+    uint256 private constant TIME_BETWEEN_VOTING = 3600;
     enum VoteType {
         REMOVE,
         ADD
@@ -37,6 +37,7 @@ contract VotingContract {
 
     VotingRoom[] public votingRooms;
     mapping(bytes => uint256) public communityVotingId;
+    mapping(bytes => uint256[]) private communityVotingHistory;
     mapping(uint256 => mapping(address => bool)) private voted;
     uint256[] public activeVotingRooms;
     mapping(uint256 => uint256) private indexOfActiveVotingRooms;
@@ -113,6 +114,13 @@ contract VotingContract {
         return votingRooms[roomId].voters;
     }
 
+    function getCommunityHistory(bytes calldata publicKey) public view returns (VotingRoom[] memory returnVotingRooms) {
+        returnVotingRooms = new VotingRoom[](communityVotingHistory[publicKey].length);
+        for (uint256 i = 0; i < communityVotingHistory[publicKey].length; i++) {
+            returnVotingRooms[i] = votingRooms[communityVotingHistory[publicKey][i]];
+        }
+    }
+
     function initializeVotingRoom(
         VoteType voteType,
         bytes calldata publicKey,
@@ -125,8 +133,17 @@ contract VotingContract {
         if (voteType == VoteType.ADD) {
             require(!directory.isCommunityInDirectory(publicKey), 'Community already in directory');
         }
+        uint256 historyLength = communityVotingHistory[publicKey].length;
+        if (historyLength > 0) {
+            uint256 roomId = communityVotingHistory[publicKey][historyLength - 1];
+            require(
+                block.timestamp.sub(votingRooms[roomId].endAt) > TIME_BETWEEN_VOTING,
+                'Community was in a vote recently'
+            );
+        }
         require(token.balanceOf(msg.sender) >= voteAmount, 'not enough token');
         communityVotingId[publicKey] = votingRooms.length;
+        communityVotingHistory[publicKey].push(votingRooms.length);
         activeVotingRooms.push(votingRooms.length);
         indexOfActiveVotingRooms[votingRooms.length] = activeVotingRooms.length;
 
@@ -151,6 +168,7 @@ contract VotingContract {
         require(votingRooms[roomId].finalized == false, 'vote already finalized');
         require(votingRooms[roomId].endAt < block.timestamp, 'vote still ongoing');
         votingRooms[roomId].finalized = true;
+        votingRooms[roomId].endAt = block.timestamp;
         bytes memory community = votingRooms[roomId].community;
         communityVotingId[community] = 0;
 

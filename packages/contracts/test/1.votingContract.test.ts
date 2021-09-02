@@ -117,9 +117,8 @@ const voteAndFinalize = async (
   )
 
   await contract.castVotes([[...vote, sig.r, sig._vs]])
-  await provider.send('evm_mine', [Math.floor(Date.now() / 1000 + 10000)])
+  await provider.send('evm_increaseTime', [10000])
   await contract.finalizeVotingRoom(room)
-  await provider.send('evm_mine', [Math.floor(Date.now() / 1000)])
 }
 
 async function fixture([alice, firstAddress, secondAddress]: any[], provider: MockProvider) {
@@ -196,8 +195,8 @@ describe('Contract', () => {
     it('gets', async () => {
       const { contract } = await loadFixture(fixture)
       await contract.initializeVotingRoom(1, publicKeys[0], BigNumber.from(100))
-
-      expect((await contract.votingRooms(1)).slice(2)).to.deep.eq([
+      const votingRoom1 = await contract.votingRooms(1)
+      expect(votingRoom1.slice(2)).to.deep.eq([
         1,
         false,
         publicKeys[0],
@@ -205,6 +204,10 @@ describe('Contract', () => {
         BigNumber.from(0),
         BigNumber.from(1),
       ])
+      const history = await contract.getCommunityHistory(publicKeys[0])
+      expect(history.length).to.eq(1)
+      expect(history[0][2]).to.eq(1)
+      expect(history[0][4]).to.eq(publicKeys[0])
 
       await contract.initializeVotingRoom(1, publicKeys[1], BigNumber.from(100))
       expect((await contract.votingRooms(2)).slice(2)).to.deep.eq([
@@ -224,6 +227,43 @@ describe('Contract', () => {
         BigNumber.from(1),
       ])
     })
+
+    describe('history', () => {
+      it('saves to history', async () => {
+        const { contract, provider, alice } = await loadFixture(fixture)
+        await contract.initializeVotingRoom(1, publicKeys[0], BigNumber.from(100))
+        await voteAndFinalize(1, 1, alice, contract, provider)
+        expect((await contract.getCommunityHistory(publicKeys[0])).length).to.eq(1)
+        await provider.send('evm_increaseTime', [10000])
+        await contract.initializeVotingRoom(0, publicKeys[0], BigNumber.from(100))
+        await voteAndFinalize(2, 0, alice, contract, provider)
+        const history = await contract.getCommunityHistory(publicKeys[0])
+        expect(history.length).to.eq(2)
+        expect(history[0][2]).to.eq(1)
+        expect(history[0][3]).to.eq(true)
+        expect(history[0][4]).to.eq(publicKeys[0])
+        expect(history[0][5]).to.eq(BigNumber.from(100))
+        expect(history[0][6]).to.eq(BigNumber.from(0))
+        expect(history[0][7]).to.eq(BigNumber.from(1))
+
+        expect(history[1][2]).to.eq(0)
+        expect(history[1][3]).to.eq(true)
+        expect(history[1][4]).to.eq(publicKeys[0])
+        expect(history[1][5]).to.eq(BigNumber.from(100))
+        expect(history[1][6]).to.eq(BigNumber.from(0))
+        expect(history[1][7]).to.eq(BigNumber.from(2))
+      })
+
+      it("can't start vote to fast", async () => {
+        const { contract, provider, alice } = await loadFixture(fixture)
+        await contract.initializeVotingRoom(1, publicKeys[0], BigNumber.from(100))
+        await voteAndFinalize(1, 1, alice, contract, provider)
+        await expect(contract.initializeVotingRoom(0, publicKeys[0], BigNumber.from(100))).to.be.revertedWith(
+          'Community was in a vote recently'
+        )
+      })
+    })
+
     describe('finalization', () => {
       it('finalizes', async () => {
         const { contract, provider } = await loadFixture(fixture)
@@ -236,7 +276,7 @@ describe('Contract', () => {
           BigNumber.from(0),
           BigNumber.from(1),
         ])
-        await provider.send('evm_mine', [Math.floor(Date.now() / 1000 + 2000)])
+        await provider.send('evm_increaseTime', [2000])
         await expect(await contract.finalizeVotingRoom(1))
           .to.emit(contract, 'VotingRoomFinalized')
           .withArgs(1, publicKeys[0], true, 1)
@@ -272,7 +312,7 @@ describe('Contract', () => {
           await voteAndFinalize(1, 1, firstAddress, contract, provider)
 
           expect(await directory.getCommunities()).to.deep.eq([publicKeys[0]])
-
+          await provider.send('evm_increaseTime', [10000])
           await contract.initializeVotingRoom(0, publicKeys[0], BigNumber.from(100))
           await voteAndFinalize(2, 1, firstAddress, contract, provider)
           expect(await directory.getCommunities()).to.deep.eq([])
@@ -292,7 +332,7 @@ describe('Contract', () => {
           await voteAndFinalize(1, 1, firstAddress, contract, provider)
 
           expect(await directory.getCommunities()).to.deep.eq([publicKeys[0]])
-
+          await provider.send('evm_increaseTime', [10000])
           await contract.initializeVotingRoom(0, publicKeys[0], BigNumber.from(100))
           await voteAndFinalize(2, 0, firstAddress, contract, provider)
           expect(await directory.getCommunities()).to.deep.eq([publicKeys[0]])
@@ -315,7 +355,7 @@ describe('Contract', () => {
         [alice.address],
       ])
 
-      await provider.send('evm_mine', [Math.floor(Date.now() / 1000 + 10000)])
+      await provider.send('evm_increaseTime', [10000])
       await contract.initializeVotingRoom(1, publicKeys[1], BigNumber.from(100))
       expect((await contract.getCommunityVoting(publicKeys[1])).slice(2)).to.deep.eq([
         1,
@@ -335,7 +375,7 @@ describe('Contract', () => {
 
       await contract.initializeVotingRoom(1, publicKeys[1], BigNumber.from(100))
       expect(await contract.getActiveVotingRooms()).to.deep.eq([BigNumber.from(1), BigNumber.from(2)])
-      await provider.send('evm_mine', [Math.floor(Date.now() / 1000 + 2000)])
+      await provider.send('evm_increaseTime', [2000])
       await contract.finalizeVotingRoom(1)
       expect(await contract.getActiveVotingRooms()).to.deep.eq([BigNumber.from(2)])
       await contract.finalizeVotingRoom(2)
@@ -429,7 +469,7 @@ describe('Contract', () => {
       const { contract, alice, firstAddress, secondAddress, provider } = await loadFixture(fixture)
       const messages = await getSignedMessages(alice, firstAddress, secondAddress)
       await contract.initializeVotingRoom(1, publicKeys[0], BigNumber.from(100))
-      await provider.send('evm_mine', [Math.floor(Date.now() / 1000 + 2000)])
+      await provider.send('evm_increaseTime', [2000])
       await expect(contract.castVotes(messages)).to.be.reverted
     })
 
@@ -437,7 +477,7 @@ describe('Contract', () => {
       const { contract, alice, firstAddress, secondAddress, provider } = await loadFixture(fixture)
       const messages = await getSignedMessages(alice, firstAddress, secondAddress)
       await contract.initializeVotingRoom(1, publicKeys[0], BigNumber.from(100))
-      await provider.send('evm_mine', [Math.floor(Date.now() / 1000 + 2000)])
+      await provider.send('evm_increaseTime', [2000])
 
       const signedMessages = messages.map((msg) => [
         ...msg.slice(0, 3),
