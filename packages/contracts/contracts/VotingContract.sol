@@ -212,6 +212,7 @@ contract VotingContract {
                 require(roomId < votingRooms.length, 'vote not found');
                 VotingRoom storage room = votingRooms[roomId];
                 require(room.endAt > block.timestamp, 'vote closed');
+                require(!room.finalized, 'room finalized');
                 if (voted[roomId][vote.voter] == false) {
                     if (token.balanceOf(vote.voter) >= vote.sntAmount) {
                         if (vote.roomIdAndType & 1 == 1) {
