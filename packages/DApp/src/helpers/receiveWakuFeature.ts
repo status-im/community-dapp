@@ -46,7 +46,7 @@ export async function receiveWakuFeature(waku: WakuLight | undefined, topic: str
         if (!top5.find((featuredComm) => featuredComm[0] === el.publicKey)) {
           merge(wakuFeatured, { [el.publicKey]: { votes: { [el.voter]: el.sntAmount } } })
         }
-      } else {
+      } else { // bug: this element's vote is ignored
         top5 = getTop(wakuFeatured, 5)
         top5.forEach((featuredComm) => {
           wakuFeatured[featuredComm[0]].votes = {}

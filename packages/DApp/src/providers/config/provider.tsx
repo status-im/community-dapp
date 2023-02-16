@@ -1,9 +1,9 @@
 import React, { ReactNode, useReducer, createContext, useContext } from 'react'
 import merge from 'lodash/merge'
-import { getEnvConfig, Config } from './config'
+import { getDAppConfig, Config } from './config'
 
 const ConfigContext = createContext<{ config: Config; updateConfig: (config: Partial<Config>) => void }>({
-  config: getEnvConfig(process.env.ENV),
+  config: getDAppConfig(process.env.ENV),
   updateConfig: () => undefined,
 })
 
@@ -16,7 +16,7 @@ interface ConfigProviderProps {
 }
 
 export function ConfigProvider({ children }: ConfigProviderProps) {
-  const [reducedConfig, dispatch] = useReducer(configReducer, { ...getEnvConfig(process.env.ENV) })
+  const [reducedConfig, dispatch] = useReducer(configReducer, { ...getDAppConfig(process.env.ENV) })
   return <ConfigContext.Provider value={{ config: reducedConfig, updateConfig: dispatch }} children={children} />
 }
 

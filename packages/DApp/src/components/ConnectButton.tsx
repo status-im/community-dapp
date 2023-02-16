@@ -6,6 +6,7 @@ import { Modal } from './Modal'
 import { LinkExternal } from './Link'
 import statusLogo from '../assets/images/statusLogo.svg'
 import { ColumnFlexDiv } from '../constants/styles'
+import { useConfig } from '../providers/config'
 
 export type ConnectButtonProps = {
   text?: string
@@ -15,13 +16,14 @@ export type ConnectButtonProps = {
 export function ConnectButton({ text, className }: ConnectButtonProps) {
   const [showModal, setShowModal] = useState(false)
   const { activateBrowserWallet } = useEthers()
+  const { config } = useConfig()
 
-  const activateStatusWallet = () => {
-    if ((window as any).ethereum?.isStatus) {
-      activateBrowserWallet()
-    } else {
+  const activateWallet = () => {
+    if (config.statusWalletRequired && !((window as any).ethereum?.isStatus)) {
       setShowModal(true)
+      return
     }
+    activateBrowserWallet()
   }
 
   return (
@@ -31,7 +33,7 @@ export function ConnectButton({ text, className }: ConnectButtonProps) {
           <StatusModal />{' '}
         </Modal>
       )}
-      <ProposeButton className={className} onClick={activateStatusWallet}>
+      <ProposeButton className={className} onClick={activateWallet}>
         {!text ? 'Connect to Vote' : text}
       </ProposeButton>
     </div>

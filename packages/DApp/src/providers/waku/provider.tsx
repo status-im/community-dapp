@@ -2,6 +2,7 @@ import React, { ReactNode, createContext, useContext, useState } from 'react'
 import { connectWaku } from './connect'
 
 import type { WakuLight } from 'js-waku/lib/interfaces'
+import { useConfig } from '../config';
 
 const WakuContext = createContext<{ waku: WakuLight | undefined; setWaku: (waku: WakuLight) => void }>({
   waku: undefined,
@@ -11,9 +12,10 @@ const WakuContext = createContext<{ waku: WakuLight | undefined; setWaku: (waku:
 export function useWaku() {
   const { setWaku, waku } = useContext(WakuContext)
   const [creatingWaku, setCreatingWaku] = useState(false)
+  const { config } = useConfig()
   if (!waku && !creatingWaku) {
     setCreatingWaku(true)
-    connectWaku(setWaku)
+    connectWaku(setWaku, config.fleet)
   }
   return { waku }
 }

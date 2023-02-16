@@ -9,17 +9,21 @@ import { ConfigProvider } from './providers/config/provider'
 import { WakuProvider } from './providers/waku/provider'
 import { CommunitiesProvider } from './providers/communities/provider'
 import { WakuFeatureProvider } from './providers/wakuFeature/provider'
+import { contracts, CustomChainId, getDAppConfig } from './providers/config/config'
 
 const config = {
-  readOnlyChainId: ChainId.Ropsten,
-  readOnlyUrls: {
+  readOnlyChainId: getDAppConfig(process.env.ENV).defaultChainId,
+  readonlyUrls: {
     [ChainId.Ropsten]: 'https://ropsten.infura.io/v3/b4451d780cc64a078ccf2181e872cfcf',
+    [CustomChainId.OptimismGoerli]: 'https://optimism-goerli.infura.io/v3/4c90c025caca4de2b1419633554e6bca',
   },
   multicallAddresses: {
     ...DEFAULT_CONFIG.multicallAddresses,
-    1337: process.env.GANACHE_MULTICALL_CONTRACT ?? '0x0000000000000000000000000000000000000000',
+    [ChainId.Ropsten]: contracts[ChainId.Ropsten].multicallContract,
+    [CustomChainId.OptimismGoerli]: contracts[CustomChainId.OptimismGoerli].multicallContract,
+    [ChainId.Localhost]: contracts[ChainId.Localhost].multicallContract,
   },
-  supportedChains: [...DEFAULT_CONFIG.supportedChains, 1337],
+  supportedChains: [...DEFAULT_CONFIG.supportedChains, CustomChainId.OptimismGoerli],
   notifications: {
     checkInterval: 500,
     expirationPeriod: 50000,
@@ -28,17 +32,17 @@ const config = {
 
 render(
   <React.StrictMode>
-    <WakuProvider>
-      <DAppProvider config={config}>
-        <ConfigProvider>
+    <ConfigProvider>
+      <WakuProvider>
+        <DAppProvider config={config}>
           <CommunitiesProvider>
             <WakuFeatureProvider>
               <App />
             </WakuFeatureProvider>
           </CommunitiesProvider>
-        </ConfigProvider>
-      </DAppProvider>
-    </WakuProvider>
+        </DAppProvider>
+      </WakuProvider>
+    </ConfigProvider>
   </React.StrictMode>,
   document.getElementById('root')
 )

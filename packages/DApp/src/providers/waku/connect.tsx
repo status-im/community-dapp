@@ -6,7 +6,7 @@ import { waitForRemotePeer } from 'js-waku/lib/wait_for_remote_peer'
 
 import type { WakuLight } from 'js-waku/lib/interfaces'
 
-export async function connectWaku(setWaku: (waku: WakuLight) => void) {
+export async function connectWaku(setWaku: (waku: WakuLight) => void, fleet: Fleet) {
   // todo: handle disconnects
   const newWaku = await createLightNode({
     defaultBootstrap: false,
@@ -15,8 +15,7 @@ export async function connectWaku(setWaku: (waku: WakuLight) => void) {
     // @ts-ignore
     emitSelf: true,
     libp2p: {
-      // todo: use config or proces.env.ENV to select fleet
-      peerDiscovery: [new PeerDiscoveryStaticPeers(getPredefinedBootstrapNodes(Fleet.Test), { maxPeers: 1 })],
+      peerDiscovery: [new PeerDiscoveryStaticPeers(getPredefinedBootstrapNodes(fleet), { maxPeers: 1 })],
     },
   })
   await newWaku.start()
