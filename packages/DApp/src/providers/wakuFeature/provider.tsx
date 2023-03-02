@@ -36,6 +36,8 @@ export function WakuFeatureProvider({ children }: WakuFeatureProviderProps) {
       }
     }
     get()
+    // todo?: use Protocols.Filter in combination with state instead
+    // todo?: use Protocols.Store only on first load
     const task = setInterval(get, 10000)
     return () => clearInterval(task)
   }, [waku?.libp2p?.peerId?.toString(), chainId])

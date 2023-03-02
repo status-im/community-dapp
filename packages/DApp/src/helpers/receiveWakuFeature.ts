@@ -2,7 +2,8 @@ import { receiveWakuFeatureMsg } from './wakuFeature'
 import { getWeek } from '../helpers/getWeek'
 import { merge } from 'lodash'
 import { BigNumber } from 'ethers'
-import { Waku } from 'js-waku'
+
+import type { WakuLight } from 'js-waku/lib/interfaces'
 
 type CommunityFeatureVote = {
   [voter: string]: BigNumber
@@ -33,7 +34,7 @@ function getTop(map: CommunitiesFeatureVotes, top: number) {
     .slice(0, top)
 }
 
-export async function receiveWakuFeature(waku: Waku | undefined, topic: string, chainId: number) {
+export async function receiveWakuFeature(waku: WakuLight | undefined, topic: string, chainId: number) {
   let messages = await receiveWakuFeatureMsg(waku, topic, chainId)
   const wakuFeatured: CommunitiesFeatureVotes = {}
   let top5: [string, CommunityFeatureVotes][] = []

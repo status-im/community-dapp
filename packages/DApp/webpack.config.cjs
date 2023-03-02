@@ -19,7 +19,7 @@ module.exports = (env) => {
         devtool: 'source-map',
         resolve: {
             extensions: ['.ts', '.tsx', '.js', '.json'],
-            fallback: { 
+            fallback: {
                 "buffer": require.resolve("buffer/"),
                 "crypto": require.resolve("crypto-browserify"),
                 "stream": require.resolve("stream-browserify"),
@@ -39,7 +39,7 @@ module.exports = (env) => {
                                 '@babel/preset-typescript',
                                 [
                                     '@babel/preset-env',
-                                    { targets: { browsers: 'chrome 77' } },
+                                    { targets: { browsers: 'chrome 77' }, corejs: { version: "3.26" } },
                                 ],
                                 '@babel/preset-react',
                             ],

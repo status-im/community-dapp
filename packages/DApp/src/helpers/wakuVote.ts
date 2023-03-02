@@ -1,11 +1,14 @@
 import { JsonRpcSigner } from '@ethersproject/providers'
 import { BigNumber } from 'ethers'
-import { Waku, WakuMessage } from 'js-waku'
 import { recoverAddress } from './ethMessage'
 import { utils } from 'ethers'
 import proto from './loadProtons'
 import { WakuVoteData } from '../models/waku'
 import { TypedVote } from '../models/TypedData'
+import { DecoderV0 } from 'js-waku/lib/waku_message/version_0'
+
+import type { WakuLight } from 'js-waku/lib/interfaces'
+import type { MessageV0 as WakuMessage } from 'js-waku/lib/waku_message/version_0'
 
 function getContractParameters(
   address: string,
@@ -62,13 +65,18 @@ function decodeWakuVote(msg: WakuMessage): WakuVoteData | undefined {
   }
 }
 
-export function decodeWakuVotes(messages: WakuMessage[] | null) {
+export function decodeWakuVotes(messages: any[] | null) {
   return messages?.map(decodeWakuVote).filter((e): e is WakuVoteData => !!e)
 }
 
-export async function receiveWakuVotes(waku: Waku, topic: string, room: number) {
-  const contentTopics = [topic + room.toString()]
-  const messages = await waku.store.queryHistory({ contentTopics })
+// todo?: pass complete topic
+export async function receiveWakuVotes(waku: WakuLight, topic: string, room: number) {
+  const messages: WakuMessage[] = []
+  // todo: init decoder once
+  await waku.store.queryOrderedCallback([new DecoderV0(topic + room.toString())], (wakuMessage: WakuMessage) => {
+    messages.push(wakuMessage)
+  })
+
   return decodeWakuVotes(messages)
 }
 
@@ -78,7 +86,6 @@ export async function createWakuVote(
   room: number,
   voteAmount: number,
   type: number,
-  topic: string,
   getTypedData: (data: [string, BigNumber, BigNumber]) => any,
   sig?: string
 ) {
@@ -106,8 +113,7 @@ export async function createWakuVote(
       sessionID: room,
     })
 
-    const msg = WakuMessage.fromBytes(payload, { contentTopic: topic + room.toString() })
-    return msg
+    return payload
   }
   return undefined
 }

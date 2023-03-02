@@ -1,5 +1,5 @@
 import React, { ReactNode, useReducer, createContext, useContext } from 'react'
-import { merge } from 'lodash'
+import merge from 'lodash/merge'
 import { getEnvConfig, Config } from './config'
 
 const ConfigContext = createContext<{ config: Config; updateConfig: (config: Partial<Config>) => void }>({

@@ -2,7 +2,7 @@ import { renderHook, act } from '@testing-library/react-hooks'
 import { ConfigProvider, useConfig } from './../src/providers/config/provider'
 import { config } from './../src/providers/config/config'
 import { expect } from 'chai'
-import { merge } from 'lodash'
+import merge from 'lodash/merge'
 
 describe('ConfigProvider', () => {
   it('success', () => {

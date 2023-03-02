@@ -1,10 +1,13 @@
-import { Waku, WakuMessage } from 'js-waku'
 import { WakuFeatureData } from '../models/waku'
 import { recoverAddress } from './ethMessage'
 import { utils, BigNumber } from 'ethers'
 import { JsonRpcSigner } from '@ethersproject/providers'
 import proto from './loadProtons'
 import { TypedFeature } from '../models/TypedData'
+import { DecoderV0 } from 'js-waku/lib/waku_message/version_0'
+
+import type { WakuLight } from 'js-waku/lib/interfaces'
+import type { MessageV0 as WakuMessage } from 'js-waku/lib/waku_message/version_0'
 
 function createTypedData(chainId: number, voter: string, sntAmount: BigNumber, publicKey: string, timestamp: Date) {
   return {
@@ -44,11 +47,14 @@ function verifyWakuFeatureMsg(data: WakuFeatureData | undefined, chainId: number
   const typedData = createTypedData(chainId, data.voter, data.sntAmount, data.publicKey, data.timestamp)
   try {
     const verifiedAddress = utils.getAddress(recoverAddress(typedData, data.sign))
-    if (data.msgTimestamp?.getTime() != data.timestamp.getTime() || verifiedAddress != data.voter) {
+    // fixme?: add `data.msgTimestamp?.getTime() != data.timestamp.getTime() || back`
+    if (verifiedAddress != data.voter) {
       return false
     }
     return true
-  } catch {
+  } catch (error) {
+    console.error(error)
+
     return false
   }
 }
@@ -62,7 +68,7 @@ function decodeWakuFeature(msg: WakuMessage): WakuFeatureData | undefined {
     if (data && data.publicKey && data.sign && data.sntAmount && data.timestamp && data.voter) {
       return {
         ...data,
-        msgTimestamp: msg.timestamp ?? new Date(0),
+        msgTimestamp: msg.timestamp ? new Date(Number(msg.timestamp) / 1_000_000) : new Date(0),
         timestamp: new Date(data.timestamp),
         sntAmount: BigNumber.from(data.sntAmount),
       }
@@ -74,13 +80,18 @@ function decodeWakuFeature(msg: WakuMessage): WakuFeatureData | undefined {
   }
 }
 
-export function decodeWakuFeatures(messages: WakuMessage[] | null, chainId: number) {
+export function decodeWakuFeatures(messages: any[] | null, chainId: number) {
   return messages?.map(decodeWakuFeature).filter((e): e is WakuFeatureData => verifyWakuFeatureMsg(e, chainId))
 }
 
-export async function receiveWakuFeatureMsg(waku: Waku | undefined, topic: string, chainId: number) {
+export async function receiveWakuFeatureMsg(waku: WakuLight | undefined, topic: string, chainId: number) {
   if (waku) {
-    const messages = await waku.store.queryHistory({ contentTopics: [topic] })
+    const messages: WakuMessage[] = []
+    // todo: init decoder once
+    await waku.store.queryOrderedCallback([new DecoderV0(topic)], (wakuMessage: WakuMessage) => {
+      messages.push(wakuMessage)
+    })
+
     return decodeWakuFeatures(messages, chainId)
   }
 }
@@ -90,7 +101,6 @@ export async function createWakuFeatureMsg(
   signer: JsonRpcSigner | undefined,
   sntAmount: BigNumber,
   publicKey: string,
-  contentTopic: string,
   chainId: number,
   sig?: string,
   time?: Date
@@ -116,11 +126,7 @@ export async function createWakuFeatureMsg(
       sign: signature,
     })
 
-    const msg = WakuMessage.fromBytes(payload, {
-      contentTopic,
-      timestamp,
-    })
-    return msg
+    return payload
   }
   return undefined
 }

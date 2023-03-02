@@ -4,6 +4,7 @@ import { useEthers } from '@usedapp/core'
 import { useConfig } from '../providers/config'
 import { createWakuFeatureMsg } from '../helpers/wakuFeature'
 import { BigNumber } from 'ethers'
+import { EncoderV0 } from 'js-waku/lib/waku_message/version_0'
 
 export function useSendWakuFeature() {
   const { waku } = useWaku()
@@ -20,12 +21,12 @@ export function useSendWakuFeature() {
         library?.getSigner(),
         BigNumber.from(voteAmount),
         publicKey,
-        config.wakuFeatureTopic,
         chainId
       )
       if (msg) {
         if (waku) {
-          await waku.relay.send(msg)
+          // todo: init encoder once
+          await waku.lightPush.push(new EncoderV0(config.wakuFeatureTopic), { payload: msg })
         } else {
           alert('error sending vote please try again')
         }

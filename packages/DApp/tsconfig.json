@@ -8,13 +8,14 @@
         "downlevelIteration": true,
         "strict": true,
         "sourceMap": true,
-        "module": "commonjs",
         "forceConsistentCasingInFileNames": true,
         "target": "es6",
-        "typeRoots": [ "./types", "./node_modules/@types", "../../node_modules/@types"]
+        "typeRoots": [ "./types", "./node_modules/@types", "../../node_modules/@types"],
+        "module": "esnext",
+		"moduleResolution": "node"
     },
     "exclude": [
         "**/dist",
-        "**/types",
+        "**/types"
     ]
 }

@@ -4,6 +4,7 @@ import { useEthers } from '@usedapp/core'
 import { useConfig } from '../providers/config'
 import { createWakuVote } from '../helpers/wakuVote'
 import { useTypedVote } from './useTypedVote'
+import { EncoderV0 } from 'js-waku/lib/waku_message/version_0'
 
 export function useSendWakuVote() {
   const { waku } = useWaku()
@@ -13,18 +14,10 @@ export function useSendWakuVote() {
 
   const sendWakuVote = useCallback(
     async (voteAmount: number, room: number, type: number) => {
-      const msg = await createWakuVote(
-        account,
-        library?.getSigner(),
-        room,
-        voteAmount,
-        type,
-        config.wakuTopic,
-        getTypedVote
-      )
+      const msg = await createWakuVote(account, library?.getSigner(), room, voteAmount, type, getTypedVote)
       if (msg) {
         if (waku) {
-          await waku.relay.send(msg)
+          await waku.lightPush.push(new EncoderV0(config.wakuTopic + room.toString()), { payload: msg })
         } else {
           alert('error sending vote please try again')
         }
