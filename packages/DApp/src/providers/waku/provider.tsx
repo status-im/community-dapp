@@ -2,7 +2,7 @@ import React, { ReactNode, createContext, useContext, useState } from 'react'
 import { connectWaku } from './connect'
 
 import type { WakuLight } from 'js-waku/lib/interfaces'
-import { useConfig } from '../config';
+import { useConfig } from '../config'
 
 const WakuContext = createContext<{ waku: WakuLight | undefined; setWaku: (waku: WakuLight) => void }>({
   waku: undefined,

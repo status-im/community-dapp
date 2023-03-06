@@ -23,7 +23,7 @@ interface DAppConfigs {
 }
 
 export enum CustomChainId {
-  OptimismGoerli = 420
+  OptimismGoerli = 420,
 }
 
 export const contracts = {
@@ -31,13 +31,15 @@ export const contracts = {
     votingContract: '0x120aEb4726F8B188DFBd7733E6A0Af85a445c8Bf',
     directoryContract: '0x950071851cB75F56BA90Fe718C3dDb723Bf852e2',
     tokenContract: '0x80ee48b5ba5c3EA556b7fF6D850d2fB2c4bc7412',
-    multicallContract: MULTICALL_ADDRESSES[ChainId.Ropsten]
+    multicallContract: MULTICALL_ADDRESSES[ChainId.Ropsten],
   },
   [CustomChainId.OptimismGoerli]: {
     votingContract: rapid ? '0x86037004278B7e6BC5f2a34ce5DFAd7c06555e7c' : '0x6F4F83bF868585f25090b111Fe762d9Dba3B839D',
-    directoryContract: rapid ? '0x5C6CCc458020977dFE324FA8924F71A4d38c6742' : '0xaEA4F79e020B041C92316303D6889E32C2285D0b',
+    directoryContract: rapid
+      ? '0x5C6CCc458020977dFE324FA8924F71A4d38c6742'
+      : '0xaEA4F79e020B041C92316303D6889E32C2285D0b',
     tokenContract: '0xf8E655fd30696Beab513ACce4c75430a992301A7',
-    multicallContract: '0x805e246abef0D2C76E619E122c79b1EF2EfBd8b7'
+    multicallContract: '0x805e246abef0D2C76E619E122c79b1EF2EfBd8b7',
   },
   [ChainId.Localhost]: {
     votingContract: process.env.GANACHE_VOTING_CONTRACT ?? '0x0000000000000000000000000000000000000000',
