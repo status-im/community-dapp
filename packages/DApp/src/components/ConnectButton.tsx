@@ -19,7 +19,7 @@ export function ConnectButton({ text, className }: ConnectButtonProps) {
   const { config } = useConfig()
 
   const activateWallet = () => {
-    if (config.statusWalletRequired && !((window as any).ethereum?.isStatus)) {
+    if (config.statusWalletRequired && !(window as any).ethereum?.isStatus) {
       setShowModal(true)
       return
     }
