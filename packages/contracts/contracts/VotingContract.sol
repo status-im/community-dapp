@@ -73,7 +73,11 @@ contract VotingContract {
         return keccak256(abi.encode(VOTE_TYPEHASH, vote.roomIdAndType, vote.sntAmount, vote.voter));
     }
 
-    function verify(Vote calldata vote, bytes32 r, bytes32 vs) internal view returns (bool) {
+    function verify(
+        Vote calldata vote,
+        bytes32 r,
+        bytes32 vs
+    ) internal view returns (bool) {
         bytes32 digest = keccak256(abi.encodePacked('\x19\x01', DOMAIN_SEPARATOR, hash(vote)));
         return digest.recover(abi.encode(r, vs)) == vote.voter;
     }
@@ -117,7 +121,11 @@ contract VotingContract {
         }
     }
 
-    function initializeVotingRoom(VoteType voteType, bytes calldata publicKey, uint256 voteAmount) public {
+    function initializeVotingRoom(
+        VoteType voteType,
+        bytes calldata publicKey,
+        uint256 voteAmount
+    ) public {
         require(communityVotingId[publicKey] == 0, 'vote already ongoing');
         if (voteType == VoteType.REMOVE) {
             require(directory.isCommunityInDirectory(publicKey), 'Community not in directory');
