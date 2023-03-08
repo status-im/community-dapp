@@ -54,6 +54,7 @@
     "babel-loader": "^8.2.2",
     "babel-preset-minify": "^0.5.1",
     "chai": "^4.3.4",
+    "core-js": "^3.26.1",
     "eslint": "^7.27.0",
     "eslint-plugin-hooks": "^0.2.0",
     "eslint-plugin-react": "^7.24.0",
