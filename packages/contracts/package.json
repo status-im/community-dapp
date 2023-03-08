@@ -5,7 +5,7 @@
   "repository": "git@github.com:EthWorks/status-community-dapp.git",
   "license": "MIT",
   "scripts": {
-    "clean": "rm -r ./{build,dist,flatten}",
+    "clean": "rimraf build dist flatten node_modules",
     "build:sol": "waffle waffle.config.json",
     "build:ts": "tsc",
     "build": "yarn build:sol && yarn build:ts",
