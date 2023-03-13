@@ -1,21 +1,14 @@
 {
-    "compilerOptions": {
-        "outDir": "dist",
-        "esModuleInterop": true,
-        "jsx": "react",
-        "resolveJsonModule": true,
-        "skipLibCheck": true,
-        "downlevelIteration": true,
-        "strict": true,
-        "sourceMap": true,
-        "forceConsistentCasingInFileNames": true,
-        "target": "es6",
-        "typeRoots": [ "./types", "./node_modules/@types", "../../node_modules/@types"],
-        "module": "esnext",
-		"moduleResolution": "node"
-    },
-    "exclude": [
-        "**/dist",
-        "**/types"
-    ]
+  "extends": "../../tsconfig",
+  "compilerOptions": {
+    "outDir": "dist",
+    "jsx": "react",
+    "typeRoots": ["./types", "./node_modules/@types", "../../node_modules/@types"]
+  },
+  "exclude": ["**/dist", "**/types"],
+  "ts-node": {
+    "files": true,
+    "esm": true,
+    "experimentalSpecifierResolution": "node"
+  }
 }

@@ -1,24 +1,10 @@
 {
+  "extends": "../../tsconfig",
   "compilerOptions": {
-    "esModuleInterop": true,
-    "lib": [
-      "esnext",
-    ],
+    "lib": ["esnext"],
     "module": "commonjs",
-    "resolveJsonModule": true,
-    "skipLibCheck": true,
-    "strict": true,
-    "sourceMap": true,
-    "target": "es6",
-    "outDir": "dist",
-    "downlevelIteration": true
+    "outDir": "dist"
   },
-  "include": [
-    "test",
-    "contracts"
-  ],
-  "exclude": [
-    "**/dist",
-    "**/build"
-  ]
+  "include": ["test", "contracts"],
+  "exclude": ["**/dist", "**/build"]
 }

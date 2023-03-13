@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid'
-import { ChainId, MULTICALL_ADDRESSES } from '@usedapp/core/src/constants'
+import { ChainId, MULTICALL_ADDRESSES } from '@usedapp/core'
 import { Fleet } from 'js-waku/lib/predefined_bootstrap_nodes'
 
 const version = '0.0.5'
