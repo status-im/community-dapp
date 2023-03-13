@@ -1,6 +1,8 @@
 {
   "spec": "test/**/*.test.{ts,tsx}",
-  "require": ["ts-node/register", "jsdom-global/register"],
+  "require": [
+    "jsdom-global/register"
+  ],
   "watchExtensions": "ts",
   "extension": "ts",
   "timeout": 3000,
