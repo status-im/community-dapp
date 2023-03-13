@@ -3,11 +3,11 @@
   "require": [
     "jsdom-global/register"
   ],
-  "watchExtensions": "ts",
   "extension": "ts",
   "timeout": 3000,
   "node-option": [
     "experimental-specifier-resolution=node",
     "loader=ts-node/esm"
-  ]
+  ],
+  "exit": true
 }
