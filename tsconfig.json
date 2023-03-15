@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "downlevelIteration": true,
+    "strict": true,
+    "sourceMap": true,
+    "forceConsistentCasingInFileNames": true,
+    "target": "es6",
+    "module": "ESNext",
+    "moduleResolution": "node"
+  }
+}

@@ -12,10 +12,14 @@
     "lint": "wsrun -c -s lint",
     "lint:fix": "wsrun -c -s lint:fix",
     "build": "wsrun -e -c -s build",
-    "test": "wsrun -e -c -s --exclude-missing test"
+    "test": "wsrun -e -c -s --exclude-missing test",
+    "clean": "wsrun -e -c -s clean"
   },
   "dependencies": {
     "prettier": "^2.3.1",
     "wsrun": "^5.2.4"
+  },
+  "devDependencies": {
+    "rimraf": "^4.3.1"
   }
 }
