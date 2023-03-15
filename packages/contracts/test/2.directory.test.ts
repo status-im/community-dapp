@@ -1,8 +1,6 @@
-import { expect, use } from 'chai'
-import { loadFixture, deployContract, solidity } from 'ethereum-waffle'
-import Directory from '../build/Directory.json'
-
-use(solidity)
+import { expect } from 'chai'
+import { loadFixture } from '@nomicfoundation/hardhat-network-helpers'
+import { ethers } from 'hardhat'
 
 describe('directory contract', () => {
   const communities = [
@@ -10,9 +8,12 @@ describe('directory contract', () => {
     '0xe84e64498172551d998a220e1d8e5893c818ee9aa90bdb855aec0c9e65e89014b8',
     '0x04bbb77ea11ee6dc4585efa2617ec90b8ee4051ade4fcf7261ae6cd4cdf33e54e3',
   ]
-  async function fixture([alice, bob]: any[], provider: any) {
-    const contract = await deployContract(alice, Directory, [alice.address])
-    return { contract, alice, bob, provider }
+  async function fixture() {
+    const [alice, bob] = await ethers.getSigners()
+    const contractFactory = await ethers.getContractFactory('Directory')
+    const contract = await contractFactory.deploy(alice.address)
+
+    return { contract, alice, bob }
   }
 
   it('deploys', async () => {
