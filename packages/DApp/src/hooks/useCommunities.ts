@@ -17,7 +17,7 @@ export function useCommunities(publicKeys: string[]) {
         return {
           abi: votingContract.interface,
           address: votingContract.address,
-          method: 'getCommunityHistory',
+          method: 'getVotingHistory',
           args: [publicKey],
         }
       })

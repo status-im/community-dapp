@@ -12,7 +12,7 @@ export function useGetCurrentVoting(publicKey: string | undefined) {
   const votingRoom = useContractCall({
     abi: votingContract.interface,
     address: votingContract.address,
-    method: 'getCommunityVoting',
+    method: 'getActiveVotingRoom',
     args: [publicKey],
   }) as any
 

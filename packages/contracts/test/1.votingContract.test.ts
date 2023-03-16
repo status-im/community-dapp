@@ -196,7 +196,7 @@ describe('VotingContract', () => {
         BigNumber.from(0),
         BigNumber.from(1),
       ])
-      const history = await votingContract.getCommunityHistory(publicKeys[0])
+      const history = await votingContract.getVotingHistory(publicKeys[0])
       expect(history.length).to.eq(1)
       expect(history[0][2]).to.eq(1)
       expect(history[0][4]).to.eq(publicKeys[0])
@@ -225,11 +225,11 @@ describe('VotingContract', () => {
         const { votingContract, firstSigner } = await loadFixture(fixture)
         await votingContract.initializeVotingRoom(1, publicKeys[0], BigNumber.from(100))
         await voteAndFinalize(1, 1, firstSigner, votingContract)
-        expect((await votingContract.getCommunityHistory(publicKeys[0])).length).to.eq(1)
+        expect((await votingContract.getVotingHistory(publicKeys[0])).length).to.eq(1)
         await time.increase(10000)
         await votingContract.initializeVotingRoom(0, publicKeys[0], BigNumber.from(100))
         await voteAndFinalize(2, 0, firstSigner, votingContract)
-        const history = await votingContract.getCommunityHistory(publicKeys[0])
+        const history = await votingContract.getVotingHistory(publicKeys[0])
         expect(history.length).to.eq(2)
         expect(history[0][2]).to.eq(1)
         expect(history[0][3]).to.eq(true)
@@ -334,10 +334,10 @@ describe('VotingContract', () => {
   })
 
   describe('helpers', () => {
-    it('getCommunityVoting', async () => {
+    it('getActiveVotingRoom', async () => {
       const { votingContract, firstSigner } = await loadFixture(fixture)
       await votingContract.initializeVotingRoom(1, publicKeys[0], BigNumber.from(100))
-      expect((await votingContract.getCommunityVoting(publicKeys[0])).slice(2)).to.deep.eq([
+      expect((await votingContract.getActiveVotingRoom(publicKeys[0])).slice(2)).to.deep.eq([
         1,
         false,
         publicKeys[0],
@@ -349,7 +349,7 @@ describe('VotingContract', () => {
 
       await time.increase(10000)
       await votingContract.initializeVotingRoom(1, publicKeys[1], BigNumber.from(100))
-      expect((await votingContract.getCommunityVoting(publicKeys[1])).slice(2)).to.deep.eq([
+      expect((await votingContract.getActiveVotingRoom(publicKeys[1])).slice(2)).to.deep.eq([
         1,
         false,
         publicKeys[1],
