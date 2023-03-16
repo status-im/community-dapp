@@ -83,8 +83,6 @@ contract VotingContract {
     constructor(IERC20 _address) {
         owner = msg.sender;
         token = _address;
-        VotingRoom memory newVotingRoom;
-        votingRooms.push(newVotingRoom);
         DOMAIN_SEPARATOR = hash(
             EIP712Domain({
                 name: 'Voting Contract',
@@ -100,16 +98,32 @@ contract VotingContract {
         directory = _address;
     }
 
+    /// Voting room with `ID` doesn't exist.
+    error VotingRoomDoesntExist(uint256 ID);
+
+    /// Room `ID` must be greater than 0.
+    error InvalidRoomID(uint256 ID);
+
+    modifier onlyIfVotingRoomExists(uint256 ID) {
+        if (ID < 1) revert InvalidRoomID(ID);
+        if (ID > votingRooms.length) revert VotingRoomDoesntExist(ID);
+        _;
+    }
+
+    function _getVotingRoom(uint256 roomID) private view onlyIfVotingRoomExists(roomID) returns (VotingRoom storage) {
+        return votingRooms[roomID - 1];
+    }
+
     function getCommunityVoting(bytes calldata publicKey) public view returns (VotingRoom memory) {
-        return votingRooms[communityVotingId[publicKey]];
+        return _getVotingRoom(communityVotingId[publicKey]);
     }
 
     function getActiveVotingRooms() public view returns (uint256[] memory) {
         uint256[] memory returnVotingRooms = new uint256[](votingRooms.length);
         uint256 count = 0;
-        for (uint256 i = 1; i < votingRooms.length; i++) {
+        for (uint256 i = 0; i < votingRooms.length; i++) {
             if (!votingRooms[i].finalized) {
-                returnVotingRooms[count] = i;
+                returnVotingRooms[count] = votingRooms[i].roomNumber;
                 count++;
             }
         }
@@ -121,13 +135,13 @@ contract VotingContract {
     }
 
     function listRoomVoters(uint256 roomId) public view returns (address[] memory) {
-        return votingRooms[roomId].voters;
+        return _getVotingRoom(roomId).voters;
     }
 
     function getCommunityHistory(bytes calldata publicKey) public view returns (VotingRoom[] memory returnVotingRooms) {
         returnVotingRooms = new VotingRoom[](communityVotingHistory[publicKey].length);
         for (uint256 i = 0; i < communityVotingHistory[publicKey].length; i++) {
-            returnVotingRooms[i] = votingRooms[communityVotingHistory[publicKey][i]];
+            returnVotingRooms[i] = _getVotingRoom(communityVotingHistory[publicKey][i]);
         }
     }
 
@@ -143,36 +157,37 @@ contract VotingContract {
         if (historyLength > 0) {
             uint256 roomId = communityVotingHistory[publicKey][historyLength - 1];
             require(
-                block.timestamp.sub(votingRooms[roomId].endAt) > TIME_BETWEEN_VOTING,
+                block.timestamp.sub(_getVotingRoom(roomId).endAt) > TIME_BETWEEN_VOTING,
                 'Community was in a vote recently'
             );
         }
         require(token.balanceOf(msg.sender) >= voteAmount, 'not enough token');
-        communityVotingId[publicKey] = votingRooms.length;
-        communityVotingHistory[publicKey].push(votingRooms.length);
+
+        uint votingRoomID = votingRooms.length + 1;
+
+        communityVotingId[publicKey] = votingRoomID;
+        communityVotingHistory[publicKey].push(votingRoomID);
 
         VotingRoom memory newVotingRoom;
         newVotingRoom.startBlock = block.number;
         newVotingRoom.endAt = block.timestamp.add(VOTING_LENGTH);
         newVotingRoom.voteType = voteType;
         newVotingRoom.community = publicKey;
-        newVotingRoom.roomNumber = votingRooms.length;
+        newVotingRoom.roomNumber = votingRoomID;
         newVotingRoom.totalVotesFor = voteAmount;
-        voted[votingRooms.length][msg.sender] = true;
+        voted[votingRoomID][msg.sender] = true;
 
         votingRooms.push(newVotingRoom);
-        votingRooms[votingRooms.length - 1].voters.push(msg.sender);
+        _getVotingRoom(votingRoomID).voters.push(msg.sender);
 
-        emit VotingRoomStarted(votingRooms.length - 1, publicKey);
+        emit VotingRoomStarted(votingRoomID, publicKey);
     }
 
     function finalizeVotingRoom(uint256 roomId) public {
-        require(roomId > 0, 'vote not found');
-        require(roomId < votingRooms.length, 'vote not found');
-        require(votingRooms[roomId].finalized == false, 'vote already finalized');
-        require(votingRooms[roomId].endAt < block.timestamp, 'vote still ongoing');
+        VotingRoom storage votingRoom = _getVotingRoom(roomId);
 
-        VotingRoom storage votingRoom = votingRooms[roomId];
+        require(votingRoom.finalized == false, 'vote already finalized');
+        require(votingRoom.endAt < block.timestamp, 'vote still ongoing');
 
         votingRoom.finalized = true;
         votingRoom.endAt = block.timestamp;
@@ -204,13 +219,14 @@ contract VotingContract {
     function castVotes(Vote[] calldata votes) public {
         for (uint256 i = 0; i < votes.length; i++) {
             Vote calldata vote = votes[i];
+
             if (verify(vote, vote.r, vote.vs)) {
                 uint256 roomId = vote.roomIdAndType >> 1;
-                require(roomId > 0, 'vote not found');
-                require(roomId < votingRooms.length, 'vote not found');
-                VotingRoom storage room = votingRooms[roomId];
+                VotingRoom storage room = _getVotingRoom(roomId);
+
                 require(room.endAt > block.timestamp, 'vote closed');
                 require(!room.finalized, 'room finalized');
+
                 if (voted[roomId][vote.voter] == false) {
                     if (token.balanceOf(vote.voter) >= vote.sntAmount) {
                         if (vote.roomIdAndType & 1 == 1) {

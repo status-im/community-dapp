@@ -15,7 +15,7 @@ export function VotingRoomMobile() {
     abi: votingContract.interface,
     address: votingContract.address,
     method: 'votingRooms',
-    args: [Number(id)],
+    args: [Number(id) - 1],
   }) as any
   const [details] = useCommunities([votingRoom?.community])
   const [detailedVotingRoom, setDetailedVotingRoom] = useState<DetailedVotingRoom | undefined>(undefined)
