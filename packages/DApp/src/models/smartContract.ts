@@ -9,7 +9,6 @@ export type VotingRoom = {
   community: string
   totalVotesFor: BigNumber
   totalVotesAgainst: BigNumber
-  voters: string[]
   roomNumber: number
 }
 
