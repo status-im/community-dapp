@@ -43,8 +43,6 @@ contract VotingContract {
     mapping(bytes => uint256) public communityVotingId;
     mapping(bytes => uint256[]) private communityVotingHistory;
     mapping(uint256 => mapping(address => bool)) private voted;
-    uint256[] public activeVotingRooms;
-    mapping(uint256 => uint256) private indexOfActiveVotingRooms;
 
     bytes32 private constant EIP712DOMAIN_TYPEHASH =
         keccak256('EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)');
@@ -107,7 +105,19 @@ contract VotingContract {
     }
 
     function getActiveVotingRooms() public view returns (uint256[] memory) {
-        return activeVotingRooms;
+        uint256[] memory returnVotingRooms = new uint256[](votingRooms.length);
+        uint256 count = 0;
+        for (uint256 i = 1; i < votingRooms.length; i++) {
+            if (!votingRooms[i].finalized) {
+                returnVotingRooms[count] = i;
+                count++;
+            }
+        }
+        // Resize the array to remove any unused elements
+        assembly {
+            mstore(returnVotingRooms, count)
+        }
+        return returnVotingRooms;
     }
 
     function listRoomVoters(uint256 roomId) public view returns (address[] memory) {
@@ -140,8 +150,6 @@ contract VotingContract {
         require(token.balanceOf(msg.sender) >= voteAmount, 'not enough token');
         communityVotingId[publicKey] = votingRooms.length;
         communityVotingHistory[publicKey].push(votingRooms.length);
-        activeVotingRooms.push(votingRooms.length);
-        indexOfActiveVotingRooms[votingRooms.length] = activeVotingRooms.length;
 
         VotingRoom memory newVotingRoom;
         newVotingRoom.startBlock = block.number;
@@ -163,29 +171,23 @@ contract VotingContract {
         require(roomId < votingRooms.length, 'vote not found');
         require(votingRooms[roomId].finalized == false, 'vote already finalized');
         require(votingRooms[roomId].endAt < block.timestamp, 'vote still ongoing');
-        votingRooms[roomId].finalized = true;
-        votingRooms[roomId].endAt = block.timestamp;
-        bytes memory community = votingRooms[roomId].community;
-        communityVotingId[community] = 0;
 
-        uint256 index = indexOfActiveVotingRooms[roomId];
-        if (index == 0) return;
-        index--;
-        if (activeVotingRooms.length > 1) {
-            activeVotingRooms[index] = activeVotingRooms[activeVotingRooms.length - 1];
-            indexOfActiveVotingRooms[activeVotingRooms[index]] = index + 1;
-        }
-        activeVotingRooms.pop();
-        bool passed = votingRooms[roomId].totalVotesFor > votingRooms[roomId].totalVotesAgainst;
+        VotingRoom storage votingRoom = votingRooms[roomId];
+
+        votingRoom.finalized = true;
+        votingRoom.endAt = block.timestamp;
+        communityVotingId[votingRoom.community] = 0;
+
+        bool passed = votingRoom.totalVotesFor > votingRoom.totalVotesAgainst;
         if (passed) {
-            if (votingRooms[roomId].voteType == VoteType.ADD) {
-                directory.addCommunity(community);
+            if (votingRoom.voteType == VoteType.ADD) {
+                directory.addCommunity(votingRoom.community);
             }
-            if (votingRooms[roomId].voteType == VoteType.REMOVE) {
-                directory.removeCommunity(community);
+            if (votingRoom.voteType == VoteType.REMOVE) {
+                directory.removeCommunity(votingRoom.community);
             }
         }
-        emit VotingRoomFinalized(roomId, community, passed, votingRooms[roomId].voteType);
+        emit VotingRoomFinalized(roomId, votingRoom.community, passed, votingRoom.voteType);
     }
 
     event VoteCast(uint256 roomId, address voter);
