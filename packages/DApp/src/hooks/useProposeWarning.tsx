@@ -21,7 +21,7 @@ export function useProposeWarning(communityFound: CommunityDetail) {
   const [isCommunityUnderVote] = useContractCall({
     abi: votingContract.interface,
     address: votingContract.address,
-    method: 'communityVotingId',
+    method: 'activeRoomIDByCommunityID',
     args: [communityFound?.publicKey],
   }) ?? [undefined]
 

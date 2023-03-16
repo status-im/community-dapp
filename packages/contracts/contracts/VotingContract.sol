@@ -40,8 +40,8 @@ contract VotingContract {
     IERC20 public token;
 
     VotingRoom[] public votingRooms;
-    mapping(bytes => uint256) public communityVotingId;
-    mapping(bytes => uint256[]) private communityVotingHistory;
+    mapping(bytes => uint256) public activeRoomIDByCommunityID;
+    mapping(bytes => uint256[]) private roomIDsByCommunityID;
     mapping(uint256 => mapping(address => bool)) private voted;
 
     bytes32 private constant EIP712DOMAIN_TYPEHASH =
@@ -115,7 +115,7 @@ contract VotingContract {
     }
 
     function getCommunityVoting(bytes calldata publicKey) public view returns (VotingRoom memory) {
-        return _getVotingRoom(communityVotingId[publicKey]);
+        return _getVotingRoom(activeRoomIDByCommunityID[publicKey]);
     }
 
     function getActiveVotingRooms() public view returns (uint256[] memory) {
@@ -139,23 +139,23 @@ contract VotingContract {
     }
 
     function getCommunityHistory(bytes calldata publicKey) public view returns (VotingRoom[] memory returnVotingRooms) {
-        returnVotingRooms = new VotingRoom[](communityVotingHistory[publicKey].length);
-        for (uint256 i = 0; i < communityVotingHistory[publicKey].length; i++) {
-            returnVotingRooms[i] = _getVotingRoom(communityVotingHistory[publicKey][i]);
+        returnVotingRooms = new VotingRoom[](roomIDsByCommunityID[publicKey].length);
+        for (uint256 i = 0; i < roomIDsByCommunityID[publicKey].length; i++) {
+            returnVotingRooms[i] = _getVotingRoom(roomIDsByCommunityID[publicKey][i]);
         }
     }
 
     function initializeVotingRoom(VoteType voteType, bytes calldata publicKey, uint256 voteAmount) public {
-        require(communityVotingId[publicKey] == 0, 'vote already ongoing');
+        require(activeRoomIDByCommunityID[publicKey] == 0, 'vote already ongoing');
         if (voteType == VoteType.REMOVE) {
             require(directory.isCommunityInDirectory(publicKey), 'Community not in directory');
         }
         if (voteType == VoteType.ADD) {
             require(!directory.isCommunityInDirectory(publicKey), 'Community already in directory');
         }
-        uint256 historyLength = communityVotingHistory[publicKey].length;
+        uint256 historyLength = roomIDsByCommunityID[publicKey].length;
         if (historyLength > 0) {
-            uint256 roomId = communityVotingHistory[publicKey][historyLength - 1];
+            uint256 roomId = roomIDsByCommunityID[publicKey][historyLength - 1];
             require(
                 block.timestamp.sub(_getVotingRoom(roomId).endAt) > TIME_BETWEEN_VOTING,
                 'Community was in a vote recently'
@@ -165,8 +165,8 @@ contract VotingContract {
 
         uint votingRoomID = votingRooms.length + 1;
 
-        communityVotingId[publicKey] = votingRoomID;
-        communityVotingHistory[publicKey].push(votingRoomID);
+        activeRoomIDByCommunityID[publicKey] = votingRoomID;
+        roomIDsByCommunityID[publicKey].push(votingRoomID);
 
         VotingRoom memory newVotingRoom;
         newVotingRoom.startBlock = block.number;
@@ -191,7 +191,7 @@ contract VotingContract {
 
         votingRoom.finalized = true;
         votingRoom.endAt = block.timestamp;
-        communityVotingId[votingRoom.community] = 0;
+        activeRoomIDByCommunityID[votingRoom.community] = 0;
 
         bool passed = votingRoom.totalVotesFor > votingRoom.totalVotesAgainst;
         if (passed) {
