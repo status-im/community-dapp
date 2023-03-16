@@ -114,7 +114,7 @@ contract VotingContract {
         return votingRooms[roomID - 1];
     }
 
-    function getCommunityVoting(bytes calldata publicKey) public view returns (VotingRoom memory) {
+    function getActiveVotingRoom(bytes calldata publicKey) public view returns (VotingRoom memory) {
         return _getVotingRoom(activeRoomIDByCommunityID[publicKey]);
     }
 
@@ -138,7 +138,7 @@ contract VotingContract {
         return _getVotingRoom(roomId).voters;
     }
 
-    function getCommunityHistory(bytes calldata publicKey) public view returns (VotingRoom[] memory returnVotingRooms) {
+    function getVotingHistory(bytes calldata publicKey) public view returns (VotingRoom[] memory returnVotingRooms) {
         returnVotingRooms = new VotingRoom[](roomIDsByCommunityID[publicKey].length);
         for (uint256 i = 0; i < roomIDsByCommunityID[publicKey].length; i++) {
             returnVotingRooms[i] = _getVotingRoom(roomIDsByCommunityID[publicKey][i]);
