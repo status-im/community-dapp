@@ -187,7 +187,7 @@ describe('VotingContract', () => {
     it('gets', async () => {
       const { votingContract } = await loadFixture(fixture)
       await votingContract.initializeVotingRoom(1, publicKeys[0], BigNumber.from(100))
-      const votingRoom1 = await votingContract.votingRooms(1)
+      const votingRoom1 = await votingContract.votingRooms(0)
       expect(votingRoom1.slice(2)).to.deep.eq([
         1,
         false,
@@ -202,7 +202,7 @@ describe('VotingContract', () => {
       expect(history[0][4]).to.eq(publicKeys[0])
 
       await votingContract.initializeVotingRoom(1, publicKeys[1], BigNumber.from(100))
-      expect((await votingContract.votingRooms(2)).slice(2)).to.deep.eq([
+      expect((await votingContract.votingRooms(1)).slice(2)).to.deep.eq([
         1,
         false,
         publicKeys[1],
@@ -210,7 +210,7 @@ describe('VotingContract', () => {
         BigNumber.from(0),
         BigNumber.from(2),
       ])
-      expect((await votingContract.votingRooms(1)).slice(2)).to.deep.eq([
+      expect((await votingContract.votingRooms(0)).slice(2)).to.deep.eq([
         1,
         false,
         publicKeys[0],
@@ -260,7 +260,7 @@ describe('VotingContract', () => {
       it('finalizes', async () => {
         const { votingContract } = await loadFixture(fixture)
         await votingContract.initializeVotingRoom(1, publicKeys[0], BigNumber.from(100))
-        expect((await votingContract.votingRooms(1)).slice(2)).to.deep.eq([
+        expect((await votingContract.votingRooms(0)).slice(2)).to.deep.eq([
           1,
           false,
           publicKeys[0],
@@ -272,7 +272,7 @@ describe('VotingContract', () => {
         await expect(await votingContract.finalizeVotingRoom(1))
           .to.emit(votingContract, 'VotingRoomFinalized')
           .withArgs(1, publicKeys[0], true, 1)
-        expect((await votingContract.votingRooms(1)).slice(2)).to.deep.eq([
+        expect((await votingContract.votingRooms(0)).slice(2)).to.deep.eq([
           1,
           true,
           publicKeys[0],
@@ -287,7 +287,7 @@ describe('VotingContract', () => {
           const { votingContract, directoryContract, secondSigner } = await loadFixture(fixture)
           await votingContract.initializeVotingRoom(1, publicKeys[0], BigNumber.from(100))
           await voteAndFinalize(1, 1, secondSigner, votingContract)
-          expect((await votingContract.votingRooms(1)).slice(2)).to.deep.eq([
+          expect((await votingContract.votingRooms(0)).slice(2)).to.deep.eq([
             1,
             true,
             publicKeys[0],
@@ -407,7 +407,7 @@ describe('VotingContract', () => {
         .to.emit(votingContract, 'NotEnoughToken')
         .withArgs(1, secondSigner.address)
 
-      await expect((await votingContract.votingRooms(1)).slice(2)).to.deep.eq([
+      await expect((await votingContract.votingRooms(0)).slice(2)).to.deep.eq([
         1,
         false,
         publicKeys[0],
@@ -422,7 +422,7 @@ describe('VotingContract', () => {
       const votes = await getSignedVotes(firstSigner, secondSigner, thirdSigner)
       await votingContract.initializeVotingRoom(1, publicKeys[0], BigNumber.from(100))
       await votingContract.castVotes(votes)
-      expect((await votingContract.votingRooms(1)).slice(2)).to.deep.eq([
+      expect((await votingContract.votingRooms(0)).slice(2)).to.deep.eq([
         1,
         false,
         publicKeys[0],
@@ -438,7 +438,7 @@ describe('VotingContract', () => {
       await votingContract.initializeVotingRoom(1, publicKeys[0], BigNumber.from(100))
       await votingContract.castVotes(votes)
       await votingContract.castVotes(votes)
-      expect((await votingContract.votingRooms(1)).slice(2)).to.deep.eq([
+      expect((await votingContract.votingRooms(0)).slice(2)).to.deep.eq([
         1,
         false,
         publicKeys[0],
