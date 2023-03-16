@@ -106,7 +106,7 @@ async function fixture() {
 
   await votingContract.setDirectory(directoryContract.address)
 
-  return { votingContract, directoryContract, firstSigner, secondSigner, thirdSigner }
+  return { votingContract, directoryContract, erc20Contract, firstSigner, secondSigner, thirdSigner }
 }
 
 before(async function () {
@@ -114,19 +114,6 @@ before(async function () {
   const { votingContract: voting } = await loadFixture(fixture)
   typedData.domain.chainId = 31337
   typedData.domain.verifyingContract = voting.address
-})
-
-describe('voting', () => {
-  it('check voters', async () => {
-    const { votingContract, firstSigner, secondSigner, thirdSigner } = await loadFixture(fixture)
-
-    const messages = await getSignedVotes(firstSigner, secondSigner, thirdSigner)
-    await votingContract.initializeVotingRoom(1, publicKeys[0], BigNumber.from(100))
-
-    expect(await votingContract.listRoomVoters(1)).to.deep.eq([firstSigner.address])
-    await votingContract.castVotes(messages.slice(2))
-    expect(await votingContract.listRoomVoters(1)).to.deep.eq([firstSigner.address, thirdSigner.address])
-  })
 })
 
 describe('VotingContract', () => {
@@ -282,6 +269,23 @@ describe('VotingContract', () => {
         ])
       })
 
+      it('verifies votes', async () => {
+        const { votingContract, erc20Contract, firstSigner } = await loadFixture(fixture)
+        await votingContract.initializeVotingRoom(1, publicKeys[0], BigNumber.from(100))
+
+        // clear balance
+        const firstSignerBalance = await erc20Contract.balanceOf(firstSigner.address)
+        await erc20Contract.increaseAllowance(firstSigner.address, firstSignerBalance)
+        await erc20Contract.transferFrom(firstSigner.address, erc20Contract.address, firstSignerBalance)
+
+        await time.increase(2000)
+        await expect(await votingContract.finalizeVotingRoom(1))
+          .to.emit(votingContract, 'NotEnoughToken')
+          .withArgs(1, firstSigner.address)
+          .to.emit(votingContract, 'VotingRoomFinalized')
+          .withArgs(1, publicKeys[0], false, 1)
+      })
+
       describe('directory interaction', () => {
         it('add community', async () => {
           const { votingContract, directoryContract, secondSigner } = await loadFixture(fixture)
@@ -335,7 +339,7 @@ describe('VotingContract', () => {
 
   describe('helpers', () => {
     it('getActiveVotingRoom', async () => {
-      const { votingContract, firstSigner } = await loadFixture(fixture)
+      const { votingContract } = await loadFixture(fixture)
       await votingContract.initializeVotingRoom(1, publicKeys[0], BigNumber.from(100))
       expect((await votingContract.getActiveVotingRoom(publicKeys[0])).slice(2)).to.deep.eq([
         1,
@@ -344,7 +348,6 @@ describe('VotingContract', () => {
         BigNumber.from(100),
         BigNumber.from(0),
         BigNumber.from(1),
-        [firstSigner.address],
       ])
 
       await time.increase(10000)
@@ -356,7 +359,6 @@ describe('VotingContract', () => {
         BigNumber.from(100),
         BigNumber.from(0),
         BigNumber.from(2),
-        [firstSigner.address],
       ])
     })
 

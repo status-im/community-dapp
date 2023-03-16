@@ -14,7 +14,6 @@ describe('voting', () => {
         community: '0x000',
         totalVotesFor: BigNumber.from(100),
         totalVotesAgainst: BigNumber.from(100),
-        voters: ['0x01', '0x02'],
         roomNumber: 1,
       }
       const room = voting.fromRoom(votingRoom)
@@ -32,7 +31,6 @@ describe('voting', () => {
         community: '0x000',
         totalVotesFor: BigNumber.from(1000),
         totalVotesAgainst: BigNumber.from(100),
-        voters: ['0x01', '0x02'],
         roomNumber: 1,
       }
       const room = voting.fromRoom(votingRoom)
