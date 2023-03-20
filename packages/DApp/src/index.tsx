@@ -21,7 +21,7 @@ const config = {
     ...DEFAULT_CONFIG.multicallAddresses,
     [ChainId.Ropsten]: contracts[ChainId.Ropsten].multicallContract,
     [CustomChainId.OptimismGoerli]: contracts[CustomChainId.OptimismGoerli].multicallContract,
-    [ChainId.Localhost]: contracts[ChainId.Localhost].multicallContract,
+    [ChainId.Hardhat]: contracts[ChainId.Hardhat].multicallContract,
   },
   supportedChains: [...DEFAULT_CONFIG.supportedChains, CustomChainId.OptimismGoerli],
   notifications: {
