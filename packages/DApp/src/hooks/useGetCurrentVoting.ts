@@ -9,27 +9,36 @@ export function useGetCurrentVoting(publicKey: string | undefined) {
   const [currentVoting, setCurrentVoting] = useState<undefined | CurrentVoting>(undefined)
   const [votingRoomState, setVotingRoomState] = useState<undefined | VotingRoom>(undefined)
   const { votingContract } = useContracts()
-  const votingRoom = useContractCall({
+
+  const [roomList] = useContractCall({
     abi: votingContract.interface,
     address: votingContract.address,
-    method: 'getActiveVotingRoom',
-    args: [publicKey],
-  }) as any
+    method: 'getActiveVotingRooms',
+    args: [],
+  }) ?? [[]]
 
   useEffect(() => {
-    if (votingRoom) {
-      if (votingRoom.roomNumber.toNumber() === 0 || votingRoom.finalized == true) {
-        setCurrentVoting(undefined)
-        setVotingRoomState(undefined)
-      } else {
+    const hasPublicKey = roomList.some((room: any) => room.community === publicKey)
+    if (hasPublicKey) {
+      const votingRoom = useContractCall({
+        abi: votingContract.interface,
+        address: votingContract.address,
+        method: 'getActiveVotingRoom',
+        args: [publicKey],
+      }) as any
+
+      if (votingRoom && !votingRoom.finalized) {
         setVotingRoomState(votingRoom)
         setCurrentVoting(votingFromRoom(votingRoom))
+      } else {
+        setCurrentVoting(undefined)
+        setVotingRoomState(undefined)
       }
     } else {
       setCurrentVoting(undefined)
       setVotingRoomState(undefined)
     }
-  }, [votingRoom?.roomNumber?.toString(), votingRoom?.finalized])
+  }, [roomList, publicKey])
 
   return { currentVoting, votingRoom: votingRoomState }
 }
