@@ -99,7 +99,7 @@ async function fixture() {
   await erc20Contract.transfer(thirdSigner.address, 10000)
 
   const votingContractFactory = await ethers.getContractFactory('VotingContract')
-  const votingContract = await votingContractFactory.deploy(erc20Contract.address)
+  const votingContract = await votingContractFactory.deploy(erc20Contract.address, 1000, 3600)
 
   const directoryContractFactory = await ethers.getContractFactory('Directory')
   const directoryContract = await directoryContractFactory.deploy(votingContract.address)

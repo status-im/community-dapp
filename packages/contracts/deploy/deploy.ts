@@ -9,9 +9,9 @@ const hre = require("hardhat");
 import { ERC20Mock, MultiCall } from '../abi';
 import { BigNumber } from 'ethers';
 
-async function deployVotingContract(tokenAddress: string) {
+async function deployVotingContract(tokenAddress: string, votingLength, timeBetweenVoting) {
   const contractFactory = await hre.ethers.getContractFactory('VotingContract');
-  const contract = await contractFactory.deploy(tokenAddress);
+  const contract = await contractFactory.deploy(tokenAddress, votingLength, timeBetweenVoting);
   await contract.deployed();
 
   console.log(`Voting contract deployed with address: ${contract.address}`);
@@ -67,6 +67,8 @@ async function obtainTokenAddress(deployer, chainId): Promise<string> {
 async function main() {
   const [deployer] = await hre.ethers.getSigners();
   const network = await hre.ethers.provider.getNetwork();
+  const votingLengthInSeconds = isTestNetwork(network.chainId) ? 2 * 60 : 30 * 24 * 3600 // 2 minutes or 30 days
+  const timeBetweenVotingInSeconds = isTestNetwork(network.chainId) ? 60 : 7 * 24 * 3600 // 1 minute or 7 days
 
   console.log(`Deploying contracts on the network: ${network.name}(${network.chainId}), with the account: ${deployer.address}`);
 
@@ -75,7 +77,7 @@ async function main() {
   }
 
   const tokenAddress = await obtainTokenAddress(deployer, network.chainId);
-  const votingContract = await deployVotingContract(tokenAddress);
+  const votingContract = await deployVotingContract(tokenAddress, votingLengthInSeconds, timeBetweenVotingInSeconds);
   const directoryContract = await deployDirectoryContract(votingContract.address);
   await votingContract.setDirectory(directoryContract.address)
 }
