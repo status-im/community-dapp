@@ -13,9 +13,6 @@ contract VotingContract {
     using ECDSA for bytes32;
     using SafeMath for uint256;
 
-    uint256 private constant VOTING_LENGTH = 1000;
-    uint256 private constant TIME_BETWEEN_VOTING = 3600;
-
     enum VoteType {
         REMOVE,
         ADD
@@ -56,6 +53,9 @@ contract VotingContract {
     address public owner;
     Directory public directory;
     IERC20 public token;
+
+    uint256 public votingLength;
+    uint256 public timeBetweenVoting;
 
     VotingRoom[] public votingRooms;
     mapping(bytes => uint256) public activeRoomIDByCommunityID;
@@ -100,9 +100,11 @@ contract VotingContract {
         return digest.recover(vote.r, vote.vs) == vote.voter;
     }
 
-    constructor(IERC20 _address) {
+    constructor(IERC20 _address, uint256 _votingLength, uint256 _timeBetweenVoting) {
         owner = msg.sender;
         token = _address;
+        votingLength = _votingLength;
+        timeBetweenVoting = _timeBetweenVoting;
         DOMAIN_SEPARATOR = hash(
             EIP712Domain({
                 name: 'Voting Contract',
@@ -180,7 +182,7 @@ contract VotingContract {
         if (historyLength > 0) {
             uint256 roomId = roomIDsByCommunityID[publicKey][historyLength - 1];
             require(
-                block.timestamp.sub(_getVotingRoom(roomId).endAt) > TIME_BETWEEN_VOTING,
+                block.timestamp.sub(_getVotingRoom(roomId).endAt) > timeBetweenVoting,
                 'Community was in a vote recently'
             );
         }
@@ -196,7 +198,7 @@ contract VotingContract {
         votingRooms.push(
             VotingRoom({
                 startBlock: block.number,
-                endAt: block.timestamp.add(VOTING_LENGTH),
+                endAt: block.timestamp.add(votingLength),
                 voteType: voteType,
                 finalized: false,
                 community: publicKey,
