@@ -1,10 +1,11 @@
 {
-  "extends": "../../tsconfig",
   "compilerOptions": {
-    "lib": ["esnext"],
+    "target": "es2020",
     "module": "commonjs",
-    "outDir": "dist"
-  },
-  "include": ["test", "contracts"],
-  "exclude": ["**/dist", "**/build"]
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true
+  }
 }

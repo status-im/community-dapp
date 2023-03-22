@@ -173,38 +173,37 @@ describe('VotingContract', () => {
 
     it('gets', async () => {
       const { votingContract } = await loadFixture(fixture)
+
       await votingContract.initializeVotingRoom(1, publicKeys[0], BigNumber.from(100))
-      const votingRoom1 = await votingContract.votingRooms(0)
-      expect(votingRoom1.slice(2)).to.deep.eq([
-        1,
-        false,
-        publicKeys[0],
-        BigNumber.from(100),
-        BigNumber.from(0),
-        BigNumber.from(1),
-      ])
+      let votingRoom1 = await votingContract.votingRooms(0)
+      expect(votingRoom1.voteType).to.eq(1)
+      expect(votingRoom1.finalized).to.eq(false)
+      expect(votingRoom1.community).to.eq(publicKeys[0])
+      expect(votingRoom1.totalVotesFor).to.eq(100)
+      expect(votingRoom1.totalVotesAgainst).to.eq(0)
+      expect(votingRoom1.roomNumber).to.eq(1)
+
       const history = await votingContract.getVotingHistory(publicKeys[0])
       expect(history.length).to.eq(1)
-      expect(history[0][2]).to.eq(1)
-      expect(history[0][4]).to.eq(publicKeys[0])
+      expect(history[0].voteType).to.eq(1)
+      expect(history[0].community).to.eq(publicKeys[0])
 
       await votingContract.initializeVotingRoom(1, publicKeys[1], BigNumber.from(100))
-      expect((await votingContract.votingRooms(1)).slice(2)).to.deep.eq([
-        1,
-        false,
-        publicKeys[1],
-        BigNumber.from(100),
-        BigNumber.from(0),
-        BigNumber.from(2),
-      ])
-      expect((await votingContract.votingRooms(0)).slice(2)).to.deep.eq([
-        1,
-        false,
-        publicKeys[0],
-        BigNumber.from(100),
-        BigNumber.from(0),
-        BigNumber.from(1),
-      ])
+      const votingRoom2 = await votingContract.votingRooms(1)
+      expect(votingRoom2.voteType).to.eq(1)
+      expect(votingRoom2.finalized).to.eq(false)
+      expect(votingRoom2.community).to.eq(publicKeys[1])
+      expect(votingRoom2.totalVotesFor).to.eq(100)
+      expect(votingRoom2.totalVotesAgainst).to.eq(0)
+      expect(votingRoom2.roomNumber).to.eq(2)
+
+      votingRoom1 = await votingContract.votingRooms(0)
+      expect(votingRoom1.voteType).to.eq(1)
+      expect(votingRoom1.finalized).to.eq(false)
+      expect(votingRoom1.community).to.eq(publicKeys[0])
+      expect(votingRoom1.totalVotesFor).to.eq(100)
+      expect(votingRoom1.totalVotesAgainst).to.eq(0)
+      expect(votingRoom1.roomNumber).to.eq(1)
     })
 
     describe('history', () => {
@@ -218,19 +217,19 @@ describe('VotingContract', () => {
         await voteAndFinalize(2, 0, firstSigner, votingContract)
         const history = await votingContract.getVotingHistory(publicKeys[0])
         expect(history.length).to.eq(2)
-        expect(history[0][2]).to.eq(1)
-        expect(history[0][3]).to.eq(true)
-        expect(history[0][4]).to.eq(publicKeys[0])
-        expect(history[0][5]).to.eq(BigNumber.from(100))
-        expect(history[0][6]).to.eq(BigNumber.from(0))
-        expect(history[0][7]).to.eq(BigNumber.from(1))
+        expect(history[0].voteType).to.eq(1)
+        expect(history[0].finalized).to.eq(true)
+        expect(history[0].community).to.eq(publicKeys[0])
+        expect(history[0].totalVotesFor).to.eq(BigNumber.from(100))
+        expect(history[0].totalVotesAgainst).to.eq(BigNumber.from(0))
+        expect(history[0].roomNumber).to.eq(BigNumber.from(1))
 
-        expect(history[1][2]).to.eq(0)
-        expect(history[1][3]).to.eq(true)
-        expect(history[1][4]).to.eq(publicKeys[0])
-        expect(history[1][5]).to.eq(BigNumber.from(100))
-        expect(history[1][6]).to.eq(BigNumber.from(0))
-        expect(history[1][7]).to.eq(BigNumber.from(2))
+        expect(history[1].voteType).to.eq(0)
+        expect(history[1].finalized).to.eq(true)
+        expect(history[1].community).to.eq(publicKeys[0])
+        expect(history[1].totalVotesFor).to.eq(BigNumber.from(100))
+        expect(history[1].totalVotesAgainst).to.eq(BigNumber.from(0))
+        expect(history[1].roomNumber).to.eq(BigNumber.from(2))
       })
 
       it("can't start vote to fast", async () => {
@@ -247,26 +246,26 @@ describe('VotingContract', () => {
       it('finalizes', async () => {
         const { votingContract } = await loadFixture(fixture)
         await votingContract.initializeVotingRoom(1, publicKeys[0], BigNumber.from(100))
-        expect((await votingContract.votingRooms(0)).slice(2)).to.deep.eq([
-          1,
-          false,
-          publicKeys[0],
-          BigNumber.from(100),
-          BigNumber.from(0),
-          BigNumber.from(1),
-        ])
+        let votingRoom = await votingContract.votingRooms(0)
+        expect(votingRoom.voteType).to.eq(1)
+        expect(votingRoom.finalized).to.eq(false)
+        expect(votingRoom.community).to.eq(publicKeys[0])
+        expect(votingRoom.totalVotesFor).to.eq(100)
+        expect(votingRoom.totalVotesAgainst).to.eq(0)
+        expect(votingRoom.roomNumber).to.eq(1)
+
         await time.increase(2000)
         await expect(await votingContract.finalizeVotingRoom(1))
           .to.emit(votingContract, 'VotingRoomFinalized')
           .withArgs(1, publicKeys[0], true, 1)
-        expect((await votingContract.votingRooms(0)).slice(2)).to.deep.eq([
-          1,
-          true,
-          publicKeys[0],
-          BigNumber.from(100),
-          BigNumber.from(0),
-          BigNumber.from(1),
-        ])
+
+        votingRoom = await votingContract.votingRooms(0)
+        expect(votingRoom.voteType).to.eq(1)
+        expect(votingRoom.finalized).to.eq(true)
+        expect(votingRoom.community).to.eq(publicKeys[0])
+        expect(votingRoom.totalVotesFor).to.eq(100)
+        expect(votingRoom.totalVotesAgainst).to.eq(0)
+        expect(votingRoom.roomNumber).to.eq(1)
       })
 
       it('verifies votes', async () => {
@@ -291,14 +290,15 @@ describe('VotingContract', () => {
           const { votingContract, directoryContract, secondSigner } = await loadFixture(fixture)
           await votingContract.initializeVotingRoom(1, publicKeys[0], BigNumber.from(100))
           await voteAndFinalize(1, 1, secondSigner, votingContract)
-          expect((await votingContract.votingRooms(0)).slice(2)).to.deep.eq([
-            1,
-            true,
-            publicKeys[0],
-            BigNumber.from(200),
-            BigNumber.from(0),
-            BigNumber.from(1),
-          ])
+
+          const votingRoom = await votingContract.votingRooms(0)
+          expect(votingRoom.voteType).to.eq(1)
+          expect(votingRoom.finalized).to.eq(true)
+          expect(votingRoom.community).to.eq(publicKeys[0])
+          expect(votingRoom.totalVotesFor).to.eq(200)
+          expect(votingRoom.totalVotesAgainst).to.eq(0)
+          expect(votingRoom.roomNumber).to.eq(1)
+
           expect(await directoryContract.getCommunities()).to.deep.eq([publicKeys[0]])
         })
 
@@ -341,25 +341,25 @@ describe('VotingContract', () => {
     it('getActiveVotingRoom', async () => {
       const { votingContract } = await loadFixture(fixture)
       await votingContract.initializeVotingRoom(1, publicKeys[0], BigNumber.from(100))
-      expect((await votingContract.getActiveVotingRoom(publicKeys[0])).slice(2)).to.deep.eq([
-        1,
-        false,
-        publicKeys[0],
-        BigNumber.from(100),
-        BigNumber.from(0),
-        BigNumber.from(1),
-      ])
+
+      const votingRoom1 = await votingContract.getActiveVotingRoom(publicKeys[0])
+      expect(votingRoom1.voteType).to.eq(1)
+      expect(votingRoom1.finalized).to.eq(false)
+      expect(votingRoom1.community).to.eq(publicKeys[0])
+      expect(votingRoom1.totalVotesFor).to.eq(100)
+      expect(votingRoom1.totalVotesAgainst).to.eq(0)
+      expect(votingRoom1.roomNumber).to.eq(1)
 
       await time.increase(10000)
       await votingContract.initializeVotingRoom(1, publicKeys[1], BigNumber.from(100))
-      expect((await votingContract.getActiveVotingRoom(publicKeys[1])).slice(2)).to.deep.eq([
-        1,
-        false,
-        publicKeys[1],
-        BigNumber.from(100),
-        BigNumber.from(0),
-        BigNumber.from(2),
-      ])
+
+      const votingRoom2 = await votingContract.getActiveVotingRoom(publicKeys[1])
+      expect(votingRoom2.voteType).to.eq(1)
+      expect(votingRoom2.finalized).to.eq(false)
+      expect(votingRoom2.community).to.eq(publicKeys[1])
+      expect(votingRoom2.totalVotesFor).to.eq(100)
+      expect(votingRoom2.totalVotesAgainst).to.eq(0)
+      expect(votingRoom2.roomNumber).to.eq(2)
     })
 
     it('get active votes', async () => {
@@ -409,14 +409,13 @@ describe('VotingContract', () => {
         .to.emit(votingContract, 'NotEnoughToken')
         .withArgs(1, secondSigner.address)
 
-      await expect((await votingContract.votingRooms(0)).slice(2)).to.deep.eq([
-        1,
-        false,
-        publicKeys[0],
-        BigNumber.from(100),
-        BigNumber.from(0),
-        BigNumber.from(1),
-      ])
+      const votingRoom = await votingContract.votingRooms(0)
+      expect(votingRoom.voteType).to.eq(1)
+      expect(votingRoom.finalized).to.eq(false)
+      expect(votingRoom.community).to.eq(publicKeys[0])
+      expect(votingRoom.totalVotesFor).to.eq(100)
+      expect(votingRoom.totalVotesAgainst).to.eq(0)
+      expect(votingRoom.roomNumber).to.eq(1)
     })
 
     it('success', async () => {
@@ -424,14 +423,14 @@ describe('VotingContract', () => {
       const votes = await getSignedVotes(firstSigner, secondSigner, thirdSigner)
       await votingContract.initializeVotingRoom(1, publicKeys[0], BigNumber.from(100))
       await votingContract.castVotes(votes)
-      expect((await votingContract.votingRooms(0)).slice(2)).to.deep.eq([
-        1,
-        false,
-        publicKeys[0],
-        BigNumber.from(200),
-        BigNumber.from(100),
-        BigNumber.from(1),
-      ])
+
+      const votingRoom = await votingContract.votingRooms(0)
+      expect(votingRoom.voteType).to.eq(1)
+      expect(votingRoom.finalized).to.eq(false)
+      expect(votingRoom.community).to.eq(publicKeys[0])
+      expect(votingRoom.totalVotesFor).to.eq(200)
+      expect(votingRoom.totalVotesAgainst).to.eq(100)
+      expect(votingRoom.roomNumber).to.eq(1)
     })
 
     it('double vote', async () => {
@@ -440,14 +439,14 @@ describe('VotingContract', () => {
       await votingContract.initializeVotingRoom(1, publicKeys[0], BigNumber.from(100))
       await votingContract.castVotes(votes)
       await votingContract.castVotes(votes)
-      expect((await votingContract.votingRooms(0)).slice(2)).to.deep.eq([
-        1,
-        false,
-        publicKeys[0],
-        BigNumber.from(200),
-        BigNumber.from(100),
-        BigNumber.from(1),
-      ])
+
+      const votingRoom = await votingContract.votingRooms(0)
+      expect(votingRoom.voteType).to.eq(1)
+      expect(votingRoom.finalized).to.eq(false)
+      expect(votingRoom.community).to.eq(publicKeys[0])
+      expect(votingRoom.totalVotesFor).to.eq(200)
+      expect(votingRoom.totalVotesAgainst).to.eq(100)
+      expect(votingRoom.roomNumber).to.eq(1)
     })
 
     it('none existent room', async () => {
