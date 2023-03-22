@@ -6,8 +6,8 @@ message WakuVote {
   string vote = 2;
   bytes  sntAmount = 3;
   string sign = 4;
-  uint32 nonce = 5;
-  uint64 sessionID = 6;
+  uint32 timestamp = 5;
+  uint64 roomID = 6;
 }
 
 message WakuFeature {

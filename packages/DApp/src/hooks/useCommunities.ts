@@ -34,11 +34,16 @@ export function useCommunities(publicKeys: string[]) {
             const communityHistory = communitiesHistories[idx]?.[0]
             if (communityHistory && communityHistory.length > 0) {
               const votingHistory = communityHistory.map((room: any) => {
-                const endAt = new Date(room[1].toNumber() * 1000)
+                const endAt = new Date(room.endAt.toNumber() * 1000)
                 return {
-                  ID: room[7].toNumber(),
-                  type: room[2] === 1 ? 'Add' : 'Remove',
-                  result: endAt > new Date() ? 'Ongoing' : room[5].gt(room[6]) ? 'Passed' : 'Failed',
+                  ID: room.roomNumber.toNumber(),
+                  type: room.voteType === 1 ? 'Add' : 'Remove',
+                  result:
+                    endAt > new Date()
+                      ? 'Ongoing'
+                      : room.totalVotesFor.gt(room.totalVotesAgainst)
+                      ? 'Passed'
+                      : 'Failed',
                   date: endAt,
                 }
               })

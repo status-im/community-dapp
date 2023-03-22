@@ -14,7 +14,8 @@ export function useSendWakuVote() {
 
   const sendWakuVote = useCallback(
     async (voteAmount: number, room: number, type: number) => {
-      const msg = await createWakuVote(account, library?.getSigner(), room, voteAmount, type, getTypedVote)
+      const timestamp = Math.floor(Date.now() / 1000)
+      const msg = await createWakuVote(account, library?.getSigner(), room, voteAmount, type, timestamp, getTypedVote)
       if (msg) {
         if (waku) {
           await waku.lightPush.push(new EncoderV0(config.wakuTopic + room.toString()), { payload: msg })
