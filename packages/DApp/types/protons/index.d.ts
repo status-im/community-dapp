@@ -4,10 +4,10 @@ declare module 'protons' {
         vote: string
         sntAmount: Uint8Array
         sign: string
-        nonce: number
-        sessionID: number
+        timestamp: number
+        roomID: number
     }
-    
+
     export type WakuFeature = {
         voter: string
         sntAmount: Uint8Array

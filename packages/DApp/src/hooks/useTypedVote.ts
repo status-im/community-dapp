@@ -9,7 +9,7 @@ export function useTypedVote() {
   const { votingContract } = useContracts()
 
   const getTypedVote = useCallback(
-    (data: [string, BigNumber, BigNumber]) => {
+    (data: [string, BigNumber, BigNumber, BigNumber]) => {
       return {
         types: {
           EIP712Domain: [
@@ -22,6 +22,7 @@ export function useTypedVote() {
             { name: 'roomIdAndType', type: 'uint256' },
             { name: 'sntAmount', type: 'uint256' },
             { name: 'voter', type: 'address' },
+            { name: 'timestamp', type: 'uint256' },
           ],
         },
         primaryType: 'Vote',
@@ -35,6 +36,7 @@ export function useTypedVote() {
           roomIdAndType: data[1].toHexString(),
           sntAmount: data[2].toHexString(),
           voter: data[0],
+          timestamp: data[3].toHexString(),
         },
       } as TypedVote
     },

@@ -5,8 +5,8 @@ export type WakuVoteData = {
   address: string
   vote: string
   sign: string
-  nonce: number
-  sessionID: number
+  timestamp: number
+  roomID: number
 }
 
 export type WakuFeatureData = {

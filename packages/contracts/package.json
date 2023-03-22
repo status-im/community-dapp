@@ -10,7 +10,7 @@
     "lint": "yarn lint:prettier --check && yarn lint:solhint && yarn lint:eslint",
     "lint:fix": "yarn lint:prettier --write && yarn lint:eslint --fix",
     "lint:eslint": "eslint './test/**/*.ts'",
-    "lint:prettier": "yarn prettier './{contracts,test}/**/*.{ts,sol}'",
+    "lint:prettier": "yarn prettier './{contracts,test,deploy}/**/*.{ts,sol}'",
     "lint:solhint": "yarn solhint -f table contracts/**/*.sol",
     "flatten": "hardhat flatten",
     "test": "hardhat test"

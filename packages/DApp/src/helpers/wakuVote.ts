@@ -14,27 +14,29 @@ function getContractParameters(
   address: string,
   room: number,
   type: number,
-  sntAmount: number
-): [string, BigNumber, BigNumber] {
-  return [address, BigNumber.from(room).mul(2).add(type), BigNumber.from(sntAmount)]
+  sntAmount: number,
+  timestamp: number
+): [string, BigNumber, BigNumber, BigNumber] {
+  return [address, BigNumber.from(room).mul(2).add(type), BigNumber.from(sntAmount), BigNumber.from(timestamp)]
 }
 
 export function filterVerifiedVotes(
   messages: WakuVoteData[] | undefined,
   alreadyVoted: string[],
-  getTypedData: (data: [string, BigNumber, BigNumber]) => TypedVote
+  getTypedData: (data: [string, BigNumber, BigNumber, BigNumber]) => TypedVote
 ) {
   if (!messages) {
     return []
   }
-  const verified: [string, BigNumber, BigNumber, string, string][] = []
+  const verified: [string, BigNumber, BigNumber, BigNumber, string, string][] = []
 
   messages.forEach((msg) => {
     const params = getContractParameters(
       msg.address,
-      msg.sessionID,
+      msg.roomID,
       msg.vote == 'yes' ? 1 : 0,
-      msg.sntAmount.toNumber()
+      msg.sntAmount.toNumber(),
+      msg.timestamp
     )
 
     if (utils.getAddress(recoverAddress(getTypedData(params), msg.sign)) == msg.address) {
@@ -55,7 +57,7 @@ function decodeWakuVote(msg: WakuMessage): WakuVoteData | undefined {
       return undefined
     }
     const data = proto.WakuVote.decode(msg.payload)
-    if (data && data.address && data.nonce && data.sessionID && data.sign && data.sntAmount && data.vote) {
+    if (data && data.address && data.timestamp && data.roomID && data.sign && data.sntAmount && data.vote) {
       return { ...data, sntAmount: BigNumber.from(data.sntAmount) }
     } else {
       return undefined
@@ -86,7 +88,8 @@ export async function createWakuVote(
   room: number,
   voteAmount: number,
   type: number,
-  getTypedData: (data: [string, BigNumber, BigNumber]) => any,
+  timestamp: number,
+  getTypedData: (data: [string, BigNumber, BigNumber, BigNumber]) => any,
   sig?: string
 ) {
   if (!account || !signer) {
@@ -99,7 +102,7 @@ export async function createWakuVote(
     return undefined
   }
 
-  const message = getContractParameters(account, room, type, voteAmount)
+  const message = getContractParameters(account, room, type, voteAmount, timestamp)
   const data = getTypedData(message)
 
   const signature = sig ? sig : await provider?.send('eth_signTypedData_v3', [account, JSON.stringify(data)])
@@ -109,8 +112,8 @@ export async function createWakuVote(
       vote: type == 1 ? 'yes' : 'no',
       sntAmount: utils.arrayify(BigNumber.from(voteAmount)),
       sign: signature,
-      nonce: 1,
-      sessionID: room,
+      timestamp: timestamp,
+      roomID: room,
     })
 
     return payload

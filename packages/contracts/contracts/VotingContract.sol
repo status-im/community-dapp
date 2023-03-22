@@ -14,8 +14,8 @@ contract VotingContract {
     using SafeMath for uint256;
 
     enum VoteType {
-        REMOVE,
-        ADD
+        AGAINST,
+        FOR
     }
 
     struct Vote {
@@ -26,6 +26,8 @@ contract VotingContract {
 
     struct VotingRoom {
         uint256 startBlock;
+        uint256 startAt;
+        uint256 verificationStartAt;
         uint256 endAt;
         VoteType voteType;
         bool finalized;
@@ -39,22 +41,26 @@ contract VotingContract {
         address voter;
         uint256 roomIdAndType;
         uint256 sntAmount;
+        uint256 timestamp;
         bytes32 r;
         bytes32 vs;
     }
 
     event VotingRoomStarted(uint256 roomId, bytes publicKey);
+    event VotingRoomVerificationStarted(uint256 roomId, bytes publicKey);
     event VotingRoomFinalized(uint256 roomId, bytes publicKey, bool passed, VoteType voteType);
 
     event VoteCast(uint256 roomId, address voter);
     event NotEnoughToken(uint256 roomId, address voter);
     event AlreadyVoted(uint256 roomId, address voter);
+    event InvalidSignature(uint256 roomId, address voter);
 
     address public owner;
     Directory public directory;
     IERC20 public token;
 
     uint256 public votingLength;
+    uint256 public votingVerificationLength;
     uint256 public timeBetweenVoting;
 
     VotingRoom[] public votingRooms;
@@ -89,21 +95,23 @@ contract VotingContract {
             );
     }
 
-    bytes32 public constant VOTE_TYPEHASH = keccak256('Vote(uint256 roomIdAndType,uint256 sntAmount,address voter)');
+    bytes32 public constant VOTE_TYPEHASH =
+        keccak256('Vote(uint256 roomIdAndType,uint256 sntAmount,address voter,uint256 timestamp)');
 
     function hash(SignedVote calldata vote) internal pure returns (bytes32) {
-        return keccak256(abi.encode(VOTE_TYPEHASH, vote.roomIdAndType, vote.sntAmount, vote.voter));
+        return keccak256(abi.encode(VOTE_TYPEHASH, vote.roomIdAndType, vote.sntAmount, vote.voter, vote.timestamp));
     }
 
-    function verify(SignedVote calldata vote) internal view returns (bool) {
+    function verifySignature(SignedVote calldata vote) internal view returns (bool) {
         bytes32 digest = keccak256(abi.encodePacked('\x19\x01', DOMAIN_SEPARATOR, hash(vote)));
         return digest.recover(vote.r, vote.vs) == vote.voter;
     }
 
-    constructor(IERC20 _address, uint256 _votingLength, uint256 _timeBetweenVoting) {
+    constructor(IERC20 _address, uint256 _votingLength, uint256 _votingVerificationLength, uint256 _timeBetweenVoting) {
         owner = msg.sender;
         token = _address;
         votingLength = _votingLength;
+        votingVerificationLength = _votingVerificationLength;
         timeBetweenVoting = _timeBetweenVoting;
         DOMAIN_SEPARATOR = hash(
             EIP712Domain({
@@ -172,10 +180,10 @@ contract VotingContract {
 
     function initializeVotingRoom(VoteType voteType, bytes calldata publicKey, uint256 voteAmount) public {
         require(activeRoomIDByCommunityID[publicKey] == 0, 'vote already ongoing');
-        if (voteType == VoteType.REMOVE) {
+        if (voteType == VoteType.AGAINST) {
             require(directory.isCommunityInDirectory(publicKey), 'Community not in directory');
         }
-        if (voteType == VoteType.ADD) {
+        if (voteType == VoteType.FOR) {
             require(!directory.isCommunityInDirectory(publicKey), 'Community already in directory');
         }
         uint256 historyLength = roomIDsByCommunityID[publicKey].length;
@@ -192,13 +200,15 @@ contract VotingContract {
 
         activeRoomIDByCommunityID[publicKey] = votingRoomID;
         roomIDsByCommunityID[publicKey].push(votingRoomID);
-        votesByRoomID[votingRoomID].push(Vote({ voter: msg.sender, voteType: VoteType.ADD, sntAmount: voteAmount }));
+        votesByRoomID[votingRoomID].push(Vote({ voter: msg.sender, voteType: VoteType.FOR, sntAmount: voteAmount }));
         votedAddressesByRoomID[votingRoomID][msg.sender] = true;
 
         votingRooms.push(
             VotingRoom({
                 startBlock: block.number,
-                endAt: block.timestamp.add(votingLength),
+                startAt: block.timestamp,
+                verificationStartAt: block.timestamp.add(votingLength),
+                endAt: block.timestamp.add(votingLength + votingVerificationLength),
                 voteType: voteType,
                 finalized: false,
                 community: publicKey,
@@ -220,7 +230,7 @@ contract VotingContract {
         for (uint256 i = 0; i < votesByRoomID[votingRoom.roomNumber].length; i++) {
             Vote storage vote = votesByRoomID[votingRoom.roomNumber][i];
             if (token.balanceOf(vote.voter) >= vote.sntAmount) {
-                if (vote.voteType == VoteType.ADD) {
+                if (vote.voteType == VoteType.FOR) {
                     votingRoom.totalVotesFor = votingRoom.totalVotesFor.add(vote.sntAmount);
                 } else {
                     votingRoom.totalVotesAgainst = votingRoom.totalVotesAgainst.add(vote.sntAmount);
@@ -233,7 +243,7 @@ contract VotingContract {
     }
 
     function _populateDirectory(VotingRoom storage votingRoom) private {
-        if (votingRoom.voteType == VoteType.ADD) {
+        if (votingRoom.voteType == VoteType.FOR) {
             directory.addCommunity(votingRoom.community);
         } else {
             directory.removeCommunity(votingRoom.community);
@@ -258,36 +268,46 @@ contract VotingContract {
         emit VotingRoomFinalized(roomId, votingRoom.community, passed, votingRoom.voteType);
     }
 
+    function castVote(SignedVote calldata vote) private {
+        if (!verifySignature(vote)) {
+            emit InvalidSignature(vote.roomIdAndType >> 1, vote.voter);
+            return;
+        }
+
+        uint256 roomId = vote.roomIdAndType >> 1;
+        VotingRoom storage room = _getVotingRoom(roomId);
+
+        require(block.timestamp < room.endAt, 'vote closed');
+        require(!room.finalized, 'room finalized');
+        require(vote.timestamp < room.verificationStartAt, 'invalid vote timestamp');
+        require(vote.timestamp >= room.startAt, 'invalid vote timestamp');
+
+        if (votedAddressesByRoomID[roomId][vote.voter]) {
+            emit AlreadyVoted(roomId, vote.voter);
+            return;
+        }
+
+        if (token.balanceOf(vote.voter) < vote.sntAmount) {
+            emit NotEnoughToken(roomId, vote.voter);
+            return;
+        }
+
+        votedAddressesByRoomID[roomId][vote.voter] = true;
+        votesByRoomID[roomId].push(
+            Vote({
+                voter: vote.voter,
+                voteType: vote.roomIdAndType & 1 == 1 ? VoteType.FOR : VoteType.AGAINST,
+                sntAmount: vote.sntAmount
+            })
+        );
+
+        _evaluateVotes(room); // TODO: optimise - aggregate votes by room id and only then evaluate
+        emit VoteCast(roomId, vote.voter);
+    }
+
     function castVotes(SignedVote[] calldata votes) public {
         for (uint256 i = 0; i < votes.length; i++) {
-            SignedVote calldata signedVote = votes[i];
-
-            if (verify(signedVote)) {
-                uint256 roomId = signedVote.roomIdAndType >> 1;
-                VotingRoom storage room = _getVotingRoom(roomId);
-
-                require(room.endAt > block.timestamp, 'vote closed');
-                require(!room.finalized, 'room finalized');
-
-                if (votedAddressesByRoomID[roomId][signedVote.voter] == false) {
-                    if (token.balanceOf(signedVote.voter) >= signedVote.sntAmount) {
-                        votedAddressesByRoomID[roomId][signedVote.voter] = true;
-                        votesByRoomID[roomId].push(
-                            Vote({
-                                voter: signedVote.voter,
-                                voteType: signedVote.roomIdAndType & 1 == 1 ? VoteType.ADD : VoteType.REMOVE,
-                                sntAmount: signedVote.sntAmount
-                            })
-                        );
-                        _evaluateVotes(room); // TODO: optimise - aggregate votes by room id and only then evaluate
-                        emit VoteCast(roomId, signedVote.voter);
-                    } else {
-                        emit NotEnoughToken(roomId, signedVote.voter);
-                    }
-                } else {
-                    emit AlreadyVoted(roomId, signedVote.voter);
-                }
-            }
+            castVote(votes[i]);
         }
     }
 }
