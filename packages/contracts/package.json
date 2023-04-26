@@ -5,7 +5,7 @@
   "repository": "git@github.com:EthWorks/status-community-dapp.git",
   "license": "MIT",
   "scripts": {
-    "clean": "hardhat clean",
+    "clean": "hardhat clean && rimraf cache node_modules",
     "build": "hardhat compile",
     "lint": "yarn lint:prettier --check && yarn lint:solhint && yarn lint:eslint",
     "lint:fix": "yarn lint:prettier --write && yarn lint:eslint --fix",
