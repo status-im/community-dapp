@@ -6,8 +6,11 @@ import { CommunityDetail } from '../models/community'
 import { useEffect, useState } from 'react'
 import { useContractCalls } from '@usedapp/core'
 import { useContracts } from './useContracts'
+import { useWaku } from '../providers/waku/provider'
+// import { RequestClient, deserializePublicKey } from '@status-im/js'
 
 export function useCommunities(publicKeys: string[]) {
+  const { waku } = useWaku()
   const { communitiesDetails, dispatch } = useCommunitiesProvider()
   const { featureVotes } = useWakuFeature()
   const { votingContract } = useContracts()
@@ -26,6 +29,27 @@ export function useCommunities(publicKeys: string[]) {
   const [returnCommunities, setReturnCommunities] = useState<(CommunityDetail | undefined)[]>([])
 
   useEffect(() => {
+    if (!waku) {
+      return
+    }
+
+    // note: new instance also means new RequestClient.wakuMessages, or cleared "cache"
+    // const requestClient = new RequestClient(waku)
+
+    // Either
+    // const deserializedPublicKeys = publicKeys.map((publicKey) => deserializePublicKey(publicKey))
+    // const details = await requestClient.fetchCommunityDescription(deserializedPublicKeys)
+    // ...
+
+    // Or
+    // const promises = publicKeys.map(async (publicKey) => {
+    //   const deserializedPublicKey = deserializePublicKey(publicKey)
+    //   const detail = await requestClient.fetchCommunityDescription(deserializedPublicKey)
+    //   // ...
+    // })
+    // await Promise.all(promises)
+
+    // todo: https://github.com/status-im/community-dapp/issues/3
     publicKeys.forEach((publicKey, idx) => {
       if (publicKey && communitiesHistories[idx]) {
         const setCommunity = async () => {
