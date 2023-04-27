@@ -3,7 +3,7 @@ import { DetailedVotingRoom } from '../models/smartContract'
 import { useVotesAggregate } from './useVotesAggregate'
 
 export function useRoomAggregateVotes(room: DetailedVotingRoom, showConfirmModal: boolean) {
-  const { votes } = useVotesAggregate(room.roomNumber)
+  const { votes } = useVotesAggregate(room.roomNumber, room.verificationStartAt, room.startAt)
 
   const [returnRoom, setReturnRoom] = useState(room)
 

@@ -6,7 +6,7 @@ import { addCommas } from '../../helpers/addCommas'
 import { VoteType, voteTypes } from './../../constants/voteTypes'
 import { CurrentVoting } from '../../models/community'
 import { VoteGraphBar } from './VoteGraphBar'
-import { formatTimeLeft } from '../../helpers/fomatTimeLeft'
+import { formatTimeLeft, formatTimeLeftVerification } from '../../helpers/fomatTimeLeft'
 export interface VoteChartProps {
   vote: CurrentVoting
   voteWinner?: number
@@ -81,7 +81,9 @@ export function VoteChart({
             <span style={{ fontWeight: 'normal' }}>SNT</span>
           </span>
         </VoteBox>
-        <TimeLeft className={selectedVote ? '' : 'notModal'}>{formatTimeLeft(vote.timeLeft)}</TimeLeft>
+        <TimeLeft className={selectedVote ? '' : 'notModal'}>
+          {vote.timeLeft > 0 ? formatTimeLeft(vote.timeLeft) : formatTimeLeftVerification(vote.timeLeftVerification)}
+        </TimeLeft>
         <VoteBox
           style={{
             filter: voteWinner && voteWinner === 1 ? 'grayscale(1)' : 'none',

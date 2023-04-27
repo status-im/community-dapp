@@ -40,6 +40,7 @@ export const communities: Array<CommunityDetail> = [
     ],
     currentVoting: {
       timeLeft: 172800,
+      timeLeftVerification: 174800,
       type: 'Remove',
       voteFor: BigNumber.from(16740235),
       voteAgainst: BigNumber.from(6740235),
@@ -140,6 +141,7 @@ export const communities: Array<CommunityDetail> = [
     ],
     currentVoting: {
       timeLeft: 28800,
+      timeLeftVerification: 30800,
       type: 'Add',
       voteFor: BigNumber.from(16740235),
       voteAgainst: BigNumber.from(126740235),
@@ -159,6 +161,7 @@ export const communities: Array<CommunityDetail> = [
     votingHistory: [],
     currentVoting: {
       timeLeft: 0,
+      timeLeftVerification: 0,
       type: 'Add',
       voteFor: BigNumber.from(16740235),
       voteAgainst: BigNumber.from(126740235),

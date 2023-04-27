@@ -10,7 +10,6 @@ import {
 } from '../components/card/CardCommunity'
 import { VoteHistoryTable } from '../components/card/CardCommunity'
 import { CardHeadingEndedVote } from '../components/card/CardVote/CardVote'
-import { VoteSubmitButton } from '../components/card/VoteSubmitButton'
 import { LinkInternal } from '../components/Link'
 import { VoteChart } from '../components/votes/VoteChart'
 import { VotePropose } from '../components/votes/VotePropose'
@@ -22,6 +21,7 @@ import arrowDown from '../assets/images/arrowDown.svg'
 import { useSendWakuVote } from '../hooks/useSendWakuVote'
 import { WrapperBottom, WrapperTop } from '../constants/styles'
 import { useRoomAggregateVotes } from '../hooks/useRoomAggregateVotes'
+import { useVotesAggregate } from '../hooks/useVotesAggregate'
 
 interface CardVoteMobileProps {
   room: DetailedVotingRoom
@@ -34,13 +34,17 @@ export const CardVoteMobile = ({ room }: CardVoteMobileProps) => {
   const selectedVoted = voteTypes['Add'].for
 
   const { votingContract } = useContracts()
+  const voteConstants = voteTypes[vote.type]
+  const { votes } = useVotesAggregate(vote.ID, room.verificationStartAt, room.startAt)
+  const castVotes = useContractFunction(votingContract, 'castVotes')
 
   const finalizeVoting = useContractFunction(votingContract, 'finalizeVotingRoom')
   room = useRoomAggregateVotes(room, false)
 
-  const voteConstants = voteTypes[vote.type]
+  const verificationPeriod =
+    room.verificationStartAt.toNumber() * 1000 - Date.now() < 0 && room.endAt.toNumber() * 1000 - Date.now() > 0
 
-  const winner = getVotingWinner(vote)
+  const winner = verificationPeriod ? 0 : getVotingWinner(vote)
   const [proposingAmount, setProposingAmount] = useState(0)
 
   const [showHistory, setShowHistory] = useState(false)
@@ -56,13 +60,16 @@ export const CardVoteMobile = ({ room }: CardVoteMobileProps) => {
   }
   return (
     <CardVoteBlock>
+      {verificationPeriod && (
+        <CardHeadingEndedVote>Verification period in progress, please verify your vote.</CardHeadingEndedVote>
+      )}
       {winner ? (
         <CardHeadingEndedVote>
           SNT holders have decided <b>{winner == 1 ? voteConstants.against.verb : voteConstants.for.verb}</b> this
           community to the directory!
         </CardHeadingEndedVote>
       ) : (
-        <CardHeadingMobile>{voteConstants.question}</CardHeadingMobile>
+        !verificationPeriod && <CardHeadingMobile>{voteConstants.question}</CardHeadingMobile>
       )}
       <div>
         <WrapperBottom>
@@ -78,12 +85,18 @@ export const CardVoteMobile = ({ room }: CardVoteMobileProps) => {
             />
           </WrapperTop>
         )}
-
-        {winner ? (
+        {verificationPeriod && (
+          <VoteBtnFinal onClick={() => castVotes.send(votes)} disabled={!account}>
+            Verify votes
+          </VoteBtnFinal>
+        )}
+        {Boolean(winner) && (
           <VoteBtnFinal onClick={() => finalizeVoting.send(room.roomNumber)} disabled={!account}>
             Finalize the vote <span>✍️</span>
           </VoteBtnFinal>
-        ) : (
+        )}
+
+        {!verificationPeriod && !winner && (
           <VotesBtns>
             <VoteBtn
               disabled={!account}
@@ -109,8 +122,6 @@ export const CardVoteMobile = ({ room }: CardVoteMobileProps) => {
             </VoteBtn>
           </VotesBtns>
         )}
-
-        <CardVoteBottom>{vote && vote.timeLeft > 0 && <VoteSubmitButton vote={vote} />}</CardVoteBottom>
       </div>
       {!isDisabled && (
         <HistoryLink
@@ -152,13 +163,6 @@ const CardHeadingMobile = styled(CardHeading)`
 const VoteBtnFinal = styled(VoteBtn)`
   width: 100%;
 `
-
-const CardVoteBottom = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`
-
 export const HistoryLink = styled(LinkInternal)`
   width: 120px;
   position: relative;
