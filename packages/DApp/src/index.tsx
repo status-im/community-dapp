@@ -23,7 +23,7 @@ const config = {
     [CustomChainId.OptimismGoerli]: contracts[CustomChainId.OptimismGoerli].multicallContract,
     [ChainId.Hardhat]: contracts[ChainId.Hardhat].multicallContract,
   },
-  supportedChains: [...DEFAULT_CONFIG.supportedChains, CustomChainId.OptimismGoerli],
+
   notifications: {
     checkInterval: 500,
     expirationPeriod: 50000,

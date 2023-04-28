@@ -1,6 +1,6 @@
 import { useCallback } from 'react'
 import { useWaku } from '../providers/waku/provider'
-import { useEthers } from '@usedapp/core'
+import { useEthers, useSigner } from '@usedapp/core'
 import { useConfig } from '../providers/config'
 import { createWakuFeatureMsg } from '../helpers/wakuFeature'
 import { BigNumber } from 'ethers'
@@ -8,7 +8,8 @@ import { EncoderV0 } from 'js-waku/lib/waku_message/version_0'
 
 export function useSendWakuFeature() {
   const { waku } = useWaku()
-  const { account, library, chainId } = useEthers()
+  const signer = useSigner()
+  const { account, chainId } = useEthers()
   const { config } = useConfig()
 
   const sendWakuFeature = useCallback(
@@ -16,13 +17,7 @@ export function useSendWakuFeature() {
       if (!chainId) {
         return
       }
-      const msg = await createWakuFeatureMsg(
-        account,
-        library?.getSigner(),
-        BigNumber.from(voteAmount),
-        publicKey,
-        chainId
-      )
+      const msg = await createWakuFeatureMsg(account, signer, BigNumber.from(voteAmount), publicKey, chainId)
       if (msg) {
         if (waku) {
           // todo: init encoder once
@@ -32,7 +27,7 @@ export function useSendWakuFeature() {
         }
       }
     },
-    [waku, library, account, chainId]
+    [waku, signer, account, chainId]
   )
 
   return sendWakuFeature
