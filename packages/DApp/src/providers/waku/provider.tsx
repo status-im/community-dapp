@@ -1,31 +1,47 @@
-import React, { ReactNode, createContext, useContext, useState } from 'react'
-import { connectWaku } from './connect'
-
+import React, { ReactNode, createContext, useContext, useEffect, useState } from 'react'
+import { Protocols } from 'js-waku'
+import { createLightNode } from 'js-waku/lib/create_waku'
+import { PeerDiscoveryStaticPeers } from 'js-waku/lib/peer_discovery_static_list'
+import { waitForRemotePeer } from 'js-waku/lib/wait_for_remote_peer'
 import type { WakuLight } from 'js-waku/lib/interfaces'
-import { useConfig } from '../config'
+import { peers } from '../../constants/peers'
+import { config } from '../../config'
 
-const WakuContext = createContext<{ waku: WakuLight | undefined; setWaku: (waku: WakuLight) => void }>({
-  waku: undefined,
-  setWaku: (waku: WakuLight) => waku,
-})
+const WakuContext = createContext<WakuLight | undefined>(undefined)
 
-export function useWaku() {
-  const { setWaku, waku } = useContext(WakuContext)
-  const [creatingWaku, setCreatingWaku] = useState(false)
-  const { config } = useConfig()
-  if (!waku && !creatingWaku) {
-    setCreatingWaku(true)
-    connectWaku(setWaku, config.fleet)
-  }
-  return { waku }
-}
-
-interface WakuProviderProps {
+interface Props {
   children: ReactNode
 }
 
-export function WakuProvider({ children }: WakuProviderProps) {
-  const [waku, setWaku] = useState<WakuLight | undefined>(undefined)
+export function WakuProvider({ children }: Props) {
+  const [client, setClient] = useState<WakuLight>()
 
-  return <WakuContext.Provider value={{ waku, setWaku }} children={children} />
+  useEffect(() => {
+    const start = async () => {
+      const waku = await createLightNode({
+        defaultBootstrap: false,
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        emitSelf: true,
+        pingKeepAlive: 0,
+        relayKeepAlive: 0,
+        libp2p: {
+          peerDiscovery: [new PeerDiscoveryStaticPeers(peers[config.wakuConfig.environment], { maxPeers: 1 })],
+        },
+      })
+      await waku.start()
+      await waitForRemotePeer(waku, [Protocols.Store, Protocols.LightPush], 10 * 1000)
+
+      setClient(waku)
+    }
+
+    start()
+  }, [])
+
+  return <WakuContext.Provider value={client}>{children}</WakuContext.Provider>
+}
+
+export function useWaku() {
+  const waku = useContext(WakuContext)
+  return { waku }
 }
