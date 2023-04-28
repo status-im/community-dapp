@@ -1,5 +1,6 @@
 import { useEthers, useTokenBalance } from '@usedapp/core'
 import { contracts } from '../constants/contracts'
+import { contracts } from '../constants/contracts'
 import { BigNumber } from 'ethers'
 import { useEffect, useState } from 'react'
 
