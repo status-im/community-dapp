@@ -1,14 +1,13 @@
 import { useState, useEffect } from 'react'
 import { useWaku } from '../providers/waku/provider'
 import { useContractCall } from '@usedapp/core'
-import { useConfig } from '../providers/config'
+import { config } from '../config'
 import { useContracts } from '../hooks/useContracts'
 
 import wakuMessage from '../helpers/wakuVote'
 import { useTypedVote } from './useTypedVote'
 
 export function useVotesAggregate(room: number | undefined) {
-  const { config } = useConfig()
   const { votingContract } = useContracts()
   const [alreadyVotedList] =
     useContractCall({
@@ -23,7 +22,7 @@ export function useVotesAggregate(room: number | undefined) {
   useEffect(() => {
     const accumulateVotes = async () => {
       if (waku && alreadyVotedList && room) {
-        const messages = await wakuMessage.receive(waku, config.wakuTopic, room)
+        const messages = await wakuMessage.receive(waku, config.wakuConfig.wakuTopic, room)
         const verifiedMessages = wakuMessage.filterVerified(messages, alreadyVotedList, getTypedVote)
         if (votesToSend.length != verifiedMessages.length) {
           setVotesToSend(verifiedMessages)

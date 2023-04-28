@@ -6,7 +6,7 @@ import { Modal } from './Modal'
 import { LinkExternal } from './Link'
 import statusLogo from '../assets/images/statusLogo.svg'
 import { ColumnFlexDiv } from '../constants/styles'
-import { useConfig } from '../providers/config'
+import { config } from '../config'
 
 export type ConnectButtonProps = {
   text?: string
@@ -16,7 +16,6 @@ export type ConnectButtonProps = {
 export function ConnectButton({ text, className }: ConnectButtonProps) {
   const [showModal, setShowModal] = useState(false)
   const { activateBrowserWallet } = useEthers()
-  const { config } = useConfig()
 
   const activateWallet = () => {
     if (config.statusWalletRequired && !(window as any).ethereum?.isStatus) {
