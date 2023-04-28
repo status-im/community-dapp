@@ -1,12 +1,11 @@
 import { useEthers } from '@usedapp/core'
-import { useConfig } from '../providers/config'
+import { contracts } from '../constants/contracts'
 import { Contract } from 'ethers'
 import { Interface } from '@ethersproject/abi'
 import { VotingContract, Directory } from '@status-community-dapp/contracts/abi'
 import { useEffect, useState } from 'react'
 
 export function useContracts() {
-  const { config } = useConfig()
   const { chainId } = useEthers()
 
   const [votingContract, setVotingContract] = useState(
@@ -19,7 +18,8 @@ export function useContracts() {
 
   useEffect(() => {
     if (chainId) {
-      const chainConfig = config.contracts[chainId]
+      // @ts-expect-error
+      const chainConfig = contracts[chainId]
       if (chainConfig) {
         setVotingContract(new Contract(chainConfig.votingContract, new Interface(VotingContract.abi)))
         setDirectoryContract(new Contract(chainConfig.directoryContract, new Interface(Directory.abi)))
