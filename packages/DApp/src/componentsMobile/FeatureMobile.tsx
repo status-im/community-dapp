@@ -47,9 +47,11 @@ export function FeatureMobile() {
         <MobileBlock>
           <FeatureHeading>{`Feature ${community.name}?`}</FeatureHeading>
           <VotePropose setProposingAmount={setProposingAmount} proposingAmount={proposingAmount} />
-          <FeatureBtn disabled={disabled}>
+          <FeatureBtn disabled>Coming soon!</FeatureBtn>
+
+          {/* <FeatureBtn disabled={disabled}>
             Feature this community! <span style={{ fontSize: '20px' }}>⭐️</span>
-          </FeatureBtn>
+          </FeatureBtn> */}
           {currentVoting && (
             <ColumnFlexDiv>
               <VoteSendingBtn onClick={() => history.push(`/votingRoom/${currentVoting.ID}`)}>
