@@ -36,9 +36,6 @@ export const CardVote = ({ room, hideModalFunction }: CardVoteProps) => {
 
   room = useRoomAggregateVotes(room, showConfirmModal)
 
-  console.log('room')
-  console.log(room)
-
   const finalizeVoting = useContractFunction(votingContract, 'finalizeVotingRoom')
 
   const setNext = (val: boolean) => {

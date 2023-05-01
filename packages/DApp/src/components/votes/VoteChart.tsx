@@ -38,9 +38,6 @@ export function VoteChart({
   const verificationPeriod =
     room.verificationStartAt.toNumber() * 1000 - Date.now() < 0 && room.endAt.toNumber() * 1000 - Date.now() > 0
 
-  console.log(votesForUnverified)
-  console.log(votesAgainstUnverified)
-
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth < 600) {
