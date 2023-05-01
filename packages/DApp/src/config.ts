@@ -3,14 +3,6 @@ import { ChainId, OptimismGoerli, Optimism, Config as DAppConfig, Localhost, Har
 
 const version = '0.0.5'
 
-declare global {
-  namespace NodeJS {
-    interface ProcessEnv {
-      ENV: 'localhost' | 'development' | 'production'
-    }
-  }
-}
-
 export interface Config {
   wakuConfig: {
     environment: 'test' | 'production'
