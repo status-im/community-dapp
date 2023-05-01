@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { VoteModal } from './../VoteModal'
 import { VoteChart } from './../../votes/VoteChart'
 import { voteTypes } from './../../../constants/voteTypes'
@@ -36,6 +36,9 @@ export const CardVote = ({ room, hideModalFunction }: CardVoteProps) => {
 
   room = useRoomAggregateVotes(room, showConfirmModal)
 
+  console.log('room')
+  console.log(room)
+
   const finalizeVoting = useContractFunction(votingContract, 'finalizeVotingRoom')
 
   const setNext = (val: boolean) => {
@@ -69,6 +72,7 @@ export const CardVote = ({ room, hideModalFunction }: CardVoteProps) => {
             proposingAmount={proposingAmount}
             setShowConfirmModal={setNext}
             setProposingAmount={setProposingAmount}
+            fullRoom={room}
           />{' '}
         </Modal>
       )}
@@ -80,6 +84,7 @@ export const CardVote = ({ room, hideModalFunction }: CardVoteProps) => {
             selectedVote={selectedVoted}
             setShowModal={hideConfirm}
             proposingAmount={proposingAmount}
+            room={room}
           />
         </Modal>
       )}
@@ -100,7 +105,7 @@ export const CardVote = ({ room, hideModalFunction }: CardVoteProps) => {
       )}
 
       <div>
-        <VoteChart vote={vote} voteWinner={winner} tabletMode={hideModalFunction} />
+        <VoteChart vote={vote} voteWinner={winner} tabletMode={hideModalFunction} room={room} />
         {verificationPeriod && (
           <VoteBtnFinal onClick={() => castVotes.send(votes)} disabled={!account}>
             Verify votes

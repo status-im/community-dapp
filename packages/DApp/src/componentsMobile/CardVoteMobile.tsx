@@ -73,7 +73,7 @@ export const CardVoteMobile = ({ room }: CardVoteMobileProps) => {
       )}
       <div>
         <WrapperBottom>
-          <VoteChart vote={vote} voteWinner={winner} isAnimation={true} />
+          <VoteChart vote={vote} voteWinner={winner} isAnimation={true} room={room} />
         </WrapperBottom>
         {!winner && (
           <WrapperTop>

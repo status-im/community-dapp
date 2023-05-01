@@ -24,7 +24,7 @@ export function VotePropose({ vote, selectedVote, proposingAmount, disabled, set
   const [displayAmount, setDisplayAmount] = useState(addCommas(proposingAmount) + ' SNT')
 
   useEffect(() => {
-    const initialProposing = vote?.type === 'Remove' && availableAmount > 2000000 ? 2000000 : 0
+    const initialProposing = availableAmount > 2000000 ? 2000000 : availableAmount
     setProposingAmount(initialProposing)
   }, [])
 

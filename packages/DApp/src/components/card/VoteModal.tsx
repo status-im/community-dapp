@@ -7,6 +7,7 @@ import { VotePropose } from '../votes/VotePropose'
 import { VoteType } from '../../constants/voteTypes'
 import { useSendWakuVote } from '../../hooks/useSendWakuVote'
 import { ColumnFlexDiv } from '../../constants/styles'
+import { DetailedVotingRoom } from '../../models/smartContract'
 
 export interface VoteModalProps {
   vote: CurrentVoting
@@ -15,6 +16,7 @@ export interface VoteModalProps {
   room: number
   setShowConfirmModal: (show: boolean) => void
   setProposingAmount: (val: number) => void
+  fullRoom: DetailedVotingRoom
 }
 
 export function VoteModal({
@@ -24,13 +26,14 @@ export function VoteModal({
   proposingAmount,
   setShowConfirmModal,
   setProposingAmount,
+  fullRoom,
 }: VoteModalProps) {
   const disabled = proposingAmount === 0
   const sendWakuVote = useSendWakuVote()
 
   return (
     <ColumnFlexDiv>
-      <VoteChart vote={vote} proposingAmount={proposingAmount} selectedVote={selectedVote} />
+      <VoteChart vote={vote} proposingAmount={proposingAmount} selectedVote={selectedVote} room={fullRoom} />
       <VotePropose
         vote={vote}
         selectedVote={selectedVote}
