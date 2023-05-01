@@ -17,7 +17,8 @@ export function VotingRoomMobile() {
     method: 'votingRooms',
     args: [Number(id) - 1],
   }) as any
-  const [details] = useCommunities([votingRoom?.community])
+
+  const [details] = useCommunities(votingRoom?.community ? [votingRoom.community] : []) ?? []
   const [detailedVotingRoom, setDetailedVotingRoom] = useState<DetailedVotingRoom | undefined>(undefined)
 
   useEffect(() => {

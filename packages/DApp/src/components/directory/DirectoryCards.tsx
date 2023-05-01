@@ -5,7 +5,7 @@ import { FilterList } from '../Filter'
 import { Search } from '../Input'
 import { PageBar } from '../PageBar'
 import { DirectorySortingOptions } from '../../constants/SortingOptions'
-import { WeeklyFeature } from '../WeeklyFeature'
+// import { WeeklyFeature } from '../WeeklyFeature'
 import { DirectoryCardSkeleton } from './DirectoryCardSkeleton'
 import { useDirectoryCommunities } from '../../hooks/useDirectoryCommunities'
 import { SearchEmpty } from '../SearchEmpty'
@@ -13,7 +13,25 @@ import { DirectoryCard } from './DirectoryCard'
 export function DirectoryCards() {
   const [filterKeyword, setFilterKeyword] = useState('')
   const [sortedBy, setSortedBy] = useState(DirectorySortingEnum.IncludedRecently)
-  const communities = useDirectoryCommunities(filterKeyword, sortedBy)
+  const [communities, publicKeys] = useDirectoryCommunities(filterKeyword, sortedBy)
+
+  const renderCommunities = () => {
+    if (!publicKeys) {
+      return null
+    }
+
+    if (publicKeys.length === 0) {
+      return <SearchEmpty />
+    }
+
+    if (communities.length === 0) {
+      return publicKeys.map((publicKey: string) => {
+        return <DirectoryCardSkeleton key={publicKey} />
+      })
+    }
+
+    return communities.map((community) => <DirectoryCard key={community!.publicKey} community={community!} />)
+  }
 
   return (
     <>
@@ -26,17 +44,8 @@ export function DirectoryCards() {
         />
         <FilterList value={sortedBy} setValue={setSortedBy} options={DirectorySortingOptions} />
       </PageBar>
-      <WeeklyFeature endDate={new Date('07/30/2021')} />
-      <Voting>
-        {communities.map((community, idx) => {
-          if (community) {
-            return <DirectoryCard key={community.publicKey} community={community} />
-          } else {
-            return <DirectoryCardSkeleton key={idx} />
-          }
-        })}
-        {communities.length === 0 && <SearchEmpty />}
-      </Voting>
+      {/* <WeeklyFeature endDate={new Date('07/30/2021')} /> */}
+      <Voting>{renderCommunities()}</Voting>
     </>
   )
 }

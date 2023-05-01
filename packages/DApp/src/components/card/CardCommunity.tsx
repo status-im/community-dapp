@@ -8,8 +8,9 @@ import { VoteConfirmModal } from './VoteConfirmModal'
 import binIcon from '../../assets/images/bin.svg'
 import { RemoveModal } from './RemoveModal'
 import { CardHeading } from '../Card'
-import { useEthers } from '@usedapp/core'
+import { useEthers, getExplorerAddressLink, ChainId } from '@usedapp/core'
 import { useHistory } from 'react-router'
+import { contracts } from '../../constants/contracts'
 
 interface CardCommunityProps {
   community: CommunityDetail
@@ -26,7 +27,7 @@ export const CardCommunity = ({
   customStyle,
   currentVoting,
 }: CardCommunityProps) => {
-  const { account } = useEthers()
+  const { account, chainId } = useEthers()
 
   const [showHistoryModal, setShowHistoryModal] = useState(false)
   const [showRemoveModal, setShowRemoveModal] = useState(false)
@@ -112,8 +113,16 @@ export const CardCommunity = ({
         </CommunityInfo>
       </Community>
       <CardLinks className={customStyle ? 'notModal' : ''}>
-        <LinkExternal>Visit community</LinkExternal>
-        <LinkExternal>Etherscan</LinkExternal>
+        <LinkExternal href={community.link} target="_blank" rel="noopener noreferrer">
+          Visit community
+        </LinkExternal>
+        <LinkExternal
+          href={getExplorerAddressLink(contracts[chainId as ChainId.Optimism].directoryContract, chainId!)}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Etherscan
+        </LinkExternal>
         <HistoryLink onClick={() => setShowHistoryModal(true)} disabled={isDisabled}>
           Voting history
         </HistoryLink>
