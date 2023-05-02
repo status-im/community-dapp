@@ -24,9 +24,31 @@ async function deployVotingContract(
   return contract
 }
 
-async function deployDirectoryContract(votingContractAddress: string) {
+async function deployFeaturedVotingContract(
+  tokenAddress: string,
+  votingLength: number,
+  votingVerificationLength: number,
+  cooldownPeriod: number,
+  featuredPerVotingCount: number
+) {
+  const contractFactory = await hre.ethers.getContractFactory('FeaturedVotingContract')
+  const contract = await contractFactory.deploy(
+    tokenAddress,
+    votingLength,
+    votingVerificationLength,
+    cooldownPeriod,
+    featuredPerVotingCount
+  )
+  await contract.deployed()
+
+  console.log(`Featured Voting contract deployed with address: ${contract.address}`)
+
+  return contract
+}
+
+async function deployDirectoryContract(votingContractAddress: string, featuredVotingContractAddress: string) {
   const contractFactory = await hre.ethers.getContractFactory('Directory')
-  const contract = await contractFactory.deploy(votingContractAddress, votingContractAddress)
+  const contract = await contractFactory.deploy(votingContractAddress, featuredVotingContractAddress)
   await contract.deployed()
 
   console.log(`Directory contract deployed with address: ${contract.address}`)
@@ -82,9 +104,15 @@ async function obtainTokenAddress(deployer: any, chainId: number): Promise<strin
 async function main() {
   const [deployer] = await hre.ethers.getSigners()
   const network = await hre.ethers.provider.getNetwork()
+
   const votingLengthInSeconds = isTestNetwork(network.chainId) ? 4 * 60 : 14 * 24 * 3600 // 4 minutes or 14 days
   const votingVerificationLengthInSeconds = isTestNetwork(network.chainId) ? 2 * 60 : 7 * 24 * 3600 // 2 minutes or 7 days
   const timeBetweenVotingInSeconds = isTestNetwork(network.chainId) ? 60 : 7 * 24 * 3600 // 1 minute or 7 days
+
+  const featuredVotingLengthInSeconds = isTestNetwork(network.chainId) ? 4 * 60 : 5 * 24 * 3600 // 4 minutes or 5 days
+  const featuredVotingVerificationLengthInSeconds = isTestNetwork(network.chainId) ? 2 * 60 : 2 * 24 * 3600 // 2 minutes or 2 days
+  const cooldownPeriod = isTestNetwork(network.chainId) ? 1 : 3
+  const featuredPerVotingCount = isTestNetwork(network.chainId) ? 3 : 5
 
   console.log(
     `Deploying contracts on the network: ${network.name}(${network.chainId}), with the account: ${deployer.address}`
@@ -101,8 +129,16 @@ async function main() {
     votingVerificationLengthInSeconds,
     timeBetweenVotingInSeconds
   )
-  const directoryContract = await deployDirectoryContract(votingContract.address)
+  const featuredVotingContract = await deployFeaturedVotingContract(
+    tokenAddress,
+    featuredVotingLengthInSeconds,
+    featuredVotingVerificationLengthInSeconds,
+    cooldownPeriod,
+    featuredPerVotingCount
+  )
+  const directoryContract = await deployDirectoryContract(votingContract.address, featuredVotingContract.address)
   await votingContract.setDirectory(directoryContract.address)
+  await featuredVotingContract.setDirectory(directoryContract.address)
 }
 
 // We recommend this pattern to be able to use async/await everywhere
