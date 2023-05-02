@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import { useState } from 'react'
 import styled from 'styled-components'
 import { Colors, ColumnFlexDiv } from '../../constants/styles'
@@ -24,19 +24,19 @@ export function VotePropose({ vote, selectedVote, proposingAmount, disabled, set
   const [displayAmount, setDisplayAmount] = useState(addCommas(proposingAmount) + ' SNT')
 
   useEffect(() => {
-    const initialProposing = availableAmount > 2000000 ? 2000000 : availableAmount
-    setProposingAmount(initialProposing)
-  }, [])
+    setProposingAmount(availableAmount)
+    setDisplayAmount(addCommas(availableAmount) + ' SNT')
+  }, [availableAmount])
 
   let step = 10 ** (Math.floor(Math.log10(availableAmount)) - 2)
   if (availableAmount < 100) {
     step = 1
   }
 
-  const setAvailableAmount = () => {
+  const setAvailableAmount = useCallback(() => {
     setProposingAmount(availableAmount)
     setDisplayAmount(addCommas(availableAmount) + ' SNT')
-  }
+  }, [availableAmount])
 
   const sliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (Number(e.target.value) == step * Math.floor(availableAmount / step)) {

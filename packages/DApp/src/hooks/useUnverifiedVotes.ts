@@ -5,6 +5,8 @@ import { useConfig } from '../providers/config'
 
 import wakuMessage from '../helpers/wakuVote'
 import { validateVote } from '../helpers/validateVote'
+import { useContracts } from './useContracts'
+import { useContractCall } from '@usedapp/core'
 
 type InitialVotes = {
   for: number
@@ -12,14 +14,22 @@ type InitialVotes = {
   voted: string[]
 }
 
-const initialVotes: InitialVotes = {
-  for: 0,
-  against: 0,
-  voted: [],
-}
-
 export function useUnverifiedVotes(room: number | undefined, verificationStartAt: BigNumber, startAt: BigNumber) {
   const { config } = useConfig()
+  const { votingContract } = useContracts()
+  const [alreadyVotedList] =
+    useContractCall({
+      abi: votingContract.interface,
+      address: votingContract.address,
+      method: 'listRoomVoters',
+      args: [room],
+    }) ?? []
+
+  const initialVotes: InitialVotes = {
+    for: 0,
+    against: 0,
+    voted: alreadyVotedList ?? [],
+  }
 
   const { waku } = useWaku()
   const [votesFor, setVotesFor] = useState<number>(initialVotes.for)
@@ -59,7 +69,7 @@ export function useUnverifiedVotes(room: number | undefined, verificationStartAt
       }
     }
     accumulateVotes()
-  }, [waku, room])
+  }, [waku, room, alreadyVotedList])
 
   return { votesFor, votesAgainst }
 }

@@ -62,6 +62,13 @@ export function VoteChart({
   const voteSum = votesFor + votesAgainst
   const graphWidth = (100 * votesAgainst) / voteSum
 
+  const [originalVotesFor] = useState(() =>
+    includeUnverifiedVotes ? vote.voteFor.toNumber() : vote.voteFor.toNumber() + votesForUnverified
+  )
+  const [originalVotesAgainst] = useState(() =>
+    includeUnverifiedVotes ? vote.voteAgainst.toNumber() : vote.voteAgainst.toNumber() + votesAgainstUnverified
+  )
+
   let balanceWidth = graphWidth
 
   if (proposingAmount && selectedVote) {
@@ -90,7 +97,7 @@ export function VoteChart({
           <span>
             {' '}
             {isAnimation && proposingAmount && selectedVote && selectedVote.type === 0 ? (
-              <CountUp end={votesAgainst + proposingAmount} separator="," />
+              <CountUp end={originalVotesAgainst + proposingAmount} separator="," />
             ) : (
               addCommas(votesAgainst)
             )}{' '}
@@ -114,7 +121,7 @@ export function VoteChart({
           <span>
             {' '}
             {isAnimation && proposingAmount && selectedVote && selectedVote.type === 1 ? (
-              <CountUp end={votesFor + proposingAmount} separator="," />
+              <CountUp end={originalVotesFor + proposingAmount} separator="," />
             ) : (
               addCommas(votesFor)
             )}{' '}
