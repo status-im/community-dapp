@@ -1,7 +1,7 @@
 import { useEthers } from '@usedapp/core'
 import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react'
 import { receiveWakuFeature } from '../../helpers/receiveWakuFeature'
-import { useConfig } from '../config'
+import { config } from '../../config'
 import { useWaku } from '../waku/provider'
 
 const WakuFeatureContext = createContext<{
@@ -24,13 +24,12 @@ export function WakuFeatureProvider({ children }: WakuFeatureProviderProps) {
   const [featureVotes, setFeatureVotes] = useState<any>({})
   const [featured, setFeatured] = useState<any[]>([])
   const { waku } = useWaku()
-  const { config } = useConfig()
   const { chainId } = useEthers()
 
   useEffect(() => {
     const get = async () => {
       if (chainId) {
-        const { wakuFeatured, top5 } = await receiveWakuFeature(waku, config.wakuFeatureTopic, chainId)
+        const { wakuFeatured, top5 } = await receiveWakuFeature(waku, config.wakuConfig.wakuFeatureTopic, chainId)
         setFeatureVotes(wakuFeatured)
         setFeatured(top5)
       }

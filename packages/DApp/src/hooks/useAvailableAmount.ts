@@ -1,12 +1,12 @@
 import { useEthers, useTokenBalance } from '@usedapp/core'
-import { useConfig } from '../providers/config'
+import { contracts } from '../constants/contracts'
 import { BigNumber } from 'ethers'
 import { useEffect, useState } from 'react'
 
 export function useAvailableAmount() {
-  const { config } = useConfig()
   const { account, chainId } = useEthers()
-  const tokenBalance = useTokenBalance(config.contracts[chainId ?? 3].tokenContract, account)
+  // @ts-expect-error Ethers does not type chainId
+  const tokenBalance = useTokenBalance(contracts[chainId ?? 3].tokenContract, account)
 
   const [availableAmount, setAvailableAmount] = useState(0)
 
