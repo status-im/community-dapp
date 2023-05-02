@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { BigNumber } from 'ethers'
 import { useWaku } from '../providers/waku/provider'
-import { useConfig } from '../providers/config'
+import { config } from '../config'
 
 import wakuMessage from '../helpers/wakuVote'
 import { validateVote } from '../helpers/validateVote'
@@ -15,7 +15,6 @@ type InitialVotes = {
 }
 
 export function useUnverifiedVotes(room: number | undefined, verificationStartAt: BigNumber, startAt: BigNumber) {
-  const { config } = useConfig()
   const { votingContract } = useContracts()
   const [alreadyVotedList] =
     useContractCall({
@@ -38,7 +37,7 @@ export function useUnverifiedVotes(room: number | undefined, verificationStartAt
   useEffect(() => {
     const accumulateVotes = async () => {
       if (waku && room) {
-        const messages = await wakuMessage.receive(waku, config.wakuTopic, room)
+        const messages = await wakuMessage.receive(waku, config.wakuConfig.wakuTopic, room)
         const validMessages = messages?.filter((message) => validateVote(message, verificationStartAt, startAt))
 
         const votes: InitialVotes =
