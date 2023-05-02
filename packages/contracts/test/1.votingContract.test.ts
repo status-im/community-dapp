@@ -36,7 +36,7 @@ const typedData = {
   domain: {
     name: 'Voting Contract',
     version: '1',
-    chainId: 0,
+    chainId: 31337,
     verifyingContract: '',
   },
 }
@@ -107,14 +107,10 @@ async function fixture() {
 
   await votingContract.setDirectory(directoryContract.address)
 
+  typedData.domain.verifyingContract = votingContract.address
+
   return { votingContract, directoryContract, erc20Contract, firstSigner, secondSigner, thirdSigner }
 }
-
-before(async function () {
-  const { votingContract: voting } = await loadFixture(fixture)
-  typedData.domain.chainId = 31337
-  typedData.domain.verifyingContract = voting.address
-})
 
 describe('VotingContract', () => {
   it('deploys properly', async () => {
