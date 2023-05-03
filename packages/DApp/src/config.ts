@@ -17,7 +17,7 @@ const configs: Record<typeof process.env.ENV, Config> = {
   localhost: {
     statusWalletRequired: false,
     wakuConfig: {
-      environment: 'production',
+      environment: 'test',
       wakuTopic: `/communitiesCuration/localhost/${uuidv4()}/${version}/directory/proto/`,
       wakuFeatureTopic: `/communitiesCuration/localhost/${uuidv4()}/${version}/featured/proto/`,
     },
