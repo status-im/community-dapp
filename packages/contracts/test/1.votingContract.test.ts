@@ -103,7 +103,7 @@ async function fixture() {
   )
 
   const directoryContractFactory = await ethers.getContractFactory('Directory')
-  const directoryContract = await directoryContractFactory.deploy(votingContract.address)
+  const directoryContract = await directoryContractFactory.deploy(votingContract.address, firstSigner.address)
 
   await votingContract.setDirectory(directoryContract.address)
 

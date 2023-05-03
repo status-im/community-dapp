@@ -26,7 +26,7 @@ async function deployVotingContract(
 
 async function deployDirectoryContract(votingContractAddress: string) {
   const contractFactory = await hre.ethers.getContractFactory('Directory')
-  const contract = await contractFactory.deploy(votingContractAddress)
+  const contract = await contractFactory.deploy(votingContractAddress, votingContractAddress)
   await contract.deployed()
 
   console.log(`Directory contract deployed with address: ${contract.address}`)
