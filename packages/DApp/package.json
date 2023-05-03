@@ -14,7 +14,7 @@
     "lint:fix": "yarn lint:prettier --write && yarn lint:eslint --fix",
     "lint:eslint": "eslint './{src,test}/**/*.{ts,tsx}'",
     "lint:prettier": "yarn prettier './{src,test}/**/*.{ts,tsx}'",
-    "clean": "rimraf node_modules"
+    "clean": "rimraf dist node_modules"
   },
   "dependencies": {
     "@status-im/js": "0.2.0",
