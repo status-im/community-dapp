@@ -7,10 +7,8 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "#build": "rm -rf dist && NODE_OPTIONS=--openssl-legacy-provider webpack --mode=production --env ENV=production",
-    "start": "NODE_OPTIONS=--openssl-legacy-provider webpack serve --mode=development --env ENV=development --https",
+    "dev": "NODE_OPTIONS=--openssl-legacy-provider webpack serve --mode=development --env ENV=development --https",
+    "build": "rm -rf dist && NODE_OPTIONS=--openssl-legacy-provider webpack --mode=production --env ENV=production",
     "test": "mocha",
     "lint": "yarn lint:prettier --check && yarn lint:eslint",
     "lint:fix": "yarn lint:prettier --write && yarn lint:eslint --fix",
@@ -77,10 +75,8 @@
     "webpack": "^5.75.0",
     "webpack-cli": "^4.7.0",
     "webpack-dev-server": "^3.11.2",
-    "@vitejs/plugin-react-swc": "^3.0.0",
     "eslint-plugin-react-hooks": "^4.6.0",
-    "eslint-plugin-react-refresh": "^0.3.4",
-    "vite": "^4.3.2"
+    "eslint-plugin-react-refresh": "^0.3.4"
   },
   "resolutions": {
     "ethers": "5.4.1"
