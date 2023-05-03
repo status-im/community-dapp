@@ -17,6 +17,7 @@
     "clean": "rimraf node_modules"
   },
   "dependencies": {
+    "@status-im/js": "0.2.0",
     "@usedapp/core": "^1.2.8",
     "assert": "^2.0.0",
     "buffer": "^6.0.3",
