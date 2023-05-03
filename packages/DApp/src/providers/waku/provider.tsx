@@ -23,8 +23,6 @@ export function WakuProvider({ children }: Props) {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         emitSelf: true,
-        pingKeepAlive: 0,
-        relayKeepAlive: 0,
         libp2p: {
           peerDiscovery: [new PeerDiscoveryStaticPeers(peers[config.wakuConfig.environment], { maxPeers: 1 })],
         },
