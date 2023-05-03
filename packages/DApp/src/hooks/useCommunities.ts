@@ -5,12 +5,12 @@ import { useEffect } from 'react'
 import { useContractCalls } from '@usedapp/core'
 import { useContracts } from './useContracts'
 import { useWaku } from '../providers/waku/provider'
-import { deserializePublicKey } from '@status-im/js'
+import { deserializePublicKey, RequestClient } from '@status-im/js'
 
 export function useCommunities(publicKeys: string[]): CommunityDetail[] {
   const { communitiesDetails, dispatch } = useCommunitiesProvider()
 
-  const { client } = useWaku()
+  const { waku } = useWaku()
   // const { featureVotes } = useWakuFeature()
 
   const { votingContract } = useContracts()
@@ -45,7 +45,7 @@ export function useCommunities(publicKeys: string[]): CommunityDetail[] {
   // }, [communitiesDetails, featureVotes, JSON.stringify(publicKeys)])
 
   useEffect(() => {
-    if (!client || publicKeys.length === 0) return
+    if (!waku || publicKeys.length === 0) return
 
     const fetch = async () => {
       await Promise.all(
@@ -56,7 +56,8 @@ export function useCommunities(publicKeys: string[]): CommunityDetail[] {
             return
           }
 
-          const community = await client.fetchCommunityDescription(deserializedPublicKey)
+          const requestClient = new RequestClient(waku)
+          const community = await requestClient.fetchCommunityDescription(deserializedPublicKey)
 
           if (!community) {
             console.warn(`Community ${deserializedPublicKey} not found`)
@@ -85,7 +86,7 @@ export function useCommunities(publicKeys: string[]): CommunityDetail[] {
     }
 
     fetch()
-  }, [client, JSON.stringify(publicKeys)])
+  }, [waku, JSON.stringify(publicKeys)])
 
   const communities = publicKeys
     .map((publicKey, index) => {
