@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
+
 const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
-// const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
 const webpack = require('webpack')
 
 module.exports = (env) => {
@@ -10,7 +12,7 @@ module.exports = (env) => {
   }
 
   return {
-    entry: './src/index.tsx',
+    entry: './src/main.tsx',
     output: {
       filename: 'index.[fullhash].js',
       path: path.join(__dirname, 'dist'),
@@ -43,7 +45,14 @@ module.exports = (env) => {
               babelrc: false,
               presets: [
                 '@babel/preset-typescript',
-                ['@babel/preset-env', { targets: { browsers: 'chrome 77' }, corejs: { version: '3.26' } }],
+                [
+                  '@babel/preset-env',
+                  {
+                    useBuiltIns: 'entry',
+                    targets: { browsers: 'chrome 77' },
+                    corejs: { version: '3.26' },
+                  },
+                ],
                 '@babel/preset-react',
               ],
               plugins: ['babel-plugin-styled-components'],
@@ -63,9 +72,9 @@ module.exports = (env) => {
       ],
     },
     plugins: [
-      // new ForkTsCheckerWebpackPlugin(),
+      new ForkTsCheckerWebpackPlugin(),
       new HtmlWebpackPlugin({
-        template: 'src/index.html',
+        template: 'index.html',
       }),
       new webpack.DefinePlugin({
         'process.env.ENV': JSON.stringify(environment),

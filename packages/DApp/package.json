@@ -8,7 +8,7 @@
   "type": "module",
   "scripts": {
     "dev": "NODE_OPTIONS=--openssl-legacy-provider webpack serve --mode=development --env ENV=development --https",
-    "build": "rm -rf dist && NODE_OPTIONS=--openssl-legacy-provider webpack --mode=production --env ENV=production",
+    "build": "NODE_OPTIONS=--openssl-legacy-provider webpack --mode=production --env ENV=production",
     "test": "mocha",
     "lint": "yarn lint:prettier --check && yarn lint:eslint",
     "lint:fix": "yarn lint:prettier --write && yarn lint:eslint --fix",
