@@ -9,12 +9,12 @@ import { getVotingWinner } from '../../../helpers/voting'
 import { VoteAnimatedModal } from './../VoteAnimatedModal'
 import voting from '../../../helpers/voting'
 import { DetailedVotingRoom } from '../../../models/smartContract'
-import { VoteSubmitButton } from './../VoteSubmitButton'
 import { useRoomAggregateVotes } from '../../../hooks/useRoomAggregateVotes'
 import styled from 'styled-components'
 import { Modal } from './../../Modal'
 import { VoteBtn, VotesBtns } from '../../Button'
 import { CardHeading, CardVoteBlock } from '../../Card'
+import { useVotesAggregate } from '../../../hooks/useVotesAggregate'
 
 interface CardVoteProps {
   room: DetailedVotingRoom
@@ -29,6 +29,10 @@ export const CardVote = ({ room, hideModalFunction }: CardVoteProps) => {
   const [selectedVoted, setSelectedVoted] = useState(voteTypes['Add'].for)
 
   const { votingContract } = useContracts()
+  const vote = voting.fromRoom(room)
+  const voteConstants = voteTypes[vote.type]
+  const { votes } = useVotesAggregate(vote.ID, room.verificationStartAt, room.startAt)
+  const castVotes = useContractFunction(votingContract, 'castVotes')
 
   room = useRoomAggregateVotes(room, showConfirmModal)
 
@@ -46,11 +50,10 @@ export const CardVote = ({ room, hideModalFunction }: CardVoteProps) => {
     setShowConfirmModal(val)
   }
 
-  const vote = voting.fromRoom(room)
+  const verificationPeriod =
+    room.verificationStartAt.toNumber() * 1000 - Date.now() < 0 && room.endAt.toNumber() * 1000 - Date.now() > 0
 
-  const voteConstants = voteTypes[vote.type]
-
-  const winner = getVotingWinner(vote)
+  const winner = verificationPeriod ? 0 : getVotingWinner(vote)
 
   if (!vote) {
     return <CardVoteBlock />
@@ -66,6 +69,7 @@ export const CardVote = ({ room, hideModalFunction }: CardVoteProps) => {
             proposingAmount={proposingAmount}
             setShowConfirmModal={setNext}
             setProposingAmount={setProposingAmount}
+            fullRoom={room}
           />{' '}
         </Modal>
       )}
@@ -77,9 +81,15 @@ export const CardVote = ({ room, hideModalFunction }: CardVoteProps) => {
             selectedVote={selectedVoted}
             setShowModal={hideConfirm}
             proposingAmount={proposingAmount}
+            room={room}
           />
         </Modal>
       )}
+
+      {verificationPeriod && (
+        <CardHeadingEndedVote>Verification period in progress, please verify your vote.</CardHeadingEndedVote>
+      )}
+
       {winner ? (
         <CardHeadingEndedVote>
           SNT holders have decided <b>{winner == 1 ? voteConstants.against.verb : voteConstants.for.verb}</b> this
@@ -88,16 +98,23 @@ export const CardVote = ({ room, hideModalFunction }: CardVoteProps) => {
       ) : hideModalFunction || window.innerWidth < 769 ? (
         <CardHeading />
       ) : (
-        <CardHeading>{voteConstants.question}</CardHeading>
+        !verificationPeriod && <CardHeading>{voteConstants.question}</CardHeading>
       )}
-      <div>
-        <VoteChart vote={vote} voteWinner={winner} tabletMode={hideModalFunction} />
 
-        {winner ? (
+      <div>
+        <VoteChart vote={vote} voteWinner={winner} tabletMode={hideModalFunction} room={room} />
+        {verificationPeriod && (
+          <VoteBtnFinal onClick={() => castVotes.send(votes)} disabled={!account}>
+            Verify votes
+          </VoteBtnFinal>
+        )}
+        {Boolean(winner) && (
           <VoteBtnFinal onClick={() => finalizeVoting.send(room.roomNumber)} disabled={!account}>
             Finalize the vote <span>✍️</span>
           </VoteBtnFinal>
-        ) : (
+        )}
+
+        {!verificationPeriod && !winner && (
           <VotesBtns>
             <VoteBtn
               disabled={!account}
@@ -119,8 +136,6 @@ export const CardVote = ({ room, hideModalFunction }: CardVoteProps) => {
             </VoteBtn>
           </VotesBtns>
         )}
-
-        <CardVoteBottom>{vote && vote.timeLeft > 0 && <VoteSubmitButton vote={vote} />}</CardVoteBottom>
       </div>
     </CardVoteBlock>
   )
@@ -147,10 +162,4 @@ const VoteBtnFinal = styled(VoteBtn)`
   @media (max-width: 600px) {
     margin-top: 24px;
   }
-`
-
-const CardVoteBottom = styled.div`
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
 `

@@ -97,7 +97,7 @@ export const CardFeature = ({ community, currentVoting, room }: CardFeatureProps
         <FeatureBottom>
           {showOngoingVote && <OngoingVote community={community} setShowOngoingVote={setShowOngoingVote} room={room} />}
           <VoteSendingBtn onClick={() => setShowOngoingVote(true)}>Removal vote in progress</VoteSendingBtn>
-          {currentVoting && currentVoting.timeLeft > 0 && <VoteSubmitButton vote={currentVoting} />}
+          {currentVoting && currentVoting.timeLeft > 0 && <VoteSubmitButton vote={currentVoting} room={room} />}
         </FeatureBottom>
       )}
     </CardVoteBlock>

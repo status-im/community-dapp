@@ -2,7 +2,8 @@ import { BigNumber } from 'ethers'
 
 export type CurrentVoting = {
   // object describing current voting if community isnt under vote returns undefined
-  timeLeft: number // number of seconds left in vote if vote is waiting for finalization returns 0
+  timeLeft: number // number of seconds left in vote if vote is waiting for verification returns 0
+  timeLeftVerification: number // // number of seconds left in verification period if vote is waiting for finalization returns 0
   type: 'Remove' | 'Add'
   voteFor: BigNumber // number of snt for a vote
   voteAgainst: BigNumber // number of snt against a vote

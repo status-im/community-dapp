@@ -8,6 +8,7 @@ describe('voting', () => {
     it('for', () => {
       const vote: CurrentVoting = {
         timeLeft: -10,
+        timeLeftVerification: -10,
         type: 'Add',
         voteFor: BigNumber.from(1000),
         voteAgainst: BigNumber.from(100),
@@ -17,6 +18,7 @@ describe('voting', () => {
     it('against', () => {
       const vote: CurrentVoting = {
         timeLeft: -10,
+        timeLeftVerification: -10,
         type: 'Add',
         voteFor: BigNumber.from(100),
         voteAgainst: BigNumber.from(1000),
@@ -26,6 +28,7 @@ describe('voting', () => {
     it('not finished', () => {
       const vote: CurrentVoting = {
         timeLeft: 10,
+        timeLeftVerification: -10,
         type: 'Add',
         voteFor: BigNumber.from(100),
         voteAgainst: BigNumber.from(1000),
@@ -35,6 +38,7 @@ describe('voting', () => {
     it('draw - against win', () => {
       const vote: CurrentVoting = {
         timeLeft: -10,
+        timeLeftVerification: -10,
         type: 'Add',
         voteFor: BigNumber.from(100),
         voteAgainst: BigNumber.from(100),

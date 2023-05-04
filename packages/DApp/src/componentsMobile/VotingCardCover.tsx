@@ -28,7 +28,7 @@ export function VotingCardCover({ room }: VotingCardCoverProps) {
           customStyle={true}
         />
       </CardCommunityWrap>
-      <VoteChart vote={vote} voteWinner={winner} />
+      <VoteChart vote={vote} voteWinner={winner} room={room} />
     </Card>
   )
 }

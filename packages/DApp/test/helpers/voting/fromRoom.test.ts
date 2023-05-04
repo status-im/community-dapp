@@ -7,8 +7,10 @@ describe('voting', () => {
   describe('fromRoom', () => {
     it('success', () => {
       const votingRoom: VotingRoom = {
-        endAt: BigNumber.from(10000000),
+        endAt: BigNumber.from(10000200),
         startBlock: BigNumber.from(10000000),
+        startAt: BigNumber.from(10000050),
+        verificationStartAt: BigNumber.from(10000100),
         voteType: 0,
         finalized: false,
         community: '0x000',
@@ -24,8 +26,10 @@ describe('voting', () => {
     })
     it('different type', () => {
       const votingRoom: VotingRoom = {
-        endAt: BigNumber.from(10000000),
+        endAt: BigNumber.from(10000200),
         startBlock: BigNumber.from(10000000),
+        startAt: BigNumber.from(10000050),
+        verificationStartAt: BigNumber.from(10000100),
         voteType: 1,
         finalized: false,
         community: '0x000',

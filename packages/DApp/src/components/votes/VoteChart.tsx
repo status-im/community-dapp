@@ -6,7 +6,9 @@ import { addCommas } from '../../helpers/addCommas'
 import { VoteType, voteTypes } from './../../constants/voteTypes'
 import { CurrentVoting } from '../../models/community'
 import { VoteGraphBar } from './VoteGraphBar'
-import { formatTimeLeft } from '../../helpers/fomatTimeLeft'
+import { formatTimeLeft, formatTimeLeftVerification } from '../../helpers/fomatTimeLeft'
+import { useUnverifiedVotes } from '../../hooks/useUnverifiedVotes'
+import { DetailedVotingRoom } from '../../models/smartContract'
 export interface VoteChartProps {
   vote: CurrentVoting
   voteWinner?: number
@@ -14,6 +16,7 @@ export interface VoteChartProps {
   selectedVote?: VoteType
   isAnimation?: boolean
   tabletMode?: (val: boolean) => void
+  room: DetailedVotingRoom
 }
 
 export function VoteChart({
@@ -23,8 +26,17 @@ export function VoteChart({
   selectedVote,
   isAnimation,
   tabletMode,
+  room,
 }: VoteChartProps) {
   const [mobileVersion, setMobileVersion] = useState(false)
+  const { votesFor: votesForUnverified, votesAgainst: votesAgainstUnverified } = useUnverifiedVotes(
+    vote.ID,
+    room.verificationStartAt,
+    room.startAt
+  )
+
+  const verificationPeriod =
+    room.verificationStartAt.toNumber() * 1000 - Date.now() < 0 && room.endAt.toNumber() * 1000 - Date.now() > 0
 
   useEffect(() => {
     const handleResize = () => {
@@ -41,10 +53,21 @@ export function VoteChart({
 
   const voteConstants = voteTypes[vote.type]
 
-  const votesFor = vote.voteFor.toNumber()
-  const votesAgainst = vote.voteAgainst.toNumber()
+  const includeUnverifiedVotes = voteWinner || verificationPeriod
+
+  const votesFor = includeUnverifiedVotes ? vote.voteFor.toNumber() : vote.voteFor.toNumber() + votesForUnverified
+  const votesAgainst = includeUnverifiedVotes
+    ? vote.voteAgainst.toNumber()
+    : vote.voteAgainst.toNumber() + votesAgainstUnverified
   const voteSum = votesFor + votesAgainst
   const graphWidth = (100 * votesAgainst) / voteSum
+
+  const [originalVotesFor] = useState(() =>
+    includeUnverifiedVotes ? vote.voteFor.toNumber() : vote.voteFor.toNumber() + votesForUnverified
+  )
+  const [originalVotesAgainst] = useState(() =>
+    includeUnverifiedVotes ? vote.voteAgainst.toNumber() : vote.voteAgainst.toNumber() + votesAgainstUnverified
+  )
 
   let balanceWidth = graphWidth
 
@@ -74,14 +97,16 @@ export function VoteChart({
           <span>
             {' '}
             {isAnimation && proposingAmount && selectedVote && selectedVote.type === 0 ? (
-              <CountUp end={votesAgainst + proposingAmount} separator="," />
+              <CountUp end={originalVotesAgainst + proposingAmount} separator="," />
             ) : (
               addCommas(votesAgainst)
             )}{' '}
             <span style={{ fontWeight: 'normal' }}>SNT</span>
           </span>
         </VoteBox>
-        <TimeLeft className={selectedVote ? '' : 'notModal'}>{formatTimeLeft(vote.timeLeft)}</TimeLeft>
+        <TimeLeft className={selectedVote ? '' : 'notModal'}>
+          {vote.timeLeft > 0 ? formatTimeLeft(vote.timeLeft) : formatTimeLeftVerification(vote.timeLeftVerification)}
+        </TimeLeft>
         <VoteBox
           style={{
             filter: voteWinner && voteWinner === 1 ? 'grayscale(1)' : 'none',
@@ -96,7 +121,7 @@ export function VoteChart({
           <span>
             {' '}
             {isAnimation && proposingAmount && selectedVote && selectedVote.type === 1 ? (
-              <CountUp end={votesFor + proposingAmount} separator="," />
+              <CountUp end={originalVotesFor + proposingAmount} separator="," />
             ) : (
               addCommas(votesFor)
             )}{' '}

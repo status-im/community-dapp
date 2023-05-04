@@ -8,6 +8,8 @@ Proposed api is available [here](API.md)
 
 # Running the project
 
+Note: Use node `v18.15.0`
+
 1. Install dependencies: Run `yarn` to install the necessary packages and dependencies.
 2. Run local hardhat node: Navigate to the `packages/contract` directory and run `yarn dev`.
 3. Deploy contracts: Navigate to the `packages/contracts` directory and run `yarn dev:deploy` to deploy the contracts needed for the project.
