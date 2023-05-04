@@ -14,7 +14,7 @@ export type CommunityDetail = {
   ens: string // ens of a community
   name: string // name of a community
   link: string // link to visit a community
-  icon: string // url to a icon of a community
+  icon: string | null // url to a icon of a community
   tags: Array<string> // list of strings that contain tag names
   description: string // short description about community
   numberOfMembers: number // amount of members in community

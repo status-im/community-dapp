@@ -69,11 +69,13 @@ export function useCommunities(publicKeys: string[]): CommunityDetail[] {
             name: community!.identity!.displayName,
             description: community!.identity!.description,
             ens: community!.identity!.ensName,
-            icon: URL.createObjectURL(
-              new Blob([community!.identity!.images.large.payload], {
-                type: 'image/jpeg',
-              })
-            ),
+            icon: community!.identity!.images.hhh
+              ? URL.createObjectURL(
+                  new Blob([community!.identity!.images.large.payload], {
+                    type: 'image/jpeg',
+                  })
+                )
+              : null,
             link: `https://join.status.im/c/${deserializedPublicKey}}`,
             currentVoting: undefined,
             tags: community.tags,

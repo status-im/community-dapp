@@ -90,8 +90,7 @@ export const CardCommunity = ({
       )}
       <Community>
         <CardLogoWrap>
-          {' '}
-          <CardLogo src={community.icon} alt={`${community.name} logo`} />
+          {community.icon && <CardLogo src={community.icon} alt={`${community.name} logo`} />}
           {showRemoveButton && !currentVoting && <RemoveBtnMobile onClick={handleMobileRemove} disabled={!account} />}
         </CardLogoWrap>
 
@@ -220,6 +219,7 @@ const RemoveBtnMobile = styled(RemoveBtn)`
 const CardText = styled.p`
   line-height: 22px;
   margin-bottom: 8px;
+  word-break: break-all;
 `
 
 const CardTags = styled.div`

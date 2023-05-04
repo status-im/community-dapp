@@ -16,7 +16,7 @@ interface VoteConfirmModalProps {
 export function VoteConfirmModal({ community, selectedVote, setShowModal }: VoteConfirmModalProps) {
   return (
     <ColumnFlexDiv>
-      <ConfirmLogo src={community.icon} alt={`${community.name} logo`} />
+      {community.icon && <ConfirmLogo src={community.icon} alt={`${community.name} logo`} />}
       <ConfirmText>
         Your vote{' '}
         <span>
