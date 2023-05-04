@@ -18,12 +18,12 @@ export function VoteConfirmModal({ community, selectedVote, setShowModal }: Vote
     <ColumnFlexDiv>
       {community.icon && <ConfirmLogo src={community.icon} alt={`${community.name} logo`} />}
       <ConfirmText>
-        Your vote{' '}
+        You voted{' '}
         <span>
           {selectedVote.verb} {community.name}
-        </span>{' '}
+        </span>
+        {'.'}
         {/* will be casted after 10 confirmations. */}
-        was casted.
       </ConfirmText>
       <EtherscanLink href="#" target="_blank">
         View on Etherscan
