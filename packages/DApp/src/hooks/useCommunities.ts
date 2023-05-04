@@ -69,7 +69,7 @@ export function useCommunities(publicKeys: string[]): CommunityDetail[] {
             name: community!.identity!.displayName,
             description: community!.identity!.description,
             ens: community!.identity!.ensName,
-            icon: community!.identity!.images.hhh
+            icon: community!.identity!.images.large
               ? URL.createObjectURL(
                   new Blob([community!.identity!.images.large.payload], {
                     type: 'image/jpeg',
