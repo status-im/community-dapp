@@ -9,7 +9,7 @@ import hre from 'hardhat'
 import { ERC20Mock, MultiCall } from '../abi'
 import { BigNumber } from 'ethers'
 
-import { config } from '../../DApp/src/config'
+// import { config } from '../../DApp/src/config'
 
 async function deployVotingContract(
   tokenAddress: string,
@@ -104,6 +104,8 @@ async function obtainTokenAddress(deployer: any, chainId: number): Promise<strin
 }
 
 async function main() {
+  const { config } = await import('../../DApp/src/config')
+
   const [deployer] = await hre.ethers.getSigners()
   const network = await hre.ethers.provider.getNetwork()
 
