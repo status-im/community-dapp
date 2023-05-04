@@ -49,12 +49,12 @@ export function useProposeWarning(communityFound: CommunityDetail) {
             text: `Not enough SNT to start a vote for this community. A new vote for ${communityFound.name} requires at least 10,000 SNT available.`,
           }
         }
-        if (communityFound.numberOfMembers < 42) {
-          return {
-            icon: '🤏',
-            text: `${communityFound.name} currently only has ${communityFound.numberOfMembers} members. A community needs more than 42 members before a vote to be added to the Status community directory can be proposed.`,
-          }
-        }
+        // if (communityFound.numberOfMembers < 42) {
+        //   return {
+        //     icon: '🤏',
+        //     text: `${communityFound.name} currently only has ${communityFound.numberOfMembers} members. A community needs more than 42 members before a vote to be added to the Status community directory can be proposed.`,
+        //   }
+        // }
       }
       return { icon: '', text: '' }
     }

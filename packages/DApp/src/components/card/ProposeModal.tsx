@@ -86,12 +86,12 @@ export function ProposeModal({ setShowConfirmModal, setCommunityFound, community
       ) : (
         <>
           <ProposingData>
-            {!publicKey && (
+            {/* {!publicKey && (
               <ProposingInfo>
                 <span>ℹ️</span>
                 <InfoText>To propose a community, it must have at least 42 members and have a ENS domain.</InfoText>
               </ProposingInfo>
-            )}
+            )} */}
             {loading && publicKey && <CommunitySkeleton />}
           </ProposingData>
           <ProposingBtn disabled={true}>Confirm vote to add community</ProposingBtn>

@@ -24,11 +24,11 @@ export function VoteAnimatedModal({
     <VoteConfirm>
       {community.icon && <ConfirmLogo src={community.icon} alt={`${community.name} logo`} />}
       <ConfirmText>
-        Your vote{' '}
+        You voted{' '}
         <span>
           {selectedVote.verb} {community.name}
-        </span>{' '}
-        has been cast!
+        </span>
+        {'.'}
       </ConfirmText>
       <VoteChart vote={vote} proposingAmount={proposingAmount} selectedVote={selectedVote} isAnimation={true} />
 

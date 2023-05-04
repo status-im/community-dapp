@@ -93,14 +93,14 @@ export function ProposeMobile() {
         </MobileTop>
       </HeaderVotingMobile>
 
-      {!publicKey && (
+      {/* {!publicKey && (
         <MobileBlock>
           <ProposingInfo>
             <span>ℹ️</span>
             <InfoText>To propose a community, it must have at least 42 members and have a ENS domain.</InfoText>
           </ProposingInfo>
         </MobileBlock>
-      )}
+      )} */}
 
       {communityFound && (
         <ProposeBlock
