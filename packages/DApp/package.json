@@ -7,16 +7,17 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "build": "rm -rf dist && NODE_OPTIONS=--openssl-legacy-provider webpack --mode=production --env ENV=production",
-    "start": "NODE_OPTIONS=--openssl-legacy-provider webpack serve --mode=development --env ENV=development --https",
+    "dev": "NODE_OPTIONS=--openssl-legacy-provider webpack serve --mode=development --env ENV=localhost --https",
+    "build": "NODE_OPTIONS=--openssl-legacy-provider webpack --mode=production --env ENV=production",
     "test": "mocha",
     "lint": "yarn lint:prettier --check && yarn lint:eslint",
     "lint:fix": "yarn lint:prettier --write && yarn lint:eslint --fix",
     "lint:eslint": "eslint './{src,test}/**/*.{ts,tsx}'",
     "lint:prettier": "yarn prettier './{src,test}/**/*.{ts,tsx}'",
-    "clean": "rimraf node_modules"
+    "clean": "rimraf dist node_modules"
   },
   "dependencies": {
+    "@status-im/js": "0.2.0",
     "@usedapp/core": "^1.2.8",
     "assert": "^2.0.0",
     "buffer": "^6.0.3",
@@ -24,7 +25,7 @@
     "eth-sig-util": "^3.0.1",
     "ethers": "5.4.1",
     "humanize-duration": "^3.27.0",
-    "js-waku": "^0.30.0",
+    "js-waku": "0.30.0",
     "protons": "^2.0.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
@@ -74,7 +75,9 @@
     "typescript": "^4.9.5",
     "webpack": "^5.75.0",
     "webpack-cli": "^4.7.0",
-    "webpack-dev-server": "^3.11.2"
+    "webpack-dev-server": "^3.11.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.3.4"
   },
   "resolutions": {
     "ethers": "5.4.1"

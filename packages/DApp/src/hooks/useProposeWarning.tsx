@@ -37,12 +37,12 @@ export function useProposeWarning(communityFound: CommunityDetail) {
         if (isCommunityUnderVote && isCommunityUnderVote?.toNumber() > 0) {
           return { icon: '⚠️', text: `There’s already an ongoing vote to add ${communityFound.name} in the directory!` }
         }
-        if (!communityFound.ens) {
-          return {
-            icon: '⚠️',
-            text: `${communityFound.name} is not registered in Ethereum Name Service. Only communities with ENS name can be included in the directory.`,
-          }
-        }
+        // if (!communityFound.ens) {
+        //   return {
+        //     icon: '⚠️',
+        //     text: `${communityFound.name} is not registered in Ethereum Name Service. Only communities with ENS name can be included in the directory.`,
+        //   }
+        // }
         if (availableAmount < 10000) {
           return {
             icon: '💰',

@@ -7,14 +7,14 @@ import { useContracts } from './useContracts'
 
 export function useDirectoryCommunities(filterKeyword: string, sortedBy: DirectorySortingEnum) {
   const { directoryContract } = useContracts()
-  const [communities] = useContractCall({
+  const [publicKeys] = useContractCall({
     abi: directoryContract.interface,
     address: directoryContract.address,
     method: 'getCommunities',
     args: [],
   }) ?? [[]]
 
-  const unfilteredComm = useCommunities(communities)
+  const unfilteredComm = useCommunities(publicKeys)
   const [filteredCommunities, setFilteredCommunities] = useState<(CommunityDetail | undefined)[]>([])
 
   useEffect(() => {
@@ -27,5 +27,5 @@ export function useDirectoryCommunities(filterKeyword: string, sortedBy: Directo
     setFilteredCommunities(filterCommunities.sort(sortDirectoryFunction(sortedBy)))
   }, [JSON.stringify(unfilteredComm), sortedBy, filterKeyword])
 
-  return filteredCommunities
+  return [filteredCommunities, publicKeys] as const
 }

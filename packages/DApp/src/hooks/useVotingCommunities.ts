@@ -6,15 +6,14 @@ import { useContracts } from './useContracts'
 import { isTextInDetails, isTypeInRoom, sortVotingFunction } from '../helpers/communityFiltering'
 import { useCommunities } from './useCommunities'
 
-export function useVotingCommunities(
-  filterKeyword: string,
-  voteType: string,
-  sortedBy: VotingSortingEnum
-): { roomsToShow: DetailedVotingRoom[]; empty: boolean } {
+type Return = { roomsToShow: DetailedVotingRoom[]; publicKeys?: string[]; empty: boolean }
+
+export function useVotingCommunities(filterKeyword: string, voteType: string, sortedBy: VotingSortingEnum): Return {
   const [roomsWithCommunity, setRoomsWithCommunity] = useState<any[]>([])
   const [filteredRooms, setFilteredRooms] = useState<any[]>([])
-  const [empty, setEmpty] = useState(false)
+
   const { votingContract } = useContracts()
+
   const [roomList] = useContractCall({
     abi: votingContract.interface,
     address: votingContract.address,
@@ -22,25 +21,17 @@ export function useVotingCommunities(
     args: [],
   }) ?? [[]]
 
-  useEffect(() => {
-    if (roomList.length === 0 && empty == false) {
-      setEmpty(true)
-    }
-    if (roomList.length > 0 && empty == true) {
-      setEmpty(false)
-    }
-  }, [JSON.stringify(roomList)])
+  const votingRooms = useContractCalls(
+    roomList.map((el: any) => {
+      return {
+        abi: votingContract.interface,
+        address: votingContract.address,
+        method: 'votingRooms',
+        args: [el - 1],
+      }
+    })
+  )
 
-  const contractCalls = roomList.map((el: any) => {
-    return {
-      abi: votingContract.interface,
-      address: votingContract.address,
-      method: 'votingRooms',
-      args: [el - 1],
-    }
-  })
-
-  const votingRooms = useContractCalls(contractCalls)
   const publicKeys = votingRooms.map((votingRoom: any) => votingRoom?.community).filter(Boolean)
   const communitiesDetails = useCommunities(publicKeys)
 
@@ -66,5 +57,5 @@ export function useVotingCommunities(
     setFilteredRooms(filteredRooms.sort(sortVotingFunction(sortedBy)))
   }, [roomsWithCommunity, filterKeyword, voteType, sortedBy])
 
-  return { roomsToShow: filteredRooms, empty }
+  return { roomsToShow: filteredRooms, publicKeys, empty: roomList.length === 0 }
 }

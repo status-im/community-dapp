@@ -25,7 +25,7 @@ export function VoteAnimatedModal({
 }: VoteAnimatedModalProps) {
   return (
     <VoteConfirm>
-      <ConfirmLogo src={community.icon} alt={`${community.name} logo`} />
+      {community.icon && <ConfirmLogo src={community.icon} alt={`${community.name} logo`} />}
       <ConfirmText>
         Your vote{' '}
         <span>

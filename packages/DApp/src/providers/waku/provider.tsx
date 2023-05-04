@@ -14,7 +14,7 @@ interface Props {
 }
 
 export function WakuProvider({ children }: Props) {
-  const [client, setClient] = useState<WakuLight>()
+  const [waku, setWaku] = useState<WakuLight>()
 
   useEffect(() => {
     const start = async () => {
@@ -23,25 +23,25 @@ export function WakuProvider({ children }: Props) {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         emitSelf: true,
-        pingKeepAlive: 0,
-        relayKeepAlive: 0,
         libp2p: {
           peerDiscovery: [new PeerDiscoveryStaticPeers(peers[config.wakuConfig.environment], { maxPeers: 1 })],
         },
       })
-      await waku.start()
-      await waitForRemotePeer(waku, [Protocols.Store, Protocols.LightPush], 10 * 1000)
 
-      setClient(waku)
+      await waku.start()
+      await waitForRemotePeer(waku, [Protocols.Store, Protocols.LightPush], 15 * 1000)
+
+      setWaku(waku)
     }
 
     start()
   }, [])
 
-  return <WakuContext.Provider value={client}>{children}</WakuContext.Provider>
+  return <WakuContext.Provider value={waku}>{children}</WakuContext.Provider>
 }
 
 export function useWaku() {
   const waku = useContext(WakuContext)
+
   return { waku }
 }

@@ -8,11 +8,11 @@ import { Modal } from '../Modal'
 import { FeatureModal } from './FeatureModal'
 import { VoteConfirmModal } from './VoteConfirmModal'
 import { OngoingVote } from './OngoingVote'
-import { useEthers } from '@usedapp/core'
+// import { useEthers } from '@usedapp/core'
 import { VoteSubmitButton } from './VoteSubmitButton'
 import { VoteSendingBtn, VoteBtn } from '../Button'
 import { VotingRoom } from '../../models/smartContract'
-import { useWakuFeature } from '../../providers/wakuFeature/provider'
+// import { useWakuFeature } from '../../providers/wakuFeature/provider'
 
 interface CardFeatureProps {
   community: CommunityDetail
@@ -21,12 +21,13 @@ interface CardFeatureProps {
 }
 
 export const CardFeature = ({ community, currentVoting, room }: CardFeatureProps) => {
-  const { account } = useEthers()
+  // const { account } = useEthers()
   const [showFeatureModal, setShowFeatureModal] = useState(false)
   const [showConfirmModal, setShowConfirmModal] = useState(false)
   const [showOngoingVote, setShowOngoingVote] = useState(false)
-  const { featured } = useWakuFeature()
-  const inFeatured = Boolean(featured.find((el) => el[0] === community.publicKey))
+  // const { featured } = useWakuFeature()
+  // const inFeatured = Boolean(featured.find((el) => el[0] === community.publicKey))
+  const inFeatured = false
 
   const [heading, setHeading] = useState('Weekly Feature vote')
   const [icon, setIcon] = useState('⭐')
@@ -86,9 +87,10 @@ export const CardFeature = ({ community, currentVoting, room }: CardFeatureProps
             <VoteConfirmModal community={community} selectedVote={{ verb: 'to feature' }} setShowModal={setNewModal} />
           </Modal>
         )}
-        <FeatureBtn disabled={!account || inFeatured} onClick={() => setShowFeatureModal(true)}>
+        <FeatureBtn disabled>Coming soon!</FeatureBtn>
+        {/* <FeatureBtn disabled={!account || inFeatured} onClick={() => setShowFeatureModal(true)}>
           Feature this community! <span style={{ fontSize: '20px' }}>⭐️</span>
-        </FeatureBtn>
+        </FeatureBtn> */}
       </div>
 
       {currentVoting && room && (
