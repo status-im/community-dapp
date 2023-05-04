@@ -22,7 +22,8 @@ export function VoteConfirmModal({ community, selectedVote, setShowModal }: Vote
         <span>
           {selectedVote.verb} {community.name}
         </span>{' '}
-        will be casted after 10 confirmations.
+        {/* will be casted after 10 confirmations. */}
+        was casted.
       </ConfirmText>
       <EtherscanLink href="#" target="_blank">
         View on Etherscan
