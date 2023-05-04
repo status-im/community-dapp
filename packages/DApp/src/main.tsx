@@ -10,6 +10,8 @@ import { CommunitiesProvider } from './providers/communities/provider'
 // import { WakuFeatureProvider } from './providers/wakuFeature/provider'
 import { config } from './config'
 
+// export { config }
+
 render(
   <React.StrictMode>
     <WakuProvider>
