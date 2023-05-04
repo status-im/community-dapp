@@ -1,23 +1,33 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { Input } from './Input'
+import { deserializePublicKey } from '@status-im/js'
 
-interface PublicKeyInputProps {
-  publicKey: string
-  setPublicKey: (val: string) => void
+type Props = {
+  onPublicKeyChange: (val: string) => void
 }
 
-export function PublicKeyInput({ publicKey, setPublicKey }: PublicKeyInputProps) {
+export function PublicKeyInput({ onPublicKeyChange }: Props) {
+  const [value, setValue] = useState('')
+
+  useEffect(() => {
+    try {
+      const publicKey = deserializePublicKey(value)
+      console.log('valid', publicKey)
+      onPublicKeyChange(publicKey)
+    } catch (error) {
+      console.log(error)
+    }
+  }, [value])
+
   return (
     <CommunityKeyLabel>
       Community public key
       <CommunityKey
-        value={publicKey}
+        value={value}
         placeholder="E.g. 0xbede83eef5d82c4dd5d82c4dd5fa837ad"
-        onChange={(e) => {
-          setPublicKey(e.currentTarget.value)
-        }}
-      ></CommunityKey>
+        onChange={(e) => setValue(e.currentTarget.value)}
+      />
     </CommunityKeyLabel>
   )
 }

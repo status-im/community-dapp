@@ -34,6 +34,20 @@ export function VotingCards() {
     return () => window.removeEventListener('resize', handleResize)
   }, [])
 
+  const renderCommunities = () => {
+    if (roomsToShow.length === 0) {
+      return empty ? <VotingEmpty /> : <SearchEmpty />
+    }
+
+    return roomsToShow.map((room: DetailedVotingRoom, idx) => {
+      if (room?.details) {
+        return <VotingCard key={idx} room={room} />
+      } else {
+        return <VotingCardSkeleton key={idx} />
+      }
+    })
+  }
+
   return (
     <div>
       <PageBar>
@@ -51,15 +65,7 @@ export function VotingCards() {
           {mobileVersion && <VoteFilter voteType={voteType} setVoteType={setVoteType} />}
         </VoteBar>
       </PageBar>
-      {roomsToShow.map((room: DetailedVotingRoom, idx) => {
-        if (room?.details) {
-          return <VotingCard key={idx} room={room} />
-        } else {
-          return <VotingCardSkeleton key={idx} />
-        }
-      })}
-      {roomsToShow.length === 0 && empty && <VotingEmpty />}
-      {roomsToShow.length === 0 && !empty && <SearchEmpty />}
+      {renderCommunities()}
     </div>
   )
 }

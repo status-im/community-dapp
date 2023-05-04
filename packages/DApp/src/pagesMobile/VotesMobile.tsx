@@ -15,6 +15,7 @@ import { useHistory } from 'react-router'
 import { useEthers } from '@usedapp/core'
 import { ConnectButton } from '../components/ConnectButton'
 import { VotingSkeletonMobile } from '../componentsMobile/VotingSkeletonMobile'
+import { DetailedVotingRoom } from '../models/smartContract'
 
 export function VotesMobile() {
   const { account } = useEthers()
@@ -23,6 +24,21 @@ export function VotesMobile() {
   const [filterKeyword, setFilterKeyword] = useState('')
   const { roomsToShow, empty } = useVotingCommunities(filterKeyword, voteType, sortedBy)
   const history = useHistory()
+
+  const renderCommunities = () => {
+    if (roomsToShow.length === 0) {
+      return empty ? <VotingEmpty /> : <SearchEmpty />
+    }
+
+    return roomsToShow.map((room: DetailedVotingRoom, idx) => {
+      if (room?.details) {
+        return <VotingCardCover key={idx} room={room} />
+      } else {
+        return <VotingSkeletonMobile key={idx} />
+      }
+    })
+  }
+
   return (
     <div>
       <TopBarMobile
@@ -43,17 +59,7 @@ export function VotesMobile() {
           <VoteFilter voteType={voteType} setVoteType={setVoteType} />
         </VoteBar>
       </TopBarMobile>
-      <VotingCardsWrapper>
-        {roomsToShow.map((room: any, idx) => {
-          if (room?.details) {
-            return <VotingCardCover key={idx} room={room} />
-          } else {
-            return <VotingSkeletonMobile key={idx} />
-          }
-        })}
-        {roomsToShow.length === 0 && empty && <VotingEmpty />}
-        {roomsToShow.length === 0 && !empty && <SearchEmpty />}
-      </VotingCardsWrapper>
+      <VotingCardsWrapper>{renderCommunities()}</VotingCardsWrapper>
 
       <ProposeButtonWrapper>
         {account ? (

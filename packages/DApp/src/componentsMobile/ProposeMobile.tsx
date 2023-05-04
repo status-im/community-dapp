@@ -77,7 +77,7 @@ export function ProposeMobile() {
         <ConnectMobile />
         <MobileTop>
           <ProposingHeading>Add community to directory</ProposingHeading>
-          <PublicKeyInput publicKey={publicKey} setPublicKey={setPublicKey} />
+          <PublicKeyInput onPublicKeyChange={setPublicKey} />
           {communityFound ? (
             <WrapperTopSmall>
               <CardCommunity community={communityFound} />

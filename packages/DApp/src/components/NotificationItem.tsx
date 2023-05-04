@@ -22,7 +22,7 @@ export function NotificationItem({ publicKey, text, transaction }: NotificationI
     return (
       <NotificationBlock>
         <NotificationLogoWrap>
-          <NotificationLogo src={communityDetails.icon} />
+          {communityDetails.icon && <NotificationLogo src={communityDetails.icon} />}
         </NotificationLogoWrap>
 
         <NotificationContent>

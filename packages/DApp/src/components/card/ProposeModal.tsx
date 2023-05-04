@@ -78,7 +78,7 @@ export function ProposeModal({ setShowConfirmModal, setCommunityFound, community
   return (
     <ColumnFlexDiv>
       <WrapperBottomMid>
-        <PublicKeyInput publicKey={publicKey} setPublicKey={setPublicKey} />
+        <PublicKeyInput onPublicKeyChange={setPublicKey} />
       </WrapperBottomMid>
 
       {communityFound ? (
