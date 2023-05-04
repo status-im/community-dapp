@@ -11,6 +11,21 @@ export interface Config {
   }
   daapConfig: DAppConfig
   statusWalletRequired: boolean
+  contractConfig: {
+    votingLengthInSeconds: number
+    votingVerificationLengthInSeconds: number
+    timeBetweenVotingInSeconds: number
+    featuredVotingLengthInSeconds: number
+    featuredVotingVerificationLengthInSeconds: number
+  }
+}
+
+const env = process.env.ENV ?? 'localhost'
+
+console.log('env', env)
+
+if (!['localhost', 'development', 'production'].includes(env)) {
+  throw new Error('Unsupported environment')
 }
 
 const configs: Record<typeof process.env.ENV, Config> = {
@@ -37,6 +52,13 @@ const configs: Record<typeof process.env.ENV, Config> = {
         expirationPeriod: 50000,
       },
     },
+    contractConfig: {
+      votingLengthInSeconds: 4 * 60, // 4 minutes
+      votingVerificationLengthInSeconds: 2 * 60, // 2 minutes
+      timeBetweenVotingInSeconds: 60, // 1 minute
+      featuredVotingLengthInSeconds: 4 * 60, // 4 minutes
+      featuredVotingVerificationLengthInSeconds: 2 * 60, // 2 minutes
+    },
   },
   development: {
     statusWalletRequired: false,
@@ -52,6 +74,13 @@ const configs: Record<typeof process.env.ENV, Config> = {
         checkInterval: 500,
         expirationPeriod: 50000,
       },
+    },
+    contractConfig: {
+      votingLengthInSeconds: 14 * 24 * 3600, // 14 days
+      votingVerificationLengthInSeconds: 7 * 24 * 3600, // 7 days
+      timeBetweenVotingInSeconds: 7 * 24 * 3600, // 7 days
+      featuredVotingLengthInSeconds: 5 * 24 * 3600, // 5 days
+      featuredVotingVerificationLengthInSeconds: 2 * 24 * 3600, // 2 days
     },
   },
   production: {
@@ -69,7 +98,14 @@ const configs: Record<typeof process.env.ENV, Config> = {
         expirationPeriod: 50000,
       },
     },
+    contractConfig: {
+      votingLengthInSeconds: 14 * 24 * 3600, // 14 days
+      votingVerificationLengthInSeconds: 7 * 24 * 3600, // 7 days
+      timeBetweenVotingInSeconds: 7 * 24 * 3600, // 7 days
+      featuredVotingLengthInSeconds: 5 * 24 * 3600, // 5 days
+      featuredVotingVerificationLengthInSeconds: 2 * 24 * 3600, // 2 days
+    },
   },
 }
 
-export const config = configs[process.env.ENV]
+export const config = configs[env]

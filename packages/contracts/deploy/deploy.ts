@@ -4,10 +4,12 @@
 // You can also run a script with `npx hardhat run <script>`. If you do that, Hardhat
 // will compile your contracts, add the Hardhat Runtime Environment's members to the
 // global scope, and execute the script.
-const hre = require('hardhat')
+import hre from 'hardhat'
 
 import { ERC20Mock, MultiCall } from '../abi'
 import { BigNumber } from 'ethers'
+
+import { config } from '../../DApp/src/config'
 
 async function deployVotingContract(
   tokenAddress: string,
@@ -105,14 +107,14 @@ async function main() {
   const [deployer] = await hre.ethers.getSigners()
   const network = await hre.ethers.provider.getNetwork()
 
-  const votingLengthInSeconds = isTestNetwork(network.chainId) ? 4 * 60 : 2 * 24 * 3600 // 4 minutes or 2 days
-  const votingVerificationLengthInSeconds = isTestNetwork(network.chainId) ? 2 * 60 : 1 * 24 * 3600 // 2 minutes or 1 day
-  const timeBetweenVotingInSeconds = isTestNetwork(network.chainId) ? 60 : 2 * 24 * 3600 // 1 minute or 2 days
+  const votingLengthInSeconds = config.contractConfig.votingLengthInSeconds
+  const votingVerificationLengthInSeconds = config.contractConfig.votingVerificationLengthInSeconds
+  const timeBetweenVotingInSeconds = config.contractConfig.timeBetweenVotingInSeconds
 
-  const featuredVotingLengthInSeconds = isTestNetwork(network.chainId) ? 4 * 60 : 2 * 24 * 3600 // 4 minutes or 2 days
-  const featuredVotingVerificationLengthInSeconds = isTestNetwork(network.chainId) ? 2 * 60 : 1 * 24 * 3600 // 2 minutes or 1 day
-  const cooldownPeriod = isTestNetwork(network.chainId) ? 1 : 2
-  const featuredPerVotingCount = isTestNetwork(network.chainId) ? 3 : 3
+  const featuredVotingLengthInSeconds = config.contractConfig.featuredVotingLengthInSeconds
+  const featuredVotingVerificationLengthInSeconds = config.contractConfig.featuredVotingVerificationLengthInSeconds
+  const cooldownPeriod = isTestNetwork(network.chainId) ? 1 : 3
+  const featuredPerVotingCount = isTestNetwork(network.chainId) ? 3 : 5
 
   console.log(
     `Deploying contracts on the network: ${network.name}(${network.chainId}), with the account: ${deployer.address}`

@@ -4,6 +4,7 @@
   "main": "index.js",
   "repository": "git@github.com:EthWorks/status-community-dapp.git",
   "license": "MIT",
+  "type": "module",
   "scripts": {
     "clean": "hardhat clean && rimraf cache node_modules",
     "build": "hardhat compile",
