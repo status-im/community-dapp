@@ -1,4 +1,6 @@
+// todo: request QtWebEngine (browser) to be updated instead, or configure target
 import 'core-js/proposals/promise-any'
+
 import React from 'react'
 import { render } from 'react-dom'
 import { App } from './App'
