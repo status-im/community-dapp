@@ -35,9 +35,6 @@ module.exports = (env) => {
           test: /\.m?[jt]sx?$/,
           resolve: {
             fullySpecified: false,
-            fallback: {
-              zlib: false,
-            },
           },
           use: {
             loader: 'babel-loader',
