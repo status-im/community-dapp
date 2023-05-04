@@ -29,7 +29,7 @@ export function WakuProvider({ children }: Props) {
       })
 
       await waku.start()
-      await waitForRemotePeer(waku, [Protocols.Store, Protocols.LightPush], 10 * 1000)
+      await waitForRemotePeer(waku, [Protocols.Store, Protocols.LightPush], 15 * 1000)
 
       setWaku(waku)
     }
