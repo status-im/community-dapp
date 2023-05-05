@@ -7,6 +7,7 @@ import { getVotingWinner } from '../helpers/voting'
 import { VoteChart } from '../components/votes/VoteChart'
 import { useHistory } from 'react-router'
 import { useRoomAggregateVotes } from '../hooks/useRoomAggregateVotes'
+import { useUnverifiedVotes } from '../hooks/useUnverifiedVotes'
 
 interface VotingCardCoverProps {
   room: DetailedVotingRoom
@@ -15,8 +16,27 @@ interface VotingCardCoverProps {
 export function VotingCardCover({ room }: VotingCardCoverProps) {
   room = useRoomAggregateVotes(room, false)
   const vote = voting.fromRoom(room)
-  const winner = getVotingWinner(vote)
   const history = useHistory()
+
+  const now = Date.now()
+  const verificationStarted = room.verificationStartAt.toNumber() * 1000 - now < 0
+  const verificationEnded = room.endAt.toNumber() * 1000 - now < 0
+  const verificationPeriod = verificationStarted && !verificationEnded
+
+  const winner = verificationPeriod ? 0 : getVotingWinner(vote)
+
+  const { votesFor: votesForUnverified, votesAgainst: votesAgainstUnverified } = useUnverifiedVotes(
+    vote.ID,
+    room.verificationStartAt,
+    room.startAt
+  )
+
+  const includeUnverifiedVotes = !winner || verificationPeriod
+
+  const votesFor = !includeUnverifiedVotes ? vote.voteFor.toNumber() : vote.voteFor.toNumber() + votesForUnverified
+  const votesAgainst = !includeUnverifiedVotes
+    ? vote.voteAgainst.toNumber()
+    : vote.voteAgainst.toNumber() + votesAgainstUnverified
 
   return (
     <Card onClick={() => history.push(`/votingRoom/${room.roomNumber.toString()}`)}>
@@ -28,12 +48,7 @@ export function VotingCardCover({ room }: VotingCardCoverProps) {
           customStyle={true}
         />
       </CardCommunityWrap>
-      <VoteChart
-        vote={vote}
-        voteWinner={winner}
-        votesFor={room.totalVotesFor.toNumber()}
-        votesAgainst={room.totalVotesAgainst.toNumber()}
-      />
+      <VoteChart vote={vote} voteWinner={winner} votesFor={votesFor} votesAgainst={votesAgainst} />
     </Card>
   )
 }
