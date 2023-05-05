@@ -1,3 +1,5 @@
+// todo?: use store for votes, aggregations, verification period, winner
+
 import React, { useState } from 'react'
 import { VoteModal } from './../VoteModal'
 import { VoteChart } from './../../votes/VoteChart'
