@@ -73,7 +73,7 @@ export function VoteChart({
           <span>
             {' '}
             {isAnimation && proposingAmount && selectedVote && selectedVote.type === 0 ? (
-              <CountUp end={originalVotesAgainst + proposingAmount} separator="," />
+              <CountUp end={votesAgainst} separator="," />
             ) : (
               addCommas(votesAgainst)
             )}{' '}
@@ -97,7 +97,7 @@ export function VoteChart({
           <span>
             {' '}
             {isAnimation && proposingAmount && selectedVote && selectedVote.type === 1 ? (
-              <CountUp end={originalVotesFor + proposingAmount} separator="," />
+              <CountUp end={votesFor} separator="," />
             ) : (
               addCommas(votesFor)
             )}{' '}
