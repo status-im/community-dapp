@@ -8,7 +8,7 @@
     ]
   },
   "scripts": {
-    "start": "yarn --cwd ./packages/DApp start",
+    "start": "yarn --cwd ./packages/DApp dev",
     "lint": "wsrun -c -s lint",
     "lint:fix": "wsrun -c -s lint:fix",
     "build": "wsrun -e -c -s build",
