@@ -46,13 +46,7 @@ export function VoteChart({
   const voteConstants = voteTypes[vote.type]
 
   const voteSum = votesFor + votesAgainst
-  const graphWidth = (100 * votesAgainst) / voteSum
-
-  let balanceWidth = graphWidth
-
-  if (proposingAmount && selectedVote) {
-    balanceWidth = selectedVote.type === 0 ? (100 * votesFor) / voteSum : (100 * votesAgainst) / voteSum
-  }
+  const graphAgaintsWidth = (100 * votesAgainst) / voteSum
 
   const iconWinnerFont = mobileVersion ? '36px' : '42px'
 
@@ -107,8 +101,8 @@ export function VoteChart({
       </VotesChart>
       <VoteGraphBarWrap className={selectedVote || tabletMode ? '' : 'notModal'}>
         <VoteGraphBar
-          graphWidth={graphWidth}
-          balanceWidth={balanceWidth}
+          graphWidth={graphAgaintsWidth}
+          balanceWidth={graphAgaintsWidth}
           voteWinner={voteWinner}
           isAnimation={isAnimation}
         />
