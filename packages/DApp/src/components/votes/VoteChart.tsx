@@ -51,10 +51,7 @@ export function VoteChart({
   let balanceWidth = graphWidth
 
   if (proposingAmount && selectedVote) {
-    balanceWidth =
-      selectedVote.type === 0
-        ? (100 * (votesAgainst + proposingAmount)) / (voteSum + proposingAmount)
-        : (100 * votesAgainst) / (voteSum + proposingAmount)
+    balanceWidth = selectedVote.type === 0 ? (100 * votesFor) / voteSum : (100 * votesAgainst) / voteSum
   }
 
   const iconWinnerFont = mobileVersion ? '36px' : '42px'
