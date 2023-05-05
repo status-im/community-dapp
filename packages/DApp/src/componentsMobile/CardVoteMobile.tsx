@@ -44,8 +44,10 @@ export const CardVoteMobile = ({ room }: CardVoteMobileProps) => {
   const finalizeVoting = useContractFunction(votingContract, 'finalizeVotingRoom')
   room = useRoomAggregateVotes(room, false)
 
-  const verificationPeriod =
-    room.verificationStartAt.toNumber() * 1000 - Date.now() < 0 && room.endAt.toNumber() * 1000 - Date.now() > 0
+  const now = Date.now()
+  const verificationStarted = room.verificationStartAt.toNumber() * 1000 - now < 0
+  const verificationEnded = room.endAt.toNumber() * 1000 - now < 0
+  const verificationPeriod = verificationStarted && !verificationEnded
 
   const winner = verificationPeriod ? 0 : getVotingWinner(vote)
 
