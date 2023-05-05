@@ -56,7 +56,7 @@ export const CardVote = ({ room, hideModalFunction }: CardVoteProps) => {
   const verificationPeriod =
     room.verificationStartAt.toNumber() * 1000 - Date.now() < 0 && room.endAt.toNumber() * 1000 - Date.now() > 0
 
-  const winner = !verificationPeriod ? 0 : getVotingWinner(vote)
+  const winner = verificationPeriod ? 0 : getVotingWinner(vote)
 
   const { votesFor: votesForUnverified, votesAgainst: votesAgainstUnverified } = useUnverifiedVotes(
     vote.ID,
