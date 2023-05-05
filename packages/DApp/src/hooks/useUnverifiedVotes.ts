@@ -14,6 +14,7 @@ type InitialVotes = {
   voted: string[]
 }
 
+// todo: merge with other aggregating hook
 export function useUnverifiedVotes(room: number | undefined, verificationStartAt: BigNumber, startAt: BigNumber) {
   const { votingContract } = useContracts()
   const [alreadyVotedList] =
