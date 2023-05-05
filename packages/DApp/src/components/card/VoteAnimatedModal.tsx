@@ -4,7 +4,6 @@ import { VoteType } from '../../constants/voteTypes'
 import { CommunityDetail, CurrentVoting } from '../../models/community'
 import { ButtonSecondary } from '../Button'
 import { VoteChart } from '../votes/VoteChart'
-import { DetailedVotingRoom } from '../../models/smartContract'
 
 interface VoteAnimatedModalProps {
   community: CommunityDetail
@@ -12,7 +11,8 @@ interface VoteAnimatedModalProps {
   selectedVote: VoteType
   proposingAmount: number
   setShowModal: (val: boolean) => void
-  room: DetailedVotingRoom
+  votesFor: number
+  votesAgainst: number
 }
 
 export function VoteAnimatedModal({
@@ -21,7 +21,8 @@ export function VoteAnimatedModal({
   proposingAmount,
   selectedVote,
   setShowModal,
-  room,
+  votesFor,
+  votesAgainst,
 }: VoteAnimatedModalProps) {
   return (
     <VoteConfirm>
@@ -38,7 +39,8 @@ export function VoteAnimatedModal({
         proposingAmount={proposingAmount}
         selectedVote={selectedVote}
         isAnimation={true}
-        room={room}
+        votesFor={votesFor}
+        votesAgainst={votesAgainst}
       />
 
       <ConfirmBtn onClick={() => setShowModal(false)}>
