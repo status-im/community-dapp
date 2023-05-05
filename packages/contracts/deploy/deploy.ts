@@ -105,14 +105,14 @@ async function main() {
   const [deployer] = await hre.ethers.getSigners()
   const network = await hre.ethers.provider.getNetwork()
 
-  const votingLengthInSeconds = isTestNetwork(network.chainId) ? 4 * 60 : 14 * 24 * 3600 // 4 minutes or 14 days
-  const votingVerificationLengthInSeconds = isTestNetwork(network.chainId) ? 2 * 60 : 7 * 24 * 3600 // 2 minutes or 7 days
-  const timeBetweenVotingInSeconds = isTestNetwork(network.chainId) ? 60 : 7 * 24 * 3600 // 1 minute or 7 days
+  const votingLengthInSeconds = isTestNetwork(network.chainId) ? 4 * 60 : 2 * 24 * 3600 // 4 minutes or 2 days
+  const votingVerificationLengthInSeconds = isTestNetwork(network.chainId) ? 2 * 60 : 1 * 24 * 3600 // 2 minutes or 1 day
+  const timeBetweenVotingInSeconds = isTestNetwork(network.chainId) ? 60 : 2 * 24 * 3600 // 1 minute or 2 days
 
-  const featuredVotingLengthInSeconds = isTestNetwork(network.chainId) ? 4 * 60 : 5 * 24 * 3600 // 4 minutes or 5 days
-  const featuredVotingVerificationLengthInSeconds = isTestNetwork(network.chainId) ? 2 * 60 : 2 * 24 * 3600 // 2 minutes or 2 days
-  const cooldownPeriod = isTestNetwork(network.chainId) ? 1 : 3
-  const featuredPerVotingCount = isTestNetwork(network.chainId) ? 3 : 5
+  const featuredVotingLengthInSeconds = isTestNetwork(network.chainId) ? 4 * 60 : 2 * 24 * 3600 // 4 minutes or 2 days
+  const featuredVotingVerificationLengthInSeconds = isTestNetwork(network.chainId) ? 2 * 60 : 1 * 24 * 3600 // 2 minutes or 1 day
+  const cooldownPeriod = isTestNetwork(network.chainId) ? 1 : 2
+  const featuredPerVotingCount = isTestNetwork(network.chainId) ? 3 : 3
 
   console.log(
     `Deploying contracts on the network: ${network.name}(${network.chainId}), with the account: ${deployer.address}`
