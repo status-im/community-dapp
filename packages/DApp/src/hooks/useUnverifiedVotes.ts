@@ -38,33 +38,49 @@ export function useUnverifiedVotes(room: number | undefined, verificationStartAt
     const accumulateVotes = async () => {
       if (waku && room) {
         const messages = await wakuMessage.receive(waku, config.wakuConfig.wakuTopic, room)
-        const validMessages = messages?.filter((message) => validateVote(message, verificationStartAt, startAt))
 
-        const votes: InitialVotes =
-          validMessages?.reduce((acc, message) => {
-            if (acc.voted.includes(message.address)) {
-              return { for: acc.for, against: acc.against, voted: acc.voted }
+        if (!messages?.length) {
+          return
+        }
+
+        const validMessages = messages.filter((message) => validateVote(message, verificationStartAt, startAt))
+
+        if (!validMessages.length) {
+          return
+        }
+
+        const votes: InitialVotes = validMessages.reduce((acc, message) => {
+          // todo?: if non-proposing accounts can vote multiple times
+          // account already voted
+          // if (acc.voted.includes(message.address)) {
+          //   // fixme?: do not include votes of the proposing account
+          //   console.log('ALREADY VOTED')
+          //   return { for: acc.for, against: acc.against, voted: acc.voted }
+          // }
+
+          if (message.vote === 'no') {
+            return {
+              for: acc.for,
+              against: acc.against + parseInt(message.sntAmount._hex, 16),
+              voted: [...acc.voted, message.address],
             }
-
-            if (message.vote === 'no') {
-              return {
-                for: acc.for,
-                against: acc.against + parseInt(message.sntAmount._hex, 16),
-                voted: [...acc.voted, message.address],
-              }
-            } else if (message.vote === 'yes') {
-              return {
-                for: acc.for + parseInt(message.sntAmount._hex, 16),
-                against: acc.against,
-                voted: [...acc.voted, message.address],
-              }
+          } else if (message.vote === 'yes') {
+            return {
+              for: acc.for + parseInt(message.sntAmount._hex, 16),
+              against: acc.against,
+              voted: [...acc.voted, message.address],
             }
+          }
 
-            return { for: acc.for, against: acc.against, voted: acc.voted }
-          }, initialVotes) ?? initialVotes
+          return { for: acc.for, against: acc.against, voted: acc.voted }
+        }, initialVotes)
 
-        setVotesFor(votes?.for)
-        setVotesAgainst(votes?.against)
+        if (!votes.for && !votes.against) {
+          return
+        }
+
+        setVotesFor(votes.for)
+        setVotesAgainst(votes.against)
       }
     }
     accumulateVotes()
