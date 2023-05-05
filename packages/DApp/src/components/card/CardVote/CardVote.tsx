@@ -15,6 +15,7 @@ import { Modal } from './../../Modal'
 import { VoteBtn, VotesBtns } from '../../Button'
 import { CardHeading, CardVoteBlock } from '../../Card'
 import { useVotesAggregate } from '../../../hooks/useVotesAggregate'
+import { useUnverifiedVotes } from '../../../hooks/useUnverifiedVotes'
 
 interface CardVoteProps {
   room: DetailedVotingRoom
@@ -27,6 +28,8 @@ export const CardVote = ({ room, hideModalFunction }: CardVoteProps) => {
   const [showConfirmModal, setShowConfirmModal] = useState(false)
   const [proposingAmount, setProposingAmount] = useState(0)
   const [selectedVoted, setSelectedVoted] = useState(voteTypes['Add'].for)
+  const [sentVotesFor, setSentVotesFor] = useState(0)
+  const [sentVotesAgainst, setSentVotesAgainst] = useState(0)
 
   const { votingContract } = useContracts()
   const vote = voting.fromRoom(room)
@@ -55,6 +58,21 @@ export const CardVote = ({ room, hideModalFunction }: CardVoteProps) => {
 
   const winner = verificationPeriod ? 0 : getVotingWinner(vote)
 
+  const { votesFor: votesForUnverified, votesAgainst: votesAgainstUnverified } = useUnverifiedVotes(
+    vote.ID,
+    room.verificationStartAt,
+    room.startAt
+  )
+
+  const includeUnverifiedVotes = verificationPeriod
+
+  const votesFor = !includeUnverifiedVotes
+    ? vote.voteFor.toNumber()
+    : vote.voteFor.toNumber() + votesForUnverified + sentVotesFor
+  const votesAgainst = !includeUnverifiedVotes
+    ? vote.voteAgainst.toNumber()
+    : vote.voteAgainst.toNumber() + votesAgainstUnverified + sentVotesAgainst
+
   if (!vote) {
     return <CardVoteBlock />
   }
@@ -69,7 +87,18 @@ export const CardVote = ({ room, hideModalFunction }: CardVoteProps) => {
             proposingAmount={proposingAmount}
             setShowConfirmModal={setNext}
             setProposingAmount={setProposingAmount}
+            onSend={(proposingAmount: number) => {
+              if (selectedVoted.type === 0) {
+                setSentVotesAgainst(sentVotesAgainst + proposingAmount)
+              }
+
+              if (selectedVoted.type === 1) {
+                setSentVotesFor(sentVotesFor + proposingAmount)
+              }
+            }}
             fullRoom={room}
+            votesFor={votesFor}
+            votesAgainst={votesAgainst}
           />{' '}
         </Modal>
       )}
@@ -81,7 +110,8 @@ export const CardVote = ({ room, hideModalFunction }: CardVoteProps) => {
             selectedVote={selectedVoted}
             setShowModal={hideConfirm}
             proposingAmount={proposingAmount}
-            room={room}
+            votesFor={votesFor}
+            votesAgainst={votesAgainst}
           />
         </Modal>
       )}
@@ -102,7 +132,13 @@ export const CardVote = ({ room, hideModalFunction }: CardVoteProps) => {
       )}
 
       <div>
-        <VoteChart vote={vote} voteWinner={winner} tabletMode={hideModalFunction} room={room} />
+        <VoteChart
+          vote={vote}
+          voteWinner={winner}
+          tabletMode={hideModalFunction}
+          votesFor={votesFor}
+          votesAgainst={votesAgainst}
+        />
         {verificationPeriod && (
           <VoteBtnFinal onClick={() => castVotes.send(votes)} disabled={!account}>
             Verify votes

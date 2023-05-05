@@ -22,6 +22,7 @@ import { useSendWakuVote } from '../hooks/useSendWakuVote'
 import { WrapperBottom, WrapperTop } from '../constants/styles'
 import { useRoomAggregateVotes } from '../hooks/useRoomAggregateVotes'
 import { useVotesAggregate } from '../hooks/useVotesAggregate'
+import { useUnverifiedVotes } from '../hooks/useUnverifiedVotes'
 
 interface CardVoteMobileProps {
   room: DetailedVotingRoom
@@ -32,6 +33,8 @@ export const CardVoteMobile = ({ room }: CardVoteMobileProps) => {
   const { account } = useEthers()
 
   const selectedVoted = voteTypes['Add'].for
+  const [sentVotesFor, setSentVotesFor] = useState(0)
+  const [sentVotesAgainst, setSentVotesAgainst] = useState(0)
 
   const { votingContract } = useContracts()
   const voteConstants = voteTypes[vote.type]
@@ -45,6 +48,13 @@ export const CardVoteMobile = ({ room }: CardVoteMobileProps) => {
     room.verificationStartAt.toNumber() * 1000 - Date.now() < 0 && room.endAt.toNumber() * 1000 - Date.now() > 0
 
   const winner = verificationPeriod ? 0 : getVotingWinner(vote)
+
+  const { votesFor: votesForUnverified, votesAgainst: votesAgainstUnverified } = useUnverifiedVotes(
+    vote.ID,
+    room.verificationStartAt,
+    room.startAt
+  )
+
   const [proposingAmount, setProposingAmount] = useState(0)
 
   const [showHistory, setShowHistory] = useState(false)
@@ -54,6 +64,15 @@ export const CardVoteMobile = ({ room }: CardVoteMobileProps) => {
   useEffect(() => {
     setVote(voting.fromRoom(room))
   }, [JSON.stringify(room)])
+
+  const includeUnverifiedVotes = !winner || verificationPeriod
+
+  const votesFor = !includeUnverifiedVotes
+    ? vote.voteFor.toNumber()
+    : vote.voteFor.toNumber() + votesForUnverified + sentVotesFor
+  const votesAgainst = !includeUnverifiedVotes
+    ? vote.voteAgainst.toNumber()
+    : vote.voteAgainst.toNumber() + votesAgainstUnverified + sentVotesAgainst
 
   if (!vote) {
     return <CardVoteBlock />
@@ -73,7 +92,13 @@ export const CardVoteMobile = ({ room }: CardVoteMobileProps) => {
       )}
       <div>
         <WrapperBottom>
-          <VoteChart vote={vote} voteWinner={winner} isAnimation={true} room={room} />
+          <VoteChart
+            vote={vote}
+            voteWinner={winner}
+            isAnimation={true}
+            votesFor={votesFor}
+            votesAgainst={votesAgainst}
+          />
         </WrapperBottom>
         {!winner && (
           <WrapperTop>
@@ -102,6 +127,7 @@ export const CardVoteMobile = ({ room }: CardVoteMobileProps) => {
               disabled={!account}
               onClick={async () => {
                 await sendWakuVote(proposingAmount, room.roomNumber, 0)
+                setSentVotesAgainst(sentVotesAgainst + proposingAmount)
                 setVote((vote) => {
                   return { ...vote, voteAgainst: vote.voteAgainst.add(proposingAmount) }
                 })
@@ -113,6 +139,7 @@ export const CardVoteMobile = ({ room }: CardVoteMobileProps) => {
               disabled={!account}
               onClick={async () => {
                 await sendWakuVote(proposingAmount, room.roomNumber, 1)
+                setSentVotesFor(sentVotesFor + proposingAmount)
                 setVote((vote) => {
                   return { ...vote, voteFor: vote.voteFor.add(proposingAmount) }
                 })
