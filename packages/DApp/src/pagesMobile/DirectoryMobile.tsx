@@ -7,7 +7,7 @@ import styled from 'styled-components'
 import { Search } from '../components/Input'
 import { DirectorySortingOptions } from '../constants/SortingOptions'
 import { SearchEmpty } from '../components/SearchEmpty'
-// import { WeeklyFeature } from '../components/WeeklyFeature'
+import { WeeklyFeature } from '../components/WeeklyFeature'
 import { FilterList } from '../components/Filter'
 import { useHistory } from 'react-router'
 import { DirectorySkeletonMobile } from '../componentsMobile/DirectorySkeletonMobile'
@@ -59,7 +59,7 @@ export function DirectoryMobile() {
         </PageBar>
       </TopBarMobile>
       <Voting>
-        {/* <WeeklyFeature endDate={new Date('07/26/2021')} /> */}
+        <WeeklyFeature endDate={new Date('07/26/2021')} />
         {renderCommunities()}
       </Voting>
     </div>

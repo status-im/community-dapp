@@ -5,11 +5,12 @@ import { FilterList } from '../Filter'
 import { Search } from '../Input'
 import { PageBar } from '../PageBar'
 import { DirectorySortingOptions } from '../../constants/SortingOptions'
-// import { WeeklyFeature } from '../WeeklyFeature'
+import { WeeklyFeature } from '../WeeklyFeature'
 import { DirectoryCardSkeleton } from './DirectoryCardSkeleton'
 import { useDirectoryCommunities } from '../../hooks/useDirectoryCommunities'
 import { SearchEmpty } from '../SearchEmpty'
 import { DirectoryCard } from './DirectoryCard'
+
 export function DirectoryCards() {
   const [filterKeyword, setFilterKeyword] = useState('')
   const [sortedBy, setSortedBy] = useState(DirectorySortingEnum.IncludedRecently)
@@ -30,6 +31,8 @@ export function DirectoryCards() {
       })
     }
 
+    console.log('communities', communities)
+
     return communities.map((community) => <DirectoryCard key={community!.publicKey} community={community!} />)
   }
 
@@ -44,7 +47,7 @@ export function DirectoryCards() {
         />
         <FilterList value={sortedBy} setValue={setSortedBy} options={DirectorySortingOptions} />
       </PageBar>
-      {/* <WeeklyFeature endDate={new Date('07/30/2021')} /> */}
+      <WeeklyFeature endDate={new Date('05/06/2023')} />
       <Voting>{renderCommunities()}</Voting>
     </>
   )

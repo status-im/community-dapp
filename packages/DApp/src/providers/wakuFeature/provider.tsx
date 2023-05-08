@@ -30,6 +30,8 @@ export function WakuFeatureProvider({ children }: WakuFeatureProviderProps) {
     const get = async () => {
       if (chainId) {
         const { wakuFeatured, top5 } = await receiveWakuFeature(waku, config.wakuConfig.wakuFeatureTopic, chainId)
+        console.log(wakuFeatured)
+        console.log(top5)
         setFeatureVotes(wakuFeatured)
         setFeatured(top5)
       }

@@ -2,19 +2,60 @@ import React from 'react'
 import styled from 'styled-components'
 import backgroundImage from '../assets/images/curve-shape.svg'
 import { Colors } from '../constants/styles'
+import { useContracts } from '../hooks/useContracts'
+import { VoteBtn } from './Button'
+import { BigNumber } from 'ethers'
+import { useContractCall, useContractFunction } from '@usedapp/core'
 
 export const WeeklyFeature = ({ endDate }: { endDate: Date }) => {
+  const { featuredVotingContract } = useContracts()
+  const { send } = useContractFunction(featuredVotingContract, 'initializeVoting')
+  const castVotes = useContractFunction(featuredVotingContract, 'castVotes')
+  const finalizeVoting = useContractFunction(featuredVotingContract, 'finalizeVoting')
+
+  const weeklyVoting = useContractCall({
+    abi: featuredVotingContract.interface,
+    address: featuredVotingContract.address,
+    method: 'votings',
+    args: [],
+  }) ?? [[]]
+
+  console.log('votings?')
+  console.log(weeklyVoting)
+
+  const votes: string[] = []
+
+  console.log(featuredVotingContract)
+
+  // weeklyVoting.map((voting: any) => {
+  //   console.log(voting.id)
+  //   console.log(voting.finalized)
+  // })
+
   const today = new Date()
   const differenceInTime = endDate.getTime() - today.getTime()
   if (differenceInTime < 1) return null
   const daysLeft = Math.ceil(differenceInTime / (1000 * 3600 * 24))
 
   return (
-    <View>
-      ⭐ <span>Weekly Feature vote {window.innerWidth < 600 ? 'ends' : ''}:</span>
-      {daysLeft}&nbsp;
-      {daysLeft.toString().endsWith('1') ? 'day ' : ' days'} {window.innerWidth < 600 ? '' : 'left'}
-    </View>
+    <>
+      <View>
+        <VoteBtn
+          onClick={() =>
+            send('0x029f196bbfef4fa6a5eb81dd802133a63498325445ca1af1d154b1bb4542955133', BigNumber.from(10000))
+          }
+        >
+          Start weekly
+        </VoteBtn>
+        <VoteBtn onClick={() => featuredVotingContract.castVotes.send(votes)}>Verify weekly</VoteBtn>
+        <VoteBtn onClick={() => finalizeVoting.send()}>Finalize weekly</VoteBtn>
+      </View>
+      <View>
+        ⭐ <span>Weekly Feature vote {window.innerWidth < 600 ? 'ends' : ''}:</span>
+        {daysLeft}&nbsp;
+        {daysLeft.toString().endsWith('1') ? 'day ' : ' days'} {window.innerWidth < 600 ? '' : 'left'}
+      </View>
+    </>
   )
 }
 

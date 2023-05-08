@@ -1,17 +1,17 @@
 import { useCommunitiesProvider } from '../providers/communities/provider'
-// import { useWakuFeature } from '../providers/wakuFeature/provider'
+import { useWakuFeature } from '../providers/wakuFeature/provider'
 import { CommunityDetail } from '../models/community'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useContractCalls } from '@usedapp/core'
 import { useContracts } from './useContracts'
 import { useWaku } from '../providers/waku/provider'
 import { deserializePublicKey, RequestClient } from '@status-im/js'
+import { BigNumber } from 'ethers'
 
 export function useCommunities(publicKeys: string[]): CommunityDetail[] {
   const { communitiesDetails, dispatch } = useCommunitiesProvider()
-
   const { waku } = useWaku()
-  // const { featureVotes } = useWakuFeature()
+  const { featureVotes } = useWakuFeature()
 
   const { votingContract } = useContracts()
 
@@ -27,23 +27,6 @@ export function useCommunities(publicKeys: string[]): CommunityDetail[] {
       })
     ) ?? []
 
-  // useEffect(() => {
-  //   setReturnCommunities(
-  //     publicKeys.map((publicKey) => {
-  //       const detail = communitiesDetails[publicKey]
-  //       if (detail) {
-  //         if (featureVotes[publicKey]) {
-  //           return { ...detail, featureVotes: featureVotes[publicKey].sum }
-  //         } else {
-  //           return { ...detail, featureVotes: BigNumber.from(0) }
-  //         }
-  //       } else {
-  //         return undefined
-  //       }
-  //     })
-  //   )
-  // }, [communitiesDetails, featureVotes, JSON.stringify(publicKeys)])
-
   useEffect(() => {
     if (!waku || publicKeys.length === 0) return
 
@@ -58,6 +41,9 @@ export function useCommunities(publicKeys: string[]): CommunityDetail[] {
 
           const requestClient = new RequestClient(waku)
           const community = await requestClient.fetchCommunityDescription(deserializedPublicKey)
+
+          console.log('community')
+          console.log(community)
 
           if (!community) {
             console.warn(`Community ${deserializedPublicKey} not found`)
@@ -114,7 +100,7 @@ export function useCommunities(publicKeys: string[]): CommunityDetail[] {
       return {
         ...communitiesDetails[deserializedPublicKey],
         votingHistory,
-        // featureVotes: featureVotes[publicKey]?.sum ?? BigNumber.from(0),
+        featureVotes: featureVotes[publicKey]?.sum ?? BigNumber.from(0),
       }
     })
     .filter(Boolean)

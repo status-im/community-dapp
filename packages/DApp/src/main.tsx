@@ -7,7 +7,7 @@ import { App } from './App'
 import { DAppProvider } from '@usedapp/core'
 import { WakuProvider } from './providers/waku/provider'
 import { CommunitiesProvider } from './providers/communities/provider'
-// import { WakuFeatureProvider } from './providers/wakuFeature/provider'
+import { WakuFeatureProvider } from './providers/wakuFeature/provider'
 import { config } from './config'
 
 render(
@@ -15,9 +15,9 @@ render(
     <WakuProvider>
       <DAppProvider config={config.daapConfig}>
         <CommunitiesProvider>
-          {/* <WakuFeatureProvider> */}
-          <App />
-          {/* </WakuFeatureProvider> */}
+          <WakuFeatureProvider>
+            <App />
+          </WakuFeatureProvider>
         </CommunitiesProvider>
       </DAppProvider>
     </WakuProvider>

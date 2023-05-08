@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from 'uuid'
+// import { v4 as uuidv4 } from 'uuid'
 import { ChainId, OptimismGoerli, Optimism, Config as DAppConfig, Localhost, Hardhat } from '@usedapp/core'
 
 const version = '0.0.6'
@@ -22,8 +22,8 @@ const configs: Record<typeof process.env.ENV, Config> = {
   development: {
     wakuConfig: {
       environment: 'test',
-      wakuTopic: `/communitiesCuration/localhost/${uuidv4()}/${version}/directory/proto/`,
-      wakuFeatureTopic: `/communitiesCuration/localhost/${uuidv4()}/${version}/featured/proto/`,
+      wakuTopic: `/communitiesCuration/localhost/abc/${version}/directory/proto/`,
+      wakuFeatureTopic: `/communitiesCuration/localhost/abc/${version}/featured/proto/`,
     },
     daapConfig: {
       readOnlyChainId: ChainId.Hardhat,

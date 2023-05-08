@@ -86,7 +86,7 @@ export const CardFeature = ({ community, currentVoting, room }: CardFeatureProps
             <VoteConfirmModal community={community} selectedVote={{ verb: 'to feature' }} setShowModal={setNewModal} />
           </Modal>
         )}
-        <FeatureBtn disabled={inFeatured} onClick={() => setShowFeatureModal(true)}>
+        <FeatureBtn disabled={!account || inFeatured} onClick={() => setShowFeatureModal(true)}>
           Feature this community! <span style={{ fontSize: '20px' }}>⭐️</span>
         </FeatureBtn>
       </div>
