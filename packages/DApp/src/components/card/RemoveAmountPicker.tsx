@@ -39,7 +39,7 @@ export function RemoveAmountPicker({ community, setShowConfirmModal }: RemoveAmo
             icon="⏳"
             text={`${community.name} had a vote for removal ${timespan(
               lastVoteDate
-            )} days ago. A new vote can be submitted after 30 days passes since the last vote.`}
+            )} days ago. A new vote can be submitted after 2 days passes since the last vote.`}
           />
           <ConfirmBtn
             onClick={() => {
