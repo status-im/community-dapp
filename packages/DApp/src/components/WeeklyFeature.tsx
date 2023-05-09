@@ -16,16 +16,14 @@ export const WeeklyFeature = ({ endDate }: { endDate: Date }) => {
   const weeklyVoting = useContractCall({
     abi: featuredVotingContract.interface,
     address: featuredVotingContract.address,
-    method: 'votings',
+    method: 'getVotings',
     args: [],
   }) ?? [[]]
 
-  console.log('votings?')
+  console.log('votings:')
   console.log(weeklyVoting)
 
   const votes: string[] = []
-
-  console.log(featuredVotingContract)
 
   // weeklyVoting.map((voting: any) => {
   //   console.log(voting.id)
@@ -39,7 +37,7 @@ export const WeeklyFeature = ({ endDate }: { endDate: Date }) => {
 
   return (
     <>
-      <View>
+      <VotingControlTemp>
         <VoteBtn
           onClick={() =>
             send('0x029f196bbfef4fa6a5eb81dd802133a63498325445ca1af1d154b1bb4542955133', BigNumber.from(10000))
@@ -47,9 +45,9 @@ export const WeeklyFeature = ({ endDate }: { endDate: Date }) => {
         >
           Start weekly
         </VoteBtn>
-        <VoteBtn onClick={() => featuredVotingContract.castVotes.send(votes)}>Verify weekly</VoteBtn>
+        <VoteBtn onClick={() => castVotes.send(votes)}>Verify weekly</VoteBtn>
         <VoteBtn onClick={() => finalizeVoting.send()}>Finalize weekly</VoteBtn>
-      </View>
+      </VotingControlTemp>
       <View>
         ⭐ <span>Weekly Feature vote {window.innerWidth < 600 ? 'ends' : ''}:</span>
         {daysLeft}&nbsp;
@@ -58,6 +56,13 @@ export const WeeklyFeature = ({ endDate }: { endDate: Date }) => {
     </>
   )
 }
+
+const VotingControlTemp = styled.div`
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 0;
+`
 
 const View = styled.div`
   display: flex;
