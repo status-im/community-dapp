@@ -29,7 +29,6 @@ interface CardVoteMobileProps {
 }
 
 export const CardVoteMobile = ({ room }: CardVoteMobileProps) => {
-  const [vote, setVote] = useState(voting.fromRoom(room))
   const { account } = useEthers()
 
   const selectedVoted = voteTypes['Add'].for
@@ -38,6 +37,7 @@ export const CardVoteMobile = ({ room }: CardVoteMobileProps) => {
   const [voted, setVoted] = useState(false)
 
   const { votingContract } = useContracts()
+  const vote = voting.fromRoom(room)
   const voteConstants = voteTypes[vote.type]
   const { votes } = useVotesAggregate(vote.ID, room.verificationStartAt, room.startAt)
   const castVotes = useContractFunction(votingContract, 'castVotes')
@@ -63,10 +63,6 @@ export const CardVoteMobile = ({ room }: CardVoteMobileProps) => {
   const [showHistory, setShowHistory] = useState(false)
   const isDisabled = room.details.votingHistory.length === 0
   const sendWakuVote = useSendWakuVote()
-
-  useEffect(() => {
-    setVote(voting.fromRoom(room))
-  }, [JSON.stringify(room)])
 
   const includeUnverifiedVotes = !winner || verificationPeriod
 
@@ -142,9 +138,6 @@ export const CardVoteMobile = ({ room }: CardVoteMobileProps) => {
                 await sendWakuVote(proposingAmount, room.roomNumber, 0)
                 setVoted(true)
                 setSentVotesAgainst(sentVotesAgainst + proposingAmount)
-                setVote((vote) => {
-                  return { ...vote, voteAgainst: vote.voteAgainst.add(proposingAmount) }
-                })
               }}
             >
               {voteConstants.against.text} <span>{voteConstants.against.icon}</span>
@@ -155,9 +148,6 @@ export const CardVoteMobile = ({ room }: CardVoteMobileProps) => {
                 await sendWakuVote(proposingAmount, room.roomNumber, 1)
                 setVoted(true)
                 setSentVotesFor(sentVotesFor + proposingAmount)
-                setVote((vote) => {
-                  return { ...vote, voteFor: vote.voteFor.add(proposingAmount) }
-                })
               }}
             >
               {voteConstants.for.text} <span>{voteConstants.for.icon}</span>
