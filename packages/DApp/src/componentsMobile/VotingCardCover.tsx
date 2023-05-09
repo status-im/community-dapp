@@ -14,8 +14,9 @@ interface VotingCardCoverProps {
 }
 
 export function VotingCardCover({ room }: VotingCardCoverProps) {
-  room = useRoomAggregateVotes(room, false)
   const vote = voting.fromRoom(room)
+
+  room = useRoomAggregateVotes(room, false)
   const history = useHistory()
 
   const now = Date.now()
