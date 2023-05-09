@@ -78,10 +78,6 @@ export function useUnverifiedVotes(room: number | undefined, verificationStartAt
           return { for: acc.for, against: acc.against, voted: acc.voted }
         }, initialVotes)
 
-        if (!votes.for && !votes.against) {
-          return
-        }
-
         setVotesFor(votes.for)
         setVotesAgainst(votes.against)
         setVoters(votes.voted)
