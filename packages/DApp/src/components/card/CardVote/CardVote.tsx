@@ -32,6 +32,7 @@ export const CardVote = ({ room, hideModalFunction }: CardVoteProps) => {
   const [selectedVoted, setSelectedVoted] = useState(voteTypes['Add'].for)
   const [sentVotesFor, setSentVotesFor] = useState(0)
   const [sentVotesAgainst, setSentVotesAgainst] = useState(0)
+  const [voted, setVoted] = useState(false)
 
   const { votingContract } = useContracts()
   const vote = voting.fromRoom(room)
@@ -62,11 +63,11 @@ export const CardVote = ({ room, hideModalFunction }: CardVoteProps) => {
 
   const winner = verificationPeriod ? 0 : getVotingWinner(vote)
 
-  const { votesFor: votesForUnverified, votesAgainst: votesAgainstUnverified } = useUnverifiedVotes(
-    vote.ID,
-    room.verificationStartAt,
-    room.startAt
-  )
+  const {
+    votesFor: votesForUnverified,
+    votesAgainst: votesAgainstUnverified,
+    voters,
+  } = useUnverifiedVotes(vote.ID, room.verificationStartAt, room.startAt)
 
   const includeUnverifiedVotes = !winner || verificationPeriod
 
@@ -76,6 +77,10 @@ export const CardVote = ({ room, hideModalFunction }: CardVoteProps) => {
   const votesAgainst = !includeUnverifiedVotes
     ? vote.voteAgainst.toNumber()
     : vote.voteAgainst.toNumber() + votesAgainstUnverified + sentVotesAgainst
+
+  /* note: the `voted` state is not shared after a proposing removal and navigatig from /directory route,
+    nor on changing routes and refreshing based on window width */
+  const canVote = voted ? false : Boolean(account && !voters.includes(account))
 
   if (!vote) {
     return <CardVoteBlock />
@@ -92,6 +97,8 @@ export const CardVote = ({ room, hideModalFunction }: CardVoteProps) => {
             setShowConfirmModal={setNext}
             setProposingAmount={setProposingAmount}
             onSend={(proposingAmount: number) => {
+              setVoted(true)
+
               if (selectedVoted.type === 0) {
                 setSentVotesAgainst(sentVotesAgainst + proposingAmount)
               }
@@ -157,8 +164,9 @@ export const CardVote = ({ room, hideModalFunction }: CardVoteProps) => {
         {!verificationPeriod && !winner && (
           <VotesBtns>
             <VoteBtn
-              disabled={!account}
+              disabled={!canVote}
               onClick={() => {
+                setVoted(true)
                 setSelectedVoted(voteConstants.against)
                 setShowVoteModal(true)
               }}
@@ -166,8 +174,9 @@ export const CardVote = ({ room, hideModalFunction }: CardVoteProps) => {
               {voteConstants.against.text} <span>{voteConstants.against.icon}</span>
             </VoteBtn>
             <VoteBtn
-              disabled={!account}
+              disabled={!canVote}
               onClick={() => {
+                setVoted(true)
                 setSelectedVoted(voteConstants.for)
                 setShowVoteModal(true)
               }}
