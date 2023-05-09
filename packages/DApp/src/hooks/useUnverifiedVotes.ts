@@ -51,13 +51,9 @@ export function useUnverifiedVotes(room: number | undefined, verificationStartAt
         }
 
         const votes: InitialVotes = validMessages.reduce((acc, message) => {
-          // todo?: if non-proposing accounts can vote multiple times
-          // account already voted
-          // if (acc.voted.includes(message.address)) {
-          //   // fixme?: do not include votes of the proposing account
-          //   console.log('ALREADY VOTED')
-          //   return { for: acc.for, against: acc.against, voted: acc.voted }
-          // }
+          if (acc.voted.includes(message.address)) {
+            return { for: acc.for, against: acc.against, voted: acc.voted }
+          }
 
           if (message.vote === 'no') {
             return {
