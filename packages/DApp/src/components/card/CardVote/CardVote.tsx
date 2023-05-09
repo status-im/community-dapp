@@ -151,7 +151,15 @@ export const CardVote = ({ room, hideModalFunction }: CardVoteProps) => {
           votesAgainst={votesAgainst}
         />
         {verificationPeriod && (
-          <VoteBtnFinal onClick={() => castVotes.send(votes)} disabled={!account}>
+          <VoteBtnFinal
+            onClick={async () => {
+              await castVotes.send(votes)
+
+              setSentVotesFor(0)
+              setSentVotesAgainst(0)
+            }}
+            disabled={!account}
+          >
             Verify votes
           </VoteBtnFinal>
         )}
