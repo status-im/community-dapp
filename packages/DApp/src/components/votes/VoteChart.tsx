@@ -74,6 +74,7 @@ export function VoteChart({
             <span style={{ fontWeight: 'normal' }}>SNT</span>
           </span>
         </VoteBox>
+        {/* todo: wrapper component with timer and setInterval */}
         <TimeLeft className={selectedVote ? '' : 'notModal'}>
           {vote.timeLeft > 0 ? formatTimeLeft(vote.timeLeft) : formatTimeLeftVerification(vote.timeLeftVerification)}
         </TimeLeft>
