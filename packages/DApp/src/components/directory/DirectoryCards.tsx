@@ -47,7 +47,7 @@ export function DirectoryCards() {
         />
         <FilterList value={sortedBy} setValue={setSortedBy} options={DirectorySortingOptions} />
       </PageBar>
-      <WeeklyFeature endDate={new Date('05/10/2023')} />
+      <WeeklyFeature endDate={new Date('05/10/2022')} />
       <Voting>{renderCommunities()}</Voting>
     </>
   )
