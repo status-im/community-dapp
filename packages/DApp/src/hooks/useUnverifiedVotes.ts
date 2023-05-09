@@ -43,6 +43,7 @@ export function useUnverifiedVotes(room: number | undefined, verificationStartAt
 
     const accumulateVotes = async () => {
       if (waku && room) {
+        // todo?: reverse order to use only first votes
         const messages = await wakuMessage.receive(waku, config.wakuConfig.wakuTopic, room)
 
         if (!messages?.length) {
