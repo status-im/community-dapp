@@ -166,7 +166,6 @@ export const CardVote = ({ room, hideModalFunction }: CardVoteProps) => {
             <VoteBtn
               disabled={!canVote}
               onClick={() => {
-                setVoted(true)
                 setSelectedVoted(voteConstants.against)
                 setShowVoteModal(true)
               }}
@@ -176,7 +175,6 @@ export const CardVote = ({ room, hideModalFunction }: CardVoteProps) => {
             <VoteBtn
               disabled={!canVote}
               onClick={() => {
-                setVoted(true)
                 setSelectedVoted(voteConstants.for)
                 setShowVoteModal(true)
               }}
