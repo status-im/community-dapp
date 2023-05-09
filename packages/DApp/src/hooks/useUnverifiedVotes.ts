@@ -34,8 +34,13 @@ export function useUnverifiedVotes(room: number | undefined, verificationStartAt
   const { waku } = useWaku()
   const [votesFor, setVotesFor] = useState<number>(initialVotes.for)
   const [votesAgainst, setVotesAgainst] = useState<number>(initialVotes.against)
+  const [voters, setVoters] = useState<string[]>(initialVotes.voted)
 
   useEffect(() => {
+    if (!voters.length && alreadyVotedList && alreadyVotedList.length) {
+      setVoters(alreadyVotedList)
+    }
+
     const accumulateVotes = async () => {
       if (waku && room) {
         const messages = await wakuMessage.receive(waku, config.wakuConfig.wakuTopic, room)
@@ -78,10 +83,11 @@ export function useUnverifiedVotes(room: number | undefined, verificationStartAt
 
         setVotesFor(votes.for)
         setVotesAgainst(votes.against)
+        setVoters(votes.voted)
       }
     }
     accumulateVotes()
   }, [waku, room, alreadyVotedList])
 
-  return { votesFor, votesAgainst }
+  return { votesFor, votesAgainst, voters }
 }
