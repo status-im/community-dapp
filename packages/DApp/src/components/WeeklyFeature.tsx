@@ -33,7 +33,10 @@ export const WeeklyFeature = ({ endDate }: { endDate: Date }) => {
       <VotingControlTemp>
         <VoteBtn
           onClick={() =>
-            send('0x029f196bbfef4fa6a5eb81dd802133a63498325445ca1af1d154b1bb4542955133', BigNumber.from(10000))
+            send(
+              '0x0486c7c2e3e389b617e75aede6a90e823bc49548a6ca937c0691851831a8690072fa4f160122d1b0aa86ba07806a0b0073b2bff0fee3c8c53dc4289e880a819e4f',
+              BigNumber.from(10000)
+            )
           }
         >
           Start weekly
