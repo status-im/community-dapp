@@ -22,8 +22,8 @@ const configs: Record<typeof process.env.ENV, Config> = {
   development: {
     wakuConfig: {
       environment: 'test',
-      wakuTopic: `/communitiesCuration/localhost/abc/${version}/directory/proto/`,
-      wakuFeatureTopic: `/communitiesCuration/localhost/abc/${version}/featured/proto/`,
+      wakuTopic: `/communitiesCuration/localhost/${version}/directory/proto/`,
+      wakuFeatureTopic: `/communitiesCuration/localhost/${version}/featured/proto/`,
     },
     daapConfig: {
       readOnlyChainId: ChainId.Hardhat,
