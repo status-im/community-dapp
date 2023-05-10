@@ -16,7 +16,10 @@ export interface VoteModalProps {
   room: number
   setShowConfirmModal: (show: boolean) => void
   setProposingAmount: (val: number) => void
+  onSend: (val: number) => void
   fullRoom: DetailedVotingRoom
+  votesFor: number
+  votesAgainst: number
 }
 
 export function VoteModal({
@@ -26,14 +29,22 @@ export function VoteModal({
   proposingAmount,
   setShowConfirmModal,
   setProposingAmount,
-  fullRoom,
+  onSend,
+  votesFor,
+  votesAgainst,
 }: VoteModalProps) {
   const disabled = proposingAmount === 0
   const sendWakuVote = useSendWakuVote()
 
   return (
     <ColumnFlexDiv>
-      <VoteChart vote={vote} proposingAmount={proposingAmount} selectedVote={selectedVote} room={fullRoom} />
+      <VoteChart
+        vote={vote}
+        proposingAmount={proposingAmount}
+        selectedVote={selectedVote}
+        votesFor={votesFor}
+        votesAgainst={votesAgainst}
+      />
       <VotePropose
         vote={vote}
         selectedVote={selectedVote}
@@ -43,7 +54,11 @@ export function VoteModal({
 
       <VoteConfirmBtn
         onClick={async () => {
+          // fixme?: eval error
           await sendWakuVote(proposingAmount, room, selectedVote.type)
+
+          onSend(proposingAmount)
+
           setShowConfirmModal(true)
         }}
         disabled={disabled}

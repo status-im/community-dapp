@@ -1,4 +1,6 @@
-import React, { useState } from 'react'
+// todo?: use store for votes, aggregations, verification period, winner
+
+import React, { useEffect, useState } from 'react'
 import { VoteModal } from './../VoteModal'
 import { VoteChart } from './../../votes/VoteChart'
 import { voteTypes } from './../../../constants/voteTypes'
@@ -15,6 +17,7 @@ import { Modal } from './../../Modal'
 import { VoteBtn, VotesBtns } from '../../Button'
 import { CardHeading, CardVoteBlock } from '../../Card'
 import { useVotesAggregate } from '../../../hooks/useVotesAggregate'
+import { useUnverifiedVotes } from '../../../hooks/useUnverifiedVotes'
 
 interface CardVoteProps {
   room: DetailedVotingRoom
@@ -27,6 +30,13 @@ export const CardVote = ({ room, hideModalFunction }: CardVoteProps) => {
   const [showConfirmModal, setShowConfirmModal] = useState(false)
   const [proposingAmount, setProposingAmount] = useState(0)
   const [selectedVoted, setSelectedVoted] = useState(voteTypes['Add'].for)
+  const [sentVotesFor, setSentVotesFor] = useState(0)
+  const [sentVotesAgainst, setSentVotesAgainst] = useState(0)
+  const [voted, setVoted] = useState<null | boolean>(null)
+
+  useEffect(() => {
+    setVoted(null)
+  }, [account])
 
   const { votingContract } = useContracts()
   const vote = voting.fromRoom(room)
@@ -50,10 +60,31 @@ export const CardVote = ({ room, hideModalFunction }: CardVoteProps) => {
     setShowConfirmModal(val)
   }
 
-  const verificationPeriod =
-    room.verificationStartAt.toNumber() * 1000 - Date.now() < 0 && room.endAt.toNumber() * 1000 - Date.now() > 0
+  const now = Date.now()
+  const verificationStarted = room.verificationStartAt.toNumber() * 1000 - now < 0
+  const verificationEnded = room.endAt.toNumber() * 1000 - now < 0
+  const verificationPeriod = verificationStarted && !verificationEnded
 
   const winner = verificationPeriod ? 0 : getVotingWinner(vote)
+
+  const {
+    votesFor: votesForUnverified,
+    votesAgainst: votesAgainstUnverified,
+    voters,
+  } = useUnverifiedVotes(vote.ID, room.verificationStartAt, room.startAt)
+
+  const includeUnverifiedVotes = !winner || verificationPeriod
+
+  const votesFor = !includeUnverifiedVotes
+    ? vote.voteFor.toNumber()
+    : vote.voteFor.toNumber() + votesForUnverified + sentVotesFor
+  const votesAgainst = !includeUnverifiedVotes
+    ? vote.voteAgainst.toNumber()
+    : vote.voteAgainst.toNumber() + votesAgainstUnverified + sentVotesAgainst
+
+  /* note: the `voted` state is not shared after a proposing removal and navigatig from /directory route,
+    nor on changing routes and refreshing based on window width */
+  const canVote = voted ? false : Boolean(account && !voters.includes(account))
 
   if (!vote) {
     return <CardVoteBlock />
@@ -69,7 +100,20 @@ export const CardVote = ({ room, hideModalFunction }: CardVoteProps) => {
             proposingAmount={proposingAmount}
             setShowConfirmModal={setNext}
             setProposingAmount={setProposingAmount}
+            onSend={(proposingAmount: number) => {
+              setVoted(true)
+
+              if (selectedVoted.type === 0) {
+                setSentVotesAgainst(sentVotesAgainst + proposingAmount)
+              }
+
+              if (selectedVoted.type === 1) {
+                setSentVotesFor(sentVotesFor + proposingAmount)
+              }
+            }}
             fullRoom={room}
+            votesFor={votesFor}
+            votesAgainst={votesAgainst}
           />{' '}
         </Modal>
       )}
@@ -81,7 +125,8 @@ export const CardVote = ({ room, hideModalFunction }: CardVoteProps) => {
             selectedVote={selectedVoted}
             setShowModal={hideConfirm}
             proposingAmount={proposingAmount}
-            room={room}
+            votesFor={votesFor}
+            votesAgainst={votesAgainst}
           />
         </Modal>
       )}
@@ -102,9 +147,23 @@ export const CardVote = ({ room, hideModalFunction }: CardVoteProps) => {
       )}
 
       <div>
-        <VoteChart vote={vote} voteWinner={winner} tabletMode={hideModalFunction} room={room} />
+        <VoteChart
+          vote={vote}
+          voteWinner={winner}
+          tabletMode={hideModalFunction}
+          votesFor={votesFor}
+          votesAgainst={votesAgainst}
+        />
         {verificationPeriod && (
-          <VoteBtnFinal onClick={() => castVotes.send(votes)} disabled={!account}>
+          <VoteBtnFinal
+            onClick={async () => {
+              await castVotes.send(votes)
+
+              setSentVotesFor(0)
+              setSentVotesAgainst(0)
+            }}
+            disabled={!account}
+          >
             Verify votes
           </VoteBtnFinal>
         )}
@@ -117,7 +176,7 @@ export const CardVote = ({ room, hideModalFunction }: CardVoteProps) => {
         {!verificationPeriod && !winner && (
           <VotesBtns>
             <VoteBtn
-              disabled={!account}
+              disabled={!canVote}
               onClick={() => {
                 setSelectedVoted(voteConstants.against)
                 setShowVoteModal(true)
@@ -126,7 +185,7 @@ export const CardVote = ({ room, hideModalFunction }: CardVoteProps) => {
               {voteConstants.against.text} <span>{voteConstants.against.icon}</span>
             </VoteBtn>
             <VoteBtn
-              disabled={!account}
+              disabled={!canVote}
               onClick={() => {
                 setSelectedVoted(voteConstants.for)
                 setShowVoteModal(true)

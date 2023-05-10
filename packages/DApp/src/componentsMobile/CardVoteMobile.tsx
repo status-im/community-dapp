@@ -22,18 +22,25 @@ import { useSendWakuVote } from '../hooks/useSendWakuVote'
 import { WrapperBottom, WrapperTop } from '../constants/styles'
 import { useRoomAggregateVotes } from '../hooks/useRoomAggregateVotes'
 import { useVotesAggregate } from '../hooks/useVotesAggregate'
+import { useUnverifiedVotes } from '../hooks/useUnverifiedVotes'
 
 interface CardVoteMobileProps {
   room: DetailedVotingRoom
 }
 
 export const CardVoteMobile = ({ room }: CardVoteMobileProps) => {
-  const [vote, setVote] = useState(voting.fromRoom(room))
   const { account } = useEthers()
-
   const selectedVoted = voteTypes['Add'].for
+  const [sentVotesFor, setSentVotesFor] = useState(0)
+  const [sentVotesAgainst, setSentVotesAgainst] = useState(0)
+  const [voted, setVoted] = useState<null | boolean>(null)
+
+  useEffect(() => {
+    setVoted(null)
+  }, [account])
 
   const { votingContract } = useContracts()
+  const vote = voting.fromRoom(room)
   const voteConstants = voteTypes[vote.type]
   const { votes } = useVotesAggregate(vote.ID, room.verificationStartAt, room.startAt)
   const castVotes = useContractFunction(votingContract, 'castVotes')
@@ -41,19 +48,35 @@ export const CardVoteMobile = ({ room }: CardVoteMobileProps) => {
   const finalizeVoting = useContractFunction(votingContract, 'finalizeVotingRoom')
   room = useRoomAggregateVotes(room, false)
 
-  const verificationPeriod =
-    room.verificationStartAt.toNumber() * 1000 - Date.now() < 0 && room.endAt.toNumber() * 1000 - Date.now() > 0
+  const now = Date.now()
+  const verificationStarted = room.verificationStartAt.toNumber() * 1000 - now < 0
+  const verificationEnded = room.endAt.toNumber() * 1000 - now < 0
+  const verificationPeriod = verificationStarted && !verificationEnded
 
   const winner = verificationPeriod ? 0 : getVotingWinner(vote)
+
+  const {
+    votesFor: votesForUnverified,
+    votesAgainst: votesAgainstUnverified,
+    voters,
+  } = useUnverifiedVotes(vote.ID, room.verificationStartAt, room.startAt)
+
   const [proposingAmount, setProposingAmount] = useState(0)
 
   const [showHistory, setShowHistory] = useState(false)
   const isDisabled = room.details.votingHistory.length === 0
   const sendWakuVote = useSendWakuVote()
 
-  useEffect(() => {
-    setVote(voting.fromRoom(room))
-  }, [JSON.stringify(room)])
+  const includeUnverifiedVotes = !winner || verificationPeriod
+
+  const votesFor = !includeUnverifiedVotes
+    ? vote.voteFor.toNumber()
+    : vote.voteFor.toNumber() + votesForUnverified + sentVotesFor
+  const votesAgainst = !includeUnverifiedVotes
+    ? vote.voteAgainst.toNumber()
+    : vote.voteAgainst.toNumber() + votesAgainstUnverified + sentVotesAgainst
+
+  const canVote = voted ? false : Boolean(account && !voters.includes(account))
 
   if (!vote) {
     return <CardVoteBlock />
@@ -73,7 +96,13 @@ export const CardVoteMobile = ({ room }: CardVoteMobileProps) => {
       )}
       <div>
         <WrapperBottom>
-          <VoteChart vote={vote} voteWinner={winner} isAnimation={true} room={room} />
+          <VoteChart
+            vote={vote}
+            voteWinner={winner}
+            isAnimation={true}
+            votesFor={votesFor}
+            votesAgainst={votesAgainst}
+          />
         </WrapperBottom>
         {!winner && (
           <WrapperTop>
@@ -86,7 +115,15 @@ export const CardVoteMobile = ({ room }: CardVoteMobileProps) => {
           </WrapperTop>
         )}
         {verificationPeriod && (
-          <VoteBtnFinal onClick={() => castVotes.send(votes)} disabled={!account}>
+          <VoteBtnFinal
+            onClick={async () => {
+              await castVotes.send(votes)
+
+              setSentVotesFor(0)
+              setSentVotesAgainst(0)
+            }}
+            disabled={!account}
+          >
             Verify votes
           </VoteBtnFinal>
         )}
@@ -99,23 +136,21 @@ export const CardVoteMobile = ({ room }: CardVoteMobileProps) => {
         {!verificationPeriod && !winner && (
           <VotesBtns>
             <VoteBtn
-              disabled={!account}
+              disabled={!canVote}
               onClick={async () => {
                 await sendWakuVote(proposingAmount, room.roomNumber, 0)
-                setVote((vote) => {
-                  return { ...vote, voteAgainst: vote.voteAgainst.add(proposingAmount) }
-                })
+                setVoted(true)
+                setSentVotesAgainst(sentVotesAgainst + proposingAmount)
               }}
             >
               {voteConstants.against.text} <span>{voteConstants.against.icon}</span>
             </VoteBtn>
             <VoteBtn
-              disabled={!account}
+              disabled={!canVote}
               onClick={async () => {
                 await sendWakuVote(proposingAmount, room.roomNumber, 1)
-                setVote((vote) => {
-                  return { ...vote, voteFor: vote.voteFor.add(proposingAmount) }
-                })
+                setVoted(true)
+                setSentVotesFor(sentVotesFor + proposingAmount)
               }}
             >
               {voteConstants.for.text} <span>{voteConstants.for.icon}</span>

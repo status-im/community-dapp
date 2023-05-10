@@ -7,36 +7,28 @@ import { VoteType, voteTypes } from './../../constants/voteTypes'
 import { CurrentVoting } from '../../models/community'
 import { VoteGraphBar } from './VoteGraphBar'
 import { formatTimeLeft, formatTimeLeftVerification } from '../../helpers/fomatTimeLeft'
-import { useUnverifiedVotes } from '../../hooks/useUnverifiedVotes'
-import { DetailedVotingRoom } from '../../models/smartContract'
 export interface VoteChartProps {
   vote: CurrentVoting
+  votesFor: number
+  votesAgainst: number
   voteWinner?: number
   proposingAmount?: number
   selectedVote?: VoteType
   isAnimation?: boolean
   tabletMode?: (val: boolean) => void
-  room: DetailedVotingRoom
 }
 
 export function VoteChart({
   vote,
+  votesFor,
+  votesAgainst,
   voteWinner,
   proposingAmount,
   selectedVote,
   isAnimation,
   tabletMode,
-  room,
 }: VoteChartProps) {
   const [mobileVersion, setMobileVersion] = useState(false)
-  const { votesFor: votesForUnverified, votesAgainst: votesAgainstUnverified } = useUnverifiedVotes(
-    vote.ID,
-    room.verificationStartAt,
-    room.startAt
-  )
-
-  const verificationPeriod =
-    room.verificationStartAt.toNumber() * 1000 - Date.now() < 0 && room.endAt.toNumber() * 1000 - Date.now() > 0
 
   useEffect(() => {
     const handleResize = () => {
@@ -53,30 +45,8 @@ export function VoteChart({
 
   const voteConstants = voteTypes[vote.type]
 
-  const includeUnverifiedVotes = voteWinner || verificationPeriod
-
-  const votesFor = includeUnverifiedVotes ? vote.voteFor.toNumber() : vote.voteFor.toNumber() + votesForUnverified
-  const votesAgainst = includeUnverifiedVotes
-    ? vote.voteAgainst.toNumber()
-    : vote.voteAgainst.toNumber() + votesAgainstUnverified
   const voteSum = votesFor + votesAgainst
-  const graphWidth = (100 * votesAgainst) / voteSum
-
-  const [originalVotesFor] = useState(() =>
-    includeUnverifiedVotes ? vote.voteFor.toNumber() : vote.voteFor.toNumber() + votesForUnverified
-  )
-  const [originalVotesAgainst] = useState(() =>
-    includeUnverifiedVotes ? vote.voteAgainst.toNumber() : vote.voteAgainst.toNumber() + votesAgainstUnverified
-  )
-
-  let balanceWidth = graphWidth
-
-  if (proposingAmount && selectedVote) {
-    balanceWidth =
-      selectedVote.type === 0
-        ? (100 * (votesAgainst + proposingAmount)) / (voteSum + proposingAmount)
-        : (100 * votesAgainst) / (voteSum + proposingAmount)
-  }
+  const graphAgaintsWidth = (100 * votesAgainst) / voteSum
 
   const iconWinnerFont = mobileVersion ? '36px' : '42px'
 
@@ -97,13 +67,14 @@ export function VoteChart({
           <span>
             {' '}
             {isAnimation && proposingAmount && selectedVote && selectedVote.type === 0 ? (
-              <CountUp end={originalVotesAgainst + proposingAmount} separator="," />
+              <CountUp end={votesAgainst} separator="," />
             ) : (
               addCommas(votesAgainst)
             )}{' '}
             <span style={{ fontWeight: 'normal' }}>SNT</span>
           </span>
         </VoteBox>
+        {/* todo: wrapper component with timer and setInterval */}
         <TimeLeft className={selectedVote ? '' : 'notModal'}>
           {vote.timeLeft > 0 ? formatTimeLeft(vote.timeLeft) : formatTimeLeftVerification(vote.timeLeftVerification)}
         </TimeLeft>
@@ -121,7 +92,7 @@ export function VoteChart({
           <span>
             {' '}
             {isAnimation && proposingAmount && selectedVote && selectedVote.type === 1 ? (
-              <CountUp end={originalVotesFor + proposingAmount} separator="," />
+              <CountUp end={votesFor} separator="," />
             ) : (
               addCommas(votesFor)
             )}{' '}
@@ -131,8 +102,8 @@ export function VoteChart({
       </VotesChart>
       <VoteGraphBarWrap className={selectedVote || tabletMode ? '' : 'notModal'}>
         <VoteGraphBar
-          graphWidth={graphWidth}
-          balanceWidth={balanceWidth}
+          graphWidth={graphAgaintsWidth}
+          balanceWidth={graphAgaintsWidth}
           voteWinner={voteWinner}
           isAnimation={isAnimation}
         />

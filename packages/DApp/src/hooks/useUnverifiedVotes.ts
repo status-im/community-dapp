@@ -14,6 +14,7 @@ type InitialVotes = {
   voted: string[]
 }
 
+// todo: merge with other aggregating hook
 export function useUnverifiedVotes(room: number | undefined, verificationStartAt: BigNumber, startAt: BigNumber) {
   const { votingContract } = useContracts()
   const [alreadyVotedList] =
@@ -33,42 +34,57 @@ export function useUnverifiedVotes(room: number | undefined, verificationStartAt
   const { waku } = useWaku()
   const [votesFor, setVotesFor] = useState<number>(initialVotes.for)
   const [votesAgainst, setVotesAgainst] = useState<number>(initialVotes.against)
+  const [voters, setVoters] = useState<string[]>(initialVotes.voted)
 
   useEffect(() => {
+    if (!voters.length && alreadyVotedList && alreadyVotedList.length) {
+      setVoters(alreadyVotedList)
+    }
+
     const accumulateVotes = async () => {
       if (waku && room) {
+        // todo?: reverse order to use only first votes
         const messages = await wakuMessage.receive(waku, config.wakuConfig.wakuTopic, room)
-        const validMessages = messages?.filter((message) => validateVote(message, verificationStartAt, startAt))
 
-        const votes: InitialVotes =
-          validMessages?.reduce((acc, message) => {
-            if (acc.voted.includes(message.address)) {
-              return { for: acc.for, against: acc.against, voted: acc.voted }
-            }
+        if (!messages?.length) {
+          return
+        }
 
-            if (message.vote === 'no') {
-              return {
-                for: acc.for,
-                against: acc.against + parseInt(message.sntAmount._hex, 16),
-                voted: [...acc.voted, message.address],
-              }
-            } else if (message.vote === 'yes') {
-              return {
-                for: acc.for + parseInt(message.sntAmount._hex, 16),
-                against: acc.against,
-                voted: [...acc.voted, message.address],
-              }
-            }
+        const validMessages = messages.filter((message) => validateVote(message, verificationStartAt, startAt))
 
+        if (!validMessages.length) {
+          return
+        }
+
+        const votes: InitialVotes = validMessages.reduce((acc, message) => {
+          if (acc.voted.includes(message.address)) {
             return { for: acc.for, against: acc.against, voted: acc.voted }
-          }, initialVotes) ?? initialVotes
+          }
 
-        setVotesFor(votes?.for)
-        setVotesAgainst(votes?.against)
+          if (message.vote === 'no') {
+            return {
+              for: acc.for,
+              against: acc.against + parseInt(message.sntAmount._hex, 16),
+              voted: [...acc.voted, message.address],
+            }
+          } else if (message.vote === 'yes') {
+            return {
+              for: acc.for + parseInt(message.sntAmount._hex, 16),
+              against: acc.against,
+              voted: [...acc.voted, message.address],
+            }
+          }
+
+          return { for: acc.for, against: acc.against, voted: acc.voted }
+        }, initialVotes)
+
+        setVotesFor(votes.for)
+        setVotesAgainst(votes.against)
+        setVoters(votes.voted)
       }
     }
     accumulateVotes()
   }, [waku, room, alreadyVotedList])
 
-  return { votesFor, votesAgainst }
+  return { votesFor, votesAgainst, voters }
 }

@@ -53,7 +53,7 @@ const VoteGraph = styled.div<VoteGraphBarProps>`
   background-color: ${({ theme }) => (theme.voteWinner === 1 ? Colors.GrayDisabledLight : Colors.BlueBar)};
   border-radius: 10px;
   padding-top: 5px;
-  border-left: 13px solid ${({ theme }) => (theme.voteWinner === 0 ? Colors.GrayDisabledLight : Colors.Orange)};
+  border-left: 13px solid ${({ theme }) => (theme.voteWinner === 2 ? Colors.GrayDisabledLight : Colors.Orange)};
   border-right: 13px solid ${({ theme }) => (theme.voteWinner === 1 ? Colors.GrayDisabledLight : Colors.BlueBar)};
 
   @media (max-width: 600px) {
