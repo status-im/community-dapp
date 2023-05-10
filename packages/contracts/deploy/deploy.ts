@@ -9,7 +9,7 @@ import hre from 'hardhat'
 import { ERC20Mock, MultiCall } from '../abi'
 import { BigNumber } from 'ethers'
 
-import { config } from '../../DApp/src/config'
+import { config } from '../config'
 
 async function deployVotingContract(
   tokenAddress: string,
@@ -107,14 +107,14 @@ async function main() {
   const [deployer] = await hre.ethers.getSigners()
   const network = await hre.ethers.provider.getNetwork()
 
-  const votingLengthInSeconds = config.contractConfig.votingLengthInSeconds
-  const votingVerificationLengthInSeconds = config.contractConfig.votingVerificationLengthInSeconds
-  const timeBetweenVotingInSeconds = config.contractConfig.timeBetweenVotingInSeconds
+  const votingLengthInSeconds = config.votingLengthInSeconds
+  const votingVerificationLengthInSeconds = config.votingVerificationLengthInSeconds
+  const timeBetweenVotingInSeconds = config.timeBetweenVotingInSeconds
 
-  const featuredVotingLengthInSeconds = config.contractConfig.featuredVotingLengthInSeconds
-  const featuredVotingVerificationLengthInSeconds = config.contractConfig.featuredVotingVerificationLengthInSeconds
-  const cooldownPeriod = isTestNetwork(network.chainId) ? 1 : 3
-  const featuredPerVotingCount = isTestNetwork(network.chainId) ? 3 : 5
+  const featuredVotingLengthInSeconds = config.featuredVotingLengthInSeconds
+  const featuredVotingVerificationLengthInSeconds = config.featuredVotingVerificationLengthInSeconds
+  const cooldownPeriod = config.cooldownPeriod
+  const featuredPerVotingCount = config.featuredPerVotingCount
 
   console.log(
     `Deploying contracts on the network: ${network.name}(${network.chainId}), with the account: ${deployer.address}`
