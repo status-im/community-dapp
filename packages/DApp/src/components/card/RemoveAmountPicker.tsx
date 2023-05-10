@@ -10,6 +10,8 @@ import { Warning } from '../votes/VoteWarning'
 import { ConfirmBtn } from './VoteConfirmModal'
 import { useAvailableAmount } from '../../hooks/useAvailableAmount'
 import { BigNumber } from 'ethers'
+// import { config } from '../../config'
+
 interface RemoveAmountPickerProps {
   community: CommunityDetail
   setShowConfirmModal: (val: boolean) => void

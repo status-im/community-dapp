@@ -75,6 +75,7 @@ export function VoteChart({
           </span>
         </VoteBox>
         {/* todo: wrapper component with timer and setInterval */}
+        {/* todo?: use config or keep using value from contract/state */}
         <TimeLeft className={selectedVote ? '' : 'notModal'}>
           {vote.timeLeft > 0 ? formatTimeLeft(vote.timeLeft) : formatTimeLeftVerification(vote.timeLeftVerification)}
         </TimeLeft>

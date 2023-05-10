@@ -1,8 +1,12 @@
 import React from 'react'
 import styled from 'styled-components'
 import { Colors } from '../constants/styles'
+// todo: format values to minutes <1h, hours <24h, otherwise days
+// import { config } from '../config'
 
 export function Rules() {
+  // todo?: useContracts() to get its config instead
+
   return (
     <VotingRules>
       <RulesHeading>Voting rules</RulesHeading>
