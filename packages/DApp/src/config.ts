@@ -1,6 +1,9 @@
 import { v4 as uuidv4 } from 'uuid'
 import { ChainId, OptimismGoerli, Optimism, Config as DAppConfig, Localhost, Hardhat } from '@usedapp/core'
 
+import { configs as contractConfigs } from '../../contracts/config'
+import type { ContractConfig } from '../../contracts/config'
+
 const version = '0.0.5'
 
 export interface Config {
@@ -11,20 +14,12 @@ export interface Config {
   }
   daapConfig: DAppConfig
   statusWalletRequired: boolean
-  contractConfig: {
-    votingLengthInSeconds: number
-    votingVerificationLengthInSeconds: number
-    timeBetweenVotingInSeconds: number
-    featuredVotingLengthInSeconds: number
-    featuredVotingVerificationLengthInSeconds: number
-  }
+  contractConfig: ContractConfig
 }
 
 const env = process.env.ENV ?? 'localhost'
 
-console.log('env', env)
-
-if (!['localhost', 'development', 'production'].includes(env)) {
+if (!['localhost', 'development', ''].includes(env)) {
   throw new Error('Unsupported environment')
 }
 
@@ -52,13 +47,7 @@ const configs: Record<typeof process.env.ENV, Config> = {
         expirationPeriod: 50000,
       },
     },
-    contractConfig: {
-      votingLengthInSeconds: 4 * 60, // 4 minutes
-      votingVerificationLengthInSeconds: 2 * 60, // 2 minutes
-      timeBetweenVotingInSeconds: 60, // 1 minute
-      featuredVotingLengthInSeconds: 4 * 60, // 4 minutes
-      featuredVotingVerificationLengthInSeconds: 2 * 60, // 2 minutes
-    },
+    contractConfig: contractConfigs[env],
   },
   development: {
     statusWalletRequired: false,
@@ -75,13 +64,7 @@ const configs: Record<typeof process.env.ENV, Config> = {
         expirationPeriod: 50000,
       },
     },
-    contractConfig: {
-      votingLengthInSeconds: 14 * 24 * 3600, // 14 days
-      votingVerificationLengthInSeconds: 7 * 24 * 3600, // 7 days
-      timeBetweenVotingInSeconds: 7 * 24 * 3600, // 7 days
-      featuredVotingLengthInSeconds: 5 * 24 * 3600, // 5 days
-      featuredVotingVerificationLengthInSeconds: 2 * 24 * 3600, // 2 days
-    },
+    contractConfig: contractConfigs[env],
   },
   production: {
     statusWalletRequired: true,
@@ -98,13 +81,7 @@ const configs: Record<typeof process.env.ENV, Config> = {
         expirationPeriod: 50000,
       },
     },
-    contractConfig: {
-      votingLengthInSeconds: 14 * 24 * 3600, // 14 days
-      votingVerificationLengthInSeconds: 7 * 24 * 3600, // 7 days
-      timeBetweenVotingInSeconds: 7 * 24 * 3600, // 7 days
-      featuredVotingLengthInSeconds: 5 * 24 * 3600, // 5 days
-      featuredVotingVerificationLengthInSeconds: 2 * 24 * 3600, // 2 days
-    },
+    contractConfig: contractConfigs[env],
   },
 }
 
