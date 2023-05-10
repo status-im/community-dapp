@@ -30,16 +30,14 @@ interface CardVoteMobileProps {
 
 export const CardVoteMobile = ({ room }: CardVoteMobileProps) => {
   const { account } = useEthers()
-  const [previousAccount, setPreviousAccount] = useState(account)
   const selectedVoted = voteTypes['Add'].for
   const [sentVotesFor, setSentVotesFor] = useState(0)
   const [sentVotesAgainst, setSentVotesAgainst] = useState(0)
   const [voted, setVoted] = useState<null | boolean>(null)
 
-  if (previousAccount !== account) {
-    setPreviousAccount(account)
+  useEffect(() => {
     setVoted(null)
-  }
+  }, [account])
 
   const { votingContract } = useContracts()
   const vote = voting.fromRoom(room)

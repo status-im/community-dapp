@@ -1,6 +1,6 @@
 // todo?: use store for votes, aggregations, verification period, winner
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { VoteModal } from './../VoteModal'
 import { VoteChart } from './../../votes/VoteChart'
 import { voteTypes } from './../../../constants/voteTypes'
@@ -26,7 +26,6 @@ interface CardVoteProps {
 
 export const CardVote = ({ room, hideModalFunction }: CardVoteProps) => {
   const { account } = useEthers()
-  const [previousAccount, setPreviousAccount] = useState(account)
   const [showVoteModal, setShowVoteModal] = useState(false)
   const [showConfirmModal, setShowConfirmModal] = useState(false)
   const [proposingAmount, setProposingAmount] = useState(0)
@@ -35,10 +34,9 @@ export const CardVote = ({ room, hideModalFunction }: CardVoteProps) => {
   const [sentVotesAgainst, setSentVotesAgainst] = useState(0)
   const [voted, setVoted] = useState<null | boolean>(null)
 
-  if (previousAccount !== account) {
-    setPreviousAccount(account)
+  useEffect(() => {
     setVoted(null)
-  }
+  }, [account])
 
   const { votingContract } = useContracts()
   const vote = voting.fromRoom(room)
