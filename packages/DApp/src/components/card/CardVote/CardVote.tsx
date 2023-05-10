@@ -26,6 +26,7 @@ interface CardVoteProps {
 
 export const CardVote = ({ room, hideModalFunction }: CardVoteProps) => {
   const { account } = useEthers()
+  const [previousAccount, setPreviousAccount] = useState(account)
   const [showVoteModal, setShowVoteModal] = useState(false)
   const [showConfirmModal, setShowConfirmModal] = useState(false)
   const [proposingAmount, setProposingAmount] = useState(0)
@@ -33,6 +34,11 @@ export const CardVote = ({ room, hideModalFunction }: CardVoteProps) => {
   const [sentVotesFor, setSentVotesFor] = useState(0)
   const [sentVotesAgainst, setSentVotesAgainst] = useState(0)
   const [voted, setVoted] = useState(false)
+
+  if (previousAccount !== account) {
+    setPreviousAccount(account)
+    setVoted(false)
+  }
 
   const { votingContract } = useContracts()
   const vote = voting.fromRoom(room)
