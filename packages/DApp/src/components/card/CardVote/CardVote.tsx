@@ -33,11 +33,11 @@ export const CardVote = ({ room, hideModalFunction }: CardVoteProps) => {
   const [selectedVoted, setSelectedVoted] = useState(voteTypes['Add'].for)
   const [sentVotesFor, setSentVotesFor] = useState(0)
   const [sentVotesAgainst, setSentVotesAgainst] = useState(0)
-  const [voted, setVoted] = useState(false)
+  const [voted, setVoted] = useState<null | boolean>(null)
 
   if (previousAccount !== account) {
     setPreviousAccount(account)
-    setVoted(false)
+    setVoted(null)
   }
 
   const { votingContract } = useContracts()
