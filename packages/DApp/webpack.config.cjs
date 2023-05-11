@@ -6,8 +6,6 @@ const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
 const webpack = require('webpack')
 
 module.exports = () => {
-  console.log('process.env', process.env)
-
   const environment = process.env.ENV ?? 'development'
 
   if (!['development', 'preview', 'production'].includes(environment)) {
