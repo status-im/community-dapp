@@ -5,5 +5,10 @@
 			"main": false,
 			"master": false
 		}
-	}
+	},
+	"#github": {
+		"silent": false,
+		"autoJobCancelation": true
+	},
+	"#ignoreCommand": "git diff --quiet HEAD^ HEAD ./"
 }
