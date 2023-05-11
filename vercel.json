@@ -9,5 +9,6 @@
 	"github": {
 		"silent": false,
 		"autoJobCancelation": true
-	}
+	},
+	"ignoreCommand": "git diff --quiet HEAD^ HEAD ./package.json ./packages/contracts/package.json ./packages/contracts/contracts ./packages/DApp"
 }
