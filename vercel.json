@@ -9,6 +9,5 @@
 	"github": {
 		"silent": false,
 		"autoJobCancelation": true
-	},
-	"#ignoreCommand": "git diff --quiet HEAD^ HEAD ./"
+	}
 }
