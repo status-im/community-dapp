@@ -5,10 +5,11 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
 const webpack = require('webpack')
 
-module.exports = (env) => {
-  let environment = 'development'
-  if (env.ENV) {
-    environment = env.ENV
+module.exports = () => {
+  const environment = process.env.ENV ?? 'development'
+
+  if (!['development', 'preview', 'production'].includes(environment)) {
+    throw new Error('Unsupported environment')
   }
 
   return {

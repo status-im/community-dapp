@@ -1,5 +1,6 @@
 import { ChainId } from '@usedapp/core'
 
+// todo?: move to config.ts
 export const contracts = {
   [ChainId.Optimism]: {
     // TO BE PROVIDED

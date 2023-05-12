@@ -13,8 +13,14 @@ export interface Config {
   statusWalletRequired: boolean
 }
 
+/**
+ * @see https://vercel.com/docs/concepts/projects/environment-variables#environments for environment descriptions
+ */
 const configs: Record<typeof process.env.ENV, Config> = {
-  localhost: {
+  /**
+   * Localhost/Development.
+   */
+  development: {
     statusWalletRequired: false,
     wakuConfig: {
       environment: 'test',
@@ -38,12 +44,17 @@ const configs: Record<typeof process.env.ENV, Config> = {
       },
     },
   },
-  development: {
+  /**
+   * Preview/Stage.
+   *
+   * All preview deployments (from pull requests) will share voting history.
+   */
+  preview: {
     statusWalletRequired: false,
     wakuConfig: {
-      environment: 'production',
-      wakuTopic: `/communitiesCuration/development/${version}/directory/proto/`,
-      wakuFeatureTopic: `/communitiesCuration/development/${version}/featured/proto/`,
+      environment: 'test',
+      wakuTopic: `/communitiesCuration/preview/${version}/directory/proto/`,
+      wakuFeatureTopic: `/communitiesCuration/preview/${version}/featured/proto/`,
     },
     daapConfig: {
       readOnlyChainId: ChainId.OptimismGoerli,
@@ -54,6 +65,9 @@ const configs: Record<typeof process.env.ENV, Config> = {
       },
     },
   },
+  /**
+   * Production.
+   */
   production: {
     statusWalletRequired: true,
     wakuConfig: {
