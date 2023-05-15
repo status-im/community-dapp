@@ -27,9 +27,6 @@ export function useFeaturedVotes() {
       const lastVoting: FeaturedVoting = featuredVotings[featuredVotings.length - 1]
       const currentTimestamp = Date.now() / 1000
 
-      console.log(lastVoting.verificationStartAt.toNumber())
-      console.log(currentTimestamp)
-
       if (lastVoting && lastVoting.verificationStartAt.toNumber() < currentTimestamp && !lastVoting.finalized) {
         setActiveVoting(lastVoting)
       }

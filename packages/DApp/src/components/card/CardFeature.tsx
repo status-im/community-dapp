@@ -26,14 +26,8 @@ export const CardFeature = ({ community, featured }: CardFeatureProps) => {
   const [heading, setHeading] = useState('Weekly Feature vote')
   const [icon, setIcon] = useState('⭐')
   const [timeLeft, setTimeLeft] = useState('')
-
   const { activeVoting } = useFeaturedVotes()
-
-  console.log(activeVoting)
-
   const featuredVotingState = getFeaturedVotingState(activeVoting)
-
-  console.log('community votes', community?.featureVotes?.toNumber())
 
   useEffect(() => {
     setHeading(inFeatured ? 'This community has been featured last week' : 'Weekly Feature vote')

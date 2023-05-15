@@ -40,13 +40,12 @@ export const WeeklyFeature = () => {
 
   const currentTimestamp = Date.now() / 1000
   const differenceInTime = activeVoting.endAt.toNumber() - currentTimestamp
-  const daysLeft = Math.ceil(differenceInTime / 1000)
+  console.log(differenceInTime)
 
   return (
     <View>
       ⭐ <span>Weekly Feature vote {window.innerWidth < 600 ? 'ends' : ''}:</span>
-      {daysLeft}&nbsp;
-      {daysLeft.toString().endsWith('1') ? 'day ' : ' days'} {window.innerWidth < 600 ? '' : 'left'}
+      {differenceInTime}
     </View>
   )
 }
