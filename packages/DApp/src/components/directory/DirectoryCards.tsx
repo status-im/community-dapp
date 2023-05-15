@@ -31,8 +31,6 @@ export function DirectoryCards() {
       })
     }
 
-    console.log('communities', communities)
-
     return communities.map((community) => <DirectoryCard key={community!.publicKey} community={community!} />)
   }
 
@@ -47,7 +45,7 @@ export function DirectoryCards() {
         />
         <FilterList value={sortedBy} setValue={setSortedBy} options={DirectorySortingOptions} />
       </PageBar>
-      <WeeklyFeature endDate={new Date('05/10/2022')} />
+      <WeeklyFeature />
       <Voting>{renderCommunities()}</Voting>
     </>
   )

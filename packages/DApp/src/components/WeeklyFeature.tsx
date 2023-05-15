@@ -2,71 +2,54 @@ import React from 'react'
 import styled from 'styled-components'
 import backgroundImage from '../assets/images/curve-shape.svg'
 import { Colors } from '../constants/styles'
-import { useContracts } from '../hooks/useContracts'
-import { VoteBtn } from './Button'
-import { BigNumber } from 'ethers'
-import { useContractCall, useContractFunction } from '@usedapp/core'
+import { getFeaturedVotingState } from '../helpers/featuredVoting'
+import { useFeaturedVotes } from '../hooks/useFeaturedVotes'
 
-export const WeeklyFeature = ({ endDate }: { endDate: Date }) => {
-  const { featuredVotingContract } = useContracts()
-  const { send } = useContractFunction(featuredVotingContract, 'initializeVoting')
-  const castVotes = useContractFunction(featuredVotingContract, 'castVotes')
-  const finalizeVoting = useContractFunction(featuredVotingContract, 'finalizeVoting')
+export const WeeklyFeature = () => {
+  const { activeVoting } = useFeaturedVotes()
 
-  const weeklyVoting = useContractCall({
-    abi: featuredVotingContract.interface,
-    address: featuredVotingContract.address,
-    method: 'votings',
-    args: [],
-  }) ?? [[]]
+  if (!activeVoting || activeVoting.finalized) {
+    console.log('%c ===== STATE: not started =====', 'color:red')
 
-  const votes: string[] = []
+    return null
+  }
 
-  console.log(weeklyVoting)
+  const featuredVotingState = getFeaturedVotingState(activeVoting)
+  const state = !activeVoting || activeVoting.finalized ? 'not started' : featuredVotingState
+  console.log('%c ===== STATE: ' + state + ' =====', 'color:blue')
 
-  const today = new Date()
-  const differenceInTime = endDate.getTime() - today.getTime()
-  const daysLeft = Math.ceil(differenceInTime / (1000 * 3600 * 24))
+  if (featuredVotingState === 'ended') {
+    return (
+      <div>
+        <ViewEnded>
+          ⭐ <span>Weekly Feature vote </span>has ended. Somebody needs to finalize the votes.
+        </ViewEnded>
+      </div>
+    )
+  }
+
+  if (featuredVotingState === 'verification') {
+    return (
+      <div>
+        <ViewEnded>
+          ⭐ <span>Weekly Feature vote </span>has ended. Somebody needs to verify the votes.
+        </ViewEnded>
+      </div>
+    )
+  }
+
+  const currentTimestamp = Date.now() / 1000
+  const differenceInTime = activeVoting.endAt.toNumber() - currentTimestamp
+  const daysLeft = Math.ceil(differenceInTime / 1000)
 
   return (
-    <>
-      <VotingControlTemp>
-        <VoteBtn
-          onClick={() =>
-            send(
-              '0x0486c7c2e3e389b617e75aede6a90e823bc49548a6ca937c0691851831a8690072fa4f160122d1b0aa86ba07806a0b0073b2bff0fee3c8c53dc4289e880a819e4f',
-              BigNumber.from(10000)
-            )
-          }
-        >
-          Start weekly
-        </VoteBtn>
-        <VoteBtn onClick={() => castVotes.send(votes)}>Verify weekly</VoteBtn>
-        <VoteBtn onClick={() => finalizeVoting.send()}>Finalize weekly</VoteBtn>
-      </VotingControlTemp>
-
-      {daysLeft <= 0 && (
-        <ViewEnded>
-          ⭐ <span>Weekly Feature vote </span>has ended
-        </ViewEnded>
-      )}
-      {daysLeft > 0 && (
-        <View>
-          ⭐ <span>Weekly Feature vote {window.innerWidth < 600 ? 'ends' : ''}:</span>
-          {daysLeft}&nbsp;
-          {daysLeft.toString().endsWith('1') ? 'day ' : ' days'} {window.innerWidth < 600 ? '' : 'left'}
-        </View>
-      )}
-    </>
+    <View>
+      ⭐ <span>Weekly Feature vote {window.innerWidth < 600 ? 'ends' : ''}:</span>
+      {daysLeft}&nbsp;
+      {daysLeft.toString().endsWith('1') ? 'day ' : ' days'} {window.innerWidth < 600 ? '' : 'left'}
+    </View>
   )
 }
-
-const VotingControlTemp = styled.div`
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 12px 0;
-`
 
 const View = styled.div`
   display: flex;

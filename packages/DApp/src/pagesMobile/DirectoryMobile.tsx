@@ -59,7 +59,7 @@ export function DirectoryMobile() {
         </PageBar>
       </TopBarMobile>
       <Voting>
-        <WeeklyFeature endDate={new Date('07/26/2021')} />
+        <WeeklyFeature />
         {renderCommunities()}
       </Voting>
     </div>

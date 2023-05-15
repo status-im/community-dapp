@@ -3,34 +3,37 @@ import styled from 'styled-components'
 import { ColumnFlexDiv } from '../../constants/styles'
 import { addCommas } from '../../helpers/addCommas'
 import { CardHeading, CardVoteBlock } from '../Card'
-import { CommunityDetail, CurrentVoting } from '../../models/community'
+import { CommunityDetail } from '../../models/community'
 import { Modal } from '../Modal'
 import { FeatureModal } from './FeatureModal'
 import { VoteConfirmModal } from './VoteConfirmModal'
-import { OngoingVote } from './OngoingVote'
 import { useEthers } from '@usedapp/core'
-import { VoteSubmitButton } from './VoteSubmitButton'
-import { VoteSendingBtn, VoteBtn } from '../Button'
-import { VotingRoom } from '../../models/smartContract'
-import { useWakuFeature } from '../../providers/wakuFeature/provider'
+import { VoteBtn } from '../Button'
+import { useFeaturedVotes } from '../../hooks/useFeaturedVotes'
+import { getFeaturedVotingState } from '../../helpers/featuredVoting'
 
 interface CardFeatureProps {
   community: CommunityDetail
-  currentVoting?: CurrentVoting
-  room?: VotingRoom
+  featured: boolean
 }
 
-export const CardFeature = ({ community, currentVoting, room }: CardFeatureProps) => {
+export const CardFeature = ({ community, featured }: CardFeatureProps) => {
   const { account } = useEthers()
   const [showFeatureModal, setShowFeatureModal] = useState(false)
   const [showConfirmModal, setShowConfirmModal] = useState(false)
-  const [showOngoingVote, setShowOngoingVote] = useState(false)
-  const { featured } = useWakuFeature()
-  const inFeatured = Boolean(featured.find((el) => el[0] === community.publicKey))
+  const inFeatured = featured
 
   const [heading, setHeading] = useState('Weekly Feature vote')
   const [icon, setIcon] = useState('⭐')
   const [timeLeft, setTimeLeft] = useState('')
+
+  const { activeVoting } = useFeaturedVotes()
+
+  console.log(activeVoting)
+
+  const featuredVotingState = getFeaturedVotingState(activeVoting)
+
+  console.log('community votes', community?.featureVotes?.toNumber())
 
   useEffect(() => {
     setHeading(inFeatured ? 'This community has been featured last week' : 'Weekly Feature vote')
@@ -86,18 +89,13 @@ export const CardFeature = ({ community, currentVoting, room }: CardFeatureProps
             <VoteConfirmModal community={community} selectedVote={{ verb: 'to feature' }} setShowModal={setNewModal} />
           </Modal>
         )}
-        <FeatureBtn disabled={!account || inFeatured} onClick={() => setShowFeatureModal(true)}>
+        <FeatureBtn
+          disabled={!account || inFeatured || featuredVotingState === 'verification' || featuredVotingState === 'ended'}
+          onClick={() => setShowFeatureModal(true)}
+        >
           Feature this community! <span style={{ fontSize: '20px' }}>⭐️</span>
         </FeatureBtn>
       </div>
-
-      {currentVoting && room && (
-        <FeatureBottom>
-          {showOngoingVote && <OngoingVote community={community} setShowOngoingVote={setShowOngoingVote} room={room} />}
-          <VoteSendingBtn onClick={() => setShowOngoingVote(true)}>Removal vote in progress</VoteSendingBtn>
-          {currentVoting && currentVoting.timeLeft > 0 && <VoteSubmitButton vote={currentVoting} room={room} />}
-        </FeatureBottom>
-      )}
     </CardVoteBlock>
   )
 }

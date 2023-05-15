@@ -6,6 +6,9 @@ import { ButtonPrimary } from '../Button'
 import { VotePropose } from '../votes/VotePropose'
 import { ColumnFlexDiv } from '../../constants/styles'
 import { useSendWakuFeature } from '../../hooks/useSendWakuFeature'
+import { useContractFunction } from '@usedapp/core'
+import { useContracts } from '../../hooks/useContracts'
+import { useFeaturedVotes } from '../../hooks/useFeaturedVotes'
 
 interface FeatureModalProps {
   community: CommunityDetail
@@ -15,7 +18,12 @@ interface FeatureModalProps {
 export function FeatureModal({ community, setShowConfirmModal }: FeatureModalProps) {
   const [proposingAmount, setProposingAmount] = useState(0)
   const sendWaku = useSendWakuFeature()
+  const { featuredVotingContract } = useContracts()
+  const { send } = useContractFunction(featuredVotingContract, 'initializeVoting')
+  const { activeVoting } = useFeaturedVotes()
   const disabled = proposingAmount === 0
+
+  console.log('active voting', activeVoting)
 
   return (
     <ColumnFlexDiv>
@@ -25,7 +33,11 @@ export function FeatureModal({ community, setShowConfirmModal }: FeatureModalPro
         <VoteConfirmBtn
           disabled={disabled}
           onClick={async () => {
-            await sendWaku(proposingAmount, community.publicKey)
+            if (!activeVoting) {
+              await send(community.publicKey, proposingAmount)
+            } else {
+              await sendWaku(proposingAmount, community.publicKey)
+            }
             setShowConfirmModal(true)
           }}
         >

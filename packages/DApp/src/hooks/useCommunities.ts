@@ -1,17 +1,17 @@
 import { useCommunitiesProvider } from '../providers/communities/provider'
-import { useWakuFeature } from '../providers/wakuFeature/provider'
 import { CommunityDetail } from '../models/community'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useContractCalls } from '@usedapp/core'
 import { useContracts } from './useContracts'
 import { useWaku } from '../providers/waku/provider'
 import { deserializePublicKey, RequestClient } from '@status-im/js'
 import { BigNumber } from 'ethers'
+import { useFeaturedVotes } from './useFeaturedVotes'
 
 export function useCommunities(publicKeys: string[]): CommunityDetail[] {
   const { communitiesDetails, dispatch } = useCommunitiesProvider()
   const { waku } = useWaku()
-  const { featureVotes } = useWakuFeature()
+  const { votes } = useFeaturedVotes()
 
   const { votingContract } = useContracts()
 
@@ -41,9 +41,6 @@ export function useCommunities(publicKeys: string[]): CommunityDetail[] {
 
           const requestClient = new RequestClient(waku)
           const community = await requestClient.fetchCommunityDescription(deserializedPublicKey)
-
-          console.log('community')
-          console.log(community)
 
           if (!community) {
             console.warn(`Community ${deserializedPublicKey} not found`)
@@ -100,7 +97,7 @@ export function useCommunities(publicKeys: string[]): CommunityDetail[] {
       return {
         ...communitiesDetails[deserializedPublicKey],
         votingHistory,
-        featureVotes: featureVotes[publicKey]?.sum ?? BigNumber.from(0),
+        featureVotes: votes?.[publicKey]?.sum ?? BigNumber.from(0),
       }
     })
     .filter(Boolean)

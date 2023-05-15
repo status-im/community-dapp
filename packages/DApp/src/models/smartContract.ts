@@ -15,3 +15,12 @@ export type VotingRoom = {
 }
 
 export type DetailedVotingRoom = VotingRoom & { details: CommunityDetail }
+
+export type FeaturedVoting = {
+  id: BigNumber
+  startBlock: BigNumber
+  startAt: BigNumber
+  endAt: BigNumber
+  verificationStartAt: BigNumber
+  finalized: boolean
+}

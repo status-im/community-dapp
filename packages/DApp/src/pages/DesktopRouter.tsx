@@ -5,6 +5,7 @@ import styled from 'styled-components'
 import { Directory } from './Directory'
 import { Votes } from './Votes'
 import { Info } from './Info'
+import { Featured } from './Featured'
 import { TopBar } from '../components/top/TopBar'
 
 export const DesktopRouter = () => (
@@ -18,6 +19,7 @@ export const DesktopRouter = () => (
         <Route path="/removal" render={() => <Redirect to="/directory" />} />
         <Route exact path="/votes" component={Votes} />
         <Route exact path="/directory" component={Directory} />
+        <Route exact path="/featured" component={Featured} />
         <Route exact path="/info" component={Info} />
       </Switch>
     </PageContent>
