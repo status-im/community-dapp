@@ -22,6 +22,8 @@ export function useFeaturedVotes() {
       args: [],
     }) ?? []
 
+  console.log(featuredVotings)
+
   useEffect(() => {
     if (featuredVotings) {
       const lastVoting: FeaturedVoting = featuredVotings[featuredVotings.length - 1]

@@ -7,22 +7,20 @@ import { useFeaturedVotes } from '../hooks/useFeaturedVotes'
 
 export const WeeklyFeature = () => {
   const { activeVoting } = useFeaturedVotes()
+  console.log(activeVoting)
 
   if (!activeVoting || activeVoting.finalized) {
-    console.log('%c ===== STATE: not started =====', 'color:red')
-
     return null
   }
 
   const featuredVotingState = getFeaturedVotingState(activeVoting)
-  const state = !activeVoting || activeVoting.finalized ? 'not started' : featuredVotingState
-  console.log('%c ===== STATE: ' + state + ' =====', 'color:blue')
+  console.log(featuredVotingState)
 
   if (featuredVotingState === 'ended') {
     return (
       <div>
         <ViewEnded>
-          ⭐ <span>Weekly Feature vote </span>has ended. Somebody needs to finalize the votes.
+          ⭐ <span>Weekly Feature vote </span>has ended. Somebody needs to finalize the voting.
         </ViewEnded>
       </div>
     )
@@ -40,12 +38,13 @@ export const WeeklyFeature = () => {
 
   const currentTimestamp = Date.now() / 1000
   const differenceInTime = activeVoting.endAt.toNumber() - currentTimestamp
-  console.log(differenceInTime)
+  const dateFormat = new Date(differenceInTime * 1000)
 
   return (
     <View>
       ⭐ <span>Weekly Feature vote {window.innerWidth < 600 ? 'ends' : ''}:</span>
-      {differenceInTime}
+      {dateFormat.getHours()}:{dateFormat.getMinutes()}:{dateFormat.getSeconds()} {dateFormat.getDate()}/
+      {dateFormat.getMonth()}/{dateFormat.getFullYear()}
     </View>
   )
 }

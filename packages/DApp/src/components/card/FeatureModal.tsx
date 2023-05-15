@@ -23,8 +23,6 @@ export function FeatureModal({ community, setShowConfirmModal }: FeatureModalPro
   const { activeVoting } = useFeaturedVotes()
   const disabled = proposingAmount === 0
 
-  console.log('active voting', activeVoting)
-
   return (
     <ColumnFlexDiv>
       <CardCommunity community={community} />
