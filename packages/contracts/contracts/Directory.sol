@@ -53,6 +53,9 @@ contract Directory {
     }
 
     function setFeaturedCommunities(bytes[] calldata _featuredCommunities) public onlyFeaturedVotingContract {
+        for (uint256 i = 0; i < featuredCommunities.length; i++) {
+            delete (featuredCommunitiesIdx[featuredCommunities[i]]);
+        }
         delete featuredCommunities;
         for (uint256 i = 0; i < _featuredCommunities.length; i++) {
             require(isCommunityInDirectory(_featuredCommunities[i]), 'Community not in directory');
