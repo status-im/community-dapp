@@ -135,7 +135,7 @@ contract FeaturedVotingContract {
     function initializeVoting(bytes calldata publicKey, uint256 voteAmount) public {
         require(votings.length == 0 || votings[votings.length - 1].finalized, 'vote already ongoing');
         require(directory.isCommunityInDirectory(publicKey), 'community not in directory');
-        require(!_isInCooldownPeriod(publicKey), 'community has been featured recently');
+        require(!isInCooldownPeriod(publicKey), 'community has been featured recently');
         require(token.balanceOf(msg.sender) >= voteAmount, 'not enough token');
 
         uint votingID = votings.length + 1;
@@ -178,11 +178,19 @@ contract FeaturedVotingContract {
         }
     }
 
+    function getVotings() public view returns (Voting[] memory) {
+        return votings;
+    }
+
+    function getVotesByVotingId(uint256 votingID) public view returns (Vote[] memory) {
+        return votesByVotingID[votingID];
+    }
+
     function _min(uint256 a, uint256 b) private pure returns (uint256) {
         return a < b ? a : b;
     }
 
-    function _isInCooldownPeriod(bytes calldata publicKey) private view returns (bool) {
+    function isInCooldownPeriod(bytes calldata publicKey) public view returns (bool) {
         uint256 votingsCount = _min(votings.length, cooldownPeriod);
         for (uint256 i = 0; i < votingsCount; i++) {
             bytes[] storage featured = featuredByVotingID[votings[votings.length - i - 1].id];
@@ -270,7 +278,7 @@ contract FeaturedVotingContract {
             return;
         }
 
-        if (_isInCooldownPeriod(vote.community)) {
+        if (isInCooldownPeriod(vote.community)) {
             emit CommunityFeaturedRecently(vote.community, vote.voter);
             return;
         }
