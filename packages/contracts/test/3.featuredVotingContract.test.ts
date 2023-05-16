@@ -22,7 +22,7 @@ const publicKeys = [
 const votingLength = 1000
 const votingVerificationLength = 200
 const featuredPerVotingCount = 3
-const cooldownPeriod = 1
+const cooldownPeriod = 2
 const votingWithVerificationLength = votingLength + votingVerificationLength
 
 const typedData = {
@@ -168,38 +168,6 @@ describe('FeaturedVotingContract', () => {
         'community has been featured recently'
       )
     })
-
-    it('should initialize voting for community when cooldown period has passed', async () => {
-      const { featuredVotingContract } = await loadFixture(fixture)
-
-      // first initialize voting with first pubkey
-      await expect(featuredVotingContract.initializeVoting(publicKeys[0], 100)).to.emit(
-        featuredVotingContract,
-        'VotingStarted'
-      )
-
-      // fast forward to finalize first voting
-      await time.increase(votingWithVerificationLength + 1)
-      await expect(featuredVotingContract.finalizeVoting()).to.emit(featuredVotingContract, 'VotingFinalized')
-      await expect((await featuredVotingContract.votings(0)).finalized).to.eq(true)
-
-      // the `cooldownPeriod` is `1` so we need at least one voting
-      // that doesn't feature `publicKeys[0]` to start a new
-      await expect(featuredVotingContract.initializeVoting(publicKeys[1], 100)).to.emit(
-        featuredVotingContract,
-        'VotingStarted'
-      )
-
-      // fast forward again to finalize second voting (which does not include `publicKeys[0]`)
-      await time.increase(votingWithVerificationLength + 1)
-      await expect(featuredVotingContract.finalizeVoting()).to.emit(featuredVotingContract, 'VotingFinalized')
-
-      // initializing vote for `publicKey[0]` should be fine now
-      await expect(featuredVotingContract.initializeVoting(publicKeys[0], 100)).to.emit(
-        featuredVotingContract,
-        'VotingStarted'
-      )
-    })
   })
 
   describe('#castVotes()', () => {
@@ -247,6 +215,32 @@ describe('FeaturedVotingContract', () => {
       await expect((await featuredVotingContract.votings(0)).finalized).to.eq(true)
 
       expect(await directoryContract.getFeaturedCommunities()).to.deep.eq([publicKeys[3], publicKeys[1], publicKeys[0]])
+    })
+  })
+
+  describe('#isInCooldownPeriod', () => {
+    it('should return false for not recently featured community', async () => {
+      const { featuredVotingContract } = await loadFixture(fixture)
+      expect(await featuredVotingContract.isInCooldownPeriod(publicKeys[0])).to.eq(false)
+    })
+
+    it('should return true for recently featured community', async () => {
+      const { featuredVotingContract } = await loadFixture(fixture)
+
+      await featuredVotingContract.initializeVoting(publicKeys[0], 100)
+      await time.increase(votingWithVerificationLength + 1)
+      await featuredVotingContract.finalizeVoting()
+
+      for (let i = 0; i < cooldownPeriod; i++) {
+        expect(await featuredVotingContract.isInCooldownPeriod(publicKeys[0])).to.eq(true)
+
+        await featuredVotingContract.initializeVoting(publicKeys[i + 1], 100)
+        await time.increase(votingWithVerificationLength + 1)
+        await featuredVotingContract.finalizeVoting()
+      }
+
+      // the cooldown period has ended here
+      expect(await featuredVotingContract.isInCooldownPeriod(publicKeys[0])).to.eq(false)
     })
   })
 })
