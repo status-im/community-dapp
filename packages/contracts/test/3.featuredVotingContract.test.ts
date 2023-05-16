@@ -150,6 +150,56 @@ describe('FeaturedVotingContract', () => {
       const secondSender = featuredVotingContract.connect(secondSigner)
       await expect(secondSender.initializeVoting(publicKeys[0], 1000000)).to.be.revertedWith('not enough token')
     })
+
+    it('should revert when cooldown period for community has not passed yet', async () => {
+      const { featuredVotingContract } = await loadFixture(fixture)
+
+      // first initialize voting with first pubkey
+      await expect(featuredVotingContract.initializeVoting(publicKeys[0], 100)).to.emit(
+        featuredVotingContract,
+        'VotingStarted'
+      )
+
+      await time.increase(votingWithVerificationLength + 1)
+      await expect(featuredVotingContract.finalizeVoting()).to.emit(featuredVotingContract, 'VotingFinalized')
+      await expect((await featuredVotingContract.votings(0)).finalized).to.eq(true)
+
+      await expect(featuredVotingContract.initializeVoting(publicKeys[0], 100)).to.be.revertedWith(
+        'community has been featured recently'
+      )
+    })
+
+    it('should initialize voting for community when cooldown period has passed', async () => {
+      const { featuredVotingContract } = await loadFixture(fixture)
+
+      // first initialize voting with first pubkey
+      await expect(featuredVotingContract.initializeVoting(publicKeys[0], 100)).to.emit(
+        featuredVotingContract,
+        'VotingStarted'
+      )
+
+      // fast forward to finalize first voting
+      await time.increase(votingWithVerificationLength + 1)
+      await expect(featuredVotingContract.finalizeVoting()).to.emit(featuredVotingContract, 'VotingFinalized')
+      await expect((await featuredVotingContract.votings(0)).finalized).to.eq(true)
+
+      // the `cooldownPeriod` is `1` so we need at least one voting
+      // that doesn't feature `publicKeys[0]` to start a new
+      await expect(featuredVotingContract.initializeVoting(publicKeys[1], 100)).to.emit(
+        featuredVotingContract,
+        'VotingStarted'
+      )
+
+      // fast forward again to finalize second voting (which does not include `publicKeys[0]`)
+      await time.increase(votingWithVerificationLength + 1)
+      await expect(featuredVotingContract.finalizeVoting()).to.emit(featuredVotingContract, 'VotingFinalized')
+
+      // initializing vote for `publicKey[0]` should be fine now
+      await expect(featuredVotingContract.initializeVoting(publicKeys[0], 100)).to.emit(
+        featuredVotingContract,
+        'VotingStarted'
+      )
+    })
   })
 
   describe('#castVotes()', () => {

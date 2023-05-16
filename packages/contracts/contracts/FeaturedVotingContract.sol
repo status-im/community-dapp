@@ -185,7 +185,7 @@ contract FeaturedVotingContract {
     function _isInCooldownPeriod(bytes calldata publicKey) private view returns (bool) {
         uint256 votingsCount = _min(votings.length, cooldownPeriod);
         for (uint256 i = 0; i < votingsCount; i++) {
-            bytes[] storage featured = featuredByVotingID[votings[i].id];
+            bytes[] storage featured = featuredByVotingID[votings[votings.length - i - 1].id];
             for (uint256 j = 0; j < featured.length; j++) {
                 if (_compareBytes(featured[j], publicKey)) {
                     return true;
