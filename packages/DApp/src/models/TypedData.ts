@@ -22,8 +22,6 @@ export interface TypedFeature extends TypedMessage<FeatureType> {
   message: {
     voter: string
     sntAmount: string
-    publicKey: string
-    timestamp: number
-    chainId: number
+    community: string
   }
 }

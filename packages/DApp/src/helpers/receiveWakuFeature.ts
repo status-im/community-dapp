@@ -1,9 +1,12 @@
 import { receiveWakuFeatureMsg } from './wakuFeature'
 import { merge } from 'lodash'
-import { BigNumber } from 'ethers'
+import { BigNumber, utils } from 'ethers'
+import { recoverAddress } from './ethMessage'
 
 import type { WakuLight } from 'js-waku/lib/interfaces'
 import { FeaturedVoting } from '../models/smartContract'
+import { TypedFeature } from '../models/TypedData'
+import { WakuFeatureData } from '../models/waku'
 
 type CommunityFeatureVote = {
   [voter: string]: BigNumber
@@ -15,7 +18,16 @@ type CommunityFeatureVotes = {
 }
 
 type CommunitiesFeatureVotes = {
-  [publicKey: string]: CommunityFeatureVotes
+  [community: string]: CommunityFeatureVotes
+}
+
+export function getContractParameters(
+  address: string,
+  publicKey: string,
+  sntAmount: number,
+  timestamp: number
+): [string, string, BigNumber, BigNumber] {
+  return [address, publicKey, BigNumber.from(sntAmount), BigNumber.from(timestamp)]
 }
 
 function sumVotes(map: CommunitiesFeatureVotes) {
@@ -27,13 +39,8 @@ function sumVotes(map: CommunitiesFeatureVotes) {
   }
 }
 
-export async function receiveWakuFeature(
-  waku: WakuLight | undefined,
-  topic: string,
-  chainId: number,
-  activeVoting: FeaturedVoting
-) {
-  let messages = await receiveWakuFeatureMsg(waku, topic, chainId)
+export async function receiveWakuFeature(waku: WakuLight | undefined, topic: string, activeVoting: FeaturedVoting) {
+  let messages = await receiveWakuFeatureMsg(waku, topic)
   const featureVotes: CommunitiesFeatureVotes = {}
 
   if (messages && messages?.length > 0) {
@@ -41,7 +48,7 @@ export async function receiveWakuFeature(
     const validatedMessages = []
 
     for (const message of messages) {
-      const messageTimestamp = message.timestamp.getTime() / 1000
+      const messageTimestamp = message.timestamp / 1000
 
       const validatedMessage =
         messageTimestamp < activeVoting.verificationStartAt.toNumber() &&
@@ -61,5 +68,37 @@ export async function receiveWakuFeature(
     sumVotes(featureVotes)
   }
 
-  return { votes: featureVotes }
+  return { votes: featureVotes, votesToSend: messages }
+}
+
+export async function filterVerifiedFeaturesVotes(
+  messages: WakuFeatureData[] | undefined,
+  alreadyVoted: string[],
+  getTypedData: (data: [string, string, BigNumber, BigNumber]) => TypedFeature
+) {
+  if (!messages) {
+    return []
+  }
+  const verified: [string, string, BigNumber, BigNumber, string, string][] = []
+
+  messages.forEach((msg) => {
+    const params = getContractParameters(msg.voter, msg.publicKey, msg.sntAmount.toNumber(), msg.timestamp)
+
+    if (utils.getAddress(recoverAddress(getTypedData(params), msg.sign)) == msg.voter) {
+      console.log('------------------')
+      console.log('------------------')
+      console.log(msg.sign)
+      console.log(recoverAddress(getTypedData(params), msg.sign))
+      console.log(utils.getAddress(recoverAddress(getTypedData(params), msg.sign)))
+      console.log(msg.voter)
+
+      const addressInVerified = verified.find((el) => el[0] === msg.voter)
+      const addressInVoted = alreadyVoted.find((el: string) => el === msg.voter)
+      const splitSig = utils.splitSignature(msg.sign)
+      if (!addressInVerified && !addressInVoted) {
+        verified.push([...params, splitSig.r, splitSig._vs])
+      }
+    }
+  })
+  return verified
 }

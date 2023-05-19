@@ -28,6 +28,8 @@ export function useVotesAggregate(room: number | undefined, verificationStartAt:
         const validMessages = messages?.filter((message) => validateVote(message, verificationStartAt, startAt))
         const verifiedMessages = wakuMessage.filterVerified(validMessages, alreadyVotedList, getTypedVote)
 
+        console.log(verifiedMessages)
+
         setVotesToSend(verifiedMessages)
       }
     }

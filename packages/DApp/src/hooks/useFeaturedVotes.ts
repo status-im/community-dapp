@@ -4,15 +4,18 @@ import { useContractCall, useEthers } from '@usedapp/core'
 import { config } from '../config'
 import { useContracts } from '../hooks/useContracts'
 
-import { receiveWakuFeature } from '../helpers/receiveWakuFeature'
+import { filterVerifiedFeaturesVotes, receiveWakuFeature } from '../helpers/receiveWakuFeature'
 import { FeaturedVoting } from '../models/smartContract'
+import { useTypedFeatureVote } from './useTypedFeatureVote'
 
 export function useFeaturedVotes() {
   const { featuredVotingContract } = useContracts()
   const [votes, setVotes] = useState<any | null>(null)
+  const [votesToSend, setVotesToSend] = useState<any | null>(null)
   const [activeVoting, setActiveVoting] = useState<FeaturedVoting | null>(null)
   const { waku } = useWaku()
   const { chainId } = useEthers()
+  const { getTypedFeatureVote } = useTypedFeatureVote()
 
   const [featuredVotings] =
     useContractCall({
@@ -22,14 +25,11 @@ export function useFeaturedVotes() {
       args: [],
     }) ?? []
 
-  console.log(featuredVotings)
-
   useEffect(() => {
     if (featuredVotings) {
       const lastVoting: FeaturedVoting = featuredVotings[featuredVotings.length - 1]
-      const currentTimestamp = Date.now() / 1000
 
-      if (lastVoting && lastVoting.verificationStartAt.toNumber() < currentTimestamp && !lastVoting.finalized) {
+      if (lastVoting && !lastVoting.finalized) {
         setActiveVoting(lastVoting)
       }
     }
@@ -38,7 +38,18 @@ export function useFeaturedVotes() {
   useEffect(() => {
     const loadFeatureVotes = async () => {
       if (chainId && waku && activeVoting) {
-        const { votes } = await receiveWakuFeature(waku, config.wakuConfig.wakuFeatureTopic, chainId, activeVoting)
+        const { votes, votesToSend } = await receiveWakuFeature(waku, config.wakuConfig.wakuFeatureTopic, activeVoting)
+
+        const verifiedVotes = await filterVerifiedFeaturesVotes(votesToSend, [], getTypedFeatureVote)
+        console.log('===== VOTES FROM WAKU =====')
+        console.log(votes)
+
+        console.log('===== VOTES TO SEND FROM WAKU =====')
+        console.log(votesToSend)
+
+        console.log('===== VERIFIED VOTES FROM WAKU =====')
+        console.log(verifiedVotes)
+        setVotesToSend(verifiedVotes)
         setVotes(votes)
       }
     }
@@ -49,5 +60,5 @@ export function useFeaturedVotes() {
     return () => clearInterval(task)
   }, [waku, chainId, activeVoting])
 
-  return { votes, activeVoting }
+  return { votes, votesToSend, activeVoting }
 }

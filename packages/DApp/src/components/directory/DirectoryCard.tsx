@@ -6,7 +6,6 @@ import { CommunityDetail } from '../../models/community'
 import { useGetCurrentVoting } from '../../hooks/useGetCurrentVoting'
 import { useContractCall } from '@usedapp/core'
 import { useContracts } from '../../hooks/useContracts'
-import { useFeaturedVotes } from '../../hooks/useFeaturedVotes'
 
 export interface DirectoryCardProps {
   community: CommunityDetail

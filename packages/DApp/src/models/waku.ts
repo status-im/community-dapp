@@ -10,8 +10,7 @@ export type WakuVoteData = {
 }
 
 export type WakuFeatureData = {
-  timestamp: Date
-  msgTimestamp: Date
+  timestamp: number
   sntAmount: BigNumber
   voter: string
   publicKey: string

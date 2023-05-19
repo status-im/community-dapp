@@ -7,10 +7,12 @@ import { CommunityDetail } from '../../models/community'
 import { Modal } from '../Modal'
 import { FeatureModal } from './FeatureModal'
 import { VoteConfirmModal } from './VoteConfirmModal'
-import { useEthers } from '@usedapp/core'
+import { useContractCall, useContractFunction, useEthers } from '@usedapp/core'
 import { VoteBtn } from '../Button'
 import { useFeaturedVotes } from '../../hooks/useFeaturedVotes'
 import { getFeaturedVotingState } from '../../helpers/featuredVoting'
+import { useContracts } from '../../hooks/useContracts'
+import { BigNumber } from 'ethers'
 
 interface CardFeatureProps {
   community: CommunityDetail
@@ -18,49 +20,107 @@ interface CardFeatureProps {
 }
 
 export const CardFeature = ({ community, featured }: CardFeatureProps) => {
+  const { featuredVotingContract } = useContracts()
+  const [isInCooldownPeriod] =
+    useContractCall({
+      abi: featuredVotingContract.interface,
+      address: featuredVotingContract.address,
+      method: 'isInCooldownPeriod',
+      args: [community.publicKey],
+    }) ?? []
+
   const { account } = useEthers()
   const [showFeatureModal, setShowFeatureModal] = useState(false)
   const [showConfirmModal, setShowConfirmModal] = useState(false)
-  const inFeatured = featured
+  const [verifiedVotes, setVerifiedVotes] = useState<BigNumber>(BigNumber.from(0))
+  const inFeatured = featured || isInCooldownPeriod
 
   const [heading, setHeading] = useState('Weekly Feature vote')
   const [icon, setIcon] = useState('⭐')
-  const [timeLeft, setTimeLeft] = useState('')
-  const { activeVoting } = useFeaturedVotes()
+  const { activeVoting, votesToSend } = useFeaturedVotes()
   const featuredVotingState = getFeaturedVotingState(activeVoting)
 
+  const castVotes = useContractFunction(featuredVotingContract, 'castVotes')
+
+  const [savedVotes] =
+    useContractCall({
+      abi: featuredVotingContract.interface,
+      address: featuredVotingContract.address,
+      method: 'getVotesByVotingId',
+      args: [activeVoting?.id.toNumber()],
+    }) ?? []
+
+  console.log('=== CARD FEATURE ===')
+
+  console.log(activeVoting?.id.toNumber())
+
+  console.log(community.name, activeVoting?.id.toNumber())
+  console.log(savedVotes?.[0]?.sntAmount?.toNumber())
+  console.log('ALL SAVED VOTES')
+  console.log(savedVotes)
+
   useEffect(() => {
-    setHeading(inFeatured ? 'This community has been featured last week' : 'Weekly Feature vote')
+    setHeading(inFeatured ? 'This community has been featured recently' : 'Weekly Feature vote')
     setIcon(inFeatured ? '⏳' : '⭐')
-    setTimeLeft(inFeatured ? '1 week' : '')
   }, [inFeatured])
+
+  useEffect(() => {
+    if (
+      community.publicKey === savedVotes?.[0]?.community &&
+      community?.featureVotes?.toNumber() !== savedVotes?.[0]?.sntAmount.toNumber()
+    ) {
+      setVerifiedVotes(savedVotes?.[0]?.sntAmount)
+    }
+  }, [savedVotes])
 
   const setNewModal = (val: boolean) => {
     setShowConfirmModal(val)
     setShowFeatureModal(false)
   }
+
+  useEffect(() => {
+    console.log('============= CAST VOTES USE EFFECT ==========')
+    if (castVotes.state) {
+      console.log(castVotes.state)
+    }
+    if (castVotes.events) {
+      console.log(castVotes.events)
+    }
+  }, [castVotes])
+
   return (
     <CardVoteBlock>
-      <CardHeadingFeature style={{ fontWeight: timeLeft ? 'normal' : 'bold', fontSize: timeLeft ? '15px' : '17px' }}>
-        {heading}
-      </CardHeadingFeature>
+      <CardHeadingFeature style={{ fontWeight: 'bold', fontSize: '17px' }}>{heading}</CardHeadingFeature>
 
       <FeatureVote>
         <FeatureIcon>{icon}</FeatureIcon>
 
-        {timeLeft && <span>{timeLeft}</span>}
-
         {!inFeatured && community?.featureVotes && (
           <FeatureText>
-            <span>{addCommas(community?.featureVotes.toNumber())}</span> SNT votes for this community
+            <span>{addCommas(community?.featureVotes.toNumber() + verifiedVotes.toNumber())}</span> SNT votes for this
+            community
           </FeatureText>
         )}
+        <div>
+          Waku votes: {community?.featureVotes?.toNumber()}
+          <br />
+          Contract votes: {verifiedVotes.toNumber()}
+        </div>
+        <button
+          onClick={() => {
+            console.log('castedVotes')
+            console.log(votesToSend)
+            castVotes.send(votesToSend)
+          }}
+        >
+          Verify
+        </button>
       </FeatureVote>
 
       <FeatureVoteMobile>
-        {timeLeft && (
+        {inFeatured && (
           <FeatureText>
-            {icon} {heading}: <span>{timeLeft}</span>
+            {icon} {heading}
           </FeatureText>
         )}
 
@@ -68,7 +128,7 @@ export const CardFeature = ({ community, featured }: CardFeatureProps) => {
           <FeatureTextWeekly>
             {icon}{' '}
             <span style={{ color: '#676868', fontWeight: 'normal', marginLeft: '4px' }}>Weekly Feature Vote: </span>
-            <span>{addCommas(community.featureVotes.toNumber())}</span> SNT
+            <span>{addCommas(community.featureVotes.toNumber() + verifiedVotes.toNumber())}</span> SNT
           </FeatureTextWeekly>
         )}
       </FeatureVoteMobile>

@@ -4,17 +4,15 @@ import backgroundImage from '../assets/images/curve-shape.svg'
 import { Colors } from '../constants/styles'
 import { getFeaturedVotingState } from '../helpers/featuredVoting'
 import { useFeaturedVotes } from '../hooks/useFeaturedVotes'
+import { formatTimeLeft } from '../helpers/fomatTimeLeft'
 
 export const WeeklyFeature = () => {
   const { activeVoting } = useFeaturedVotes()
-  console.log(activeVoting)
-
-  if (!activeVoting || activeVoting.finalized) {
+  if (!activeVoting) {
     return null
   }
 
   const featuredVotingState = getFeaturedVotingState(activeVoting)
-  console.log(featuredVotingState)
 
   if (featuredVotingState === 'ended') {
     return (
@@ -36,15 +34,13 @@ export const WeeklyFeature = () => {
     )
   }
 
-  const currentTimestamp = Date.now() / 1000
-  const differenceInTime = activeVoting.endAt.toNumber() - currentTimestamp
-  const dateFormat = new Date(differenceInTime * 1000)
+  const currentTimestamp = Date.now()
+  const differenceInTime = activeVoting.verificationStartAt.toNumber() * 1000 - currentTimestamp
 
   return (
     <View>
-      ⭐ <span>Weekly Feature vote {window.innerWidth < 600 ? 'ends' : ''}:</span>
-      {dateFormat.getHours()}:{dateFormat.getMinutes()}:{dateFormat.getSeconds()} {dateFormat.getDate()}/
-      {dateFormat.getMonth()}/{dateFormat.getFullYear()}
+      ⭐ <span>Weekly Feature vote:</span>
+      {formatTimeLeft(differenceInTime)}
     </View>
   )
 }

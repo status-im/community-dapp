@@ -10,12 +10,10 @@ import { useContracts } from '../../hooks/useContracts'
 export function DirectoryInfo() {
   const { account } = useEthers()
   const { featuredVotingContract } = useContracts()
-  const { activeVoting } = useFeaturedVotes()
+  const { activeVoting, votesToSend } = useFeaturedVotes()
   const featuredVotingState = getFeaturedVotingState(activeVoting)
   const castVotes = useContractFunction(featuredVotingContract, 'castVotes')
   const finalizeVoting = useContractFunction(featuredVotingContract, 'finalizeVoting')
-
-  const votes: string[] = []
 
   return (
     <InfoWrap>
@@ -25,10 +23,10 @@ export function DirectoryInfo() {
       Weekly Featured Communities"
       />
       {!account && <ConnectButton />}
-      {featuredVotingState === 'verification' && (
-        <ProposeButton onClick={() => castVotes.send(votes)}>Verify Weekly featured</ProposeButton>
+      {account && featuredVotingState === 'verification' && (
+        <ProposeButton onClick={() => castVotes.send(votesToSend)}>Verify Weekly featured</ProposeButton>
       )}
-      {featuredVotingState === 'ended' && (
+      {account && featuredVotingState === 'ended' && (
         <ProposeButton onClick={() => finalizeVoting.send()}>Finalize Weekly featured</ProposeButton>
       )}
     </InfoWrap>

@@ -157,6 +157,8 @@ export const CardVote = ({ room, hideModalFunction }: CardVoteProps) => {
         {verificationPeriod && (
           <VoteBtnFinal
             onClick={async () => {
+              console.log('votes to send')
+              console.log(votes)
               await castVotes.send(votes)
 
               setSentVotesFor(0)
