@@ -23,11 +23,11 @@ type CommunitiesFeatureVotes = {
 
 export function getContractParameters(
   address: string,
-  publicKey: string,
+  community: string,
   sntAmount: number,
   timestamp: number
 ): [string, string, BigNumber, BigNumber] {
-  return [address, publicKey, BigNumber.from(sntAmount), BigNumber.from(timestamp)]
+  return [address, community, BigNumber.from(sntAmount), BigNumber.from(timestamp)]
 }
 
 function sumVotes(map: CommunitiesFeatureVotes) {
@@ -62,7 +62,7 @@ export async function receiveWakuFeature(waku: WakuLight | undefined, topic: str
     }
 
     validatedMessages?.forEach((message) => {
-      merge(featureVotes, { [message.publicKey]: { votes: { [message.voter]: message.sntAmount } } })
+      merge(featureVotes, { [message.community]: { votes: { [message.voter]: message.sntAmount } } })
     })
 
     sumVotes(featureVotes)
@@ -82,12 +82,13 @@ export async function filterVerifiedFeaturesVotes(
   const verified: [string, string, BigNumber, BigNumber, string, string][] = []
 
   messages.forEach((msg) => {
-    const params = getContractParameters(msg.voter, msg.publicKey, msg.sntAmount.toNumber(), msg.timestamp)
+    const params = getContractParameters(msg.voter, msg.community, msg.sntAmount.toNumber(), msg.timestamp)
 
     if (utils.getAddress(recoverAddress(getTypedData(params), msg.sign)) == msg.voter) {
       console.log('------------------')
       console.log('------------------')
       console.log(msg.sign)
+      console.log(getTypedData(params))
       console.log(recoverAddress(getTypedData(params), msg.sign))
       console.log(utils.getAddress(recoverAddress(getTypedData(params), msg.sign)))
       console.log(msg.voter)
@@ -96,6 +97,7 @@ export async function filterVerifiedFeaturesVotes(
       const addressInVoted = alreadyVoted.find((el: string) => el === msg.voter)
       const splitSig = utils.splitSignature(msg.sign)
       if (!addressInVerified && !addressInVoted) {
+        console.log(splitSig.r, splitSig._vs)
         verified.push([...params, splitSig.r, splitSig._vs])
       }
     }

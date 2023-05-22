@@ -13,6 +13,6 @@ export type WakuFeatureData = {
   timestamp: number
   sntAmount: BigNumber
   voter: string
-  publicKey: string
+  community: string
   sign: string
 }

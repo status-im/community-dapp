@@ -14,7 +14,8 @@ function decodeWakuFeature(msg: WakuMessage): WakuFeatureData | undefined {
       return undefined
     }
     const data = proto.WakuFeature.decode(msg.payload)
-    if (data && data.publicKey && data.sign && data.sntAmount && data.timestamp && data.voter) {
+
+    if (data && data.community && data.sign && data.sntAmount && data.timestamp && data.voter) {
       return { ...data, sntAmount: BigNumber.from(data.sntAmount) }
     } else {
       return undefined
@@ -44,7 +45,7 @@ export async function createWakuFeatureMsg(
   voter: string | null | undefined,
   signer: JsonRpcSigner | undefined,
   sntAmount: number,
-  publicKey: string,
+  community: string,
   time: number,
   getTypedData: (data: [string, string, BigNumber, BigNumber]) => any
 ) {
@@ -58,15 +59,17 @@ export async function createWakuFeatureMsg(
     return undefined
   }
 
-  const message = getContractParameters(voter, publicKey, sntAmount, time)
+  const message = getContractParameters(voter, community, sntAmount, time)
   const data = getTypedData(message)
+
+  console.log(data)
 
   const signature = await provider?.send('eth_signTypedData_v3', [voter, JSON.stringify(data)])
   if (signature) {
     const payload = proto.WakuFeature.encode({
       voter,
       sntAmount: utils.arrayify(BigNumber.from(sntAmount)),
-      publicKey,
+      community,
       timestamp: time,
       sign: signature,
     })

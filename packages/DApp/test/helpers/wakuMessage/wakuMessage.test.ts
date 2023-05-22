@@ -120,7 +120,7 @@ describe('wakuMessage', () => {
         const data = response[0]
         expect(data).to.not.be.undefined
         expect(data?.voter).to.eq('0x17ec8597ff92C3F44523bDc65BF0f1bE632917ff')
-        expect(data?.publicKey).to.eq('0x1234')
+        expect(data?.community).to.eq('0x1234')
         expect(data?.sntAmount).to.deep.eq(BigNumber.from('0x10'))
       }
     })
