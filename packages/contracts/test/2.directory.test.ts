@@ -103,12 +103,17 @@ describe('Directory', () => {
         const byBobInvokedContract = await contract.connect(bob)
         await byBobInvokedContract.setFeaturedCommunities([communities[0]])
         expect(await contract.getFeaturedCommunities()).to.deep.eq([communities[0]])
+        expect(await contract.isCommunityFeatured(communities[0])).to.eq(true)
 
         await byBobInvokedContract.setFeaturedCommunities([communities[1]])
         expect(await contract.getFeaturedCommunities()).to.deep.eq([communities[1]])
+        expect(await contract.isCommunityFeatured(communities[0])).to.eq(false)
+        expect(await contract.isCommunityFeatured(communities[1])).to.eq(true)
 
         await byBobInvokedContract.setFeaturedCommunities([])
         expect(await contract.getFeaturedCommunities()).to.deep.eq([])
+        expect(await contract.isCommunityFeatured(communities[0])).to.eq(false)
+        expect(await contract.isCommunityFeatured(communities[1])).to.eq(false)
       })
 
       it('should revert when invoked by a non-owner', async () => {
