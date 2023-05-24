@@ -10,8 +10,8 @@ declare module 'protons' {
 
   export type WakuFeature = {
     voter: string
-    sntAmount: Uint8Array
     community: string
+    sntAmount: Uint8Array
     timestamp: number
     sign: string
   }

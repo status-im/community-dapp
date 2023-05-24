@@ -34,8 +34,8 @@ export const WeeklyFeature = () => {
     )
   }
 
-  const currentTimestamp = Date.now()
-  const differenceInTime = activeVoting.verificationStartAt.toNumber() * 1000 - currentTimestamp
+  const currentTimestamp = Date.now() / 1000
+  const differenceInTime = activeVoting.verificationStartAt.toNumber() - currentTimestamp
 
   return (
     <View>

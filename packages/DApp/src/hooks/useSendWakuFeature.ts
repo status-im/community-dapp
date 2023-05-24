@@ -14,7 +14,7 @@ export function useSendWakuFeature() {
 
   const sendWakuFeature = useCallback(
     async (voteAmount: number, publicKey: string) => {
-      const timestamp = Math.floor(Date.now())
+      const timestamp = Math.floor(Date.now() / 1000)
       const msg = await createWakuFeatureMsg(account, signer, voteAmount, publicKey, timestamp, getTypedFeatureVote)
       if (msg) {
         if (waku) {

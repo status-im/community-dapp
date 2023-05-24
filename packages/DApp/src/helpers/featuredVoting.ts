@@ -3,7 +3,7 @@ import { FeaturedVoting } from '../models/smartContract'
 type Phase = 'not started' | 'voting' | 'verification' | 'ended' | null
 
 export function getFeaturedVotingState(featuredVoting: FeaturedVoting | null): Phase {
-  const currentTimestamp = Date.now() / 1000
+  const currentTimestamp = Math.floor(Date.now() / 1000)
 
   if (!featuredVoting) {
     return null

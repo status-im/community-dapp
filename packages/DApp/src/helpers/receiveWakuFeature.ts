@@ -40,16 +40,19 @@ function sumVotes(map: CommunitiesFeatureVotes) {
 }
 
 export async function receiveWakuFeature(waku: WakuLight | undefined, topic: string, activeVoting: FeaturedVoting) {
-  let messages = await receiveWakuFeatureMsg(waku, topic)
+  const messages = await receiveWakuFeatureMsg(waku, topic)
   const featureVotes: CommunitiesFeatureVotes = {}
 
   if (messages && messages?.length > 0) {
-    messages = messages.sort((a, b) => (a.timestamp < b.timestamp ? 1 : -1))
+    // messages = messages.sort((a, b) => (a.timestamp < b.timestamp ? 1 : -1))
     const validatedMessages = []
 
     for (const message of messages) {
-      const messageTimestamp = message.timestamp / 1000
-
+      const messageTimestamp = message.timestamp
+      console.log(messageTimestamp)
+      console.log(activeVoting.verificationStartAt.toNumber())
+      console.log(activeVoting.startAt.toNumber())
+      validatedMessages.push(message)
       const validatedMessage =
         messageTimestamp < activeVoting.verificationStartAt.toNumber() &&
         messageTimestamp > activeVoting.startAt.toNumber()
@@ -85,20 +88,14 @@ export async function filterVerifiedFeaturesVotes(
     const params = getContractParameters(msg.voter, msg.community, msg.sntAmount.toNumber(), msg.timestamp)
 
     if (utils.getAddress(recoverAddress(getTypedData(params), msg.sign)) == msg.voter) {
-      console.log('------------------')
-      console.log('------------------')
-      console.log(msg.sign)
-      console.log(getTypedData(params))
-      console.log(recoverAddress(getTypedData(params), msg.sign))
-      console.log(utils.getAddress(recoverAddress(getTypedData(params), msg.sign)))
-      console.log(msg.voter)
-
       const addressInVerified = verified.find((el) => el[0] === msg.voter)
       const addressInVoted = alreadyVoted.find((el: string) => el === msg.voter)
       const splitSig = utils.splitSignature(msg.sign)
       if (!addressInVerified && !addressInVoted) {
-        console.log(splitSig.r, splitSig._vs)
-        verified.push([...params, splitSig.r, splitSig._vs])
+        console.log(msg.sign)
+        const a = [...params, splitSig.r, splitSig._vs]
+        console.log(a)
+        verified.push(a as any)
       }
     }
   })
