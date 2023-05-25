@@ -7,7 +7,7 @@ import { CommunityDetail } from '../../models/community'
 import { Modal } from '../Modal'
 import { FeatureModal } from './FeatureModal'
 import { VoteConfirmModal } from './VoteConfirmModal'
-import { useContractCall, useContractFunction, useEthers } from '@usedapp/core'
+import { useContractCall, useEthers } from '@usedapp/core'
 import { VoteBtn } from '../Button'
 import { useFeaturedVotes } from '../../hooks/useFeaturedVotes'
 import { getFeaturedVotingState } from '../../helpers/featuredVoting'
@@ -37,10 +37,8 @@ export const CardFeature = ({ community, featured }: CardFeatureProps) => {
 
   const [heading, setHeading] = useState('Weekly Feature vote')
   const [icon, setIcon] = useState('⭐')
-  const { activeVoting, votesToSend } = useFeaturedVotes()
+  const { activeVoting } = useFeaturedVotes()
   const featuredVotingState = getFeaturedVotingState(activeVoting)
-
-  const castVotes = useContractFunction(featuredVotingContract, 'castVotes')
 
   const [savedVotes] =
     useContractCall({
@@ -82,18 +80,6 @@ export const CardFeature = ({ community, featured }: CardFeatureProps) => {
             community
           </FeatureText>
         )}
-        <div>
-          Waku votes: {community?.featureVotes?.toNumber()}
-          <br />
-          Contract votes: {verifiedVotes.toNumber()}
-        </div>
-        <button
-          onClick={() => {
-            castVotes.send(votesToSend)
-          }}
-        >
-          Verify
-        </button>
       </FeatureVote>
 
       <FeatureVoteMobile>

@@ -39,16 +39,8 @@ export function useFeaturedVotes() {
     const loadFeatureVotes = async () => {
       if (chainId && waku && activeVoting) {
         const { votes, votesToSend } = await receiveWakuFeature(waku, config.wakuConfig.wakuFeatureTopic, activeVoting)
-
         const verifiedVotes = await filterVerifiedFeaturesVotes(votesToSend, [], getTypedFeatureVote)
-        console.log('===== VOTES FROM WAKU =====')
-        console.log(votes)
 
-        console.log('===== VOTES TO SEND FROM WAKU =====')
-        console.log(votesToSend)
-
-        console.log('===== VERIFIED VOTES FROM WAKU =====')
-        console.log(verifiedVotes)
         setVotesToSend(verifiedVotes)
         setVotes(votes)
       }

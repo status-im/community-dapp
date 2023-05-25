@@ -44,7 +44,7 @@ export async function receiveWakuFeature(waku: WakuLight | undefined, topic: str
   const featureVotes: CommunitiesFeatureVotes = {}
 
   if (messages && messages?.length > 0) {
-    // messages = messages.sort((a, b) => (a.timestamp < b.timestamp ? 1 : -1))
+    messages.sort((a, b) => (a.timestamp < b.timestamp ? 1 : -1))
     const validatedMessages = []
 
     for (const message of messages) {

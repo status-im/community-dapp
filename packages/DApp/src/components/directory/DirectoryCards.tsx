@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
 import { DirectorySortingEnum } from '../../models/community'
 import { FilterList } from '../Filter'
@@ -10,9 +10,6 @@ import { DirectoryCardSkeleton } from './DirectoryCardSkeleton'
 import { useDirectoryCommunities } from '../../hooks/useDirectoryCommunities'
 import { SearchEmpty } from '../SearchEmpty'
 import { DirectoryCard } from './DirectoryCard'
-import { useContractCall } from '@usedapp/core'
-import { useContracts } from '../../hooks/useContracts'
-import { useFeaturedVotes } from '../../hooks/useFeaturedVotes'
 
 export function DirectoryCards() {
   const [filterKeyword, setFilterKeyword] = useState('')
