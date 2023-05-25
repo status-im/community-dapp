@@ -107,11 +107,11 @@ async function main() {
   const [deployer] = await hre.ethers.getSigners()
   const network = await hre.ethers.provider.getNetwork()
 
-  const votingLengthInSeconds = isTestNetwork(network.chainId) ? 1 * 60 : 2 * 24 * 3600 // 4 minutes or 2 days
-  const votingVerificationLengthInSeconds = isTestNetwork(network.chainId) ? 2 * 60 : 1 * 24 * 3600 // 1 minutes or 1 day
+  const votingLengthInSeconds = isTestNetwork(network.chainId) ? 4 * 60 : 2 * 24 * 3600 // 4 minutes or 2 days
+  const votingVerificationLengthInSeconds = isTestNetwork(network.chainId) ? 2 * 60 : 1 * 24 * 3600 // 2 minutes or 1 day
   const timeBetweenVotingInSeconds = isTestNetwork(network.chainId) ? 60 : 2 * 24 * 3600 // 1 minute or 2 days
 
-  const featuredVotingLengthInSeconds = isTestNetwork(network.chainId) ? 20 * 60 : 2 * 24 * 3600 // 4 minutes or 2 days
+  const featuredVotingLengthInSeconds = isTestNetwork(network.chainId) ? 4 * 60 : 2 * 24 * 3600 // 4 minutes or 2 days
   const featuredVotingVerificationLengthInSeconds = isTestNetwork(network.chainId) ? 2 * 60 : 1 * 24 * 3600 // 2 minutes or 1 day
   const cooldownPeriod = isTestNetwork(network.chainId) ? 1 : 2
   const featuredPerVotingCount = isTestNetwork(network.chainId) ? 3 : 3
