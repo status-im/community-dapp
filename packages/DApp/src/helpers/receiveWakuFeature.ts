@@ -1,5 +1,5 @@
 import { receiveWakuFeatureMsg } from './wakuFeature'
-import { merge } from 'lodash'
+import lodash from 'lodash'
 import { BigNumber, utils } from 'ethers'
 import { recoverAddress } from './ethMessage'
 
@@ -42,6 +42,7 @@ function sumVotes(map: CommunitiesFeatureVotes) {
 export async function receiveWakuFeature(waku: WakuLight | undefined, topic: string, activeVoting: FeaturedVoting) {
   const messages = await receiveWakuFeatureMsg(waku, topic)
   const featureVotes: CommunitiesFeatureVotes = {}
+  const { merge } = lodash
 
   if (messages && messages?.length > 0) {
     messages.sort((a, b) => (a.timestamp < b.timestamp ? 1 : -1))
