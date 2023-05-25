@@ -18,14 +18,14 @@ export function useTypedFeatureVote() {
             { name: 'chainId', type: 'uint256' },
             { name: 'verifyingContract', type: 'address' },
           ],
-          Feature: [
+          Vote: [
             { name: 'voter', type: 'address' },
-            { name: 'sntAmount', type: 'uint256' },
             { name: 'community', type: 'bytes' },
+            { name: 'sntAmount', type: 'uint256' },
             { name: 'timestamp', type: 'uint256' },
           ],
         },
-        primaryType: 'Feature',
+        primaryType: 'Vote',
         domain: {
           name: 'Featured Voting Contract',
           version: '1',
@@ -34,8 +34,8 @@ export function useTypedFeatureVote() {
         },
         message: {
           voter: data[0],
-          sntAmount: data[2].toHexString(),
           community: data[1],
+          sntAmount: data[2].toHexString(),
           timestamp: data[3].toHexString(),
         },
       } as TypedFeature

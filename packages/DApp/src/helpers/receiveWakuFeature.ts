@@ -49,9 +49,6 @@ export async function receiveWakuFeature(waku: WakuLight | undefined, topic: str
 
     for (const message of messages) {
       const messageTimestamp = message.timestamp
-      console.log(messageTimestamp)
-      console.log(activeVoting.verificationStartAt.toNumber())
-      console.log(activeVoting.startAt.toNumber())
       validatedMessages.push(message)
       const validatedMessage =
         messageTimestamp < activeVoting.verificationStartAt.toNumber() &&
@@ -92,10 +89,7 @@ export async function filterVerifiedFeaturesVotes(
       const addressInVoted = alreadyVoted.find((el: string) => el === msg.voter)
       const splitSig = utils.splitSignature(msg.sign)
       if (!addressInVerified && !addressInVoted) {
-        console.log(msg.sign)
-        const a = [...params, splitSig.r, splitSig._vs]
-        console.log(a)
-        verified.push(a as any)
+        verified.push([...params, splitSig.r, splitSig._vs])
       }
     }
   })

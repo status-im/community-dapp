@@ -44,8 +44,6 @@ export function filterVerifiedVotes(
       const addressInVoted = alreadyVoted.find((el: string) => el === msg.address)
       const splitSig = utils.splitSignature(msg.sign)
       if (!addressInVerified && !addressInVoted) {
-        console.log(msg.sign)
-        console.log([...params, splitSig.r, splitSig._vs])
         verified.push([...params, splitSig.r, splitSig._vs])
       }
     }

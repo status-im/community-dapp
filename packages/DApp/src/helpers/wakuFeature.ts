@@ -62,8 +62,6 @@ export async function createWakuFeatureMsg(
   const message = getContractParameters(voter, community, sntAmount, time)
   const data = getTypedData(message)
 
-  console.log(data)
-
   const signature = await provider?.send('eth_signTypedData_v3', [voter, JSON.stringify(data)])
   if (signature) {
     const payload = proto.WakuFeature.encode({

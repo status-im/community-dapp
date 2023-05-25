@@ -50,15 +50,6 @@ export const CardFeature = ({ community, featured }: CardFeatureProps) => {
       args: [activeVoting?.id.toNumber()],
     }) ?? []
 
-  console.log('=== CARD FEATURE ===')
-
-  console.log(activeVoting?.id.toNumber())
-
-  console.log(community.name, activeVoting?.id.toNumber())
-  console.log(savedVotes?.[0]?.sntAmount?.toNumber())
-  console.log('ALL SAVED VOTES')
-  console.log(savedVotes)
-
   useEffect(() => {
     setHeading(inFeatured ? 'This community has been featured recently' : 'Weekly Feature vote')
     setIcon(inFeatured ? '⏳' : '⭐')
@@ -77,16 +68,6 @@ export const CardFeature = ({ community, featured }: CardFeatureProps) => {
     setShowConfirmModal(val)
     setShowFeatureModal(false)
   }
-
-  useEffect(() => {
-    console.log('============= CAST VOTES USE EFFECT ==========')
-    if (castVotes.state) {
-      console.log(castVotes.state)
-    }
-    if (castVotes.events) {
-      console.log(castVotes.events)
-    }
-  }, [castVotes])
 
   return (
     <CardVoteBlock>
@@ -108,8 +89,6 @@ export const CardFeature = ({ community, featured }: CardFeatureProps) => {
         </div>
         <button
           onClick={() => {
-            console.log('castedVotes')
-            console.log(votesToSend)
             castVotes.send(votesToSend)
           }}
         >
