@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid'
 import { ChainId, OptimismGoerli, Optimism, Config as DAppConfig, Localhost, Hardhat } from '@usedapp/core'
 
-const version = '0.0.5'
+const version = '0.0.6'
 
 export interface Config {
   wakuConfig: {
@@ -52,12 +52,15 @@ const configs: Record<typeof process.env.ENV, Config> = {
   preview: {
     statusWalletRequired: false,
     wakuConfig: {
-      environment: 'test',
+      environment: 'production',
       wakuTopic: `/communitiesCuration/preview/${version}/directory/proto/`,
       wakuFeatureTopic: `/communitiesCuration/preview/${version}/featured/proto/`,
     },
     daapConfig: {
       readOnlyChainId: ChainId.OptimismGoerli,
+      readOnlyUrls: {
+        [ChainId.OptimismGoerli]: `https://optimism-goerli.infura.io/v3/${process.env.INFURA_API_KEY}`,
+      },
       networks: [OptimismGoerli],
       notifications: {
         checkInterval: 500,

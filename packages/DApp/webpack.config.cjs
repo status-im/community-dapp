@@ -81,6 +81,7 @@ module.exports = () => {
         'process.env.DIRECTORY_CONTRACT': JSON.stringify(process.env.DIRECTORY_CONTRACT),
         'process.env.MULTICALL_CONTRACT': JSON.stringify(process.env.MULTICALL_CONTRACT),
         'process.env.TOKEN_CONTRACT': JSON.stringify(process.env.TOKEN_CONTRACT),
+        'process.env.INFURA_API_KEY': JSON.stringify(process.env.INFURA_API_KEY),
       }),
       new webpack.ProvidePlugin({
         process: 'process/browser.js',
