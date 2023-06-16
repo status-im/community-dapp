@@ -92,11 +92,13 @@ function isTestNetwork(chainId: number) {
 
 async function obtainTokenAddress(deployer: any, chainId: number): Promise<string> {
   let tokenAddress = process.env.TOKEN_CONTRACT
-  if (!tokenAddress && isTestNetwork(chainId)) {
-    const tokenContract = await deployERC20MockContract(deployer.address)
-    tokenAddress = tokenContract.address
-  } else {
-    throw new Error('TOKEN_ADDRESS should be provided')
+  if (!tokenAddress) {
+    if (isTestNetwork(chainId)) {
+      const tokenContract = await deployERC20MockContract(deployer.address)
+      tokenAddress = tokenContract.address
+    } else {
+      throw new Error('TOKEN_CONTRACT must be provided')
+    }
   }
   return tokenAddress ? tokenAddress : ''
 }
