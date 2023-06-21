@@ -10,7 +10,6 @@ export interface Config {
     wakuFeatureTopic: string
   }
   daapConfig: DAppConfig
-  statusWalletRequired: boolean
 }
 
 /**
@@ -21,7 +20,6 @@ const configs: Record<typeof process.env.ENV, Config> = {
    * Localhost/Development.
    */
   development: {
-    statusWalletRequired: false,
     wakuConfig: {
       environment: 'test',
       wakuTopic: `/communitiesCuration/localhost/${uuidv4()}/${version}/directory/proto/`,
@@ -50,7 +48,6 @@ const configs: Record<typeof process.env.ENV, Config> = {
    * All preview deployments (from pull requests) will share voting history.
    */
   preview: {
-    statusWalletRequired: false,
     wakuConfig: {
       environment: 'production',
       wakuTopic: `/communitiesCuration/preview/${version}/directory/proto/`,
@@ -72,7 +69,6 @@ const configs: Record<typeof process.env.ENV, Config> = {
    * Production.
    */
   production: {
-    statusWalletRequired: true,
     wakuConfig: {
       environment: 'production',
       wakuTopic: `/communitiesCuration/${version}/directory/proto/`,
