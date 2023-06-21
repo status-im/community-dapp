@@ -12,6 +12,9 @@ const proto2 = protons(`
 message WakuVote {
   string address = 1;
 }
+message WakuFeature {
+  string voter = 1;
+}
 `) as any
 
 describe('wakuMessage', () => {
@@ -100,15 +103,16 @@ describe('wakuMessage', () => {
     it('success', async () => {
       const encoder = new EncoderV0('/test/')
 
-      const payload = proto2.Waku.encode({
-        address: '0x0',
+      const payload = proto2.WakuFeature.encode({
+        voter: '0x0',
       })
       const msg = await encoder.toProtoObj({ payload: payload })
-      const payload2 = proto2.Waku.encode({
+      const payload2 = proto.WakuFeature.encode({
         voter: '0x17ec8597ff92C3F44523bDc65BF0f1bE632917ff',
-        signer: alice as unknown as JsonRpcSigner,
-        sntAmount: BigNumber.from('0x10'),
-        publicKey: '0x1234',
+        sign: '0x1234abc',
+        sntAmount: utils.arrayify(BigNumber.from('0x10')),
+        community: '0x1234',
+        timestamp: 1,
       })
       const msg2 = await encoder.toProtoObj({ payload: payload2 })
 
