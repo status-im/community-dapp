@@ -37,7 +37,7 @@ export const CardFeature = ({ community, featured }: CardFeatureProps) => {
 
   const [heading, setHeading] = useState('Weekly Feature vote')
   const [icon, setIcon] = useState('⭐')
-  const { activeVoting } = useFeaturedVotes()
+  const { activeVoting, alreadyVoted } = useFeaturedVotes()
   const featuredVotingState = getFeaturedVotingState(activeVoting)
 
   const [savedVotes] =

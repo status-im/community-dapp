@@ -4,7 +4,7 @@ import { useContractCall, useEthers } from '@usedapp/core'
 import { config } from '../config'
 import { useContracts } from '../hooks/useContracts'
 
-import { filterVerifiedFeaturesVotes, receiveWakuFeature } from '../helpers/receiveWakuFeature'
+import { filterVerifiedFeaturesVotes, receiveWakuFeature, getAlreadyVotedList } from '../helpers/receiveWakuFeature'
 import { FeaturedVoting } from '../models/smartContract'
 import { useTypedFeatureVote } from './useTypedFeatureVote'
 
@@ -12,6 +12,7 @@ export function useFeaturedVotes() {
   const { featuredVotingContract } = useContracts()
   const [votes, setVotes] = useState<any | null>(null)
   const [votesToSend, setVotesToSend] = useState<any | null>(null)
+  const [alreadyVoted, setAlreadyVoted] = useState<string[]>([])
   const [activeVoting, setActiveVoting] = useState<FeaturedVoting | null>(null)
   const { waku } = useWaku()
   const { chainId } = useEthers()
@@ -39,8 +40,12 @@ export function useFeaturedVotes() {
     const loadFeatureVotes = async () => {
       if (chainId && waku && activeVoting) {
         const { votes, votesToSend } = await receiveWakuFeature(waku, config.wakuConfig.wakuFeatureTopic, activeVoting)
-        const verifiedVotes = await filterVerifiedFeaturesVotes(votesToSend, [], getTypedFeatureVote)
+        const verifiedVotes = await filterVerifiedFeaturesVotes(votesToSend, alreadyVoted, getTypedFeatureVote)
+        const alreadyVotedList = await getAlreadyVotedList(votes)
 
+        console.log('alreadyVotedList', alreadyVotedList)
+
+        setAlreadyVoted(alreadyVotedList)
         setVotesToSend(verifiedVotes)
         setVotes(votes)
       }
@@ -52,5 +57,5 @@ export function useFeaturedVotes() {
     return () => clearInterval(task)
   }, [waku, chainId, activeVoting])
 
-  return { votes, votesToSend, activeVoting }
+  return { votes, votesToSend, activeVoting, alreadyVoted }
 }

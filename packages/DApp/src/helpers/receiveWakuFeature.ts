@@ -96,3 +96,13 @@ export async function filterVerifiedFeaturesVotes(
   })
   return verified
 }
+
+export function getAlreadyVotedList(votes: CommunitiesFeatureVotes) {
+  const alreadyVoted: string[] = []
+  for (const [publicKey, community] of Object.entries(votes)) {
+    for (const [voter] of Object.entries(community['votes'])) {
+      alreadyVoted.push(voter)
+    }
+  }
+  return alreadyVoted
+}
