@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react'
 export function useAvailableAmount() {
   const { account, chainId } = useEthers()
   // @ts-expect-error Ethers does not type chainId
-  const tokenBalance = useTokenBalance(contracts[chainId ?? 3].tokenContract, account)
+  const tokenBalance = useTokenBalance(contracts[chainId ?? 3]?.tokenContract, account)
 
   const [availableAmount, setAvailableAmount] = useState(0)
 

@@ -50,7 +50,6 @@ export async function receiveWakuFeature(waku: WakuLight | undefined, topic: str
 
     for (const message of messages) {
       const messageTimestamp = message.timestamp
-      validatedMessages.push(message)
       const validatedMessage =
         messageTimestamp < activeVoting.verificationStartAt.toNumber() &&
         messageTimestamp > activeVoting.startAt.toNumber()

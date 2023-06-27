@@ -48,6 +48,8 @@ export const CardFeature = ({ community, featured }: CardFeatureProps) => {
       args: [activeVoting?.id.toNumber()],
     }) ?? []
 
+  const canVote = Boolean(account && !alreadyVoted.includes(account) && savedVotes?.[0]?.voter !== account)
+
   useEffect(() => {
     setHeading(inFeatured ? 'This community has been featured recently' : 'Weekly Feature vote')
     setIcon(inFeatured ? '⏳' : '⭐')
@@ -109,7 +111,13 @@ export const CardFeature = ({ community, featured }: CardFeatureProps) => {
           </Modal>
         )}
         <FeatureBtn
-          disabled={!account || inFeatured || featuredVotingState === 'verification' || featuredVotingState === 'ended'}
+          disabled={
+            !account ||
+            inFeatured ||
+            featuredVotingState === 'verification' ||
+            featuredVotingState === 'ended' ||
+            !canVote
+          }
           onClick={() => setShowFeatureModal(true)}
         >
           Feature this community! <span style={{ fontSize: '20px' }}>⭐️</span>
