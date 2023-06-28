@@ -62,7 +62,7 @@ contract FeaturedVotingContract {
     uint256 public cooldownPeriod;
 
     Voting[] public votings;
-    mapping(uint256 => Vote[]) public votesByVotingID;
+    mapping(uint256 => Vote[]) private votesByVotingID;
     mapping(uint256 => bytes[]) private featuredByVotingID;
     mapping(uint256 => mapping(bytes => mapping(address => bool))) private votersByCommunityByVotingID;
 
