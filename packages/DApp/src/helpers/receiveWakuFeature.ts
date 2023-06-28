@@ -21,6 +21,10 @@ type CommunitiesFeatureVotes = {
   [community: string]: CommunityFeatureVotes
 }
 
+export type AlreadyVoted = {
+  [community: string]: string[]
+}
+
 export function getContractParameters(
   address: string,
   community: string,
@@ -42,11 +46,11 @@ function sumVotes(map: CommunitiesFeatureVotes) {
 export async function receiveWakuFeature(waku: WakuLight | undefined, topic: string, activeVoting: FeaturedVoting) {
   const messages = await receiveWakuFeatureMsg(waku, topic)
   const featureVotes: CommunitiesFeatureVotes = {}
+  const validatedMessages = []
   const { merge } = lodash
 
   if (messages && messages?.length > 0) {
     messages.sort((a, b) => (a.timestamp < b.timestamp ? 1 : -1))
-    const validatedMessages = []
 
     for (const message of messages) {
       const messageTimestamp = message.timestamp
@@ -68,12 +72,12 @@ export async function receiveWakuFeature(waku: WakuLight | undefined, topic: str
     sumVotes(featureVotes)
   }
 
-  return { votes: featureVotes, votesToSend: messages }
+  return { votes: featureVotes, votesToSend: validatedMessages }
 }
 
 export async function filterVerifiedFeaturesVotes(
   messages: WakuFeatureData[] | undefined,
-  alreadyVoted: string[],
+  alreadyVoted: AlreadyVoted,
   getTypedData: (data: [string, string, BigNumber, BigNumber]) => TypedFeature
 ) {
   if (!messages) {
@@ -86,7 +90,8 @@ export async function filterVerifiedFeaturesVotes(
 
     if (utils.getAddress(recoverAddress(getTypedData(params), msg.sign)) == msg.voter) {
       const addressInVerified = verified.find((el) => el[0] === msg.voter)
-      const addressInVoted = alreadyVoted.find((el: string) => el === msg.voter)
+      const addressInVoted =
+        msg.community in alreadyVoted && alreadyVoted[msg.community].find((el: string) => el === msg.voter)
       const splitSig = utils.splitSignature(msg.sign)
       if (!addressInVerified && !addressInVoted) {
         verified.push([...params, splitSig.r, splitSig._vs])
@@ -97,10 +102,15 @@ export async function filterVerifiedFeaturesVotes(
 }
 
 export function getAlreadyVotedList(votes: CommunitiesFeatureVotes) {
-  const alreadyVoted: string[] = []
+  const { merge } = lodash
+  const alreadyVoted: AlreadyVoted = {}
   for (const [publicKey, community] of Object.entries(votes)) {
     for (const [voter] of Object.entries(community['votes'])) {
-      alreadyVoted.push(voter)
+      if (!(publicKey in alreadyVoted)) {
+        merge(alreadyVoted, { [publicKey]: [voter] })
+      } else {
+        alreadyVoted[publicKey].push(voter)
+      }
     }
   }
   return alreadyVoted

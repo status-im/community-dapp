@@ -48,7 +48,12 @@ export const CardFeature = ({ community, featured }: CardFeatureProps) => {
       args: [activeVoting?.id.toNumber()],
     }) ?? []
 
-  const canVote = Boolean(account && !alreadyVoted.includes(account) && savedVotes?.[0]?.voter !== account)
+  const canVote = Boolean(
+    account &&
+      ((community.publicKey in alreadyVoted && !alreadyVoted[community.publicKey].includes(account)) ||
+        !(community.publicKey in alreadyVoted)) &&
+      (savedVotes?.[0]?.community !== community.publicKey || savedVotes?.[0]?.voter !== account)
+  )
 
   useEffect(() => {
     setHeading(inFeatured ? 'This community has been featured recently' : 'Weekly Feature vote')
