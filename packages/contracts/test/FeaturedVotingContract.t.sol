@@ -30,6 +30,10 @@ contract FeaturedVotingContract_Test is Test {
 
     bytes communityID1 = bytes('0x0d9cb350e1dc415303e2816a21b0a439530725b4b2b42d2948e967cb211eab89d5');
     bytes communityID2 = bytes('0xe84e64498172551d998a220e1d8e5893c818ee9aa90bdb855aec0c9e65e89014b8');
+    bytes communityID3 = bytes('0x04bbb77ea11ee6dc4585efa2617ec90b8ee4051ade4fcf7261ae6cd4cdf33e54e3');
+    bytes communityID4 = bytes('0xadfcf42e083e71d8c755da07a2b1bad754d7ca97c35fbd407da6bde9844580ad55');
+    bytes communityID5 = bytes('0xec62724b6828954a705eb3b531c30a69503d3561d4283fb8b60835ff34205c64d8');
+    bytes communityID6 = bytes('0xb8def1f5e7160e5e1a6440912b7e633ad923030352f23abb54226020bff781b7e6');
 
     event VotingStarted();
     event NotEnoughToken(bytes community, address voter);
@@ -268,6 +272,46 @@ contract FinalizeVoting_Test is FeaturedVotingContract_Test {
         assertEq(votings.length, 1);
         assertEq(votings[0].id, 1);
         assert(votings[0].finalized);
+    }
+
+    function test_FinalizeVoting_FeatureByFirstCastedWhenVoteIsADraw() public {
+        vm.startPrank(votingContract);
+        directoryContract.addCommunity(communityID2);
+        directoryContract.addCommunity(communityID3);
+        directoryContract.addCommunity(communityID4);
+        directoryContract.addCommunity(communityID5);
+        directoryContract.addCommunity(communityID6);
+        vm.stopPrank();
+
+        featuredVotingContract.initializeVoting(communityID3, 100);
+
+        FeaturedVotingContract.SignedVote[] memory votes = new FeaturedVotingContract.SignedVote[](4);
+        votes[0] = _createSignedVote(bobsKey, bob, communityID4, 100, block.timestamp);
+        votes[1] = _createSignedVote(bobsKey, bob, communityID5, 100, block.timestamp);
+        votes[2] = _createSignedVote(bobsKey, bob, communityID2, 100, block.timestamp);
+        votes[3] = _createSignedVote(bobsKey, bob, communityID6, 100, block.timestamp);
+
+        // ensure bob has funds
+        mockSNT.transfer(bob, 10000);
+
+        featuredVotingContract.castVotes(votes);
+        skip(votingWithVerificationLength + 1);
+
+        emit VotingFinalized();
+        featuredVotingContract.finalizeVoting();
+
+        FeaturedVotingContract.Voting[] memory votings = featuredVotingContract.getVotings();
+        assertEq(votings.length, 1);
+        assert(votings[0].finalized);
+
+        bytes[] memory featuredCommunities = directoryContract.getFeaturedCommunities();
+        assertEq(featuredCommunities.length, 3);
+
+        // we expect that communities which have been voted for
+        // first to make it into the featured list, if the vote is a draw
+        assertEq(featuredCommunities[0], communityID3);
+        assertEq(featuredCommunities[1], communityID4);
+        assertEq(featuredCommunities[2], communityID5);
     }
 }
 
