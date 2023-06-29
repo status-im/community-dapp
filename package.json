@@ -11,7 +11,7 @@
     "start": "yarn --cwd ./packages/DApp dev",
     "lint": "wsrun -c -s lint",
     "lint:fix": "wsrun -c -s lint:fix",
-    "build": "yarn workspace @status-community-dapp/contracts build && yarn workspace @status-community-dapp/dapp build",
+    "build": "wsrun -e -c -s build",
     "test": "wsrun -e -c -s --exclude-missing test",
     "clean": "wsrun -e -c -s clean && rimraf node_modules"
   },
