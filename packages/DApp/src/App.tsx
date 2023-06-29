@@ -25,7 +25,7 @@ export function App() {
     <Page>
       <GlobalStyle />
       {mobileVersion ? <MobileRouter /> : <DesktopRouter />}
-      <NotificationsList />
+      {/* <NotificationsList /> */}
     </Page>
   )
 }

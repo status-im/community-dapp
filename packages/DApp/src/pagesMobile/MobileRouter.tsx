@@ -9,6 +9,7 @@ import { InfoMobile } from './InfoMobile'
 import { VotesMobile } from './VotesMobile'
 import { FeatureMobile } from '../componentsMobile/FeatureMobile'
 import { RemoveMobile } from '../componentsMobile/RemoveMobile'
+import { FeaturedMobile } from './FeaturedMobile'
 
 export const MobileRouter = () => (
   <BrowserRouter>
@@ -21,6 +22,7 @@ export const MobileRouter = () => (
         <Route exact path="/propose" component={ProposeMobile} />
         <Route exact path="/votes" component={VotesMobile} />
         <Route exact path="/directory" component={DirectoryMobile} />
+        <Route exact path="/featured" component={FeaturedMobile} />
         <Route exact path="/info" component={InfoMobile} />
       </Switch>
     </PageContentMobile>

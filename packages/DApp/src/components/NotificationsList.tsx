@@ -14,6 +14,7 @@ export function NotificationsList() {
       {notifications.map((notification) => {
         if ('receipt' in notification) {
           return notification.receipt.logs.map((log) => {
+            // this needs to be updated so it takes into account also interface of featuredVotingContract
             const parsedLog = votingContract.interface.parseLog(log)
 
             let text

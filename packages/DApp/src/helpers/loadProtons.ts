@@ -13,8 +13,8 @@ message WakuVote {
 message WakuFeature {
   string voter = 1;
   bytes  sntAmount = 2;
-  string publicKey = 3;
-  uint64 timestamp = 4;
+  string community = 3;
+  uint32 timestamp = 4;
   string sign = 5;
 }
 `)

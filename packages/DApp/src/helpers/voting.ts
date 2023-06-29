@@ -9,9 +9,11 @@ export function getVotingWinner(vote: CurrentVoting) {
 }
 
 export function votingFromRoom(votingRoom: VotingRoom) {
+  const currentTimestamp = Date.now() / 1000
+
   const currentVoting: CurrentVoting = {
-    timeLeft: votingRoom.verificationStartAt.toNumber() * 1000 - Date.now(),
-    timeLeftVerification: votingRoom.endAt.toNumber() * 1000 - Date.now(),
+    timeLeft: votingRoom.verificationStartAt.toNumber() - currentTimestamp,
+    timeLeftVerification: votingRoom.endAt.toNumber() - currentTimestamp,
     type: votingRoom.voteType === 1 ? 'Add' : 'Remove',
     voteFor: votingRoom.totalVotesFor,
     voteAgainst: votingRoom.totalVotesAgainst,

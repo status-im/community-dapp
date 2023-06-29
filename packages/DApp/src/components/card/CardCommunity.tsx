@@ -116,7 +116,7 @@ export const CardCommunity = ({
           Visit community
         </LinkExternal>
         <LinkExternal
-          href={getExplorerAddressLink(contracts[chainId as ChainId.Optimism].directoryContract, chainId!)}
+          href={getExplorerAddressLink(contracts[chainId as ChainId.Optimism]?.directoryContract, chainId!)}
           target="_blank"
           rel="noopener noreferrer"
         >

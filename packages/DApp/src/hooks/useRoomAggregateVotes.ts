@@ -8,7 +8,7 @@ export function useRoomAggregateVotes(room: DetailedVotingRoom, showConfirmModal
   const [returnRoom, setReturnRoom] = useState(room)
 
   useEffect(() => {
-    if (room.endAt.toNumber() * 1000 > Date.now() && showConfirmModal === false) {
+    if (room.endAt.toNumber() > Date.now() / 1000 && showConfirmModal === false) {
       const reducedVotes = votes.reduce(
         (accumulator, vote) => {
           if (vote[1].mod(2).toNumber()) {

@@ -60,9 +60,9 @@ export const CardVote = ({ room, hideModalFunction }: CardVoteProps) => {
     setShowConfirmModal(val)
   }
 
-  const now = Date.now()
-  const verificationStarted = room.verificationStartAt.toNumber() * 1000 - now < 0
-  const verificationEnded = room.endAt.toNumber() * 1000 - now < 0
+  const now = Date.now() / 1000
+  const verificationStarted = room.verificationStartAt.toNumber() - now < 0
+  const verificationEnded = room.endAt.toNumber() - now < 0
   const verificationPeriod = verificationStarted && !verificationEnded
 
   const winner = verificationPeriod ? 0 : getVotingWinner(vote)

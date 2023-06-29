@@ -36,6 +36,11 @@ export function TopBar() {
                 </StyledNavLink>
               </NavItem>
               <NavItem>
+                <StyledNavLink activeClassName="active-page" to="/featured">
+                  Featured
+                </StyledNavLink>
+              </NavItem>
+              <NavItem>
                 <StyledNavLink activeClassName="active-page" to="/info">
                   Info
                 </StyledNavLink>

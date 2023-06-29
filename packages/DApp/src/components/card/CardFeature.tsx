@@ -3,68 +3,96 @@ import styled from 'styled-components'
 import { ColumnFlexDiv } from '../../constants/styles'
 import { addCommas } from '../../helpers/addCommas'
 import { CardHeading, CardVoteBlock } from '../Card'
-import { CommunityDetail, CurrentVoting } from '../../models/community'
+import { CommunityDetail } from '../../models/community'
 import { Modal } from '../Modal'
 import { FeatureModal } from './FeatureModal'
 import { VoteConfirmModal } from './VoteConfirmModal'
-import { OngoingVote } from './OngoingVote'
-// import { useEthers } from '@usedapp/core'
-import { VoteSubmitButton } from './VoteSubmitButton'
-import { VoteSendingBtn, VoteBtn } from '../Button'
-import { VotingRoom } from '../../models/smartContract'
-// import { useWakuFeature } from '../../providers/wakuFeature/provider'
+import { useContractCall, useEthers } from '@usedapp/core'
+import { VoteBtn } from '../Button'
+import { useFeaturedVotes } from '../../hooks/useFeaturedVotes'
+import { getFeaturedVotingState } from '../../helpers/featuredVoting'
+import { useContracts } from '../../hooks/useContracts'
+import { BigNumber } from 'ethers'
 
 interface CardFeatureProps {
   community: CommunityDetail
-  currentVoting?: CurrentVoting
-  room?: VotingRoom
+  featured: boolean
 }
 
-export const CardFeature = ({ community, currentVoting, room }: CardFeatureProps) => {
-  // const { account } = useEthers()
+export const CardFeature = ({ community, featured }: CardFeatureProps) => {
+  const { featuredVotingContract } = useContracts()
+  const [isInCooldownPeriod] =
+    useContractCall({
+      abi: featuredVotingContract.interface,
+      address: featuredVotingContract.address,
+      method: 'isInCooldownPeriod',
+      args: [community.publicKey],
+    }) ?? []
+
+  const { account } = useEthers()
   const [showFeatureModal, setShowFeatureModal] = useState(false)
   const [showConfirmModal, setShowConfirmModal] = useState(false)
-  const [showOngoingVote, setShowOngoingVote] = useState(false)
-  // const { featured } = useWakuFeature()
-  // const inFeatured = Boolean(featured.find((el) => el[0] === community.publicKey))
-  const inFeatured = false
+  const [verifiedVotes, setVerifiedVotes] = useState<BigNumber>(BigNumber.from(0))
+  const inFeatured = featured || isInCooldownPeriod
 
   const [heading, setHeading] = useState('Weekly Feature vote')
   const [icon, setIcon] = useState('⭐')
-  const [timeLeft, setTimeLeft] = useState('')
+  const { activeVoting, alreadyVoted } = useFeaturedVotes()
+  const featuredVotingState = getFeaturedVotingState(activeVoting)
+
+  const [savedVotes] =
+    useContractCall({
+      abi: featuredVotingContract.interface,
+      address: featuredVotingContract.address,
+      method: 'getVotesByVotingId',
+      args: [activeVoting?.id.toNumber()],
+    }) ?? []
+
+  const canVote = Boolean(
+    account &&
+      ((community.publicKey in alreadyVoted && !alreadyVoted[community.publicKey].includes(account)) ||
+        !(community.publicKey in alreadyVoted)) &&
+      (savedVotes?.[0]?.community !== community.publicKey || savedVotes?.[0]?.voter !== account)
+  )
 
   useEffect(() => {
-    setHeading(inFeatured ? 'This community has been featured last week' : 'Weekly Feature vote')
+    setHeading(inFeatured ? 'This community has been featured recently' : 'Weekly Feature vote')
     setIcon(inFeatured ? '⏳' : '⭐')
-    setTimeLeft(inFeatured ? '1 week' : '')
   }, [inFeatured])
+
+  useEffect(() => {
+    if (
+      community.publicKey === savedVotes?.[0]?.community &&
+      community?.featureVotes?.toNumber() !== savedVotes?.[0]?.sntAmount.toNumber()
+    ) {
+      setVerifiedVotes(savedVotes?.[0]?.sntAmount)
+    }
+  }, [savedVotes])
 
   const setNewModal = (val: boolean) => {
     setShowConfirmModal(val)
     setShowFeatureModal(false)
   }
+
   return (
     <CardVoteBlock>
-      <CardHeadingFeature style={{ fontWeight: timeLeft ? 'normal' : 'bold', fontSize: timeLeft ? '15px' : '17px' }}>
-        {heading}
-      </CardHeadingFeature>
+      <CardHeadingFeature style={{ fontWeight: 'bold', fontSize: '17px' }}>{heading}</CardHeadingFeature>
 
       <FeatureVote>
         <FeatureIcon>{icon}</FeatureIcon>
 
-        {timeLeft && <span>{timeLeft}</span>}
-
         {!inFeatured && community?.featureVotes && (
           <FeatureText>
-            <span>{addCommas(community?.featureVotes.toNumber())}</span> SNT votes for this community
+            <span>{addCommas(community?.featureVotes.toNumber() + verifiedVotes.toNumber())}</span> SNT votes for this
+            community
           </FeatureText>
         )}
       </FeatureVote>
 
       <FeatureVoteMobile>
-        {timeLeft && (
+        {inFeatured && (
           <FeatureText>
-            {icon} {heading}: <span>{timeLeft}</span>
+            {icon} {heading}
           </FeatureText>
         )}
 
@@ -72,7 +100,7 @@ export const CardFeature = ({ community, currentVoting, room }: CardFeatureProps
           <FeatureTextWeekly>
             {icon}{' '}
             <span style={{ color: '#676868', fontWeight: 'normal', marginLeft: '4px' }}>Weekly Feature Vote: </span>
-            <span>{addCommas(community.featureVotes.toNumber())}</span> SNT
+            <span>{addCommas(community.featureVotes.toNumber() + verifiedVotes.toNumber())}</span> SNT
           </FeatureTextWeekly>
         )}
       </FeatureVoteMobile>
@@ -87,19 +115,19 @@ export const CardFeature = ({ community, currentVoting, room }: CardFeatureProps
             <VoteConfirmModal community={community} selectedVote={{ verb: 'to feature' }} setShowModal={setNewModal} />
           </Modal>
         )}
-        <FeatureBtn disabled>Coming soon!</FeatureBtn>
-        {/* <FeatureBtn disabled={!account || inFeatured} onClick={() => setShowFeatureModal(true)}>
+        <FeatureBtn
+          disabled={
+            !account ||
+            inFeatured ||
+            featuredVotingState === 'verification' ||
+            featuredVotingState === 'ended' ||
+            !canVote
+          }
+          onClick={() => setShowFeatureModal(true)}
+        >
           Feature this community! <span style={{ fontSize: '20px' }}>⭐️</span>
-        </FeatureBtn> */}
+        </FeatureBtn>
       </div>
-
-      {currentVoting && room && (
-        <FeatureBottom>
-          {showOngoingVote && <OngoingVote community={community} setShowOngoingVote={setShowOngoingVote} room={room} />}
-          <VoteSendingBtn onClick={() => setShowOngoingVote(true)}>Removal vote in progress</VoteSendingBtn>
-          {currentVoting && currentVoting.timeLeft > 0 && <VoteSubmitButton vote={currentVoting} room={room} />}
-        </FeatureBottom>
-      )}
     </CardVoteBlock>
   )
 }

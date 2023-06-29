@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 import wakuMessage, { decodeWakuVotes } from '../../../src/helpers/wakuVote'
-import { decodeWakuFeatures, createWakuFeatureMsg } from '../../../src/helpers/wakuFeature'
+import { decodeWakuFeatures } from '../../../src/helpers/wakuFeature'
 import { MockProvider } from 'ethereum-waffle'
 import { JsonRpcSigner } from '@ethersproject/providers'
 import proto from '../../../src/helpers/loadProtons'
@@ -11,6 +11,9 @@ import { EncoderV0 } from 'js-waku/lib/waku_message/version_0'
 const proto2 = protons(`
 message WakuVote {
   string address = 1;
+}
+message WakuFeature {
+  string voter = 1;
 }
 `) as any
 
@@ -100,36 +103,34 @@ describe('wakuMessage', () => {
     it('success', async () => {
       const encoder = new EncoderV0('/test/')
 
-      const payload = proto2.WakuVote.encode({
-        address: '0x0',
+      const payload = proto2.WakuFeature.encode({
+        voter: '0x0',
       })
       const msg = await encoder.toProtoObj({ payload: payload })
-      const payload2 = await createWakuFeatureMsg(
-        '0x17ec8597ff92C3F44523bDc65BF0f1bE632917ff',
-        alice as unknown as JsonRpcSigner,
-        BigNumber.from('0x10'),
-        '0x1234',
-        1337,
-        '0x4e744a50da20c547a4adf888d2bc411efcf3b833cfc79c461b340e6145c34dc314d7a1a82127fff63a34efec0ff11be48929bb6a020ed30dfdeab8ac8c32fffa1c',
-        new Date(1)
-      )
+      const payload2 = proto.WakuFeature.encode({
+        voter: '0x17ec8597ff92C3F44523bDc65BF0f1bE632917ff',
+        sign: '0x1234abc',
+        sntAmount: utils.arrayify(BigNumber.from('0x10')),
+        community: '0x1234',
+        timestamp: 1,
+      })
       const msg2 = await encoder.toProtoObj({ payload: payload2 })
 
       expect(msg2).to.not.be.undefined
       if (msg2) {
-        const response = decodeWakuFeatures([msg, msg2], 1337) ?? []
+        const response = decodeWakuFeatures([msg, msg2]) ?? []
 
         expect(response.length).to.eq(1)
         const data = response[0]
         expect(data).to.not.be.undefined
         expect(data?.voter).to.eq('0x17ec8597ff92C3F44523bDc65BF0f1bE632917ff')
-        expect(data?.publicKey).to.eq('0x1234')
+        expect(data?.community).to.eq('0x1234')
         expect(data?.sntAmount).to.deep.eq(BigNumber.from('0x10'))
       }
     })
 
     it('empty', async () => {
-      expect(decodeWakuFeatures([], 1337)).to.deep.eq([])
+      expect(decodeWakuFeatures([])).to.deep.eq([])
     })
   })
 

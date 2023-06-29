@@ -21,7 +21,7 @@ import { BigNumber } from 'ethers'
 import { ButtonPrimary } from '../components/Button'
 import { HeaderVotingMobile } from './VotingMobile'
 import { ConnectMobile } from './ConnectMobile'
-import { InfoText, ProposingInfo, VoteProposeWrap, WarningWrap } from '../components/card/ProposeModal'
+import { VoteProposeWrap, WarningWrap } from '../components/card/ProposeModal'
 import { HistoryLink } from './CardVoteMobile'
 
 interface ProposeBlockProps {

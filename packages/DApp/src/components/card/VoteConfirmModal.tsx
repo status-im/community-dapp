@@ -4,6 +4,7 @@ import { ColumnFlexDiv } from '../../constants/styles'
 import { CommunityDetail } from '../../models/community'
 import { ButtonSecondary } from '../Button'
 import { LinkExternal } from '../Link'
+import { useHistory } from 'react-router'
 
 interface VoteConfirmModalProps {
   community: CommunityDetail
@@ -14,6 +15,8 @@ interface VoteConfirmModalProps {
 }
 
 export function VoteConfirmModal({ community, selectedVote, setShowModal }: VoteConfirmModalProps) {
+  const history = useHistory()
+
   return (
     <ColumnFlexDiv>
       {community.icon && <ConfirmLogo src={community.icon} alt={`${community.name} logo`} />}
@@ -27,7 +30,12 @@ export function VoteConfirmModal({ community, selectedVote, setShowModal }: Vote
       <EtherscanLink href="#" target="_blank">
         View on Etherscan
       </EtherscanLink>
-      <ConfirmBtn onClick={() => setShowModal(false)}>
+      <ConfirmBtn
+        onClick={() => {
+          setShowModal(false)
+          history.go(0)
+        }}
+      >
         OK, let’s move on! <span>🤙</span>
       </ConfirmBtn>
     </ColumnFlexDiv>

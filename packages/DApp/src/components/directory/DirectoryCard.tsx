@@ -4,6 +4,8 @@ import { CardCommunity } from '../card/CardCommunity'
 import { CardFeature } from '../card/CardFeature'
 import { CommunityDetail } from '../../models/community'
 import { useGetCurrentVoting } from '../../hooks/useGetCurrentVoting'
+import { useContractCall } from '@usedapp/core'
+import { useContracts } from '../../hooks/useContracts'
 
 export interface DirectoryCardProps {
   community: CommunityDetail
@@ -11,6 +13,13 @@ export interface DirectoryCardProps {
 
 export function DirectoryCard({ community }: DirectoryCardProps) {
   const [customStyle, setCustomStyle] = useState(true)
+  const { directoryContract } = useContracts()
+  const [publicKeys] = useContractCall({
+    abi: directoryContract.interface,
+    address: directoryContract.address,
+    method: 'getFeaturedCommunities',
+    args: [],
+  }) ?? [[]]
 
   useEffect(() => {
     const handleResize = () => {
@@ -24,7 +33,7 @@ export function DirectoryCard({ community }: DirectoryCardProps) {
     return () => window.removeEventListener('resize', handleResize)
   }, [window.innerWidth])
 
-  const { currentVoting, votingRoom } = useGetCurrentVoting(community?.publicKey)
+  const { currentVoting } = useGetCurrentVoting(community?.publicKey)
 
   return (
     <Card>
@@ -38,7 +47,7 @@ export function DirectoryCard({ community }: DirectoryCardProps) {
         />
       </CardCommunityWrap>
       <CardVoteWrap>
-        <CardFeature community={community} currentVoting={currentVoting} room={votingRoom} />
+        <CardFeature community={community} featured={publicKeys.includes(community.publicKey)} />
       </CardVoteWrap>
     </Card>
   )

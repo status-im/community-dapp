@@ -15,15 +15,13 @@ export interface TypedVote extends TypedMessage<VoteType> {
 
 type FeatureType = {
   EIP712Domain: { name: string; type: string }[]
-  Feature: { name: string; type: string }[]
+  Vote: { name: string; type: string }[]
 }
 
 export interface TypedFeature extends TypedMessage<FeatureType> {
   message: {
     voter: string
     sntAmount: string
-    publicKey: string
-    timestamp: number
-    chainId: number
+    community: string
   }
 }

@@ -2,18 +2,45 @@ import React from 'react'
 import styled from 'styled-components'
 import backgroundImage from '../assets/images/curve-shape.svg'
 import { Colors } from '../constants/styles'
+import { getFeaturedVotingState } from '../helpers/featuredVoting'
+import { useFeaturedVotes } from '../hooks/useFeaturedVotes'
+import { formatTimeLeft } from '../helpers/fomatTimeLeft'
 
-export const WeeklyFeature = ({ endDate }: { endDate: Date }) => {
-  const today = new Date()
-  const differenceInTime = endDate.getTime() - today.getTime()
-  if (differenceInTime < 1) return null
-  const daysLeft = Math.ceil(differenceInTime / (1000 * 3600 * 24))
+export const WeeklyFeature = () => {
+  const { activeVoting } = useFeaturedVotes()
+  if (!activeVoting) {
+    return null
+  }
+
+  const featuredVotingState = getFeaturedVotingState(activeVoting)
+
+  if (featuredVotingState === 'ended') {
+    return (
+      <div>
+        <ViewEnded>
+          ⭐ <span>Weekly Feature vote </span>has ended. Somebody needs to finalize the voting.
+        </ViewEnded>
+      </div>
+    )
+  }
+
+  if (featuredVotingState === 'verification') {
+    return (
+      <div>
+        <ViewEnded>
+          ⭐ <span>Weekly Feature vote </span>has ended. Somebody needs to verify the votes.
+        </ViewEnded>
+      </div>
+    )
+  }
+
+  const currentTimestamp = Date.now() / 1000
+  const differenceInTime = activeVoting.verificationStartAt.toNumber() - currentTimestamp
 
   return (
     <View>
-      ⭐ <span>Weekly Feature vote {window.innerWidth < 600 ? 'ends' : ''}:</span>
-      {daysLeft}&nbsp;
-      {daysLeft.toString().endsWith('1') ? 'day ' : ' days'} {window.innerWidth < 600 ? '' : 'left'}
+      ⭐ <span>Weekly Feature vote:</span>
+      {formatTimeLeft(differenceInTime)}
     </View>
   )
 }
@@ -50,4 +77,8 @@ const View = styled.div`
       margin: 0 5px;
     }
   }
+`
+
+const ViewEnded = styled(View)`
+  background-color: green;
 `

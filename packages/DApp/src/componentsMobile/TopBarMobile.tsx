@@ -69,6 +69,11 @@ export const TopBarMobile = ({ heading, text, children, type }: TopBarMobileProp
                 Directory
               </StyledNavLinkMobile>
             </NavItemMobile>
+            <NavItemMobile>
+              <StyledNavLinkMobile activeClassName="active-page" to="/featured">
+                Featured
+              </StyledNavLinkMobile>
+            </NavItemMobile>
           </NavLinks>
         </NavigationMobile>
       </HeaderWrapperMobile>
