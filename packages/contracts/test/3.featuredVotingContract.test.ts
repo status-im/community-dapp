@@ -216,6 +216,25 @@ describe('FeaturedVotingContract', () => {
 
       expect(await directoryContract.getFeaturedCommunities()).to.deep.eq([publicKeys[3], publicKeys[1], publicKeys[0]])
     })
+
+    it('should finalize voting and break ties by first casted', async () => {
+      const { featuredVotingContract, directoryContract, firstSigner, secondSigner } = await loadFixture(fixture)
+      // votes summary (top3 should be featured, break ties by first casted):
+      await featuredVotingContract.initializeVoting(publicKeys[2], 100)
+      await featuredVotingContract.castVotes([
+        await createSignedVote(firstSigner, publicKeys[3], 100),
+        await createSignedVote(firstSigner, publicKeys[4], 100),
+        await createSignedVote(firstSigner, publicKeys[1], 100),
+        await createSignedVote(firstSigner, publicKeys[5], 100),
+      ])
+
+      await time.increase(votingWithVerificationLength + 1)
+
+      await expect(featuredVotingContract.finalizeVoting()).to.emit(featuredVotingContract, 'VotingFinalized')
+      await expect((await featuredVotingContract.votings(0)).finalized).to.eq(true)
+
+      expect(await directoryContract.getFeaturedCommunities()).to.deep.eq([publicKeys[2], publicKeys[3], publicKeys[4]])
+    })
   })
 
   describe('#isInCooldownPeriod', () => {
