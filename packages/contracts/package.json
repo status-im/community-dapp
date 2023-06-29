@@ -6,7 +6,7 @@
   "license": "MIT",
   "scripts": {
     "clean": "hardhat clean && rimraf cache node_modules",
-    "build": "hardhat compile",
+    "build": "hardhat --verbose compile",
     "dev": "hardhat node",
     "dev:deploy": "hardhat run --network localhost deploy/deploy.ts",
     "lint": "yarn lint:prettier --check && yarn lint:solhint && yarn lint:eslint",
