@@ -16,5 +16,7 @@
 			"source": "/(.*)",
 			"destination": "/index.html"
 		}
-	]
+	],
+	"installCommand": "yarn install --frozen-lockfile",
+	"buildCommand": "yarn build"
 }
