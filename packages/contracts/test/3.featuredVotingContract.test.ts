@@ -188,6 +188,27 @@ describe('FeaturedVotingContract', () => {
       const { featuredVotingContract } = await loadFixture(fixture)
       await expect(featuredVotingContract.castVotes([])).to.be.revertedWith('no ongoing vote')
     })
+
+    it('should reject votes for communities recently featured', async () => {
+      const { featuredVotingContract, firstSigner } = await loadFixture(fixture)
+
+      // make publicKeys[0] land in featured section
+      await featuredVotingContract.initializeVoting(publicKeys[0], 100)
+      await time.increase(votingWithVerificationLength + 1)
+      await featuredVotingContract.finalizeVoting()
+
+      // make publicKeys[1] land in featured section
+      await featuredVotingContract.initializeVoting(publicKeys[1], 100)
+      await time.increase(votingWithVerificationLength + 1)
+      await featuredVotingContract.finalizeVoting()
+
+      // try to cast votes for publicKeys[0], which is in cooldown period
+      await featuredVotingContract.initializeVoting(publicKeys[2], 100)
+      const vote1 = await createSignedVote(firstSigner, publicKeys[0], 1000)
+      await expect(featuredVotingContract.castVotes([vote1]))
+        .to.emit(featuredVotingContract, 'CommunityFeaturedRecently')
+        .withArgs(publicKeys[0], firstSigner.address)
+    })
   })
 
   describe('#finalizeVoting()', () => {
