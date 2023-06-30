@@ -191,7 +191,12 @@ contract FeaturedVotingContract {
     }
 
     function isInCooldownPeriod(bytes calldata publicKey) public view returns (bool) {
-        uint256 votingsCount = _min(votings.length, cooldownPeriod);
+        if (votings.length == 0) {
+            return false;
+        }
+        // don't count the active voting
+        uint256 votingsCount = votings[votings.length - 1].finalized ? cooldownPeriod : cooldownPeriod + 1;
+        votingsCount = _min(votings.length, votingsCount);
         for (uint256 i = 0; i < votingsCount; i++) {
             bytes[] storage featured = featuredByVotingID[votings[votings.length - i - 1].id];
             for (uint256 j = 0; j < featured.length; j++) {
