@@ -353,43 +353,41 @@ contract CastVotes_Test is FeaturedVotingContract_Test {
         featuredVotingContract.castVotes(votes);
     }
 
-    // // it seems impossible to come up with a scenario in which `castVotes()`
-    // // would emit `CommunityFeaturedRecently`, so this test is disabled
-    // function test_CastVotes_CooldownPeriodHasNotPassed() public {
-    //     vm.prank(votingContract);
-    //     directoryContract.addCommunity(communityID1);
-    //
-    //     // initialize and finalize first voting for communityID1
-    //     featuredVotingContract.initializeVoting(communityID1, 100);
-    //     skip(votingWithVerificationLength + 1);
-    //     featuredVotingContract.finalizeVoting();
-    //
-    //     // the idea is that, if `cooldownPeriod` == 1, then there had
-    //     // to be at least 1 finished voting that didn't include `communityID1`
-    //     // since we want a test that verifies `castVotes()` indeed emits
-    //     // `CommunityFeaturedRecently` we need to first try to build a scenario
-    //     // in which `initializeVoting()` isn't already emitting that same error,
-    //     // yet a vote for `communityID1` should trigger the expected event.
-    //     //
-    //     // We try this by initializing a second voting that is not `communityID1`
-    //     vm.prank(votingContract);
-    //     directoryContract.addCommunity(communityID2);
-    //
-    //     // initialize second voting not containing communityID1
-    //     featuredVotingContract.initializeVoting(communityID2, 100);
-    //
-    //     // cast a vote for `communityID1` to have `castVotes()` emit the expected
-    //     // event
-    //     FeaturedVotingContract.SignedVote[] memory votes = new FeaturedVotingContract.SignedVote[](1);
-    //     votes[0] = _createSignedVote(bobsKey, bob, communityID1, 200, block.timestamp);
-    //
-    //     // ensure bob has funds
-    //     mockSNT.transfer(bob, 10000);
-    //
-    //     vm.expectEmit(false, false, false, true);
-    //     emit CommunityFeaturedRecently(communityID1, bob);
-    //     featuredVotingContract.castVotes(votes);
-    // }
+    function test_CastVotes_CooldownPeriodHasNotPassed() public {
+        vm.prank(votingContract);
+        directoryContract.addCommunity(communityID1);
+
+        // initialize and finalize first voting for communityID1
+        featuredVotingContract.initializeVoting(communityID1, 100);
+        skip(votingWithVerificationLength + 1);
+        featuredVotingContract.finalizeVoting();
+
+        // the idea is that, if `cooldownPeriod` == 1, then there had
+        // to be at least 1 finished voting that didn't include `communityID1`
+        // since we want a test that verifies `castVotes()` indeed emits
+        // `CommunityFeaturedRecently` we need to first try to build a scenario
+        // in which `initializeVoting()` isn't already emitting that same error,
+        // yet a vote for `communityID1` should trigger the expected event.
+        //
+        // We try this by initializing a second voting that is not `communityID1`
+        vm.prank(votingContract);
+        directoryContract.addCommunity(communityID2);
+
+        // initialize second voting not containing communityID1
+        featuredVotingContract.initializeVoting(communityID2, 100);
+
+        // cast a vote for `communityID1` to have `castVotes()` emit the expected
+        // event
+        FeaturedVotingContract.SignedVote[] memory votes = new FeaturedVotingContract.SignedVote[](1);
+        votes[0] = _createSignedVote(bobsKey, bob, communityID1, 200, block.timestamp);
+
+        // ensure bob has funds
+        mockSNT.transfer(bob, 10000);
+
+        vm.expectEmit(false, false, false, true);
+        emit CommunityFeaturedRecently(communityID1, bob);
+        featuredVotingContract.castVotes(votes);
+    }
 
     function test_CastVotes_EmitInvalidVoteTimestamp() public {
         vm.prank(votingContract);
