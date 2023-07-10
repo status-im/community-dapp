@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.18;
 
-import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
+import './token/MiniMeToken.sol';
 import '@openzeppelin/contracts/utils/cryptography/ECDSA.sol';
 import '@openzeppelin/contracts/utils/math/SafeMath.sol';
 import './Directory.sol';
@@ -35,6 +35,8 @@ contract VotingContract {
         uint256 totalVotesFor;
         uint256 totalVotesAgainst;
         uint256 roomNumber;
+        uint256 evaluatingPos;
+        bool evaluated;
     }
 
     struct SignedVote {
@@ -57,7 +59,7 @@ contract VotingContract {
 
     address public owner;
     Directory public directory;
-    IERC20 public token;
+    MiniMeToken public token;
 
     uint256 public votingLength;
     uint256 public votingVerificationLength;
@@ -107,7 +109,7 @@ contract VotingContract {
         return digest.recover(vote.r, vote.vs) == vote.voter;
     }
 
-    constructor(IERC20 _address, uint256 _votingLength, uint256 _votingVerificationLength, uint256 _timeBetweenVoting) {
+    constructor(MiniMeToken _address, uint256 _votingLength, uint256 _votingVerificationLength, uint256 _timeBetweenVoting) {
         owner = msg.sender;
         token = _address;
         votingLength = _votingLength;
@@ -223,11 +225,12 @@ contract VotingContract {
         emit VotingRoomStarted(votingRoomID, publicKey);
     }
 
-    function _evaluateVotes(VotingRoom storage votingRoom) private returns (bool) {
+    function _evaluateVotes(VotingRoom storage votingRoom, uint256 limit) private returns (bool) {
         votingRoom.totalVotesFor = 0;
         votingRoom.totalVotesAgainst = 0;
-
-        for (uint256 i = 0; i < votesByRoomID[votingRoom.roomNumber].length; i++) {
+        require(limit <= votesByRoomID[votingRoom.roomNumber].length, "Limit is greater than votes length");
+        uint256 i = votingRoom.evaluatingPos;
+        for (; i < limit; i++) {
             Vote storage vote = votesByRoomID[votingRoom.roomNumber][i];
             if (token.balanceOf(vote.voter) >= vote.sntAmount) {
                 if (vote.voteType == VoteType.FOR) {
@@ -238,6 +241,10 @@ contract VotingContract {
             } else {
                 emit NotEnoughToken(votingRoom.roomNumber, vote.voter);
             }
+        }
+        votingRoom.evaluatingPos = i;
+        if(votingRoom.evaluatingPos == votesByRoomID[votingRoom.roomNumber].length){
+            votingRoom.evaluated = true;    
         }
         return votingRoom.totalVotesFor > votingRoom.totalVotesAgainst;
     }
@@ -250,22 +257,26 @@ contract VotingContract {
         }
     }
 
-    function finalizeVotingRoom(uint256 roomId) public {
+
+    function finalizeVotingRoom(uint256 roomId, uint256 limit) public {
         VotingRoom storage votingRoom = _getVotingRoom(roomId);
 
-        require(votingRoom.finalized == false, 'vote already finalized');
-        require(votingRoom.endAt < block.timestamp, 'vote still ongoing');
+        require(votingRoom.evaluated == false, 'vote already finalized');
 
-        votingRoom.finalized = true;
-        votingRoom.endAt = block.timestamp;
-        activeRoomIDByCommunityID[votingRoom.community] = 0;
-
-        bool passed = _evaluateVotes(votingRoom);
-        if (passed) {
-            _populateDirectory(votingRoom);
+        if(!votingRoom.finalized){
+            require(votingRoom.endAt < block.timestamp, 'vote still ongoing');
+            votingRoom.finalized = true;
+            votingRoom.endAt = block.timestamp;
+            activeRoomIDByCommunityID[votingRoom.community] = 0;
         }
 
-        emit VotingRoomFinalized(roomId, votingRoom.community, passed, votingRoom.voteType);
+        bool passed = _evaluateVotes(votingRoom);
+        if(votingRoom.evaluated){
+            if (passed) {
+            _populateDirectory(votingRoom);
+            }
+            emit VotingRoomFinalized(roomId, votingRoom.community, passed, votingRoom.voteType);
+        }
     }
 
     function castVote(SignedVote calldata vote) private {
