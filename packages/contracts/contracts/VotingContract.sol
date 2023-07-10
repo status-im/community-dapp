@@ -35,6 +35,7 @@ contract VotingContract {
         uint256 totalVotesFor;
         uint256 totalVotesAgainst;
         uint256 roomNumber;
+        uint256 endBlock;
         uint256 evaluatingPos;
         bool evaluated;
     }
@@ -232,7 +233,7 @@ contract VotingContract {
         uint256 i = votingRoom.evaluatingPos;
         for (; i < limit; i++) {
             Vote storage vote = votesByRoomID[votingRoom.roomNumber][i];
-            if (token.balanceOf(vote.voter) >= vote.sntAmount) {
+            if (token.balanceOfAt(vote.voter, votingRoom.endBlock) >= vote.sntAmount) {
                 if (vote.voteType == VoteType.FOR) {
                     votingRoom.totalVotesFor = votingRoom.totalVotesFor.add(vote.sntAmount);
                 } else {
@@ -267,6 +268,7 @@ contract VotingContract {
             require(votingRoom.endAt < block.timestamp, 'vote still ongoing');
             votingRoom.finalized = true;
             votingRoom.endAt = block.timestamp;
+            votingRoom.endBlock = block.number;
             activeRoomIDByCommunityID[votingRoom.community] = 0;
         }
 
