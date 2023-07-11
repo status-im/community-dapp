@@ -282,10 +282,10 @@ contract VotingContract {
         require(vote.timestamp < room.verificationStartAt, 'invalid vote timestamp');
         require(vote.timestamp >= room.startAt, 'invalid vote timestamp');
 
-        if (votedAddressesByRoomID[roomId][vote.voter]) {
-            emit AlreadyVoted(roomId, vote.voter);
-            return;
-        }
+        // if (votedAddressesByRoomID[roomId][vote.voter]) {
+        //     emit AlreadyVoted(roomId, vote.voter);
+        //     return;
+        // }
 
         if (token.balanceOf(vote.voter) < vote.sntAmount) {
             emit NotEnoughToken(roomId, vote.voter);

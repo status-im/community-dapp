@@ -386,6 +386,23 @@ describe('VotingContract', () => {
       expect(await votingContract.listRoomVoters(1)).to.deep.eq([firstSigner.address, thirdSigner.address])
     })
 
+    it('check limit', async () => {
+      const { votingContract, firstSigner } = await loadFixture(fixture)
+      await votingContract.initializeVotingRoom(VoteType.FOR, publicKeys[0], BigNumber.from(100))
+
+      let votesCount = 0;
+      const vote = await createSignedVote(firstSigner, 1, VoteType.FOR, 100)
+      for (var i = 0; i < 100; i++) {
+          const tx = await votingContract.castVotes([vote, vote, vote, vote, vote, vote, vote, vote, vote, vote])
+          expect(tx).to.be.not.reverted
+
+          // If it succeeded, increment the number of votes and repeat.
+          votesCount = votesCount + 10;
+          const receipt = await tx.wait()
+          console.log(votesCount, receipt.gasUsed.toString())
+      }
+    })
+
     it('not enough tokens', async () => {
       const { votingContract, secondSigner } = await loadFixture(fixture)
       await votingContract.initializeVotingRoom(VoteType.FOR, publicKeys[0], BigNumber.from(100))
