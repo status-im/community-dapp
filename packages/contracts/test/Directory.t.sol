@@ -2,19 +2,27 @@
 pragma solidity ^0.8.19;
 
 import { Test } from "forge-std/Test.sol";
+import { DeployContracts } from "../script/DeployContracts.s.sol";
 import { Directory } from "../contracts/Directory.sol";
+import { VotingContract } from "../contracts/VotingContract.sol";
+import { FeaturedVotingContract } from "../contracts/FeaturedVotingContract.sol";
 
 contract DirectoryTest is Test {
     Directory public directory;
-    address internal votingContract = makeAddr("votingContract");
-    address internal featuredVotingContract = makeAddr("featuredVotingContract");
+    address internal votingContract;
+    address internal featuredVotingContract;
 
     bytes internal communityID = "communityID";
     bytes internal communityID2 = "communityID2";
     bytes internal communityID3 = "communityID3";
 
     function setUp() public virtual {
-        directory = new Directory(votingContract, featuredVotingContract);
+        DeployContracts deployment = new DeployContracts();
+        (Directory _directory, VotingContract _votingContract, FeaturedVotingContract _featuredVotingContract,) =
+            deployment.run();
+        directory = _directory;
+        votingContract = address(_votingContract);
+        featuredVotingContract = address(_featuredVotingContract);
     }
 
     function _addCommunitiesToDirectory(bytes[] memory communityIDs) internal {
