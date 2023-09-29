@@ -3,7 +3,8 @@
 pragma solidity ^0.8.19;
 
 import { Script } from "forge-std/Script.sol";
-import { MockSNT } from "../test/mocks/MockSNT.sol";
+import { MiniMeTokenFactory } from "@vacp2p/minime/contracts/MiniMeTokenFactory.sol";
+import { MiniMeToken } from "@vacp2p/minime/contracts/MiniMeToken.sol";
 
 contract DeploymentConfig is Script {
     NetworkConfig public activeNetworkConfig;
@@ -33,6 +34,7 @@ contract DeploymentConfig is Script {
     address internal SNT_ADDRESS_MAINNET = 0x744d70FDBE2Ba4CF95131626614a1763DF805B9E;
 
     constructor(address _broadcaster) {
+        deployer = _broadcaster;
         if (block.chainid == 1) {
             activeNetworkConfig = getMainnetConfig();
         } else if (block.chainid == 5) {
@@ -42,7 +44,6 @@ contract DeploymentConfig is Script {
         } else {
             revert("no network config for this chain");
         }
-        deployer = _broadcaster;
     }
 
     function getMainnetConfig() public view returns (NetworkConfig memory) {
@@ -72,8 +73,17 @@ contract DeploymentConfig is Script {
     }
 
     function getOrCreateAnvilEthConfig() public returns (NetworkConfig memory) {
-        vm.startBroadcast();
-        MockSNT voteToken = new MockSNT();
+        vm.startBroadcast(deployer);
+        MiniMeTokenFactory minimeFactory = new MiniMeTokenFactory();
+        MiniMeToken minimeToken = new MiniMeToken(
+          minimeFactory,
+          MiniMeToken(payable(address(0))), 
+          0, 
+          "Status Network Token", 
+          18, 
+          "STT", 
+          true
+        );
         vm.stopBroadcast();
 
         return NetworkConfig({
@@ -84,7 +94,7 @@ contract DeploymentConfig is Script {
             featuredVotingVerificationLengthInSeconds: TWO_MINS_IN_SECONDS,
             cooldownPeriod: 1,
             featuredPerVotingCount: 3,
-            voteToken: address(voteToken)
+            voteToken: address(minimeToken)
         });
     }
 }

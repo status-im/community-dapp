@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.18;
 
-import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { ECDSA } from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import { MiniMeToken } from "@vacp2p/minime/contracts/MiniMeToken.sol";
 import { Directory } from "./Directory.sol";
 
 contract FeaturedVotingContract {
@@ -15,6 +15,9 @@ contract FeaturedVotingContract {
         uint256 verificationStartAt;
         uint256 endAt;
         bool finalized;
+        uint32 evaluatingPos;
+        bool evaluated;
+        uint256 endBlock;
     }
 
     struct Vote {
@@ -49,12 +52,15 @@ contract FeaturedVotingContract {
 
     address public owner;
     Directory public directory;
-    IERC20 public token;
+    MiniMeToken public token;
 
     uint256 public votingLength;
     uint256 public votingVerificationLength;
     uint256 public featuredPerVotingCount;
     uint256 public cooldownPeriod;
+
+    CommunityVotes[] private communitiesVotes;
+    uint256 private communitiesVotesCount = 0;
 
     Voting[] public votings;
     mapping(uint256 => Vote[]) private votesByVotingID;
@@ -99,14 +105,14 @@ contract FeaturedVotingContract {
     }
 
     constructor(
-        IERC20 _address,
+        MiniMeToken _token,
         uint256 _votingLength,
         uint256 _votingVerificationLength,
         uint256 _cooldownPeriod,
         uint256 _featuredPerVotingCount
     ) {
         owner = msg.sender;
-        token = _address;
+        token = _token;
         votingLength = _votingLength;
         votingVerificationLength = _votingVerificationLength;
         cooldownPeriod = _cooldownPeriod;
@@ -143,33 +149,77 @@ contract FeaturedVotingContract {
                 startAt: block.timestamp,
                 verificationStartAt: block.timestamp + votingLength,
                 endAt: block.timestamp + votingLength + votingVerificationLength,
-                finalized: false
+                finalized: false,
+                evaluatingPos: 0,
+                evaluated: false,
+                endBlock: 0
             })
         );
+
+        // initializing a voting is equal to casting a single
+        // vote, so a limit of `1` is sufficient here
+        _evaluateVotes(1);
 
         emit VotingStarted();
     }
 
-    function finalizeVoting() public {
-        require(votings.length > 0 && !votings[votings.length - 1].finalized, "no ongoing vote");
-
+    function finalizeVoting(uint32 limit) public {
+        require(votings.length > 0, "no ongoing vote");
         Voting storage voting = votings[votings.length - 1];
-        require(voting.endAt < block.timestamp, "vote still ongoing");
 
-        voting.finalized = true;
-        voting.endAt = block.timestamp;
+        if (!voting.finalized) {
+            require(voting.endAt < block.timestamp, "vote still ongoing");
+            voting.finalized = true;
+            voting.endAt = block.timestamp;
+            voting.endBlock = block.number;
+            voting.evaluatingPos = 0;
+            voting.evaluated = false;
+        }
 
-        _evaluateVotes();
+        require(!voting.evaluated, "vote already finalized");
+        _evaluateVotes(limit);
 
-        emit VotingFinalized();
+        if (voting.evaluated) {
+            bytes[] storage featured = featuredByVotingID[voting.id];
+
+            for (uint256 i = 0; i < featuredPerVotingCount; i++) {
+                uint256 highestIndex = 0;
+
+                for (uint256 j = 1; j < communitiesVotesCount; j++) {
+                    if (communitiesVotes[j].totalSntAmount > communitiesVotes[highestIndex].totalSntAmount) {
+                        highestIndex = j;
+                    }
+                }
+
+                if (communitiesVotes[highestIndex].totalSntAmount == 0) {
+                    break;
+                }
+
+                featured.push(communitiesVotes[highestIndex].community);
+                communitiesVotes[highestIndex].totalSntAmount = 0;
+            }
+
+            directory.setFeaturedCommunities(featured);
+
+            // clean up storage for next voting
+            communitiesVotesCount = 0;
+            delete communitiesVotes;
+
+            emit VotingFinalized();
+        }
     }
 
     function castVotes(SignedVote[] calldata votes) public {
         require(votings.length > 0 && !votings[votings.length - 1].finalized, "no ongoing vote");
 
+        uint32 successVotesCount = 0;
         for (uint256 i = 0; i < votes.length; i++) {
-            _castVote(votes[i]);
+            bool success = _castVote(votes[i]);
+            if (success) {
+                successVotesCount += 1;
+            }
         }
+        _evaluateVotes(successVotesCount);
     }
 
     function getVotings() public view returns (Voting[] memory) {
@@ -214,70 +264,62 @@ contract FeaturedVotingContract {
         return true;
     }
 
-    function _evaluateVotes() private {
+    function _evaluateVotes(uint32 limit) private {
         Voting storage voting = votings[votings.length - 1];
         Vote[] storage votes = votesByVotingID[voting.id];
 
-        CommunityVotes[] memory communitiesVotes = new CommunityVotes[](votes.length);
-        uint256 communitiesVotesCount = 0;
+        require(limit <= votes.length - voting.evaluatingPos, "limit is greater than votes length");
 
-        for (uint256 i = 0; i < votes.length; i++) {
-            if (token.balanceOf(votes[i].voter) < votes[i].sntAmount) {
-                emit NotEnoughToken(votes[i].community, votes[i].voter);
+        // evaluation of votes happens against current's block balance
+        // unless finalization phase has started
+        uint256 balanceOfAtBlock = block.number;
+
+        if (voting.finalized) {
+            balanceOfAtBlock = voting.endBlock;
+        }
+
+        uint32 i = 0;
+        for (; i < limit; i++) {
+            Vote storage vote = votes[voting.evaluatingPos + i];
+            if (token.balanceOfAt(vote.voter, balanceOfAtBlock) < vote.sntAmount) {
+                emit NotEnoughToken(vote.community, vote.voter);
                 continue;
             }
 
             bool found = false;
             for (uint256 j = 0; j < communitiesVotesCount; j++) {
-                if (_compareBytes(votes[i].community, communitiesVotes[j].community)) {
-                    communitiesVotes[j].totalSntAmount += votes[i].sntAmount;
+                if (_compareBytes(vote.community, communitiesVotes[j].community)) {
+                    communitiesVotes[j].totalSntAmount += vote.sntAmount;
                     found = true;
                     break;
                 }
             }
             if (!found) {
-                communitiesVotes[communitiesVotesCount] =
-                    CommunityVotes({ community: votes[i].community, totalSntAmount: votes[i].sntAmount });
+                communitiesVotes.push(CommunityVotes({ community: vote.community, totalSntAmount: vote.sntAmount }));
                 communitiesVotesCount++;
             }
         }
 
-        bytes[] storage featured = featuredByVotingID[voting.id];
-
-        for (uint256 i = 0; i < featuredPerVotingCount; i++) {
-            uint256 highestIndex = 0;
-
-            for (uint256 j = 1; j < communitiesVotesCount; j++) {
-                if (communitiesVotes[j].totalSntAmount > communitiesVotes[highestIndex].totalSntAmount) {
-                    highestIndex = j;
-                }
-            }
-
-            if (communitiesVotes[highestIndex].totalSntAmount == 0) {
-                break;
-            }
-
-            featured.push(communitiesVotes[highestIndex].community);
-            communitiesVotes[highestIndex].totalSntAmount = 0;
+        voting.evaluatingPos += i;
+        if (voting.evaluatingPos == votes.length) {
+            voting.evaluated = true;
         }
-
-        directory.setFeaturedCommunities(featured);
     }
 
-    function _castVote(SignedVote calldata vote) private {
+    function _castVote(SignedVote calldata vote) private returns (bool) {
         if (!verifySignature(vote)) {
             emit InvalidSignature(vote.community, vote.voter);
-            return;
+            return false;
         }
 
         if (!directory.isCommunityInDirectory(vote.community)) {
             emit CommunityNotInDirectory(vote.community, vote.voter);
-            return;
+            return false;
         }
 
         if (isInCooldownPeriod(vote.community)) {
             emit CommunityFeaturedRecently(vote.community, vote.voter);
-            return;
+            return false;
         }
 
         Voting storage voting = votings[votings.length - 1];
@@ -289,12 +331,7 @@ contract FeaturedVotingContract {
 
         if (votersByCommunityByVotingID[voting.id][vote.community][vote.voter]) {
             emit AlreadyVoted(vote.community, vote.voter);
-            return;
-        }
-
-        if (token.balanceOf(vote.voter) < vote.sntAmount) {
-            emit NotEnoughToken(vote.community, vote.voter);
-            return;
+            return false;
         }
 
         votersByCommunityByVotingID[voting.id][vote.community][vote.voter] = true;
@@ -303,5 +340,6 @@ contract FeaturedVotingContract {
         );
 
         emit VoteCast(vote.community, vote.voter);
+        return true;
     }
 }
