@@ -1,17 +1,17 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.19;
 
-import 'forge-std/Test.sol';
-import '../contracts/Directory.sol';
+import { Test } from "forge-std/Test.sol";
+import { Directory } from "../contracts/Directory.sol";
 
-contract Directory_Test is Test {
+contract DirectoryTest is Test {
     Directory public directory;
-    address votingContract = makeAddr('votingContract');
-    address featuredVotingContract = makeAddr('featuredVotingContract');
+    address internal votingContract = makeAddr("votingContract");
+    address internal featuredVotingContract = makeAddr("featuredVotingContract");
 
-    bytes communityID = 'communityID';
-    bytes communityID2 = 'communityID2';
-    bytes communityID3 = 'communityID3';
+    bytes internal communityID = "communityID";
+    bytes internal communityID2 = "communityID2";
+    bytes internal communityID3 = "communityID3";
 
     function setUp() public virtual {
         directory = new Directory(votingContract, featuredVotingContract);
@@ -29,9 +29,9 @@ contract Directory_Test is Test {
     }
 }
 
-contract IsCommunityInDirectory_Test is Directory_Test {
+contract IsCommunityInDirectoryTest is DirectoryTest {
     function setUp() public virtual override {
-        Directory_Test.setUp();
+        DirectoryTest.setUp();
     }
 
     function test_IsInCommunityDirectory() public {
@@ -42,9 +42,9 @@ contract IsCommunityInDirectory_Test is Directory_Test {
     }
 }
 
-contract IsCommunityFeatured_Test is Directory_Test {
+contract IsCommunityFeaturedTest is DirectoryTest {
     function setUp() public virtual override {
-        Directory_Test.setUp();
+        DirectoryTest.setUp();
     }
 
     function test_IsCommunityFeatured() public {
@@ -66,9 +66,9 @@ contract IsCommunityFeatured_Test is Directory_Test {
     }
 }
 
-contract GetCommunities_Test is Directory_Test {
+contract GetCommunitiesTest is DirectoryTest {
     function setUp() public virtual override {
-        Directory_Test.setUp();
+        DirectoryTest.setUp();
     }
 
     function test_GetCommunities() public {
@@ -78,9 +78,9 @@ contract GetCommunities_Test is Directory_Test {
     }
 }
 
-contract GetFeaturedCommunities_Test is Directory_Test {
+contract GetFeaturedCommunitiesTest is DirectoryTest {
     function setUp() public virtual override {
-        Directory_Test.setUp();
+        DirectoryTest.setUp();
     }
 
     function test_GetFeaturedCommunities() public {
@@ -101,13 +101,13 @@ contract GetFeaturedCommunities_Test is Directory_Test {
     }
 }
 
-contract AddCommunity_Test is Directory_Test {
+contract AddCommunityTest is DirectoryTest {
     function setUp() public virtual override {
-        Directory_Test.setUp();
+        DirectoryTest.setUp();
     }
 
     function test_RevertWhen_SenderIsNotVotingContract() public {
-        vm.expectRevert(bytes('Invalid sender'));
+        vm.expectRevert(bytes("Invalid sender"));
         directory.addCommunity(communityID);
     }
 
@@ -115,7 +115,7 @@ contract AddCommunity_Test is Directory_Test {
         vm.startPrank(votingContract);
 
         directory.addCommunity(communityID);
-        vm.expectRevert(bytes('Community already exist'));
+        vm.expectRevert(bytes("Community already exist"));
         directory.addCommunity(communityID);
         vm.stopPrank();
     }
@@ -131,9 +131,9 @@ contract AddCommunity_Test is Directory_Test {
     }
 }
 
-contract RemoveCommunity_Test is Directory_Test {
+contract RemoveCommunityTest is DirectoryTest {
     function setUp() public virtual override {
-        Directory_Test.setUp();
+        DirectoryTest.setUp();
     }
 
     function test_RevertWhen_SenderIsNotVotingContract() public {
@@ -141,7 +141,7 @@ contract RemoveCommunity_Test is Directory_Test {
         directory.addCommunity(communityID);
         vm.stopPrank();
         // no longer impersonating votingContract
-        vm.expectRevert(bytes('Invalid sender'));
+        vm.expectRevert(bytes("Invalid sender"));
         directory.removeCommunity(communityID);
     }
 
@@ -188,9 +188,9 @@ contract RemoveCommunity_Test is Directory_Test {
     }
 }
 
-contract SetFeaturedCommunities_Test is Directory_Test {
+contract SetFeaturedCommunitiesTest is DirectoryTest {
     function setUp() public virtual override {
-        Directory_Test.setUp();
+        DirectoryTest.setUp();
     }
 
     function test_RevertWhen_SenderIsNotFeaturedVotingContract() public {
@@ -200,7 +200,7 @@ contract SetFeaturedCommunities_Test is Directory_Test {
         toFeature[2] = communityID3;
 
         vm.prank(votingContract);
-        vm.expectRevert(bytes('Invalid sender'));
+        vm.expectRevert(bytes("Invalid sender"));
         directory.setFeaturedCommunities(toFeature);
     }
 
@@ -209,7 +209,7 @@ contract SetFeaturedCommunities_Test is Directory_Test {
         toFeature[0] = communityID;
 
         vm.prank(featuredVotingContract);
-        vm.expectRevert(bytes('Community not in directory'));
+        vm.expectRevert(bytes("Community not in directory"));
         directory.setFeaturedCommunities(toFeature);
     }
 
@@ -253,9 +253,9 @@ contract SetFeaturedCommunities_Test is Directory_Test {
         assert(directory.isCommunityFeatured(communityID2));
         assert(directory.isCommunityFeatured(communityID3));
 
-        bytes memory communityID4 = bytes('communityID4');
-        bytes memory communityID5 = bytes('communityID5');
-        bytes memory communityID6 = bytes('communityID6');
+        bytes memory communityID4 = bytes("communityID4");
+        bytes memory communityID5 = bytes("communityID5");
+        bytes memory communityID6 = bytes("communityID6");
 
         toAdd[0] = communityID4;
         toAdd[1] = communityID5;
