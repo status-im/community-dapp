@@ -2,10 +2,11 @@
 pragma solidity ^0.8.18;
 
 import { ECDSA } from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import { Ownable2Step } from "@openzeppelin/contracts/access/Ownable2Step.sol";
 import { MiniMeToken } from "@vacp2p/minime/contracts/MiniMeToken.sol";
 import { Directory } from "./Directory.sol";
 
-contract FeaturedVotingContract {
+contract FeaturedVotingContract is Ownable2Step {
     using ECDSA for bytes32;
 
     struct Voting {
@@ -50,7 +51,6 @@ contract FeaturedVotingContract {
     event CommunityFeaturedRecently(bytes community, address voter);
     event CommunityNotInDirectory(bytes community, address voter); // TODO: use me
 
-    address public owner;
     Directory public directory;
     MiniMeToken public token;
 
@@ -111,7 +111,6 @@ contract FeaturedVotingContract {
         uint256 _cooldownPeriod,
         uint256 _featuredPerVotingCount
     ) {
-        owner = msg.sender;
         token = _token;
         votingLength = _votingLength;
         votingVerificationLength = _votingVerificationLength;
@@ -127,8 +126,7 @@ contract FeaturedVotingContract {
         );
     }
 
-    function setDirectory(Directory _address) public {
-        require(msg.sender == owner, "Not owner");
+    function setDirectory(Directory _address) public onlyOwner {
         directory = _address;
     }
 
