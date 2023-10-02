@@ -20,11 +20,14 @@ contract DeploymentConfig is Script {
         address voteToken;
     }
 
-    uint32 internal constant ONE_DAY_IN_SECONDS = 24 * 3600;
     uint32 internal constant TWO_DAYS_IN_SECONDS = 2 * 24 * 3600;
+    uint32 internal constant FIVE_DAYS_IN_SECONDS = 5 * 24 * 3600;
     uint32 internal constant FOUR_MINS_IN_SECONDS = 4 * 60;
     uint32 internal constant TWO_MINS_IN_SECONDS = 2 * 60;
     uint32 internal constant ONE_MIN_IN_SECONDS = 60;
+    uint32 internal constant TWO_WEEKS_IN_SECONDS = 2 * 7 * 24 * 3600;
+    uint32 internal constant ONE_WEEK_IN_SECONDS = 7 * 24 * 3600;
+    uint32 internal constant THIRTY_DAYS_IN_SECONDS = 30 * 24 * 3600;
 
     address public deployer;
 
@@ -48,13 +51,13 @@ contract DeploymentConfig is Script {
 
     function getMainnetConfig() public view returns (NetworkConfig memory) {
         return NetworkConfig({
-            votingLengthInSeconds: TWO_DAYS_IN_SECONDS,
-            votingVerificationLengthInSeconds: ONE_DAY_IN_SECONDS,
-            timeBetweenVotingInSeconds: TWO_DAYS_IN_SECONDS,
-            featuredVotingLengthInSeconds: TWO_DAYS_IN_SECONDS,
-            featuredVotingVerificationLengthInSeconds: ONE_DAY_IN_SECONDS,
-            cooldownPeriod: 2,
-            featuredPerVotingCount: 3,
+            votingLengthInSeconds: TWO_WEEKS_IN_SECONDS,
+            votingVerificationLengthInSeconds: ONE_WEEK_IN_SECONDS,
+            timeBetweenVotingInSeconds: THIRTY_DAYS_IN_SECONDS,
+            featuredVotingLengthInSeconds: FIVE_DAYS_IN_SECONDS,
+            featuredVotingVerificationLengthInSeconds: TWO_DAYS_IN_SECONDS,
+            cooldownPeriod: 3,
+            featuredPerVotingCount: 5,
             voteToken: SNT_ADDRESS_MAINNET
         });
     }
@@ -76,13 +79,13 @@ contract DeploymentConfig is Script {
         vm.startBroadcast(deployer);
         MiniMeTokenFactory minimeFactory = new MiniMeTokenFactory();
         MiniMeToken minimeToken = new MiniMeToken(
-          minimeFactory,
-          MiniMeToken(payable(address(0))), 
-          0, 
-          "Status Network Token", 
-          18, 
-          "STT", 
-          true
+            minimeFactory,
+            MiniMeToken(payable(address(0))),
+            0,
+            "Status Network Token",
+            18,
+            "STT",
+            true
         );
         vm.stopBroadcast();
 
