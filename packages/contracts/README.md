@@ -2,6 +2,15 @@
 
 Community directory curator contracts
 
+# Deployments
+
+| **Contract**           | **Address**                                                                                                                    | **Snapshot**                                                                   |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------ |
+| **Goerli**             |                                                                                                                                |                                                                                |
+| Directory              | [`0x2fC419c6Ec940A3689922A845F5067577b2d9846`](https://goerli.etherscan.io/address/0x2fC419c6Ec940A3689922A845F5067577b2d9846) | [`5f0dd58`](https://github.com/status-im/communities-contracts/commit/5f0dd58) |
+| VotingContract         | [`0xCDE984e57cdb88c70b53437cc694345B646371f9`](https://goerli.etherscan.io/address/0xCDE984e57cdb88c70b53437cc694345B646371f9) | [`5f0dd58`](https://github.com/status-im/communities-contracts/commit/5f0dd58) |
+| FeaturedVotingContract | [`0xCe4839946e3e51dd467A75b93FF9d33B408E90d7`](https://goerli.etherscan.io/address/0xCDE984e57cdb88c70b53437cc694345B646371f9) | [`5f0dd58`](https://github.com/status-im/communities-contracts/commit/5f0dd58) |
+
 ## Mock Contract
 
 Mock Contract is a mock of voting smart contract for community curation.
