@@ -156,7 +156,7 @@ contract SetDirectoryTest is VotingContractTest {
     }
 
     function test_RevertWhen_SenderIsNotOwner() public {
-        vm.expectRevert(bytes("Not owner"));
+        vm.expectRevert(bytes("Ownable: caller is not the owner"));
         vm.prank(bob);
         votingContract.setDirectory(directoryContract);
     }
