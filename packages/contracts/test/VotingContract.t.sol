@@ -1,37 +1,36 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.19;
 
-import 'forge-std/Test.sol';
-import 'forge-std/console2.sol';
-import '@openzeppelin/contracts/token/ERC20/ERC20.sol';
-import './SigUtils.sol';
-import '../contracts/Directory.sol';
-import '../contracts/VotingContract.sol';
+import { Test } from "forge-std/Test.sol";
+import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import { SigUtils } from "./SigUtils.sol";
+import { Directory } from "../contracts/Directory.sol";
+import { VotingContract } from "../contracts/VotingContract.sol";
 
 contract MockSNT is ERC20 {
-    constructor() ERC20('Mock SNT', 'MSNT') {
-        _mint(msg.sender, 1000000000000000000);
+    constructor() ERC20("Mock SNT", "MSNT") {
+        _mint(msg.sender, 1_000_000_000_000_000_000);
     }
 }
 
-contract VotingContract_Test is Test {
-    uint256 votingLength = 1000;
-    uint256 votingVerificationLength = 200;
-    uint256 timeBetweenVoting = 3600;
-    uint256 votingWithVerificationLength = votingLength + votingVerificationLength;
+contract VotingContractTest is Test {
+    uint256 internal votingLength = 1000;
+    uint256 internal votingVerificationLength = 200;
+    uint256 internal timeBetweenVoting = 3600;
+    uint256 internal votingWithVerificationLength = votingLength + votingVerificationLength;
 
-    VotingContract votingContract;
-    Directory directoryContract;
-    MockSNT mockSNT;
+    VotingContract internal votingContract;
+    Directory internal directoryContract;
+    MockSNT internal mockSNT;
     SigUtils internal sigUtils;
 
-    address bob;
-    uint256 bobsKey;
-    address alice;
-    uint256 alicesKey;
+    address internal bob;
+    uint256 internal bobsKey;
+    address internal alice;
+    uint256 internal alicesKey;
 
-    bytes communityID1 = bytes('0x0d9cb350e1dc415303e2816a21b0a439530725b4b2b42d2948e967cb211eab89d5');
-    bytes communityID2 = bytes('0xe84e64498172551d998a220e1d8e5893c818ee9aa90bdb855aec0c9e65e89014b8');
+    bytes internal communityID1 = bytes("0x0d9cb350e1dc415303e2816a21b0a439530725b4b2b42d2948e967cb211eab89d5");
+    bytes internal communityID2 = bytes("0xe84e64498172551d998a220e1d8e5893c818ee9aa90bdb855aec0c9e65e89014b8");
 
     event VoteCast(uint256 roomId, address voter);
     event VotingRoomStarted(uint256 roomId, bytes publicKey);
@@ -40,32 +39,38 @@ contract VotingContract_Test is Test {
     event InvalidSignature(uint256 roomId, address voter);
     event AlreadyVoted(uint256 roomId, address voter);
 
-    bytes32 DOMAIN_SEPARATOR;
-    bytes32 constant EIP712DOMAIN_TYPEHASH =
-        keccak256('EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)');
-    bytes32 constant VOTE_TYPEHASH =
-        keccak256('Vote(uint256 roomIdAndType,uint256 sntAmount,address voter,uint256 timestamp)');
+    // solhint-disable-next-line var-name-mixedcase
+    bytes32 internal DOMAIN_SEPARATOR;
+    // solhint-disable-next-line var-name-mixedcase
+    bytes32 internal constant EIP712DOMAIN_TYPEHASH =
+        keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)");
+    // solhint-disable-next-line var-name-mixedcase
+    bytes32 internal constant VOTE_TYPEHASH =
+        keccak256("Vote(uint256 roomIdAndType,uint256 sntAmount,address voter,uint256 timestamp)");
 
     function _hashVoteData(
         uint256 roomId,
         uint256 amount,
         address voter,
         uint256 timestamp
-    ) internal pure returns (bytes32) {
+    )
+        internal
+        pure
+        returns (bytes32)
+    {
         return keccak256(abi.encode(VOTE_TYPEHASH, roomId, amount, voter, timestamp));
     }
 
     function _hashDomainData(uint256 chainId, address verifyingContract) internal pure returns (bytes32) {
-        return
-            keccak256(
-                abi.encode(
-                    EIP712DOMAIN_TYPEHASH,
-                    keccak256(bytes('Voting Contract')),
-                    keccak256(bytes('1')),
-                    chainId,
-                    verifyingContract
-                )
-            );
+        return keccak256(
+            abi.encode(
+                EIP712DOMAIN_TYPEHASH,
+                keccak256(bytes("Voting Contract")),
+                keccak256(bytes("1")),
+                chainId,
+                verifyingContract
+            )
+        );
     }
 
     function _createSignedVote(
@@ -75,7 +80,11 @@ contract VotingContract_Test is Test {
         VotingContract.VoteType _type,
         uint256 amount,
         uint256 timestamp
-    ) internal view returns (VotingContract.SignedVote memory) {
+    )
+        internal
+        view
+        returns (VotingContract.SignedVote memory)
+    {
         uint256 roomIdAndType = (roomId * 2) + uint8(_type);
 
         bytes32 voteHash = sigUtils.getTypedDataHash(
@@ -86,20 +95,19 @@ contract VotingContract_Test is Test {
 
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(signer, voteHash);
 
-        return
-            VotingContract.SignedVote({
-                voter: voter,
-                roomIdAndType: roomIdAndType,
-                sntAmount: amount,
-                timestamp: timestamp,
-                r: r,
-                vs: (bytes32(uint256(v > 27 ? 1 : 0)) << 255) | s
-            });
+        return VotingContract.SignedVote({
+            voter: voter,
+            roomIdAndType: roomIdAndType,
+            sntAmount: amount,
+            timestamp: timestamp,
+            r: r,
+            vs: (bytes32(uint256(v > 27 ? 1 : 0)) << 255) | s
+        });
     }
 
     function setUp() public virtual {
         mockSNT = new MockSNT();
-        address featuredVotingContract = makeAddr('featuredVotingContract');
+        address featuredVotingContract = makeAddr("featuredVotingContract");
         votingContract = new VotingContract(mockSNT, votingLength, votingVerificationLength, timeBetweenVoting);
         directoryContract = new Directory(address(votingContract), featuredVotingContract);
         votingContract.setDirectory(directoryContract);
@@ -107,32 +115,32 @@ contract VotingContract_Test is Test {
         DOMAIN_SEPARATOR = _hashDomainData(block.chainid, address(votingContract));
         sigUtils = new SigUtils(DOMAIN_SEPARATOR);
 
-        (address bob_, uint256 bobsKey_) = makeAddrAndKey('bob');
-        (address alice_, uint256 alicesKey_) = makeAddrAndKey('alice');
+        (address bob_, uint256 bobsKey_) = makeAddrAndKey("bob");
+        (address alice_, uint256 alicesKey_) = makeAddrAndKey("alice");
         bob = bob_;
         bobsKey = bobsKey_;
         alice = alice_;
         alicesKey = alicesKey_;
 
-        mockSNT.transfer(bob, 10000);
+        mockSNT.transfer(bob, 10_000);
     }
 }
 
-contract SetDirectory_Test is VotingContract_Test {
+contract SetDirectoryTest is VotingContractTest {
     function setUp() public virtual override {
-        VotingContract_Test.setUp();
+        VotingContractTest.setUp();
     }
 
     function test_RevertWhen_SenderIsNotOwner() public {
-        vm.expectRevert(bytes('Not owner'));
+        vm.expectRevert(bytes("Not owner"));
         vm.prank(bob);
         votingContract.setDirectory(directoryContract);
     }
 }
 
-contract GetActiveVotingRoom_Test is VotingContract_Test {
+contract GetActiveVotingRoomTest is VotingContractTest {
     function setUp() public virtual override {
-        VotingContract_Test.setUp();
+        VotingContractTest.setUp();
     }
 
     function test_GetActiveVotingRoom() public {
@@ -148,9 +156,9 @@ contract GetActiveVotingRoom_Test is VotingContract_Test {
     }
 }
 
-contract GetActiveVotingRooms_Test is VotingContract_Test {
+contract GetActiveVotingRoomsTest is VotingContractTest {
     function setUp() public virtual override {
-        VotingContract_Test.setUp();
+        VotingContractTest.setUp();
     }
 
     function test_GetActiveVotingRooms() public {
@@ -165,9 +173,9 @@ contract GetActiveVotingRooms_Test is VotingContract_Test {
     }
 }
 
-contract ListRoomVoters_Test is VotingContract_Test {
+contract ListRoomVotersTest is VotingContractTest {
     function setUp() public virtual override {
-        VotingContract_Test.setUp();
+        VotingContractTest.setUp();
     }
 
     function test_ListRoomVoters() public {
@@ -196,9 +204,9 @@ contract ListRoomVoters_Test is VotingContract_Test {
     }
 }
 
-contract GetVotingHistory_Test is VotingContract_Test {
+contract GetVotingHistoryTest is VotingContractTest {
     function setUp() public virtual override {
-        VotingContract_Test.setUp();
+        VotingContractTest.setUp();
     }
 
     function test_GetVotingHistory() public {
@@ -237,35 +245,35 @@ contract GetVotingHistory_Test is VotingContract_Test {
     }
 }
 
-contract InitializeVotingRoom_Test is VotingContract_Test {
+contract InitializeVotingRoomTest is VotingContractTest {
     function setUp() public virtual override {
-        VotingContract_Test.setUp();
+        VotingContractTest.setUp();
     }
 
     function test_RevertWhen_VoteAlreadyOngoing() public {
         votingContract.initializeVotingRoom(VotingContract.VoteType.FOR, communityID1, 100);
-        vm.expectRevert(bytes('vote already ongoing'));
+        vm.expectRevert(bytes("vote already ongoing"));
         votingContract.initializeVotingRoom(VotingContract.VoteType.FOR, communityID1, 100);
     }
 
     function test_RevertWhen_CommunityIsNotInDirectory() public {
         // initializing a voting room with VoteType.AGAINST requires `publicKey`
         // to be in the directory
-        vm.expectRevert(bytes('Community not in directory'));
+        vm.expectRevert(bytes("Community not in directory"));
         votingContract.initializeVotingRoom(VotingContract.VoteType.AGAINST, communityID1, 100);
     }
 
     function test_RevertWhen_CommunityIsAlreadyInDirectory() public {
         vm.prank(address(votingContract));
         directoryContract.addCommunity(communityID1);
-        vm.expectRevert(bytes('Community already in directory'));
+        vm.expectRevert(bytes("Community already in directory"));
         votingContract.initializeVotingRoom(VotingContract.VoteType.FOR, communityID1, 100);
     }
 
     function test_RevertWhen_SenderHasNotEnoughFunds() public {
         // alice doesn't have any MockSNT
         vm.prank(alice);
-        vm.expectRevert(bytes('not enough token'));
+        vm.expectRevert(bytes("not enough token"));
         votingContract.initializeVotingRoom(VotingContract.VoteType.FOR, communityID1, 100);
     }
 
@@ -276,7 +284,7 @@ contract InitializeVotingRoom_Test is VotingContract_Test {
         skip(votingWithVerificationLength + 1);
         votingContract.finalizeVotingRoom(1);
 
-        vm.expectRevert(bytes('Community was in a vote recently'));
+        vm.expectRevert(bytes("Community was in a vote recently"));
         // community is in the directory now, so cause the expected revert
         // we need to initilalize a voting room to vote the community out of the directory
         votingContract.initializeVotingRoom(VotingContract.VoteType.AGAINST, communityID1, 100);
@@ -305,14 +313,14 @@ contract InitializeVotingRoom_Test is VotingContract_Test {
     }
 }
 
-contract FinalizeVotingRoom_Test is VotingContract_Test {
+contract FinalizeVotingRoomTest is VotingContractTest {
     function setUp() public virtual override {
-        VotingContract_Test.setUp();
+        VotingContractTest.setUp();
     }
 
     function test_RevertWhen_VoteStillOngoing() public {
         votingContract.initializeVotingRoom(VotingContract.VoteType.FOR, communityID1, 100);
-        vm.expectRevert(bytes('vote still ongoing'));
+        vm.expectRevert(bytes("vote still ongoing"));
         votingContract.finalizeVotingRoom(1);
     }
 
@@ -320,7 +328,7 @@ contract FinalizeVotingRoom_Test is VotingContract_Test {
         votingContract.initializeVotingRoom(VotingContract.VoteType.FOR, communityID1, 100);
         skip(votingWithVerificationLength + 1);
         votingContract.finalizeVotingRoom(1);
-        vm.expectRevert(bytes('vote already finalized'));
+        vm.expectRevert(bytes("vote already finalized"));
         votingContract.finalizeVotingRoom(1);
     }
 
@@ -378,9 +386,9 @@ contract FinalizeVotingRoom_Test is VotingContract_Test {
     }
 }
 
-contract CastVotes_Test is VotingContract_Test {
+contract CastVotesTest is VotingContractTest {
     function setUp() public virtual override {
-        VotingContract_Test.setUp();
+        VotingContractTest.setUp();
     }
 
     function test_RevertWhen_VotingRoomHasBeenClosedAlready() public {
@@ -389,7 +397,7 @@ contract CastVotes_Test is VotingContract_Test {
 
         VotingContract.SignedVote[] memory votes = new VotingContract.SignedVote[](1);
         votes[0] = _createSignedVote(bobsKey, bob, 1, VotingContract.VoteType.FOR, 200, block.timestamp);
-        vm.expectRevert(bytes('vote closed'));
+        vm.expectRevert(bytes("vote closed"));
         votingContract.castVotes(votes);
     }
 
@@ -403,14 +411,14 @@ contract CastVotes_Test is VotingContract_Test {
         skip(1000);
         votingContract.initializeVotingRoom(VotingContract.VoteType.FOR, communityID1, 100);
 
-        vm.expectRevert(bytes('invalid vote timestamp'));
+        vm.expectRevert(bytes("invalid vote timestamp"));
         votingContract.castVotes(votes);
 
         // now create another failing vote that has a newer timestamp than the
         // voting room's verificationStartAt
         skip(votingLength + 1);
         votes[0] = _createSignedVote(bobsKey, bob, 1, VotingContract.VoteType.FOR, 200, block.timestamp);
-        vm.expectRevert(bytes('invalid vote timestamp'));
+        vm.expectRevert(bytes("invalid vote timestamp"));
         votingContract.castVotes(votes);
     }
 
@@ -450,7 +458,7 @@ contract CastVotes_Test is VotingContract_Test {
         votes[0] = _createSignedVote(alicesKey, alice, 1, VotingContract.VoteType.FOR, 200, block.timestamp);
 
         // ensure alice has funds
-        mockSNT.transfer(alice, 10000);
+        mockSNT.transfer(alice, 10_000);
         votingContract.castVotes(votes);
 
         // check if voting wen through

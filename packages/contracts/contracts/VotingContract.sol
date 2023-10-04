@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.18;
 
-import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
-import '@openzeppelin/contracts/utils/cryptography/ECDSA.sol';
-import '@openzeppelin/contracts/utils/math/SafeMath.sol';
-import './Directory.sol';
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import "@openzeppelin/contracts/utils/math/SafeMath.sol";
+import "./Directory.sol";
 
 // Uncomment this line to use console.log
 // import 'hardhat/console.sol';
@@ -71,7 +71,7 @@ contract VotingContract {
     mapping(uint256 => mapping(address => bool)) private votedAddressesByRoomID;
 
     bytes32 private constant EIP712DOMAIN_TYPEHASH =
-        keccak256('EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)');
+        keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)");
 
     struct EIP712Domain {
         string name;
@@ -83,27 +83,26 @@ contract VotingContract {
     bytes32 private DOMAIN_SEPARATOR;
 
     function hash(EIP712Domain memory eip712Domain) internal pure returns (bytes32) {
-        return
-            keccak256(
-                abi.encode(
-                    EIP712DOMAIN_TYPEHASH,
-                    keccak256(bytes(eip712Domain.name)),
-                    keccak256(bytes(eip712Domain.version)),
-                    eip712Domain.chainId,
-                    eip712Domain.verifyingContract
-                )
-            );
+        return keccak256(
+            abi.encode(
+                EIP712DOMAIN_TYPEHASH,
+                keccak256(bytes(eip712Domain.name)),
+                keccak256(bytes(eip712Domain.version)),
+                eip712Domain.chainId,
+                eip712Domain.verifyingContract
+            )
+        );
     }
 
     bytes32 public constant VOTE_TYPEHASH =
-        keccak256('Vote(uint256 roomIdAndType,uint256 sntAmount,address voter,uint256 timestamp)');
+        keccak256("Vote(uint256 roomIdAndType,uint256 sntAmount,address voter,uint256 timestamp)");
 
     function hash(SignedVote calldata vote) internal pure returns (bytes32) {
         return keccak256(abi.encode(VOTE_TYPEHASH, vote.roomIdAndType, vote.sntAmount, vote.voter, vote.timestamp));
     }
 
     function verifySignature(SignedVote calldata vote) internal view returns (bool) {
-        bytes32 digest = keccak256(abi.encodePacked('\x19\x01', DOMAIN_SEPARATOR, hash(vote)));
+        bytes32 digest = keccak256(abi.encodePacked("\x19\x01", DOMAIN_SEPARATOR, hash(vote)));
         return digest.recover(vote.r, vote.vs) == vote.voter;
     }
 
@@ -115,8 +114,8 @@ contract VotingContract {
         timeBetweenVoting = _timeBetweenVoting;
         DOMAIN_SEPARATOR = hash(
             EIP712Domain({
-                name: 'Voting Contract',
-                version: '1',
+                name: "Voting Contract",
+                version: "1",
                 chainId: block.chainid,
                 verifyingContract: address(this)
             })
@@ -124,7 +123,7 @@ contract VotingContract {
     }
 
     function setDirectory(Directory _address) public {
-        require(msg.sender == owner, 'Not owner');
+        require(msg.sender == owner, "Not owner");
         directory = _address;
     }
 
@@ -166,7 +165,7 @@ contract VotingContract {
 
     function listRoomVoters(uint256 roomID) public view returns (address[] memory roomVoters) {
         roomVoters = new address[](votesByRoomID[roomID].length);
-        for (uint i = 0; i < votesByRoomID[roomID].length; i++) {
+        for (uint256 i = 0; i < votesByRoomID[roomID].length; i++) {
             roomVoters[i] = votesByRoomID[roomID][i].voter;
         }
     }
@@ -179,24 +178,24 @@ contract VotingContract {
     }
 
     function initializeVotingRoom(VoteType voteType, bytes calldata publicKey, uint256 voteAmount) public {
-        require(activeRoomIDByCommunityID[publicKey] == 0, 'vote already ongoing');
+        require(activeRoomIDByCommunityID[publicKey] == 0, "vote already ongoing");
         if (voteType == VoteType.AGAINST) {
-            require(directory.isCommunityInDirectory(publicKey), 'Community not in directory');
+            require(directory.isCommunityInDirectory(publicKey), "Community not in directory");
         }
         if (voteType == VoteType.FOR) {
-            require(!directory.isCommunityInDirectory(publicKey), 'Community already in directory');
+            require(!directory.isCommunityInDirectory(publicKey), "Community already in directory");
         }
         uint256 historyLength = roomIDsByCommunityID[publicKey].length;
         if (historyLength > 0) {
             uint256 roomId = roomIDsByCommunityID[publicKey][historyLength - 1];
             require(
                 block.timestamp.sub(_getVotingRoom(roomId).endAt) > timeBetweenVoting,
-                'Community was in a vote recently'
+                "Community was in a vote recently"
             );
         }
-        require(token.balanceOf(msg.sender) >= voteAmount, 'not enough token');
+        require(token.balanceOf(msg.sender) >= voteAmount, "not enough token");
 
-        uint votingRoomID = votingRooms.length + 1;
+        uint256 votingRoomID = votingRooms.length + 1;
 
         activeRoomIDByCommunityID[publicKey] = votingRoomID;
         roomIDsByCommunityID[publicKey].push(votingRoomID);
@@ -253,8 +252,8 @@ contract VotingContract {
     function finalizeVotingRoom(uint256 roomId) public {
         VotingRoom storage votingRoom = _getVotingRoom(roomId);
 
-        require(votingRoom.finalized == false, 'vote already finalized');
-        require(votingRoom.endAt < block.timestamp, 'vote still ongoing');
+        require(votingRoom.finalized == false, "vote already finalized");
+        require(votingRoom.endAt < block.timestamp, "vote still ongoing");
 
         votingRoom.finalized = true;
         votingRoom.endAt = block.timestamp;
@@ -277,10 +276,10 @@ contract VotingContract {
         uint256 roomId = vote.roomIdAndType >> 1;
         VotingRoom storage room = _getVotingRoom(roomId);
 
-        require(block.timestamp < room.endAt, 'vote closed');
-        require(!room.finalized, 'room finalized');
-        require(vote.timestamp < room.verificationStartAt, 'invalid vote timestamp');
-        require(vote.timestamp >= room.startAt, 'invalid vote timestamp');
+        require(block.timestamp < room.endAt, "vote closed");
+        require(!room.finalized, "room finalized");
+        require(vote.timestamp < room.verificationStartAt, "invalid vote timestamp");
+        require(vote.timestamp >= room.startAt, "invalid vote timestamp");
 
         if (votedAddressesByRoomID[roomId][vote.voter]) {
             emit AlreadyVoted(roomId, vote.voter);

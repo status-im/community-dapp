@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.18;
 
-import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
-import '@openzeppelin/contracts/utils/cryptography/ECDSA.sol';
-import '@openzeppelin/contracts/utils/math/SafeMath.sol';
-import './Directory.sol';
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import "@openzeppelin/contracts/utils/math/SafeMath.sol";
+import "./Directory.sol";
 
 // Uncomment this line to use console.log
 // import 'hardhat/console.sol';
@@ -67,7 +67,7 @@ contract FeaturedVotingContract {
     mapping(uint256 => mapping(bytes => mapping(address => bool))) private votersByCommunityByVotingID;
 
     bytes32 private constant EIP712DOMAIN_TYPEHASH =
-        keccak256('EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)');
+        keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)");
 
     struct EIP712Domain {
         string name;
@@ -79,20 +79,19 @@ contract FeaturedVotingContract {
     bytes32 private DOMAIN_SEPARATOR;
 
     function hash(EIP712Domain memory eip712Domain) internal pure returns (bytes32) {
-        return
-            keccak256(
-                abi.encode(
-                    EIP712DOMAIN_TYPEHASH,
-                    keccak256(bytes(eip712Domain.name)),
-                    keccak256(bytes(eip712Domain.version)),
-                    eip712Domain.chainId,
-                    eip712Domain.verifyingContract
-                )
-            );
+        return keccak256(
+            abi.encode(
+                EIP712DOMAIN_TYPEHASH,
+                keccak256(bytes(eip712Domain.name)),
+                keccak256(bytes(eip712Domain.version)),
+                eip712Domain.chainId,
+                eip712Domain.verifyingContract
+            )
+        );
     }
 
     bytes32 public constant VOTE_TYPEHASH =
-        keccak256('Vote(address voter,bytes community,uint256 sntAmount,uint256 timestamp)');
+        keccak256("Vote(address voter,bytes community,uint256 sntAmount,uint256 timestamp)");
 
     function hash(SignedVote calldata vote) internal pure returns (bytes32) {
         return
@@ -100,7 +99,7 @@ contract FeaturedVotingContract {
     }
 
     function verifySignature(SignedVote calldata vote) internal view returns (bool) {
-        bytes32 digest = keccak256(abi.encodePacked('\x19\x01', DOMAIN_SEPARATOR, hash(vote)));
+        bytes32 digest = keccak256(abi.encodePacked("\x19\x01", DOMAIN_SEPARATOR, hash(vote)));
         return digest.recover(vote.r, vote.vs) == vote.voter;
     }
 
@@ -119,8 +118,8 @@ contract FeaturedVotingContract {
         featuredPerVotingCount = _featuredPerVotingCount;
         DOMAIN_SEPARATOR = hash(
             EIP712Domain({
-                name: 'Featured Voting Contract',
-                version: '1',
+                name: "Featured Voting Contract",
+                version: "1",
                 chainId: block.chainid,
                 verifyingContract: address(this)
             })
@@ -128,17 +127,17 @@ contract FeaturedVotingContract {
     }
 
     function setDirectory(Directory _address) public {
-        require(msg.sender == owner, 'Not owner');
+        require(msg.sender == owner, "Not owner");
         directory = _address;
     }
 
     function initializeVoting(bytes calldata publicKey, uint256 voteAmount) public {
-        require(votings.length == 0 || votings[votings.length - 1].finalized, 'vote already ongoing');
-        require(directory.isCommunityInDirectory(publicKey), 'community not in directory');
-        require(!isInCooldownPeriod(publicKey), 'community has been featured recently');
-        require(token.balanceOf(msg.sender) >= voteAmount, 'not enough token');
+        require(votings.length == 0 || votings[votings.length - 1].finalized, "vote already ongoing");
+        require(directory.isCommunityInDirectory(publicKey), "community not in directory");
+        require(!isInCooldownPeriod(publicKey), "community has been featured recently");
+        require(token.balanceOf(msg.sender) >= voteAmount, "not enough token");
 
-        uint votingID = votings.length + 1;
+        uint256 votingID = votings.length + 1;
 
         votersByCommunityByVotingID[votingID][publicKey][msg.sender] = true;
         votesByVotingID[votingID].push(Vote({ voter: msg.sender, community: publicKey, sntAmount: voteAmount }));
@@ -157,10 +156,10 @@ contract FeaturedVotingContract {
     }
 
     function finalizeVoting() public {
-        require(votings.length > 0 && !votings[votings.length - 1].finalized, 'no ongoing vote');
+        require(votings.length > 0 && !votings[votings.length - 1].finalized, "no ongoing vote");
 
         Voting storage voting = votings[votings.length - 1];
-        require(voting.endAt < block.timestamp, 'vote still ongoing');
+        require(voting.endAt < block.timestamp, "vote still ongoing");
 
         voting.finalized = true;
         voting.endAt = block.timestamp;
@@ -171,7 +170,7 @@ contract FeaturedVotingContract {
     }
 
     function castVotes(SignedVote[] calldata votes) public {
-        require(votings.length > 0 && !votings[votings.length - 1].finalized, 'no ongoing vote');
+        require(votings.length > 0 && !votings[votings.length - 1].finalized, "no ongoing vote");
 
         for (uint256 i = 0; i < votes.length; i++) {
             _castVote(votes[i]);
@@ -242,10 +241,8 @@ contract FeaturedVotingContract {
                 }
             }
             if (!found) {
-                communitiesVotes[communitiesVotesCount] = CommunityVotes({
-                    community: votes[i].community,
-                    totalSntAmount: votes[i].sntAmount
-                });
+                communitiesVotes[communitiesVotesCount] =
+                    CommunityVotes({ community: votes[i].community, totalSntAmount: votes[i].sntAmount });
                 communitiesVotesCount++;
             }
         }
@@ -290,10 +287,10 @@ contract FeaturedVotingContract {
 
         Voting storage voting = votings[votings.length - 1];
 
-        require(block.timestamp < voting.endAt, 'vote closed');
-        require(!voting.finalized, 'room finalized');
-        require(vote.timestamp < voting.verificationStartAt, 'invalid vote timestamp');
-        require(vote.timestamp >= voting.startAt, 'invalid vote timestamp');
+        require(block.timestamp < voting.endAt, "vote closed");
+        require(!voting.finalized, "room finalized");
+        require(vote.timestamp < voting.verificationStartAt, "invalid vote timestamp");
+        require(vote.timestamp >= voting.startAt, "invalid vote timestamp");
 
         if (votersByCommunityByVotingID[voting.id][vote.community][vote.voter]) {
             emit AlreadyVoted(vote.community, vote.voter);

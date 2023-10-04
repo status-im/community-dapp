@@ -32,17 +32,17 @@ contract Directory {
     }
 
     modifier onlyVotingContract() {
-        require(msg.sender == votingContract, 'Invalid sender');
+        require(msg.sender == votingContract, "Invalid sender");
         _;
     }
 
     modifier onlyFeaturedVotingContract() {
-        require(msg.sender == featuredVotingContract, 'Invalid sender');
+        require(msg.sender == featuredVotingContract, "Invalid sender");
         _;
     }
 
     function addCommunity(bytes calldata community) public onlyVotingContract {
-        require(communitiesIdx[community] == 0, 'Community already exist');
+        require(communitiesIdx[community] == 0, "Community already exist");
         communities.push(community);
         communitiesIdx[community] = communities.length;
     }
@@ -58,7 +58,7 @@ contract Directory {
         }
         delete featuredCommunities;
         for (uint256 i = 0; i < _featuredCommunities.length; i++) {
-            require(isCommunityInDirectory(_featuredCommunities[i]), 'Community not in directory');
+            require(isCommunityInDirectory(_featuredCommunities[i]), "Community not in directory");
             featuredCommunities.push(_featuredCommunities[i]);
             featuredCommunitiesIdx[_featuredCommunities[i]] = i + 1;
         }
@@ -68,7 +68,9 @@ contract Directory {
         bytes memory item,
         bytes[] storage list,
         mapping(bytes => uint256) storage listIdx
-    ) private {
+    )
+        private
+    {
         uint256 index = listIdx[item];
         if (index == 0) return;
         index--;

@@ -1,6 +1,6 @@
-# status-community-dapp/contracts 
-Community directory curator contracts
+# status-community-dapp/contracts
 
+Community directory curator contracts
 
 ## Mock Contract
 
@@ -10,12 +10,8 @@ This Contract is responsible for creating voting rooms in which you can vote for
 Directory of communities will be held on another smart contract at finalization this contract will call smart contract with directory, to make necessary changes.
 When voting room is initialized for given community another can't be started for the same community until previous one was finalized.
 
-Lifecycle of voting room:
-    1. initialize voting room.
-    2. period of time when votes are accepted.
-    3. voting time is finished votes are no longer accepted and voting room can be finalized.
-    4. finalization
-    
+Lifecycle of voting room: 1. initialize voting room. 2. period of time when votes are accepted. 3. voting time is finished votes are no longer accepted and voting room can be finalized. 4. finalization
+
 ### Voting room initialization
 
 ```solidity
@@ -33,7 +29,7 @@ event VotingRoomStarted(uint256 roomId)
 ```
 
 TODO:
-    -vote type chosen automatically based if community is in directory
+-vote type chosen automatically based if community is in directory
 
 ### Voting room structure
 
