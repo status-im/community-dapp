@@ -2,27 +2,23 @@
 pragma solidity ^0.8.19;
 
 import { Test } from "forge-std/Test.sol";
-import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import { DeployContracts } from "../script/DeployContracts.s.sol";
+import { DeploymentConfig } from "../script/DeploymentConfig.s.sol";
 import { SigUtils } from "./SigUtils.sol";
 import { Directory } from "../contracts/Directory.sol";
 import { VotingContract } from "../contracts/VotingContract.sol";
 
-contract MockSNT is ERC20 {
-    constructor() ERC20("Mock SNT", "MSNT") {
-        _mint(msg.sender, 1_000_000_000_000_000_000);
-    }
-}
-
 contract VotingContractTest is Test {
-    uint256 internal votingLength = 1000;
-    uint256 internal votingVerificationLength = 200;
-    uint256 internal timeBetweenVoting = 3600;
-    uint256 internal votingWithVerificationLength = votingLength + votingVerificationLength;
+    uint256 internal votingLength;
+    uint256 internal votingVerificationLength;
+    uint256 internal timeBetweenVoting;
+    uint256 internal votingWithVerificationLength;
 
     VotingContract internal votingContract;
     Directory internal directoryContract;
-    MockSNT internal mockSNT;
     SigUtils internal sigUtils;
+    IERC20 mockSNT;
 
     address internal bob;
     uint256 internal bobsKey;
@@ -106,10 +102,29 @@ contract VotingContractTest is Test {
     }
 
     function setUp() public virtual {
-        mockSNT = new MockSNT();
-        address featuredVotingContract = makeAddr("featuredVotingContract");
-        votingContract = new VotingContract(mockSNT, votingLength, votingVerificationLength, timeBetweenVoting);
-        directoryContract = new Directory(address(votingContract), featuredVotingContract);
+        DeployContracts deployment = new DeployContracts();
+        (Directory _directory, VotingContract _votingContract,, DeploymentConfig deploymentConfig) = deployment.run();
+
+        (
+            uint32 _votingLengthInSeconds,
+            uint32 _votingVerificationLengthInSeconds,
+            uint32 _timeBetweenVoting,
+            ,
+            ,
+            ,
+            ,
+            address tokenAddress
+        ) = deploymentConfig.activeNetworkConfig();
+
+        timeBetweenVoting = _timeBetweenVoting;
+        votingContract = _votingContract;
+        directoryContract = _directory;
+        votingLength = _votingLengthInSeconds;
+        votingVerificationLength = _votingVerificationLengthInSeconds;
+        votingWithVerificationLength = votingLength + votingVerificationLength;
+        mockSNT = IERC20(tokenAddress);
+
+        vm.prank(deploymentConfig.deployer());
         votingContract.setDirectory(directoryContract);
 
         DOMAIN_SEPARATOR = _hashDomainData(block.chainid, address(votingContract));
@@ -122,7 +137,7 @@ contract VotingContractTest is Test {
         alice = alice_;
         alicesKey = alicesKey_;
 
-        mockSNT.transfer(bob, 10_000);
+        deal(address(mockSNT), bob, 100_000);
     }
 }
 
@@ -144,6 +159,7 @@ contract GetActiveVotingRoomTest is VotingContractTest {
     }
 
     function test_GetActiveVotingRoom() public {
+        vm.prank(bob);
         votingContract.initializeVotingRoom(VotingContract.VoteType.FOR, communityID1, 100);
 
         VotingContract.VotingRoom memory votingRoom = votingContract.getActiveVotingRoom(communityID1);
@@ -165,6 +181,7 @@ contract GetActiveVotingRoomsTest is VotingContractTest {
         uint256[] memory votingRooms = votingContract.getActiveVotingRooms();
         assertEq(votingRooms.length, 0);
 
+        vm.prank(bob);
         votingContract.initializeVotingRoom(VotingContract.VoteType.FOR, communityID1, 100);
 
         votingRooms = votingContract.getActiveVotingRooms();
@@ -194,7 +211,7 @@ contract ListRoomVotersTest is VotingContractTest {
         votes[1] = _createSignedVote(alicesKey, alice, 1, VotingContract.VoteType.AGAINST, 100, block.timestamp);
 
         // ensure alice has funds
-        mockSNT.transfer(alice, 1000);
+        deal(address(mockSNT), alice, 1000);
         votingContract.castVotes(votes);
 
         roomVoters = votingContract.listRoomVoters(1);
@@ -213,6 +230,7 @@ contract GetVotingHistoryTest is VotingContractTest {
         VotingContract.VotingRoom[] memory votingRooms = votingContract.getVotingHistory(communityID1);
         assertEq(votingRooms.length, 0);
 
+        vm.prank(bob);
         votingContract.initializeVotingRoom(VotingContract.VoteType.FOR, communityID1, 100);
 
         votingRooms = votingContract.getVotingHistory(communityID1);
@@ -229,6 +247,7 @@ contract GetVotingHistoryTest is VotingContractTest {
 
         // make sure enough time has passed to initialize another voting room
         skip(timeBetweenVoting + 1);
+        vm.prank(bob);
         votingContract.initializeVotingRoom(VotingContract.VoteType.AGAINST, communityID1, 200);
 
         votingRooms = votingContract.getVotingHistory(communityID1);
@@ -251,8 +270,10 @@ contract InitializeVotingRoomTest is VotingContractTest {
     }
 
     function test_RevertWhen_VoteAlreadyOngoing() public {
+        vm.prank(bob);
         votingContract.initializeVotingRoom(VotingContract.VoteType.FOR, communityID1, 100);
         vm.expectRevert(bytes("vote already ongoing"));
+        vm.prank(bob);
         votingContract.initializeVotingRoom(VotingContract.VoteType.FOR, communityID1, 100);
     }
 
@@ -260,6 +281,7 @@ contract InitializeVotingRoomTest is VotingContractTest {
         // initializing a voting room with VoteType.AGAINST requires `publicKey`
         // to be in the directory
         vm.expectRevert(bytes("Community not in directory"));
+        vm.prank(bob);
         votingContract.initializeVotingRoom(VotingContract.VoteType.AGAINST, communityID1, 100);
     }
 
@@ -267,6 +289,7 @@ contract InitializeVotingRoomTest is VotingContractTest {
         vm.prank(address(votingContract));
         directoryContract.addCommunity(communityID1);
         vm.expectRevert(bytes("Community already in directory"));
+        vm.prank(bob);
         votingContract.initializeVotingRoom(VotingContract.VoteType.FOR, communityID1, 100);
     }
 
@@ -279,6 +302,7 @@ contract InitializeVotingRoomTest is VotingContractTest {
 
     function test_RevertWhen_TimeBetweenVotingHasNotPassed() public {
         // vote community `communityID1` into the directory
+        vm.prank(bob);
         votingContract.initializeVotingRoom(VotingContract.VoteType.FOR, communityID1, 100);
         // fast forward such that voting time has passed
         skip(votingWithVerificationLength + 1);
@@ -287,10 +311,12 @@ contract InitializeVotingRoomTest is VotingContractTest {
         vm.expectRevert(bytes("Community was in a vote recently"));
         // community is in the directory now, so cause the expected revert
         // we need to initilalize a voting room to vote the community out of the directory
+        vm.prank(bob);
         votingContract.initializeVotingRoom(VotingContract.VoteType.AGAINST, communityID1, 100);
     }
 
     function test_InitializeVotingRoom() public {
+        vm.prank(bob);
         vm.expectEmit(false, false, false, true);
         emit VotingRoomStarted(1, communityID1);
         votingContract.initializeVotingRoom(VotingContract.VoteType.FOR, communityID1, 100);
@@ -309,7 +335,7 @@ contract InitializeVotingRoomTest is VotingContractTest {
 
         address[] memory roomVoters = votingContract.listRoomVoters(1);
         assertEq(roomVoters.length, 1);
-        assertEq(roomVoters[0], address(this));
+        assertEq(roomVoters[0], bob);
     }
 }
 
@@ -319,12 +345,14 @@ contract FinalizeVotingRoomTest is VotingContractTest {
     }
 
     function test_RevertWhen_VoteStillOngoing() public {
+        vm.prank(bob);
         votingContract.initializeVotingRoom(VotingContract.VoteType.FOR, communityID1, 100);
         vm.expectRevert(bytes("vote still ongoing"));
         votingContract.finalizeVotingRoom(1);
     }
 
     function test_RevertWhen_VoteAlreadyFinalized() public {
+        vm.prank(bob);
         votingContract.initializeVotingRoom(VotingContract.VoteType.FOR, communityID1, 100);
         skip(votingWithVerificationLength + 1);
         votingContract.finalizeVotingRoom(1);
@@ -334,6 +362,7 @@ contract FinalizeVotingRoomTest is VotingContractTest {
 
     function test_FinalizeVotingRoom() public {
         uint256 startAt = block.timestamp;
+        vm.prank(bob);
         votingContract.initializeVotingRoom(VotingContract.VoteType.FOR, communityID1, 100);
 
         skip(votingWithVerificationLength + 1);
@@ -362,7 +391,7 @@ contract FinalizeVotingRoomTest is VotingContractTest {
         votingContract.initializeVotingRoom(VotingContract.VoteType.FOR, communityID1, 100);
 
         // remove bob's funds
-        mockSNT.transfer(address(mockSNT), mockSNT.balanceOf(bob));
+        deal(address(mockSNT), bob, 0);
         assertEq(mockSNT.balanceOf(bob), 0);
 
         // fast forward to finalize vote
@@ -392,6 +421,7 @@ contract CastVotesTest is VotingContractTest {
     }
 
     function test_RevertWhen_VotingRoomHasBeenClosedAlready() public {
+        vm.prank(bob);
         votingContract.initializeVotingRoom(VotingContract.VoteType.FOR, communityID1, 100);
         skip(votingWithVerificationLength + 1);
 
@@ -409,6 +439,7 @@ contract CastVotesTest is VotingContractTest {
         // fast forward, such that vote timestamp will be earlier than the
         // voting room's startAt
         skip(1000);
+        vm.prank(bob);
         votingContract.initializeVotingRoom(VotingContract.VoteType.FOR, communityID1, 100);
 
         vm.expectRevert(bytes("invalid vote timestamp"));
@@ -423,6 +454,7 @@ contract CastVotesTest is VotingContractTest {
     }
 
     function test_CastVotes_EmitInvalidSignature() public {
+        vm.prank(bob);
         votingContract.initializeVotingRoom(VotingContract.VoteType.FOR, communityID1, 100);
 
         VotingContract.SignedVote[] memory votes = new VotingContract.SignedVote[](1);
@@ -435,6 +467,9 @@ contract CastVotesTest is VotingContractTest {
     }
 
     function test_CastVotes_EmitAlreadyVoted() public {
+        // neither bob, nor alice should initialize the voting in this scenario
+        deal(address(mockSNT), address(this), 10_000);
+        vm.prank(address(this));
         votingContract.initializeVotingRoom(VotingContract.VoteType.FOR, communityID1, 100);
 
         VotingContract.SignedVote[] memory votes = new VotingContract.SignedVote[](1);
@@ -457,8 +492,8 @@ contract CastVotesTest is VotingContractTest {
         // try voting as alice
         votes[0] = _createSignedVote(alicesKey, alice, 1, VotingContract.VoteType.FOR, 200, block.timestamp);
 
-        // ensure alice has funds
-        mockSNT.transfer(alice, 10_000);
+        // ensure alice has funds (bob already got funds durign `setUp`)
+        deal(address(mockSNT), alice, 10_000);
         votingContract.castVotes(votes);
 
         // check if voting wen through
@@ -467,14 +502,16 @@ contract CastVotesTest is VotingContractTest {
     }
 
     function test_CastVotes_EmitNotEnoughToken() public {
+        // neither bob, nor alice should initialize the voting in this scenario
+        deal(address(mockSNT), address(this), 10_000);
+        vm.prank(address(this));
         votingContract.initializeVotingRoom(VotingContract.VoteType.FOR, communityID1, 100);
 
         VotingContract.SignedVote[] memory votes = new VotingContract.SignedVote[](1);
         votes[0] = _createSignedVote(bobsKey, bob, 1, VotingContract.VoteType.FOR, 200, block.timestamp);
 
         // remove bob's funds
-        vm.startPrank(bob);
-        mockSNT.transfer(address(mockSNT), mockSNT.balanceOf(bob));
+        deal(address(mockSNT), bob, 0);
         assertEq(mockSNT.balanceOf(bob), 0);
 
         vm.expectEmit(false, false, false, true);
@@ -489,8 +526,11 @@ contract CastVotesTest is VotingContractTest {
 
     function test_CastVotes() public {
         // ensure alice has funds
-        mockSNT.transfer(alice, 1000);
+        deal(address(mockSNT), alice, 10_000);
 
+        // neither bob, nor alice should initialize the voting in this scenario
+        deal(address(mockSNT), address(this), 10_000);
+        vm.prank(address(this));
         votingContract.initializeVotingRoom(VotingContract.VoteType.FOR, communityID1, 100);
 
         VotingContract.SignedVote[] memory votes = new VotingContract.SignedVote[](2);
@@ -524,6 +564,7 @@ contract CastVotesTest is VotingContractTest {
         // fast forward to initialize a new voting room
         skip(timeBetweenVoting + 1);
 
+        vm.prank(address(this));
         votingContract.initializeVotingRoom(VotingContract.VoteType.FOR, communityID1, 100);
 
         votes[0] = _createSignedVote(bobsKey, bob, 2, VotingContract.VoteType.FOR, 500, block.timestamp);

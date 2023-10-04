@@ -2,26 +2,21 @@
 pragma solidity ^0.8.19;
 
 import { Test } from "forge-std/Test.sol";
-import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import { DeployContracts } from "../script/DeployContracts.s.sol";
+import { DeploymentConfig } from "../script/DeploymentConfig.s.sol";
 import { SigUtils } from "./SigUtils.sol";
 import { Directory } from "../contracts/Directory.sol";
+import { VotingContract } from "../contracts/VotingContract.sol";
 import { FeaturedVotingContract } from "../contracts/FeaturedVotingContract.sol";
-
-contract MockSNT is ERC20 {
-    constructor() ERC20("Mock SNT", "MSNT") {
-        _mint(msg.sender, 1_000_000_000_000_000_000);
-    }
-}
 
 // solhint-disable-next-line max-states-count
 contract FeaturedVotingContractTest is Test {
-    uint256 internal votingLength = 1000;
-    uint256 internal votingVerificationLength = 200;
-    uint256 internal featuredPerVotingCount = 3;
-    uint256 internal cooldownPeriod = 1;
-    uint256 internal votingWithVerificationLength = votingLength + votingVerificationLength;
+    uint32 internal featuredVotingLengthInSeconds;
+    uint32 internal featuredVotingVerificationLengthInSeconds;
+    uint256 internal votingWithVerificationLength;
 
-    address internal votingContract = makeAddr("votingContract");
+    address internal votingContract;
 
     address internal bob;
     uint256 internal bobsKey;
@@ -40,7 +35,6 @@ contract FeaturedVotingContractTest is Test {
 
     SigUtils internal sigUtils;
 
-    MockSNT internal mockSNT;
     Directory internal directoryContract;
     FeaturedVotingContract internal featuredVotingContract;
 
@@ -119,16 +113,34 @@ contract FeaturedVotingContractTest is Test {
     }
 
     function setUp() public virtual {
-        mockSNT = new MockSNT();
+        DeployContracts deployment = new DeployContracts();
+        (
+            Directory _directory,
+            VotingContract _votingContract,
+            FeaturedVotingContract _featuredVotingContract,
+            DeploymentConfig deploymentConfig
+        ) = deployment.run();
 
-        featuredVotingContract = new FeaturedVotingContract(
-            mockSNT,
-            votingLength,
-            votingVerificationLength,
-            cooldownPeriod,
-            featuredPerVotingCount
-        );
-        directoryContract = new Directory(votingContract, address(featuredVotingContract));
+        (
+            ,
+            ,
+            ,
+            uint32 _featuredVotingLengthInSeconds,
+            uint32 _featuredVotingVerificationLengthInSeconds,
+            ,
+            ,
+            address mockSNT
+        ) = deploymentConfig.activeNetworkConfig();
+
+        votingContract = address(_votingContract);
+        featuredVotingLengthInSeconds = _featuredVotingLengthInSeconds;
+        featuredVotingVerificationLengthInSeconds = _featuredVotingVerificationLengthInSeconds;
+        votingWithVerificationLength = featuredVotingLengthInSeconds + featuredVotingVerificationLengthInSeconds;
+
+        featuredVotingContract = _featuredVotingContract;
+        directoryContract = _directory;
+
+        vm.prank(deploymentConfig.deployer());
         featuredVotingContract.setDirectory(directoryContract);
 
         DOMAIN_SEPARATOR = _hashDomainData(block.chainid, address(featuredVotingContract));
@@ -148,6 +160,8 @@ contract FeaturedVotingContractTest is Test {
         communityIDs[3] = bytes("0xadfcf42e083e71d8c755da07a2b1bad754d7ca97c35fbd407da6bde9844580ad55");
         communityIDs[4] = bytes("0xec62724b6828954a705eb3b531c30a69503d3561d4283fb8b60835ff34205c64d8");
         communityIDs[5] = bytes("0xb8def1f5e7160e5e1a6440912b7e633ad923030352f23abb54226020bff781b7e6");
+
+        deal(mockSNT, bob, 100_000);
     }
 }
 
@@ -172,6 +186,7 @@ contract InitializeVotingTest is FeaturedVotingContractTest {
         vm.prank(votingContract);
         directoryContract.addCommunity(communityIDs[0]);
 
+        vm.startPrank(bob);
         featuredVotingContract.initializeVoting(communityIDs[0], 100);
         vm.expectRevert(bytes("vote already ongoing"));
         featuredVotingContract.initializeVoting(communityIDs[0], 100);
@@ -195,11 +210,13 @@ contract InitializeVotingTest is FeaturedVotingContractTest {
         vm.prank(votingContract);
         directoryContract.addCommunity(communityIDs[0]);
 
+        vm.prank(bob);
         featuredVotingContract.initializeVoting(communityIDs[0], 100);
         skip(votingWithVerificationLength + 1);
         featuredVotingContract.finalizeVoting();
 
         vm.expectRevert(bytes("community has been featured recently"));
+        vm.prank(bob);
         featuredVotingContract.initializeVoting(communityIDs[0], 100);
     }
 
@@ -209,13 +226,14 @@ contract InitializeVotingTest is FeaturedVotingContractTest {
 
         vm.expectEmit(false, false, false, false);
         emit VotingStarted();
+        vm.prank(bob);
         featuredVotingContract.initializeVoting(communityIDs[0], 100);
 
         FeaturedVotingContract.Voting memory voting = _getVoting(0);
         assertEq(voting.id, 1);
         assertEq(voting.startBlock, block.number);
         assertEq(voting.startAt, block.timestamp);
-        assertEq(voting.verificationStartAt, block.timestamp + votingLength);
+        assertEq(voting.verificationStartAt, block.timestamp + featuredVotingLengthInSeconds);
         assertEq(voting.endAt, block.timestamp + votingWithVerificationLength);
         assertFalse(voting.finalized);
     }
@@ -224,6 +242,7 @@ contract InitializeVotingTest is FeaturedVotingContractTest {
         vm.prank(votingContract);
         directoryContract.addCommunity(communityIDs[0]);
 
+        vm.prank(bob);
         featuredVotingContract.initializeVoting(communityIDs[0], 100);
         skip(votingWithVerificationLength + 1);
         featuredVotingContract.finalizeVoting();
@@ -233,11 +252,13 @@ contract InitializeVotingTest is FeaturedVotingContractTest {
         vm.prank(votingContract);
         directoryContract.addCommunity(communityIDs[1]);
 
+        vm.prank(bob);
         featuredVotingContract.initializeVoting(communityIDs[1], 100);
         skip(votingWithVerificationLength + 1);
         featuredVotingContract.finalizeVoting();
 
         // try initialize voting that was already featured
+        vm.prank(bob);
         featuredVotingContract.initializeVoting(communityIDs[0], 100);
     }
 }
@@ -256,6 +277,7 @@ contract FinalizeVotingTest is FeaturedVotingContractTest {
         vm.prank(votingContract);
         directoryContract.addCommunity(communityIDs[0]);
 
+        vm.prank(bob);
         featuredVotingContract.initializeVoting(communityIDs[0], 100);
         vm.expectRevert(bytes("vote still ongoing"));
         featuredVotingContract.finalizeVoting();
@@ -265,6 +287,7 @@ contract FinalizeVotingTest is FeaturedVotingContractTest {
         vm.prank(votingContract);
         directoryContract.addCommunity(communityIDs[0]);
 
+        vm.prank(bob);
         featuredVotingContract.initializeVoting(communityIDs[0], 100);
         skip(votingWithVerificationLength + 1);
         vm.expectEmit(false, false, false, false);
@@ -286,6 +309,7 @@ contract FinalizeVotingTest is FeaturedVotingContractTest {
         directoryContract.addCommunity(communityIDs[5]);
         vm.stopPrank();
 
+        vm.prank(bob);
         featuredVotingContract.initializeVoting(communityIDs[2], 100);
 
         FeaturedVotingContract.SignedVote[] memory votes = new FeaturedVotingContract.SignedVote[](4);
@@ -293,9 +317,6 @@ contract FinalizeVotingTest is FeaturedVotingContractTest {
         votes[1] = _createSignedVote(bobsKey, bob, communityIDs[4], 100, block.timestamp);
         votes[2] = _createSignedVote(bobsKey, bob, communityIDs[1], 100, block.timestamp);
         votes[3] = _createSignedVote(bobsKey, bob, communityIDs[5], 100, block.timestamp);
-
-        // ensure bob has funds
-        mockSNT.transfer(bob, 10_000);
 
         featuredVotingContract.castVotes(votes);
         skip(votingWithVerificationLength + 1);
@@ -333,6 +354,7 @@ contract CastVotesTest is FeaturedVotingContractTest {
         vm.prank(votingContract);
         directoryContract.addCommunity(communityIDs[0]);
 
+        vm.prank(bob);
         featuredVotingContract.initializeVoting(communityIDs[0], 100);
         skip(votingWithVerificationLength + 1);
 
@@ -345,6 +367,7 @@ contract CastVotesTest is FeaturedVotingContractTest {
     function test_CastVotes_EmitInvalidSignature() public {
         vm.prank(votingContract);
         directoryContract.addCommunity(communityIDs[0]);
+        vm.prank(bob);
         featuredVotingContract.initializeVoting(communityIDs[0], 100);
 
         FeaturedVotingContract.SignedVote[] memory votes = new FeaturedVotingContract.SignedVote[](1);
@@ -361,6 +384,7 @@ contract CastVotesTest is FeaturedVotingContractTest {
         directoryContract.addCommunity(communityIDs[0]);
 
         // initialize and finalize first voting for communityIDs[0]
+        vm.prank(bob);
         featuredVotingContract.initializeVoting(communityIDs[0], 100);
         skip(votingWithVerificationLength + 1);
         featuredVotingContract.finalizeVoting();
@@ -377,15 +401,13 @@ contract CastVotesTest is FeaturedVotingContractTest {
         directoryContract.addCommunity(communityIDs[1]);
 
         // initialize second voting not containing communityIDs[0]
+        vm.prank(bob);
         featuredVotingContract.initializeVoting(communityIDs[1], 100);
 
         // cast a vote for `communityIDs[0]` to have `castVotes()` emit the expected
         // event
         FeaturedVotingContract.SignedVote[] memory votes = new FeaturedVotingContract.SignedVote[](1);
         votes[0] = _createSignedVote(bobsKey, bob, communityIDs[0], 200, block.timestamp);
-
-        // ensure bob has funds
-        mockSNT.transfer(bob, 10_000);
 
         vm.expectEmit(false, false, false, true);
         emit CommunityFeaturedRecently(communityIDs[0], bob);
@@ -403,6 +425,7 @@ contract CastVotesTest is FeaturedVotingContractTest {
         // fast forward, such that vote timestamp will be earlier than the
         // voting room's startAt
         skip(1000);
+        vm.prank(bob);
         featuredVotingContract.initializeVoting(communityIDs[0], 100);
 
         vm.expectRevert(bytes("invalid vote timestamp"));
@@ -410,7 +433,7 @@ contract CastVotesTest is FeaturedVotingContractTest {
 
         // now create another failing vote that has a newer timestamp than the
         // voting room's verificationStartAt
-        skip(votingLength + 1);
+        skip(featuredVotingLengthInSeconds + 1);
         votes[0] = _createSignedVote(bobsKey, bob, communityIDs[0], 200, block.timestamp);
         vm.expectRevert(bytes("invalid vote timestamp"));
         featuredVotingContract.castVotes(votes);
@@ -428,10 +451,12 @@ contract GetVotingsTest is FeaturedVotingContractTest {
         directoryContract.addCommunity(communityIDs[1]);
         vm.stopPrank();
 
+        vm.prank(bob);
         featuredVotingContract.initializeVoting(communityIDs[0], 100);
         skip(votingWithVerificationLength + 1);
         featuredVotingContract.finalizeVoting();
 
+        vm.prank(bob);
         featuredVotingContract.initializeVoting(communityIDs[1], 100);
         skip(votingWithVerificationLength + 1);
         featuredVotingContract.finalizeVoting();
@@ -458,10 +483,12 @@ contract GetVotesByVotingIdTest is FeaturedVotingContractTest {
         directoryContract.addCommunity(communityIDs[1]);
         vm.stopPrank();
 
+        vm.prank(bob);
         featuredVotingContract.initializeVoting(communityIDs[0], 100);
         skip(votingWithVerificationLength + 1);
         featuredVotingContract.finalizeVoting();
 
+        vm.prank(bob);
         featuredVotingContract.initializeVoting(communityIDs[1], 300);
         skip(votingWithVerificationLength + 1);
         featuredVotingContract.finalizeVoting();
@@ -487,6 +514,7 @@ contract IsInCooldownPeriodTest is FeaturedVotingContractTest {
         vm.prank(votingContract);
         directoryContract.addCommunity(communityIDs[0]);
 
+        vm.prank(bob);
         featuredVotingContract.initializeVoting(communityIDs[0], 100);
         skip(votingWithVerificationLength + 1);
         featuredVotingContract.finalizeVoting();
@@ -494,6 +522,7 @@ contract IsInCooldownPeriodTest is FeaturedVotingContractTest {
         vm.prank(votingContract);
         directoryContract.addCommunity(communityIDs[1]);
 
+        vm.prank(bob);
         featuredVotingContract.initializeVoting(communityIDs[1], 100);
         skip(votingWithVerificationLength + 1);
         featuredVotingContract.finalizeVoting();
