@@ -1,17 +1,12 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.18;
 
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
-import "@openzeppelin/contracts/utils/math/SafeMath.sol";
-import "./Directory.sol";
-
-// Uncomment this line to use console.log
-// import 'hardhat/console.sol';
+import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import { ECDSA } from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import { Directory } from "./Directory.sol";
 
 contract VotingContract {
     using ECDSA for bytes32;
-    using SafeMath for uint256;
 
     enum VoteType {
         AGAINST,
@@ -189,8 +184,7 @@ contract VotingContract {
         if (historyLength > 0) {
             uint256 roomId = roomIDsByCommunityID[publicKey][historyLength - 1];
             require(
-                block.timestamp.sub(_getVotingRoom(roomId).endAt) > timeBetweenVoting,
-                "Community was in a vote recently"
+                (block.timestamp - _getVotingRoom(roomId).endAt) > timeBetweenVoting, "Community was in a vote recently"
             );
         }
         require(token.balanceOf(msg.sender) >= voteAmount, "not enough token");
@@ -206,8 +200,8 @@ contract VotingContract {
             VotingRoom({
                 startBlock: block.number,
                 startAt: block.timestamp,
-                verificationStartAt: block.timestamp.add(votingLength),
-                endAt: block.timestamp.add(votingLength + votingVerificationLength),
+                verificationStartAt: block.timestamp + votingLength,
+                endAt: block.timestamp + votingLength + votingVerificationLength,
                 voteType: voteType,
                 finalized: false,
                 community: publicKey,
@@ -230,9 +224,9 @@ contract VotingContract {
             Vote storage vote = votesByRoomID[votingRoom.roomNumber][i];
             if (token.balanceOf(vote.voter) >= vote.sntAmount) {
                 if (vote.voteType == VoteType.FOR) {
-                    votingRoom.totalVotesFor = votingRoom.totalVotesFor.add(vote.sntAmount);
+                    votingRoom.totalVotesFor = votingRoom.totalVotesFor + vote.sntAmount;
                 } else {
-                    votingRoom.totalVotesAgainst = votingRoom.totalVotesAgainst.add(vote.sntAmount);
+                    votingRoom.totalVotesAgainst = votingRoom.totalVotesAgainst + vote.sntAmount;
                 }
             } else {
                 emit NotEnoughToken(votingRoom.roomNumber, vote.voter);

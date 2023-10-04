@@ -1,17 +1,12 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.18;
 
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
-import "@openzeppelin/contracts/utils/math/SafeMath.sol";
-import "./Directory.sol";
-
-// Uncomment this line to use console.log
-// import 'hardhat/console.sol';
+import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import { ECDSA } from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import { Directory } from "./Directory.sol";
 
 contract FeaturedVotingContract {
     using ECDSA for bytes32;
-    using SafeMath for uint256;
 
     struct Voting {
         uint256 id;
@@ -146,8 +141,8 @@ contract FeaturedVotingContract {
                 id: votingID,
                 startBlock: block.number,
                 startAt: block.timestamp,
-                verificationStartAt: block.timestamp.add(votingLength),
-                endAt: block.timestamp.add(votingLength + votingVerificationLength),
+                verificationStartAt: block.timestamp + votingLength,
+                endAt: block.timestamp + votingLength + votingVerificationLength,
                 finalized: false
             })
         );
