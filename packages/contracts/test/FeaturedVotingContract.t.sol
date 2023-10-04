@@ -2,7 +2,7 @@
 pragma solidity ^0.8.19;
 
 import { Test } from "forge-std/Test.sol";
-import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import { MiniMeToken } from "@vacp2p/minime/contracts/MiniMeToken.sol";
 import { DeployContracts } from "../script/DeployContracts.s.sol";
 import { DeploymentConfig } from "../script/DeploymentConfig.s.sol";
 import { SigUtils } from "./SigUtils.sol";
@@ -37,6 +37,9 @@ contract FeaturedVotingContractTest is Test {
 
     Directory internal directoryContract;
     FeaturedVotingContract internal featuredVotingContract;
+    MiniMeToken internal mockSNT;
+
+    address internal deployer;
 
     // solhint-disable-next-line var-name-mixedcase
     bytes32 internal DOMAIN_SEPARATOR;
@@ -99,8 +102,17 @@ contract FeaturedVotingContractTest is Test {
     }
 
     function _getVoting(uint256 index) internal view returns (FeaturedVotingContract.Voting memory) {
-        (uint256 id, uint256 startBlock, uint256 startAt, uint256 verificationStartAt, uint256 endAt, bool finalized) =
-            featuredVotingContract.votings(index);
+        (
+            uint256 id,
+            uint256 startBlock,
+            uint256 startAt,
+            uint256 verificationStartAt,
+            uint256 endAt,
+            bool finalized,
+            uint32 evaluatingPos,
+            bool evaluated,
+            uint256 endBlock
+        ) = featuredVotingContract.votings(index);
 
         return FeaturedVotingContract.Voting({
             id: id,
@@ -108,7 +120,10 @@ contract FeaturedVotingContractTest is Test {
             startAt: startAt,
             verificationStartAt: verificationStartAt,
             endAt: endAt,
-            finalized: finalized
+            finalized: finalized,
+            evaluatingPos: evaluatingPos,
+            evaluated: evaluated,
+            endBlock: endBlock
         });
     }
 
@@ -129,7 +144,7 @@ contract FeaturedVotingContractTest is Test {
             uint32 _featuredVotingVerificationLengthInSeconds,
             ,
             ,
-            address mockSNT
+            address _mockSNT
         ) = deploymentConfig.activeNetworkConfig();
 
         votingContract = address(_votingContract);
@@ -140,7 +155,10 @@ contract FeaturedVotingContractTest is Test {
         featuredVotingContract = _featuredVotingContract;
         directoryContract = _directory;
 
-        vm.prank(deploymentConfig.deployer());
+        mockSNT = MiniMeToken(payable(_mockSNT));
+        deployer = deploymentConfig.deployer();
+
+        vm.prank(deployer);
         featuredVotingContract.setDirectory(directoryContract);
 
         DOMAIN_SEPARATOR = _hashDomainData(block.chainid, address(featuredVotingContract));
@@ -161,7 +179,12 @@ contract FeaturedVotingContractTest is Test {
         communityIDs[4] = bytes("0xec62724b6828954a705eb3b531c30a69503d3561d4283fb8b60835ff34205c64d8");
         communityIDs[5] = bytes("0xb8def1f5e7160e5e1a6440912b7e633ad923030352f23abb54226020bff781b7e6");
 
-        deal(mockSNT, bob, 100_000);
+        _ensureVoteTokens(bob, 100_000);
+    }
+
+    function _ensureVoteTokens(address owner, uint256 amount) internal {
+        vm.prank(deployer);
+        mockSNT.generateTokens(owner, amount);
     }
 }
 
@@ -213,7 +236,7 @@ contract InitializeVotingTest is FeaturedVotingContractTest {
         vm.prank(bob);
         featuredVotingContract.initializeVoting(communityIDs[0], 100);
         skip(votingWithVerificationLength + 1);
-        featuredVotingContract.finalizeVoting();
+        featuredVotingContract.finalizeVoting(1);
 
         vm.expectRevert(bytes("community has been featured recently"));
         vm.prank(bob);
@@ -236,6 +259,9 @@ contract InitializeVotingTest is FeaturedVotingContractTest {
         assertEq(voting.verificationStartAt, block.timestamp + featuredVotingLengthInSeconds);
         assertEq(voting.endAt, block.timestamp + votingWithVerificationLength);
         assertFalse(voting.finalized);
+        // ensure evaluation happens at initialization
+        assert(voting.evaluated);
+        assertEq(voting.evaluatingPos, 1);
     }
 
     function test_InitializeVoting_CooldownPeriodHasPassed() public {
@@ -245,7 +271,12 @@ contract InitializeVotingTest is FeaturedVotingContractTest {
         vm.prank(bob);
         featuredVotingContract.initializeVoting(communityIDs[0], 100);
         skip(votingWithVerificationLength + 1);
-        featuredVotingContract.finalizeVoting();
+        featuredVotingContract.finalizeVoting(1);
+
+        FeaturedVotingContract.Voting memory voting = _getVoting(0);
+        assert(voting.finalized);
+        assert(voting.evaluated);
+        assertEq(voting.evaluatingPos, 1);
 
         // now initialize and finalize voting for another community
         // so we can initialize another voting using `communityIDs[0]` again
@@ -255,11 +286,21 @@ contract InitializeVotingTest is FeaturedVotingContractTest {
         vm.prank(bob);
         featuredVotingContract.initializeVoting(communityIDs[1], 100);
         skip(votingWithVerificationLength + 1);
-        featuredVotingContract.finalizeVoting();
+        featuredVotingContract.finalizeVoting(1);
+
+        voting = _getVoting(1);
+        assert(voting.finalized);
+        assert(voting.evaluated);
+        assertEq(voting.evaluatingPos, 1);
 
         // try initialize voting that was already featured
         vm.prank(bob);
         featuredVotingContract.initializeVoting(communityIDs[0], 100);
+
+        voting = _getVoting(2);
+        assertFalse(voting.finalized);
+        assert(voting.evaluated);
+        assertEq(voting.evaluatingPos, 1);
     }
 }
 
@@ -270,7 +311,7 @@ contract FinalizeVotingTest is FeaturedVotingContractTest {
 
     function test_RevertWhen_NoOngoingVote() public {
         vm.expectRevert(bytes("no ongoing vote"));
-        featuredVotingContract.finalizeVoting();
+        featuredVotingContract.finalizeVoting(1);
     }
 
     function test_RevertWhen_VoteStillOngoing() public {
@@ -280,7 +321,7 @@ contract FinalizeVotingTest is FeaturedVotingContractTest {
         vm.prank(bob);
         featuredVotingContract.initializeVoting(communityIDs[0], 100);
         vm.expectRevert(bytes("vote still ongoing"));
-        featuredVotingContract.finalizeVoting();
+        featuredVotingContract.finalizeVoting(1);
     }
 
     function test_FinalizeVoting() public {
@@ -292,7 +333,7 @@ contract FinalizeVotingTest is FeaturedVotingContractTest {
         skip(votingWithVerificationLength + 1);
         vm.expectEmit(false, false, false, false);
         emit VotingFinalized();
-        featuredVotingContract.finalizeVoting();
+        featuredVotingContract.finalizeVoting(1);
 
         FeaturedVotingContract.Voting[] memory votings = featuredVotingContract.getVotings();
         assertEq(votings.length, 1);
@@ -311,6 +352,11 @@ contract FinalizeVotingTest is FeaturedVotingContractTest {
 
         vm.prank(bob);
         featuredVotingContract.initializeVoting(communityIDs[2], 100);
+        FeaturedVotingContract.Voting[] memory votings = featuredVotingContract.getVotings();
+        assertEq(votings.length, 1);
+        assertEq(votings[0].id, 1);
+        assert(votings[0].evaluated);
+        assertEq(votings[0].evaluatingPos, 1);
 
         FeaturedVotingContract.SignedVote[] memory votes = new FeaturedVotingContract.SignedVote[](4);
         votes[0] = _createSignedVote(bobsKey, bob, communityIDs[3], 100, block.timestamp);
@@ -319,14 +365,91 @@ contract FinalizeVotingTest is FeaturedVotingContractTest {
         votes[3] = _createSignedVote(bobsKey, bob, communityIDs[5], 100, block.timestamp);
 
         featuredVotingContract.castVotes(votes);
+        votings = featuredVotingContract.getVotings();
+        assert(votings[0].evaluated);
+        assertEq(votings[0].evaluatingPos, 5);
+
         skip(votingWithVerificationLength + 1);
 
+        vm.expectEmit(false, false, false, false);
         emit VotingFinalized();
-        featuredVotingContract.finalizeVoting();
+        featuredVotingContract.finalizeVoting(5);
 
-        FeaturedVotingContract.Voting[] memory votings = featuredVotingContract.getVotings();
+        votings = featuredVotingContract.getVotings();
         assertEq(votings.length, 1);
         assert(votings[0].finalized);
+        assert(votings[0].evaluated);
+        assertEq(votings[0].evaluatingPos, 5);
+
+        bytes[] memory featuredCommunities = directoryContract.getFeaturedCommunities();
+        assertEq(featuredCommunities.length, 3);
+
+        // we expect that communities which have been voted for
+        // first to make it into the featured list, if the vote is a draw
+        assertEq(featuredCommunities[0], communityIDs[2]);
+        assertEq(featuredCommunities[1], communityIDs[3]);
+        assertEq(featuredCommunities[2], communityIDs[4]);
+    }
+
+    function test_FinalizeVoting_BatchProcessing() public {
+        vm.startPrank(votingContract);
+        directoryContract.addCommunity(communityIDs[1]);
+        directoryContract.addCommunity(communityIDs[2]);
+        directoryContract.addCommunity(communityIDs[3]);
+        directoryContract.addCommunity(communityIDs[4]);
+        directoryContract.addCommunity(communityIDs[5]);
+        vm.stopPrank();
+
+        vm.prank(bob);
+        featuredVotingContract.initializeVoting(communityIDs[2], 100);
+        FeaturedVotingContract.Voting[] memory votings = featuredVotingContract.getVotings();
+        assertEq(votings.length, 1);
+        assertEq(votings[0].id, 1);
+        assert(votings[0].evaluated);
+        assertEq(votings[0].evaluatingPos, 1);
+
+        FeaturedVotingContract.SignedVote[] memory votes = new FeaturedVotingContract.SignedVote[](4);
+        votes[0] = _createSignedVote(bobsKey, bob, communityIDs[3], 100, block.timestamp);
+        votes[1] = _createSignedVote(bobsKey, bob, communityIDs[4], 100, block.timestamp);
+        votes[2] = _createSignedVote(bobsKey, bob, communityIDs[1], 100, block.timestamp);
+        votes[3] = _createSignedVote(bobsKey, bob, communityIDs[5], 100, block.timestamp);
+
+        featuredVotingContract.castVotes(votes);
+        votings = featuredVotingContract.getVotings();
+        assert(votings[0].evaluated);
+        assertEq(votings[0].evaluatingPos, 5);
+
+        skip(votingWithVerificationLength + 1);
+
+        // finalizing with a limit of 1 leaving 4 votes to be evaluated
+        featuredVotingContract.finalizeVoting(1);
+        votings = featuredVotingContract.getVotings();
+        assert(votings[0].finalized);
+        assertFalse(votings[0].evaluated);
+        assertEq(votings[0].evaluatingPos, 1);
+
+        // finalizing with a limit of 2 leaving 2 votes to be evaluated
+        featuredVotingContract.finalizeVoting(2);
+        votings = featuredVotingContract.getVotings();
+        assert(votings[0].finalized);
+        assertFalse(votings[0].evaluated);
+        assertEq(votings[0].evaluatingPos, 3);
+
+        // finalizing with a limit of 1 leaving 1 votes to be evaluated
+        featuredVotingContract.finalizeVoting(1);
+        votings = featuredVotingContract.getVotings();
+        assert(votings[0].finalized);
+        assertFalse(votings[0].evaluated);
+        assertEq(votings[0].evaluatingPos, 4);
+
+        // finalizing with a limit of 1 causing evaluation to finish
+        vm.expectEmit(false, false, false, false);
+        emit VotingFinalized();
+        featuredVotingContract.finalizeVoting(1);
+        votings = featuredVotingContract.getVotings();
+        assert(votings[0].finalized);
+        assert(votings[0].evaluated);
+        assertEq(votings[0].evaluatingPos, 5);
 
         bytes[] memory featuredCommunities = directoryContract.getFeaturedCommunities();
         assertEq(featuredCommunities.length, 3);
@@ -362,6 +485,11 @@ contract CastVotesTest is FeaturedVotingContractTest {
         votes[0] = _createSignedVote(bobsKey, bob, communityIDs[0], 200, block.timestamp);
         vm.expectRevert(bytes("vote closed"));
         featuredVotingContract.castVotes(votes);
+
+        FeaturedVotingContract.Voting[] memory votings = featuredVotingContract.getVotings();
+        assertEq(votings.length, 1);
+        assert(votings[0].evaluated);
+        assertEq(votings[0].evaluatingPos, 1);
     }
 
     function test_CastVotes_EmitInvalidSignature() public {
@@ -387,7 +515,7 @@ contract CastVotesTest is FeaturedVotingContractTest {
         vm.prank(bob);
         featuredVotingContract.initializeVoting(communityIDs[0], 100);
         skip(votingWithVerificationLength + 1);
-        featuredVotingContract.finalizeVoting();
+        featuredVotingContract.finalizeVoting(1);
 
         // the idea is that, if `cooldownPeriod` == 1, then there had
         // to be at least 1 finished voting that didn't include `communityIDs[0]`
@@ -438,6 +566,34 @@ contract CastVotesTest is FeaturedVotingContractTest {
         vm.expectRevert(bytes("invalid vote timestamp"));
         featuredVotingContract.castVotes(votes);
     }
+
+    function test_CastVotes_EmitNotEnoughToken() public {
+        vm.prank(votingContract);
+        directoryContract.addCommunity(communityIDs[0]);
+
+        vm.prank(bob);
+        featuredVotingContract.initializeVoting(communityIDs[0], 100);
+
+        FeaturedVotingContract.Voting[] memory votings = featuredVotingContract.getVotings();
+        assertEq(votings.length, 1);
+        assertEq(votings[0].id, 1);
+        assertFalse(votings[0].finalized);
+        assert(votings[0].evaluated);
+        assertEq(votings[0].evaluatingPos, 1);
+
+        FeaturedVotingContract.SignedVote[] memory votes = new FeaturedVotingContract.SignedVote[](1);
+
+        votes[0] = _createSignedVote(alicesKey, alice, communityIDs[0], 200, block.timestamp);
+
+        vm.expectEmit(false, false, false, true);
+        emit NotEnoughToken(communityIDs[0], alice);
+        featuredVotingContract.castVotes(votes);
+
+        votings = featuredVotingContract.getVotings();
+        assertFalse(votings[0].finalized);
+        assert(votings[0].evaluated);
+        assertEq(votings[0].evaluatingPos, 2);
+    }
 }
 
 contract GetVotingsTest is FeaturedVotingContractTest {
@@ -454,12 +610,12 @@ contract GetVotingsTest is FeaturedVotingContractTest {
         vm.prank(bob);
         featuredVotingContract.initializeVoting(communityIDs[0], 100);
         skip(votingWithVerificationLength + 1);
-        featuredVotingContract.finalizeVoting();
+        featuredVotingContract.finalizeVoting(1);
 
         vm.prank(bob);
         featuredVotingContract.initializeVoting(communityIDs[1], 100);
         skip(votingWithVerificationLength + 1);
-        featuredVotingContract.finalizeVoting();
+        featuredVotingContract.finalizeVoting(1);
 
         FeaturedVotingContract.Voting[] memory votings = featuredVotingContract.getVotings();
         assertEq(votings.length, 2);
@@ -486,12 +642,12 @@ contract GetVotesByVotingIdTest is FeaturedVotingContractTest {
         vm.prank(bob);
         featuredVotingContract.initializeVoting(communityIDs[0], 100);
         skip(votingWithVerificationLength + 1);
-        featuredVotingContract.finalizeVoting();
+        featuredVotingContract.finalizeVoting(1);
 
         vm.prank(bob);
         featuredVotingContract.initializeVoting(communityIDs[1], 300);
         skip(votingWithVerificationLength + 1);
-        featuredVotingContract.finalizeVoting();
+        featuredVotingContract.finalizeVoting(1);
 
         FeaturedVotingContract.Vote[] memory votes = featuredVotingContract.getVotesByVotingId(1);
         assertEq(votes.length, 1);
@@ -517,7 +673,7 @@ contract IsInCooldownPeriodTest is FeaturedVotingContractTest {
         vm.prank(bob);
         featuredVotingContract.initializeVoting(communityIDs[0], 100);
         skip(votingWithVerificationLength + 1);
-        featuredVotingContract.finalizeVoting();
+        featuredVotingContract.finalizeVoting(1);
 
         vm.prank(votingContract);
         directoryContract.addCommunity(communityIDs[1]);
@@ -525,7 +681,7 @@ contract IsInCooldownPeriodTest is FeaturedVotingContractTest {
         vm.prank(bob);
         featuredVotingContract.initializeVoting(communityIDs[1], 100);
         skip(votingWithVerificationLength + 1);
-        featuredVotingContract.finalizeVoting();
+        featuredVotingContract.finalizeVoting(1);
 
         assert(featuredVotingContract.isInCooldownPeriod(communityIDs[1]));
         assertFalse(featuredVotingContract.isInCooldownPeriod(communityIDs[0]));

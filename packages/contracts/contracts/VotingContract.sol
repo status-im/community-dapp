@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.18;
 
-import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { ECDSA } from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import { MiniMeToken } from "@vacp2p/minime/contracts/MiniMeToken.sol";
 import { Directory } from "./Directory.sol";
 
 contract VotingContract {
@@ -30,6 +30,9 @@ contract VotingContract {
         uint256 totalVotesFor;
         uint256 totalVotesAgainst;
         uint256 roomNumber;
+        uint256 endBlock;
+        uint32 evaluatingPos;
+        bool evaluated;
     }
 
     struct SignedVote {
@@ -52,7 +55,7 @@ contract VotingContract {
 
     address public owner;
     Directory public directory;
-    IERC20 public token;
+    MiniMeToken public token;
 
     uint256 public votingLength;
     uint256 public votingVerificationLength;
@@ -61,6 +64,11 @@ contract VotingContract {
     VotingRoom[] public votingRooms;
     mapping(bytes => uint256) public activeRoomIDByCommunityID;
     mapping(bytes => uint256[]) private roomIDsByCommunityID;
+
+    // @dev This mapping is only hydrated and dehydrated during `castVotes()`
+    mapping(uint256 => uint32) private transientRoomIdToVotesCount;
+    // @dev This array is only hydrated and dehydrated during `castVotes()`
+    uint256[] private transientRoomIds;
 
     mapping(uint256 => Vote[]) private votesByRoomID;
     mapping(uint256 => mapping(address => bool)) private votedAddressesByRoomID;
@@ -101,9 +109,14 @@ contract VotingContract {
         return digest.recover(vote.r, vote.vs) == vote.voter;
     }
 
-    constructor(IERC20 _address, uint256 _votingLength, uint256 _votingVerificationLength, uint256 _timeBetweenVoting) {
+    constructor(
+        MiniMeToken _token,
+        uint256 _votingLength,
+        uint256 _votingVerificationLength,
+        uint256 _timeBetweenVoting
+    ) {
         owner = msg.sender;
-        token = _address;
+        token = _token;
         votingLength = _votingLength;
         votingVerificationLength = _votingVerificationLength;
         timeBetweenVoting = _timeBetweenVoting;
@@ -207,22 +220,39 @@ contract VotingContract {
                 community: publicKey,
                 totalVotesFor: 0,
                 totalVotesAgainst: 0,
-                roomNumber: votingRoomID
+                roomNumber: votingRoomID,
+                endBlock: 0,
+                evaluatingPos: 0,
+                evaluated: false
             })
         );
 
-        _evaluateVotes(_getVotingRoom(votingRoomID));
+        // initializing a voting room is equal to casting a single
+        // vote, so a limit of `1` is sufficient here
+        _evaluateVotes(_getVotingRoom(votingRoomID), 1);
 
         emit VotingRoomStarted(votingRoomID, publicKey);
     }
 
-    function _evaluateVotes(VotingRoom storage votingRoom) private returns (bool) {
-        votingRoom.totalVotesFor = 0;
-        votingRoom.totalVotesAgainst = 0;
+    function _evaluateVotes(VotingRoom storage votingRoom, uint32 limit) private returns (bool) {
+        require(
+            limit <= votesByRoomID[votingRoom.roomNumber].length - votingRoom.evaluatingPos,
+            "limit is greater than votes length"
+        );
 
-        for (uint256 i = 0; i < votesByRoomID[votingRoom.roomNumber].length; i++) {
-            Vote storage vote = votesByRoomID[votingRoom.roomNumber][i];
-            if (token.balanceOf(vote.voter) >= vote.sntAmount) {
+        // evaluation of votes happens against current's block balance
+        // unless finalization phase has started
+        uint256 balanceOfAtBlock = block.number;
+
+        if (votingRoom.finalized) {
+            balanceOfAtBlock = votingRoom.endBlock;
+        }
+
+        uint32 i = 0;
+        for (; i < limit; i++) {
+            Vote storage vote = votesByRoomID[votingRoom.roomNumber][votingRoom.evaluatingPos + i];
+
+            if (token.balanceOfAt(vote.voter, balanceOfAtBlock) >= vote.sntAmount) {
                 if (vote.voteType == VoteType.FOR) {
                     votingRoom.totalVotesFor = votingRoom.totalVotesFor + vote.sntAmount;
                 } else {
@@ -231,6 +261,11 @@ contract VotingContract {
             } else {
                 emit NotEnoughToken(votingRoom.roomNumber, vote.voter);
             }
+        }
+
+        votingRoom.evaluatingPos += i;
+        if (votingRoom.evaluatingPos == votesByRoomID[votingRoom.roomNumber].length) {
+            votingRoom.evaluated = true;
         }
         return votingRoom.totalVotesFor > votingRoom.totalVotesAgainst;
     }
@@ -243,28 +278,39 @@ contract VotingContract {
         }
     }
 
-    function finalizeVotingRoom(uint256 roomId) public {
+    function finalizeVotingRoom(uint256 roomId, uint32 limit) public {
         VotingRoom storage votingRoom = _getVotingRoom(roomId);
 
-        require(votingRoom.finalized == false, "vote already finalized");
-        require(votingRoom.endAt < block.timestamp, "vote still ongoing");
+        if (!votingRoom.finalized) {
+            require(votingRoom.endAt < block.timestamp, "vote still ongoing");
+            votingRoom.finalized = true;
+            votingRoom.endAt = block.timestamp;
+            votingRoom.endBlock = block.number;
+            activeRoomIDByCommunityID[votingRoom.community] = 0;
 
-        votingRoom.finalized = true;
-        votingRoom.endAt = block.timestamp;
-        activeRoomIDByCommunityID[votingRoom.community] = 0;
-
-        bool passed = _evaluateVotes(votingRoom);
-        if (passed) {
-            _populateDirectory(votingRoom);
+            // resetting evaluation state as we're not entering finalization
+            // phase in which all votes have to be reevaluated
+            votingRoom.evaluatingPos = 0;
+            votingRoom.evaluated = false;
+            votingRoom.totalVotesFor = 0;
+            votingRoom.totalVotesAgainst = 0;
         }
 
-        emit VotingRoomFinalized(roomId, votingRoom.community, passed, votingRoom.voteType);
+        require(!votingRoom.evaluated, "vote already finalized");
+
+        bool passed = _evaluateVotes(votingRoom, limit);
+        if (votingRoom.evaluated) {
+            if (passed) {
+                _populateDirectory(votingRoom);
+            }
+            emit VotingRoomFinalized(roomId, votingRoom.community, passed, votingRoom.voteType);
+        }
     }
 
-    function castVote(SignedVote calldata vote) private {
+    function castVote(SignedVote calldata vote) private returns (bool) {
         if (!verifySignature(vote)) {
             emit InvalidSignature(vote.roomIdAndType >> 1, vote.voter);
-            return;
+            return false;
         }
 
         uint256 roomId = vote.roomIdAndType >> 1;
@@ -277,12 +323,7 @@ contract VotingContract {
 
         if (votedAddressesByRoomID[roomId][vote.voter]) {
             emit AlreadyVoted(roomId, vote.voter);
-            return;
-        }
-
-        if (token.balanceOf(vote.voter) < vote.sntAmount) {
-            emit NotEnoughToken(roomId, vote.voter);
-            return;
+            return false;
         }
 
         votedAddressesByRoomID[roomId][vote.voter] = true;
@@ -294,13 +335,35 @@ contract VotingContract {
             })
         );
 
-        _evaluateVotes(room); // TODO: optimise - aggregate votes by room id and only then evaluate
         emit VoteCast(roomId, vote.voter);
+        return true;
     }
 
     function castVotes(SignedVote[] calldata votes) public {
+        // @dev used to keep track of how many different rooms have
+        // been voted for.
+        uint16 roomIdCount = 0;
+
         for (uint256 i = 0; i < votes.length; i++) {
-            castVote(votes[i]);
+            bool success = castVote(votes[i]);
+            if (success) {
+                uint256 roomId = votes[i].roomIdAndType >> 1;
+                if (transientRoomIdToVotesCount[roomId] == 0) {
+                    roomIdCount += 1;
+                    transientRoomIds.push(roomId);
+                }
+                transientRoomIdToVotesCount[roomId] += 1;
+            }
         }
+
+        // evaluate newly casted votes on a per room bases
+        for (uint16 i = 0; i < roomIdCount; i++) {
+            uint256 _roomId = transientRoomIds[i];
+            VotingRoom storage votingRoom = _getVotingRoom(_roomId);
+            _evaluateVotes(votingRoom, transientRoomIdToVotesCount[_roomId]);
+            // clean up transient storage
+            delete transientRoomIdToVotesCount[_roomId];
+        }
+        delete transientRoomIds;
     }
 }
