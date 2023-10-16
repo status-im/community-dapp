@@ -130,22 +130,16 @@ contract FeaturedVotingContractTest is Test {
     function setUp() public virtual {
         DeployContracts deployment = new DeployContracts();
         (
+            MiniMeToken _mockSNT,
             Directory _directory,
             VotingContract _votingContract,
-            FeaturedVotingContract _featuredVotingContract,
-            DeploymentConfig deploymentConfig
+            FeaturedVotingContract _featuredVotingContract
         ) = deployment.run();
 
-        (
-            ,
-            ,
-            ,
-            uint32 _featuredVotingLengthInSeconds,
-            uint32 _featuredVotingVerificationLengthInSeconds,
-            ,
-            ,
-            address _mockSNT
-        ) = deploymentConfig.activeNetworkConfig();
+        DeploymentConfig deploymentConfig = deployment.getDeploymentConfig();
+
+        (,,, uint32 _featuredVotingLengthInSeconds, uint32 _featuredVotingVerificationLengthInSeconds,,,) =
+            deploymentConfig.activeNetworkConfig();
 
         votingContract = address(_votingContract);
         featuredVotingLengthInSeconds = _featuredVotingLengthInSeconds;
@@ -155,7 +149,7 @@ contract FeaturedVotingContractTest is Test {
         featuredVotingContract = _featuredVotingContract;
         directoryContract = _directory;
 
-        mockSNT = MiniMeToken(payable(_mockSNT));
+        mockSNT = _mockSNT;
         deployer = deploymentConfig.deployer();
 
         vm.prank(deployer);

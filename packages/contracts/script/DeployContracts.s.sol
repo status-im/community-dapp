@@ -12,8 +12,17 @@ import { FeaturedVotingContract } from "../contracts/FeaturedVotingContract.sol"
 import { VotingContract } from "../contracts/VotingContract.sol";
 
 contract DeployContracts is BaseScript {
-    function run() external returns (Directory, VotingContract, FeaturedVotingContract, DeploymentConfig) {
-        DeploymentConfig deploymentConfig = new DeploymentConfig(broadcaster);
+    DeploymentConfig internal deploymentConfig;
+
+    function getDeploymentConfig() public returns (DeploymentConfig) {
+        if (address(deploymentConfig) == address(0)) {
+            deploymentConfig = new DeploymentConfig(broadcaster);
+        }
+        return deploymentConfig;
+    }
+
+    function run() external returns (MiniMeToken, Directory, VotingContract, FeaturedVotingContract) {
+        deploymentConfig = getDeploymentConfig();
         (
             uint32 votingLengthInSeconds,
             uint32 votingVerificationLength,
@@ -24,17 +33,18 @@ contract DeployContracts is BaseScript {
             uint8 featuredPerVotingCount,
             address tokenAddress
         ) = deploymentConfig.activeNetworkConfig();
+        MiniMeToken minimeToken = MiniMeToken(payable(tokenAddress));
 
         vm.startBroadcast(broadcaster);
 
         VotingContract votingContract = new VotingContract(
-            MiniMeToken(payable(tokenAddress)), 
+            minimeToken,
             votingLengthInSeconds, 
             votingVerificationLength, 
             timeBetweenVotingInSeconds
         );
         FeaturedVotingContract featuredVotingContract = new FeaturedVotingContract(
-            MiniMeToken(payable(tokenAddress)),
+            minimeToken,
             featuredVotingLength,
             featuredVotingVerificationLength,
             cooldownPeriod,
@@ -44,6 +54,6 @@ contract DeployContracts is BaseScript {
 
         vm.stopBroadcast();
 
-        return (directoryContract, votingContract, featuredVotingContract, deploymentConfig);
+        return (minimeToken, directoryContract, votingContract, featuredVotingContract);
     }
 }

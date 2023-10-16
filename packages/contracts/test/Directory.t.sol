@@ -18,7 +18,7 @@ contract DirectoryTest is Test {
 
     function setUp() public virtual {
         DeployContracts deployment = new DeployContracts();
-        (Directory _directory, VotingContract _votingContract, FeaturedVotingContract _featuredVotingContract,) =
+        (, Directory _directory, VotingContract _votingContract, FeaturedVotingContract _featuredVotingContract) =
             deployment.run();
         directory = _directory;
         votingContract = address(_votingContract);
