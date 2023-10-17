@@ -152,9 +152,6 @@ contract FeaturedVotingContractTest is Test {
         mockSNT = _mockSNT;
         deployer = deploymentConfig.deployer();
 
-        vm.prank(deployer);
-        featuredVotingContract.setDirectory(directoryContract);
-
         DOMAIN_SEPARATOR = _hashDomainData(block.chainid, address(featuredVotingContract));
         sigUtils = new SigUtils(DOMAIN_SEPARATOR);
 

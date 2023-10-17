@@ -121,9 +121,6 @@ contract VotingContractTest is Test {
         mockSNT = _mockSNT;
         deployer = deploymentConfig.deployer();
 
-        vm.prank(deployer);
-        votingContract.setDirectory(directoryContract);
-
         DOMAIN_SEPARATOR = _hashDomainData(block.chainid, address(votingContract));
         sigUtils = new SigUtils(DOMAIN_SEPARATOR);
 
