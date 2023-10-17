@@ -52,6 +52,8 @@ contract DeployContracts is BaseScript {
         );
         Directory directoryContract = new Directory(address(votingContract), address(featuredVotingContract));
 
+        votingContract.setDirectory(directoryContract);
+        featuredVotingContract.setDirectory(directoryContract);
         vm.stopBroadcast();
 
         return (minimeToken, directoryContract, votingContract, featuredVotingContract);
