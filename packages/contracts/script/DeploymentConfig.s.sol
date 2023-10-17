@@ -87,6 +87,7 @@ contract DeploymentConfig is Script {
             "STT",
             true
         );
+        minimeToken.generateTokens(deployer, 100_000_000 ether);
         vm.stopBroadcast();
 
         return NetworkConfig({
