@@ -5,8 +5,12 @@ pragma solidity ^0.8.19;
 import { Script } from "forge-std/Script.sol";
 import { MiniMeTokenFactory } from "@vacp2p/minime/contracts/MiniMeTokenFactory.sol";
 import { MiniMeToken } from "@vacp2p/minime/contracts/MiniMeToken.sol";
+import { Multicall2 } from "../contracts/Multicall2.sol";
 
 contract DeploymentConfig is Script {
+    
+    error DeploymentConfig__InvalidMulticallAddress();
+
     NetworkConfig public activeNetworkConfig;
 
     struct NetworkConfig {
@@ -31,10 +35,17 @@ contract DeploymentConfig is Script {
 
     address public deployer;
 
+    address private multicallAddress;
+
     // solhint-disable-next-line var-name-mixedcase
     address internal SNT_ADDRESS_GOERLI = 0x3D6AFAA395C31FCd391fE3D562E75fe9E8ec7E6a;
     // solhint-disable-next-line var-name-mixedcase
     address internal SNT_ADDRESS_MAINNET = 0x744d70FDBE2Ba4CF95131626614a1763DF805B9E;
+
+    // solhint-disable-next-line var-name-mixedcase
+    address internal MULTICALL_ADDRESS_GOERLI = 0x77dCa2C955b15e9dE4dbBCf1246B4B85b651e50e;
+    // solhint-disable-next-line var-name-mixedcase
+    address internal MULTICALL_ADDRESS_OPTIMISM = 0xeAa6877139d436Dc6d1f75F3aF15B74662617B2C;
 
     constructor(address _broadcaster) {
         deployer = _broadcaster;
@@ -62,7 +73,12 @@ contract DeploymentConfig is Script {
         });
     }
 
-    function getGoerliEthConfig() public view returns (NetworkConfig memory) {
+    function getGoerliEthConfig() public returns (NetworkConfig memory) {
+        // Actually, it'd be nicer to have `multicallAddress` be part of `NetworkConfig`,
+        // however, adding another field to the struct causes us to run into the
+        // "stack too deep" error during compilation, hence, we're using an additional
+        // property on the contract to access the value later from there.
+        multicallAddress = MULTICALL_ADDRESS_GOERLI;
         return NetworkConfig({
             votingLengthInSeconds: FOUR_MINS_IN_SECONDS,
             votingVerificationLengthInSeconds: TWO_MINS_IN_SECONDS,
@@ -88,7 +104,15 @@ contract DeploymentConfig is Script {
             true
         );
         minimeToken.generateTokens(deployer, 100_000_000 ether);
+
+        Multicall2 multicall = new Multicall2();
         vm.stopBroadcast();
+
+        // Actually, it'd be nicer to have `multicallAddress` be part of `NetworkConfig`,
+        // however, adding another field to the struct causes us to run into the
+        // "stack too deep" error during compilation, hence, we're using an additional
+        // property on the contract to access the value later from there.
+        multicallAddress = address(multicall);
 
         return NetworkConfig({
             votingLengthInSeconds: FOUR_MINS_IN_SECONDS,
@@ -100,5 +124,12 @@ contract DeploymentConfig is Script {
             featuredPerVotingCount: 3,
             voteToken: address(minimeToken)
         });
+    }
+
+    function getMulticallAddress() public view returns (address) {
+        if (multicallAddress == address(0)) {
+            revert DeploymentConfig__InvalidMulticallAddress();
+        }
+        return multicallAddress;
     }
 }
