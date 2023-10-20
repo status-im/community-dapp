@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.19;
 
-import { Script } from "forge-std/Script.sol";
+import { console } from "forge-std/Test.sol";
 import { MiniMeToken } from "@vacp2p/minime/contracts/MiniMeToken.sol";
 import { DeploymentConfig } from "./DeploymentConfig.s.sol";
 import { BaseScript } from "./Base.s.sol";
@@ -56,6 +56,7 @@ contract DeployContracts is BaseScript {
         featuredVotingContract.setDirectory(directoryContract);
         vm.stopBroadcast();
 
+        console.log("contract Multicall2", deploymentConfig.getMulticallAddress());
         return (minimeToken, directoryContract, votingContract, featuredVotingContract);
     }
 }
