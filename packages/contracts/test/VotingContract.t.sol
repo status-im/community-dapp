@@ -378,6 +378,7 @@ contract FinalizeVotingRoomTest is VotingContractTest {
         assertEq(votingRooms.length, 1);
         assertEq(votingRooms[0].community, communityID1);
         assertEq(votingRooms[0].finalized, true);
+        assertEq(votingRooms[0].evaluated, true);
         assertEq(votingRooms[0].endAt, startAt + votingWithVerificationLength + 1);
 
         assert(directoryContract.isCommunityInDirectory(communityID1));
