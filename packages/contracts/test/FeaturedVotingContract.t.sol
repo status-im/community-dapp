@@ -330,6 +330,10 @@ contract FinalizeVotingTest is FeaturedVotingContractTest {
         assertEq(votings.length, 1);
         assertEq(votings[0].id, 1);
         assert(votings[0].finalized);
+
+        bytes[] memory featuredCommunities = directoryContract.getFeaturedCommunities();
+        assertEq(featuredCommunities.length, 1);
+        assertEq(featuredCommunities[0], communityIDs[0]);
     }
 
     function test_FinalizeVoting_FeatureByFirstCastedWhenVoteIsADraw() public {
