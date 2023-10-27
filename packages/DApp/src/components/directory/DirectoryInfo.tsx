@@ -6,11 +6,18 @@ import { ProposeButton } from '../Button'
 import { useFeaturedVotes } from '../../hooks/useFeaturedVotes'
 import { getFeaturedVotingState } from '../../helpers/featuredVoting'
 import { useContracts } from '../../hooks/useContracts'
+import { useWaku } from '../../providers/waku/provider'
+import { mapFeaturesVotes, receiveWakuFeature } from '../../helpers/receiveWakuFeature'
+import { config } from '../../config'
+import { useTypedFeatureVote } from '../../hooks/useTypedFeatureVote'
 
 export function DirectoryInfo() {
   const { account } = useEthers()
   const { featuredVotingContract } = useContracts()
-  const { activeVoting, votesToSend } = useFeaturedVotes()
+  const { getTypedFeatureVote } = useTypedFeatureVote()
+  const { activeVoting } = useFeaturedVotes()
+  const { waku } = useWaku()
+
   const featuredVotingState = getFeaturedVotingState(activeVoting)
   const castVotes = useContractFunction(featuredVotingContract, 'castVotes')
   const finalizeVoting = useContractFunction(featuredVotingContract, 'finalizeVoting')
@@ -19,15 +26,31 @@ export function DirectoryInfo() {
     <InfoWrap>
       <PageInfo
         heading="Current directory"
-        text="Vote on your favourite communities being included in 
+        text="Vote on your favourite communities being included in
       Weekly Featured Communities"
       />
       {!account && <ConnectButton />}
       {account && featuredVotingState === 'verification' && (
-        <ProposeButton onClick={() => castVotes.send(votesToSend)}>Verify Weekly featured</ProposeButton>
+        <ProposeButton
+          onClick={async () => {
+            const { votesToSend } = await receiveWakuFeature(waku, config.wakuConfig.wakuFeatureTopic, activeVoting!)
+            const votes = mapFeaturesVotes(votesToSend, getTypedFeatureVote)
+
+            await castVotes.send(votes)
+          }}
+        >
+          Verify Weekly featured
+        </ProposeButton>
       )}
       {account && featuredVotingState === 'ended' && (
-        <ProposeButton onClick={() => finalizeVoting.send()}>Finalize Weekly featured</ProposeButton>
+        <ProposeButton
+          onClick={async () => {
+            // note: @jkbktl PR
+            await finalizeVoting.send(activeVoting?.evaluatingPos)
+          }}
+        >
+          Finalize Weekly featured
+        </ProposeButton>
       )}
     </InfoWrap>
   )

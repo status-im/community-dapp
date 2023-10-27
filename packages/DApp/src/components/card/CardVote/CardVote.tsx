@@ -168,7 +168,8 @@ export const CardVote = ({ room, hideModalFunction }: CardVoteProps) => {
           </VoteBtnFinal>
         )}
         {Boolean(winner) && (
-          <VoteBtnFinal onClick={() => finalizeVoting.send(room.roomNumber)} disabled={!account}>
+          // note: @jkbktl PR
+          <VoteBtnFinal onClick={() => finalizeVoting.send(room.roomNumber, 1)} disabled={!account}>
             Finalize the vote <span>✍️</span>
           </VoteBtnFinal>
         )}
