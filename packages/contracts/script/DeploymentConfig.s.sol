@@ -8,7 +8,6 @@ import { MiniMeToken } from "@vacp2p/minime/contracts/MiniMeToken.sol";
 import { Multicall2 } from "../contracts/Multicall2.sol";
 
 contract DeploymentConfig is Script {
-    
     error DeploymentConfig__InvalidMulticallAddress();
 
     NetworkConfig public activeNetworkConfig;
@@ -41,6 +40,8 @@ contract DeploymentConfig is Script {
     address internal SNT_ADDRESS_GOERLI = 0x3D6AFAA395C31FCd391fE3D562E75fe9E8ec7E6a;
     // solhint-disable-next-line var-name-mixedcase
     address internal SNT_ADDRESS_MAINNET = 0x744d70FDBE2Ba4CF95131626614a1763DF805B9E;
+    // solhint-disable-next-line var-name-mixedcase
+    address internal SNT_ADDRESS_OPTIMISM_MAINNET = 0x650AF3C15AF43dcB218406d30784416D64Cfb6B2;
 
     // solhint-disable-next-line var-name-mixedcase
     address internal MULTICALL_ADDRESS_GOERLI = 0x77dCa2C955b15e9dE4dbBCf1246B4B85b651e50e;
@@ -55,6 +56,8 @@ contract DeploymentConfig is Script {
             activeNetworkConfig = getGoerliEthConfig();
         } else if (block.chainid == 31_337) {
             activeNetworkConfig = getOrCreateAnvilEthConfig();
+        } else if (block.chainid == 10) {
+            activeNetworkConfig = getOptimismMainnetConfig();
         } else {
             revert("no network config for this chain");
         }
@@ -88,6 +91,24 @@ contract DeploymentConfig is Script {
             cooldownPeriod: 1,
             featuredPerVotingCount: 3,
             voteToken: SNT_ADDRESS_GOERLI
+        });
+    }
+
+    function getOptimismMainnetConfig() public returns (NetworkConfig memory) {
+        // Actually, it'd be nicer to have `multicallAddress` be part of `NetworkConfig`,
+        // however, adding another field to the struct causes us to run into the
+        // "stack too deep" error during compilation, hence, we're using an additional
+        // property on the contract to access the value later from there.
+        multicallAddress = MULTICALL_ADDRESS_OPTIMISM;
+        return NetworkConfig({
+            votingLengthInSeconds: TWO_WEEKS_IN_SECONDS,
+            votingVerificationLengthInSeconds: ONE_WEEK_IN_SECONDS,
+            timeBetweenVotingInSeconds: THIRTY_DAYS_IN_SECONDS,
+            featuredVotingLengthInSeconds: FIVE_DAYS_IN_SECONDS,
+            featuredVotingVerificationLengthInSeconds: TWO_DAYS_IN_SECONDS,
+            cooldownPeriod: 3,
+            featuredPerVotingCount: 5,
+            voteToken: SNT_ADDRESS_OPTIMISM_MAINNET
         });
     }
 
