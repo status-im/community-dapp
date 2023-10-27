@@ -17,6 +17,9 @@ describe('voting', () => {
         totalVotesFor: BigNumber.from(100),
         totalVotesAgainst: BigNumber.from(100),
         roomNumber: 1,
+        endBlock: BigNumber.from(0),
+        evaluatingPos: 0,
+        evaluated: false,
       }
       const room = voting.fromRoom(votingRoom)
 
@@ -36,6 +39,9 @@ describe('voting', () => {
         totalVotesFor: BigNumber.from(1000),
         totalVotesAgainst: BigNumber.from(100),
         roomNumber: 1,
+        endBlock: BigNumber.from(0),
+        evaluatingPos: 0,
+        evaluated: false,
       }
       const room = voting.fromRoom(votingRoom)
 
