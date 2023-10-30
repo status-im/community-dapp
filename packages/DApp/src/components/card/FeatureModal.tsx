@@ -36,6 +36,7 @@ export function FeatureModal({ community, setShowConfirmModal }: FeatureModalPro
             } else {
               await sendWaku(proposingAmount, community.publicKey)
             }
+
             setShowConfirmModal(true)
           }}
         >

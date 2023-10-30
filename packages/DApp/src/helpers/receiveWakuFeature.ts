@@ -75,6 +75,27 @@ export async function receiveWakuFeature(waku: WakuLight | undefined, topic: str
   return { votes: featureVotes, votesToSend: validatedMessages }
 }
 
+// note: copy of filterVerifiedFeaturesVotes()
+export function mapFeaturesVotes(
+  messages: WakuFeatureData[] | undefined,
+  getTypedData: (data: [string, string, BigNumber, BigNumber]) => TypedFeature
+) {
+  if (!messages) {
+    return []
+  }
+  const votes: [string, string, BigNumber, BigNumber, string, string][] = []
+
+  messages.forEach((msg) => {
+    const params = getContractParameters(msg.voter, msg.community, msg.sntAmount.toNumber(), msg.timestamp)
+
+    if (utils.getAddress(recoverAddress(getTypedData(params), msg.sign)) == msg.voter) {
+      const splitSig = utils.splitSignature(msg.sign)
+      votes.push([...params, splitSig.r, splitSig._vs])
+    }
+  })
+  return votes
+}
+
 export async function filterVerifiedFeaturesVotes(
   messages: WakuFeatureData[] | undefined,
   alreadyVoted: AlreadyVoted,

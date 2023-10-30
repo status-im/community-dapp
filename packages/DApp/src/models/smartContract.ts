@@ -12,6 +12,9 @@ export type VotingRoom = {
   totalVotesFor: BigNumber
   totalVotesAgainst: BigNumber
   roomNumber: number
+  endBlock: BigNumber
+  evaluatingPos: number
+  evaluated: boolean
 }
 
 export type DetailedVotingRoom = VotingRoom & { details: CommunityDetail }
@@ -23,4 +26,5 @@ export type FeaturedVoting = {
   endAt: BigNumber
   verificationStartAt: BigNumber
   finalized: boolean
+  evaluatingPos: number
 }
