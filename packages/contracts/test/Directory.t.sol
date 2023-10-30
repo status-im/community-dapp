@@ -3,6 +3,7 @@ pragma solidity ^0.8.19;
 
 import { Test } from "forge-std/Test.sol";
 import { DeployContracts } from "../script/DeployContracts.s.sol";
+import { DeploymentConfig } from "../script/DeploymentConfig.s.sol";
 import { Directory } from "../contracts/Directory.sol";
 import { VotingContract } from "../contracts/VotingContract.sol";
 import { FeaturedVotingContract } from "../contracts/FeaturedVotingContract.sol";
@@ -11,6 +12,7 @@ contract DirectoryTest is Test {
     Directory public directory;
     address internal votingContract;
     address internal featuredVotingContract;
+    address internal deployer;
 
     bytes internal communityID = "communityID";
     bytes internal communityID2 = "communityID2";
@@ -23,6 +25,9 @@ contract DirectoryTest is Test {
         directory = _directory;
         votingContract = address(_votingContract);
         featuredVotingContract = address(_featuredVotingContract);
+
+        DeploymentConfig deploymentConfig = deployment.getDeploymentConfig();
+        deployer = deploymentConfig.deployer();
     }
 
     function _addCommunitiesToDirectory(bytes[] memory communityIDs) internal {
@@ -34,6 +39,12 @@ contract DirectoryTest is Test {
         for (uint8 i = 0; i < communityIDs.length; i++) {
             assert(directory.isCommunityInDirectory(communityIDs[i]));
         }
+    }
+
+    function testDeployment() public {
+        assertEq(directory.owner(), deployer);
+        assertEq(directory.votingContract(), votingContract);
+        assertEq(directory.featuredVotingContract(), featuredVotingContract);
     }
 }
 
