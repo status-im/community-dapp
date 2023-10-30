@@ -108,7 +108,7 @@ export const CardVote = ({ room, hideModalFunction }: CardVoteProps) => {
     voters,
   } = useUnverifiedVotes(vote.ID, room.verificationStartAt, room.startAt)
 
-  const includeUnverifiedVotes = !winner || verificationPeriod || beingFinalized
+  const includeUnverifiedVotes = !winner || verificationPeriod
 
   const votesFor = !includeUnverifiedVotes
     ? vote.voteFor.toNumber()
