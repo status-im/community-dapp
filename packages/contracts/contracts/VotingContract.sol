@@ -157,7 +157,7 @@ contract VotingContract is Ownable2Step {
         uint256[] memory returnVotingRooms = new uint256[](votingRooms.length);
         uint256 count = 0;
         for (uint256 i = 0; i < votingRooms.length; i++) {
-            if (!votingRooms[i].finalized) {
+            if (!votingRooms[i].finalized || !votingRooms[i].evaluated) {
                 returnVotingRooms[count] = votingRooms[i].roomNumber;
                 count++;
             }
@@ -284,7 +284,6 @@ contract VotingContract is Ownable2Step {
             votingRoom.finalized = true;
             votingRoom.endAt = block.timestamp;
             votingRoom.endBlock = block.number;
-            activeRoomIDByCommunityID[votingRoom.community] = 0;
 
             // resetting evaluation state as we're not entering finalization
             // phase in which all votes have to be reevaluated
@@ -298,6 +297,7 @@ contract VotingContract is Ownable2Step {
 
         bool passed = _evaluateVotes(votingRoom, limit);
         if (votingRoom.evaluated) {
+            activeRoomIDByCommunityID[votingRoom.community] = 0;
             if (passed) {
                 _populateDirectory(votingRoom);
             }

@@ -187,6 +187,49 @@ contract GetActiveVotingRoomsTest is VotingContractTest {
         assertEq(votingRooms.length, 1);
         assertEq(votingRooms[0], 1);
     }
+
+    function test_GetActiveVotingRooms_WhenFinalizationHasStarted() public {
+        // ensure there are not active voting rooms
+        uint256[] memory votingRooms = votingContract.getActiveVotingRooms();
+        assertEq(votingRooms.length, 0);
+
+        vm.prank(bob);
+        votingContract.initializeVotingRoom(VotingContract.VoteType.FOR, communityID1, 100);
+
+        // create another vote so we have more than one to evaluate
+        VotingContract.SignedVote[] memory votes = new VotingContract.SignedVote[](1);
+        votes[0] = _createSignedVote(alicesKey, alice, 1, VotingContract.VoteType.AGAINST, 200, block.timestamp);
+        // ensure users have funds
+        _ensureVoteTokens(alice, 1000);
+        votingContract.castVotes(votes);
+
+        // fast forward such that voting time has passed
+        skip(votingWithVerificationLength + 1);
+
+        // finalize voting room with a `limit` of `1`, meaning, 1 vote left to evaluate
+        votingContract.finalizeVotingRoom(1, 1);
+
+        // there should be one active voting room
+        votingRooms = votingContract.getActiveVotingRooms();
+        assertEq(votingRooms.length, 1);
+        assertEq(votingRooms[0], 1);
+
+        // current active voting room should be marked as finalized but not evaluated yet
+        VotingContract.VotingRoom memory votingRoom = votingContract.getActiveVotingRoom(communityID1);
+        assertEq(votingRoom.community, communityID1);
+        assertEq(votingRoom.finalized, true);
+        assertEq(votingRoom.evaluated, false);
+
+        // finalize voting room once more with a `limit` of `1`, this will close the voting room
+        votingContract.finalizeVotingRoom(1, 1);
+
+        // there should be no active voting room anymore
+        votingRooms = votingContract.getActiveVotingRooms();
+        assertEq(votingRooms.length, 0);
+
+        // sanity check, community should not be in directy due to vote result
+        assertFalse(directoryContract.isCommunityInDirectory(communityID1));
+    }
 }
 
 contract ListRoomVotersTest is VotingContractTest {
