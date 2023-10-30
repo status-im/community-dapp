@@ -45,7 +45,6 @@ export function NotificationsList({ type }: Props) {
   }
 
   const parseFeatured = (parsedLog: any) => {
-    console.log(parsedLog)
     let text = ''
     if (parsedLog.name === 'VotingStarted') {
       text = 'Featured voting started.'

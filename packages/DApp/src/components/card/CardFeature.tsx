@@ -10,7 +10,7 @@ import { VoteConfirmModal } from './VoteConfirmModal'
 import { useContractCall, useEthers } from '@usedapp/core'
 import { VoteBtn } from '../Button'
 import { useFeaturedVotes } from '../../hooks/useFeaturedVotes'
-import { useFeaturedVotingState } from '../../helpers/featuredVoting'
+import { useFeaturedVotingState } from '../../hooks/useFeaturedVotingState'
 import { useContracts } from '../../hooks/useContracts'
 import { BigNumber } from 'ethers'
 

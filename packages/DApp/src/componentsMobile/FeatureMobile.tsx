@@ -47,8 +47,6 @@ export function FeatureMobile() {
         <MobileBlock>
           <FeatureHeading>{`Feature ${community.name}?`}</FeatureHeading>
           <VotePropose setProposingAmount={setProposingAmount} proposingAmount={proposingAmount} />
-          <FeatureBtn disabled>Coming soon!</FeatureBtn>
-
           <FeatureBtn disabled={disabled}>
             Feature this community! <span style={{ fontSize: '20px' }}>⭐️</span>
           </FeatureBtn>

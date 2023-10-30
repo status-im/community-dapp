@@ -2,7 +2,7 @@ import React from 'react'
 import styled from 'styled-components'
 import backgroundImage from '../assets/images/curve-shape.svg'
 import { Colors } from '../constants/styles'
-import { useFeaturedVotingState } from '../helpers/featuredVoting'
+import { useFeaturedVotingState } from '../hooks/useFeaturedVotingState'
 import { useFeaturedVotes } from '../hooks/useFeaturedVotes'
 import { formatTimeLeft } from '../helpers/fomatTimeLeft'
 

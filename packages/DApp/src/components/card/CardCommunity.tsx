@@ -138,7 +138,7 @@ export const CardCommunityBlock = styled.div`
 
   &.notModal {
     @media (max-width: 768px) {
-      align-items: flex-end;
+      align-items: stretch;
     }
   }
 `
