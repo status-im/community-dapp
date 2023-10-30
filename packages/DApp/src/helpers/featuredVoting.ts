@@ -1,34 +1,42 @@
+import { useEffect, useState } from 'react'
 import { FeaturedVoting } from '../models/smartContract'
 
 type Phase = 'not started' | 'voting' | 'verification' | 'ended' | null
 
-export function getFeaturedVotingState(featuredVoting: FeaturedVoting | null): Phase {
-  const currentTimestamp = Math.floor(Date.now() / 1000)
+export const useFeaturedVotingState = (featuredVoting: FeaturedVoting | null): Phase => {
+  const [votingState, setVotingState] = useState<Phase>(null)
 
-  if (!featuredVoting) {
-    return null
-  }
+  useEffect(() => {
+    const getState = () => {
+      const currentTimestamp = Math.floor(Date.now() / 1000)
 
-  if (featuredVoting.startAt.toNumber() > currentTimestamp) {
-    return 'not started'
-  }
+      const startAt = featuredVoting?.startAt.toNumber() ?? 0
+      const verificationStartAt = featuredVoting?.verificationStartAt.toNumber() ?? 0
+      const endAt = featuredVoting?.endAt.toNumber() ?? 0
 
-  if (featuredVoting.verificationStartAt.toNumber() > currentTimestamp) {
-    return 'voting'
-  }
+      if (!featuredVoting || featuredVoting === null) {
+        setVotingState(null)
+      } else if (endAt < currentTimestamp) {
+        setVotingState('ended')
+      } else if (verificationStartAt < currentTimestamp && endAt > currentTimestamp) {
+        setVotingState('verification')
+      } else if (verificationStartAt > currentTimestamp) {
+        setVotingState('voting')
+      } else if (startAt > currentTimestamp) {
+        setVotingState('not started')
+      }
+    }
 
-  if (
-    featuredVoting.verificationStartAt.toNumber() < currentTimestamp &&
-    featuredVoting.endAt.toNumber() > currentTimestamp
-  ) {
-    return 'verification'
-  }
+    const timer = setInterval(() => {
+      getState()
+    }, 5000)
 
-  if (featuredVoting.endAt.toNumber() < currentTimestamp) {
-    return 'ended'
-  }
+    getState()
 
-  return 'ended'
+    return () => {
+      if (timer) clearInterval(timer)
+    }
+  })
+
+  return votingState
 }
-
-export default { getFeaturedVotingState }

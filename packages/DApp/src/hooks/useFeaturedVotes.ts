@@ -35,7 +35,7 @@ export function useFeaturedVotes() {
     if (featuredVotings) {
       const lastVoting: FeaturedVoting = featuredVotings[featuredVotings.length - 1]
 
-      if (lastVoting && !lastVoting.finalized) {
+      if (lastVoting && (!lastVoting.evaluated || !lastVoting.finalized)) {
         setActiveVoting(lastVoting)
       }
     }
@@ -56,7 +56,7 @@ export function useFeaturedVotes() {
 
     loadFeatureVotes()
 
-    const task = setInterval(loadFeatureVotes, 10000)
+    const task = setInterval(loadFeatureVotes, 5000)
     return () => clearInterval(task)
   }, [waku, chainId, activeVoting])
 

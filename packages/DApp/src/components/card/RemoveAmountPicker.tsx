@@ -32,7 +32,7 @@ export function RemoveAmountPicker({ community, setShowConfirmModal }: RemoveAmo
   if (community.votingHistory && community.votingHistory.length > 0) {
     const lastVote = community.votingHistory[community.votingHistory.length - 1]
     const lastVoteDate = lastVote.date
-    if (timespan(lastVoteDate) < 30 && lastVote.type === 'Remove') {
+    if (timespan(lastVoteDate) < 3 && lastVote.type === 'Remove') {
       return (
         <WarningWrapRemoval>
           <Warning

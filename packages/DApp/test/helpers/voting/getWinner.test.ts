@@ -12,6 +12,8 @@ describe('voting', () => {
         type: 'Add',
         voteFor: BigNumber.from(1000),
         voteAgainst: BigNumber.from(100),
+        votingEndAt: 10000,
+        verificationEndAt: 10000,
       }
       expect(voting.getWinner(vote)).to.eq(2)
     })
@@ -22,6 +24,8 @@ describe('voting', () => {
         type: 'Add',
         voteFor: BigNumber.from(100),
         voteAgainst: BigNumber.from(1000),
+        votingEndAt: 10000,
+        verificationEndAt: 10000,
       }
       expect(voting.getWinner(vote)).to.eq(1)
     })
@@ -32,6 +36,8 @@ describe('voting', () => {
         type: 'Add',
         voteFor: BigNumber.from(100),
         voteAgainst: BigNumber.from(1000),
+        votingEndAt: 10000,
+        verificationEndAt: 10000,
       }
       expect(voting.getWinner(vote)).to.eq(undefined)
     })
@@ -42,6 +48,8 @@ describe('voting', () => {
         type: 'Add',
         voteFor: BigNumber.from(100),
         voteAgainst: BigNumber.from(100),
+        votingEndAt: 10000,
+        verificationEndAt: 10000,
       }
       expect(voting.getWinner(vote)).to.eq(1)
     })

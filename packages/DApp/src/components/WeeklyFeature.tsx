@@ -2,17 +2,17 @@ import React from 'react'
 import styled from 'styled-components'
 import backgroundImage from '../assets/images/curve-shape.svg'
 import { Colors } from '../constants/styles'
-import { getFeaturedVotingState } from '../helpers/featuredVoting'
+import { useFeaturedVotingState } from '../helpers/featuredVoting'
 import { useFeaturedVotes } from '../hooks/useFeaturedVotes'
 import { formatTimeLeft } from '../helpers/fomatTimeLeft'
 
 export const WeeklyFeature = () => {
   const { activeVoting } = useFeaturedVotes()
-  if (!activeVoting) {
+  const featuredVotingState = useFeaturedVotingState(activeVoting)
+
+  if (!activeVoting || !featuredVotingState) {
     return null
   }
-
-  const featuredVotingState = getFeaturedVotingState(activeVoting)
 
   if (featuredVotingState === 'ended') {
     return (

@@ -27,4 +27,6 @@ export type FeaturedVoting = {
   verificationStartAt: BigNumber
   finalized: boolean
   evaluatingPos: number
+  evaluated: boolean
+  endBlock: BigNumber
 }

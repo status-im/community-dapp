@@ -42,7 +42,7 @@ export const CardVoteMobile = ({ room }: CardVoteMobileProps) => {
   const { votingContract } = useContracts()
   const vote = voting.fromRoom(room)
   const voteConstants = voteTypes[vote.type]
-  const { votes } = useVotesAggregate(vote.ID, room.verificationStartAt, room.startAt)
+  const { votesToSend } = useVotesAggregate(vote.ID, room.verificationStartAt, room.startAt)
   const castVotes = useContractFunction(votingContract, 'castVotes')
 
   const finalizeVoting = useContractFunction(votingContract, 'finalizeVotingRoom')
@@ -117,7 +117,7 @@ export const CardVoteMobile = ({ room }: CardVoteMobileProps) => {
         {verificationPeriod && (
           <VoteBtnFinal
             onClick={async () => {
-              await castVotes.send(votes)
+              await castVotes.send(votesToSend)
 
               setSentVotesFor(0)
               setSentVotesAgainst(0)

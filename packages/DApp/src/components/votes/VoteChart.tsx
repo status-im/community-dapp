@@ -7,6 +7,7 @@ import { VoteType, voteTypes } from './../../constants/voteTypes'
 import { CurrentVoting } from '../../models/community'
 import { VoteGraphBar } from './VoteGraphBar'
 import { formatTimeLeft, formatTimeLeftVerification } from '../../helpers/fomatTimeLeft'
+import { useTimeLeft } from '../../hooks/useTimeLeft'
 export interface VoteChartProps {
   vote: CurrentVoting
   votesFor: number
@@ -43,6 +44,9 @@ export function VoteChart({
     return () => window.removeEventListener('resize', handleResize)
   }, [])
 
+  const timeLeft = useTimeLeft(vote.votingEndAt)
+  const timeLeftVerification = useTimeLeft(vote.verificationEndAt)
+
   const voteConstants = voteTypes[vote.type]
 
   const voteSum = votesFor + votesAgainst
@@ -74,9 +78,8 @@ export function VoteChart({
             <span style={{ fontWeight: 'normal' }}>SNT</span>
           </span>
         </VoteBox>
-        {/* todo: wrapper component with timer and setInterval */}
         <TimeLeft className={selectedVote ? '' : 'notModal'}>
-          {vote.timeLeft > 0 ? formatTimeLeft(vote.timeLeft) : formatTimeLeftVerification(vote.timeLeftVerification)}
+          {timeLeft > 0 ? formatTimeLeft(timeLeft) : formatTimeLeftVerification(timeLeftVerification)}
         </TimeLeft>
         <VoteBox
           style={{
@@ -107,7 +110,7 @@ export function VoteChart({
           voteWinner={voteWinner}
           isAnimation={isAnimation}
         />
-        <TimeLeftMobile className={selectedVote ? '' : 'notModal'}>{formatTimeLeft(vote.timeLeft)}</TimeLeftMobile>
+        <TimeLeftMobile className={selectedVote ? '' : 'notModal'}>{formatTimeLeft(timeLeft)}</TimeLeftMobile>
       </VoteGraphBarWrap>
     </Votes>
   )

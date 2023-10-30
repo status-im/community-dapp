@@ -37,6 +37,28 @@ export function NotificationItem({ publicKey, text, transaction }: NotificationI
       </NotificationBlock>
     )
   }
+
+  return null
+}
+
+interface NotificationItemPlainProps {
+  text: string
+}
+
+export function NotificationItemPlain({ text }: NotificationItemPlainProps) {
+  const [show, setShow] = useState(true)
+
+  if (show) {
+    return (
+      <NotificationBlock>
+        <NotificationContent>
+          <NotificationText>{text}</NotificationText>
+        </NotificationContent>
+        <NotificationCloseButton onClick={() => setShow(false)} />
+      </NotificationBlock>
+    )
+  }
+
   return null
 }
 

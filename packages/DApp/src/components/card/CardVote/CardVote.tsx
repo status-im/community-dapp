@@ -18,6 +18,7 @@ import { VoteBtn, VotesBtns } from '../../Button'
 import { CardHeading, CardVoteBlock } from '../../Card'
 import { useVotesAggregate } from '../../../hooks/useVotesAggregate'
 import { useUnverifiedVotes } from '../../../hooks/useUnverifiedVotes'
+import { config } from '../../../config'
 
 interface CardVoteProps {
   room: DetailedVotingRoom
@@ -33,6 +34,8 @@ export const CardVote = ({ room, hideModalFunction }: CardVoteProps) => {
   const [sentVotesFor, setSentVotesFor] = useState(0)
   const [sentVotesAgainst, setSentVotesAgainst] = useState(0)
   const [voted, setVoted] = useState<null | boolean>(null)
+  const [verificationPeriod, setVerificationPeriod] = useState(false)
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     setVoted(null)
@@ -41,12 +44,26 @@ export const CardVote = ({ room, hideModalFunction }: CardVoteProps) => {
   const { votingContract } = useContracts()
   const vote = voting.fromRoom(room)
   const voteConstants = voteTypes[vote.type]
-  const { votes } = useVotesAggregate(vote.ID, room.verificationStartAt, room.startAt)
+  const { votesToSend, allVotes } = useVotesAggregate(vote.ID, room.verificationStartAt, room.startAt)
   const castVotes = useContractFunction(votingContract, 'castVotes')
 
-  room = useRoomAggregateVotes(room, showConfirmModal)
-
+  const { evaluated, finalized, evaluatingPos } = useRoomAggregateVotes(room, showConfirmModal)
   const finalizeVoting = useContractFunction(votingContract, 'finalizeVotingRoom')
+
+  const beingFinalized = !evaluated && finalized
+  const beingEvaluated = evaluated && !finalized
+  const firstFinalization = beingEvaluated && evaluatingPos === allVotes.length + 1
+  const currentPosition = evaluatingPos ?? 0
+
+  const votesLeftCount = allVotes.length - currentPosition + 1
+  const finalizeVotingLimit = firstFinalization
+    ? Math.min(allVotes.length, config.votesLimit)
+    : Math.min(votesLeftCount, config.votesLimit)
+
+  const batchCount = Math.ceil((beingFinalized ? allVotes.length + 1 : allVotes.length) / config.votesLimit)
+  const batchLeftCount = Math.ceil(votesLeftCount / config.votesLimit)
+  const batchDoneCount = batchCount - batchLeftCount
+  const batchedVotes = votesToSend?.slice(0, finalizeVotingLimit)
 
   const setNext = (val: boolean) => {
     setShowConfirmModal(val)
@@ -60,10 +77,28 @@ export const CardVote = ({ room, hideModalFunction }: CardVoteProps) => {
     setShowConfirmModal(val)
   }
 
-  const now = Date.now() / 1000
-  const verificationStarted = room.verificationStartAt.toNumber() - now < 0
-  const verificationEnded = room.endAt.toNumber() - now < 0
-  const verificationPeriod = verificationStarted && !verificationEnded
+  useEffect(() => {
+    const checkPeriod = () => {
+      const now = Date.now() / 1000
+      const verificationStarted = room.verificationStartAt.toNumber() - now < 0
+      const verificationEnded = room.endAt.toNumber() - now < 0
+      const verificationPeriod = verificationStarted && !verificationEnded
+      setVerificationPeriod(verificationPeriod)
+    }
+
+    checkPeriod()
+
+    const timer = setInterval(checkPeriod, 5000)
+    return () => {
+      if (timer) clearInterval(timer)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (finalizeVoting.state.status === 'Success' || castVotes.state.status === 'Success') {
+      history.go(0)
+    }
+  }, [finalizeVoting.state.status, castVotes.state.status])
 
   const winner = verificationPeriod ? 0 : getVotingWinner(vote)
 
@@ -73,7 +108,7 @@ export const CardVote = ({ room, hideModalFunction }: CardVoteProps) => {
     voters,
   } = useUnverifiedVotes(vote.ID, room.verificationStartAt, room.startAt)
 
-  const includeUnverifiedVotes = !winner || verificationPeriod
+  const includeUnverifiedVotes = !winner || verificationPeriod || beingFinalized
 
   const votesFor = !includeUnverifiedVotes
     ? vote.voteFor.toNumber()
@@ -132,7 +167,14 @@ export const CardVote = ({ room, hideModalFunction }: CardVoteProps) => {
       )}
 
       {verificationPeriod && (
-        <CardHeadingEndedVote>Verification period in progress, please verify your vote.</CardHeadingEndedVote>
+        <CardHeadingEndedVote>
+          Verification period in progress, please verify your vote.{' '}
+          {batchCount > 1 && (
+            <>
+              <br />({beingEvaluated ? batchDoneCount : 0}/{batchCount} verified)
+            </>
+          )}
+        </CardHeadingEndedVote>
       )}
 
       {winner ? (
@@ -157,20 +199,26 @@ export const CardVote = ({ room, hideModalFunction }: CardVoteProps) => {
         {verificationPeriod && (
           <VoteBtnFinal
             onClick={async () => {
-              await castVotes.send(votes)
+              setLoading(true)
+              await castVotes.send(batchedVotes)
 
               setSentVotesFor(0)
               setSentVotesAgainst(0)
+              setLoading(false)
             }}
-            disabled={!account}
+            disabled={!account || loading}
           >
-            Verify votes
+            {loading ? 'Waiting...' : 'Verify votes'}
           </VoteBtnFinal>
         )}
         {Boolean(winner) && (
-          // note: @jkbktl PR
-          <VoteBtnFinal onClick={() => finalizeVoting.send(room.roomNumber, 1)} disabled={!account}>
-            Finalize the vote <span>✍️</span>
+          <VoteBtnFinal
+            onClick={() => finalizeVoting.send(room.roomNumber, finalizeVotingLimit < 1 ? 1 : finalizeVotingLimit)}
+            disabled={!account}
+          >
+            <>
+              Finalize the vote <span>✍️</span>
+            </>
           </VoteBtnFinal>
         )}
 
