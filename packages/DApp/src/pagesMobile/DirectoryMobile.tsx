@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { DirectoryCard } from '../components/directory/DirectoryCard'
 import { TopBarMobile } from '../componentsMobile/TopBarMobile'
 import { useDirectoryCommunities } from '../hooks/useDirectoryCommunities'
@@ -11,12 +11,58 @@ import { WeeklyFeature } from '../components/WeeklyFeature'
 import { FilterList } from '../components/Filter'
 import { useHistory } from 'react-router'
 import { DirectorySkeletonMobile } from '../componentsMobile/DirectorySkeletonMobile'
+import { useContractFunction, useEthers } from '@usedapp/core'
+import { useContracts } from '../hooks/useContracts'
+import { useFeaturedVotes } from '../hooks/useFeaturedVotes'
+import { useFeaturedVotingState } from '../hooks/useFeaturedVotingState'
+import { config } from '../config'
+import { ConnectButton } from '../components/ConnectButton'
+import { ProposeButton } from './VotesMobile'
 
 export function DirectoryMobile() {
+  const { account } = useEthers()
+  const { featuredVotingContract } = useContracts()
+  const { activeVoting, votes, votesToSend } = useFeaturedVotes()
+  const featuredVotingState = useFeaturedVotingState(activeVoting)
+  const castVotes = useContractFunction(featuredVotingContract, 'castVotes')
+  const finalizeVoting = useContractFunction(featuredVotingContract, 'finalizeVoting')
+
   const [filterKeyword, setFilterKeyword] = useState('')
   const [sortedBy, setSortedBy] = useState(DirectorySortingEnum.IncludedRecently)
   const [communities, publicKeys] = useDirectoryCommunities(filterKeyword, sortedBy)
   const history = useHistory()
+
+  const evaluated = activeVoting?.evaluated ?? false
+  const finalized = activeVoting?.finalized ?? false
+  const allVotes = votes ?? {}
+  const votesCount: number = Object.values(allVotes).reduce(
+    (acc: number, curr: any) => acc + Object.keys(curr?.votes).length,
+    0
+  )
+
+  const beingFinalized = !evaluated && finalized
+  const beingEvaluated = evaluated && !finalized
+  const currentPosition = activeVoting?.evaluatingPos ?? 0
+  const firstFinalization = beingEvaluated && currentPosition === votesCount + 1
+
+  const votesLeftCount = votesCount - currentPosition + 1
+  const finalizeVotingLimit = firstFinalization
+    ? Math.min(votesCount, config.votesLimit)
+    : Math.min(votesLeftCount, config.votesLimit)
+  const batchCount = Math.ceil((beingFinalized ? votesCount + 1 : votesCount) / config.votesLimit)
+  const batchLeftCount = Math.ceil(votesLeftCount / config.votesLimit)
+
+  const batchDoneCount = batchCount - batchLeftCount
+  const batchedVotes = votesToSend?.slice(
+    batchDoneCount * config.votesLimit,
+    batchDoneCount * config.votesLimit + finalizeVotingLimit
+  )
+
+  useEffect(() => {
+    if (finalizeVoting.state.status === 'Success' || castVotes.state.status === 'Success') {
+      history.go(0)
+    }
+  }, [finalizeVoting.state.status, castVotes.state.status])
 
   const renderCommunities = () => {
     if (!publicKeys) {
@@ -61,6 +107,27 @@ export function DirectoryMobile() {
       <Voting>
         <WeeklyFeature />
         {renderCommunities()}
+        <>
+          {!account && <ConnectButton />}
+          {account && featuredVotingState === 'verification' && (
+            <ProposeButton
+              onClick={async () => {
+                await castVotes.send(batchedVotes)
+              }}
+            >
+              Verify Weekly featured
+            </ProposeButton>
+          )}
+          {account && featuredVotingState === 'ended' && (
+            <ProposeButton
+              onClick={() => {
+                finalizeVoting.send(finalizeVotingLimit < 1 ? 1 : finalizeVotingLimit)
+              }}
+            >
+              Finalize Weekly featured
+            </ProposeButton>
+          )}
+        </>
       </Voting>
     </div>
   )
