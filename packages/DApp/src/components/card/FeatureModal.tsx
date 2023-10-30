@@ -33,9 +33,9 @@ export function FeatureModal({ community, setShowConfirmModal }: FeatureModalPro
           onClick={async () => {
             if (!activeVoting) {
               await send(community.publicKey, proposingAmount)
+            } else {
+              await sendWaku(proposingAmount, community.publicKey)
             }
-
-            await sendWaku(proposingAmount, community.publicKey)
 
             setShowConfirmModal(true)
           }}
