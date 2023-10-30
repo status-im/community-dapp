@@ -1,7 +1,9 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.18;
 
-contract Directory {
+import { Ownable2Step } from "@openzeppelin/contracts/access/Ownable2Step.sol";
+
+contract Directory is Ownable2Step {
     address public votingContract;
     address public featuredVotingContract;
 
