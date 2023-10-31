@@ -72,7 +72,7 @@ export const CardVoteMobile = ({ room }: CardVoteMobileProps) => {
 
     checkPeriod()
 
-    const timer = setInterval(checkPeriod, 5000)
+    const timer = setInterval(checkPeriod, 1000)
     return () => {
       if (timer) clearInterval(timer)
     }

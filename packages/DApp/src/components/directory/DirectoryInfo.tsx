@@ -16,23 +16,34 @@ export function DirectoryInfo() {
   const { featuredVotingContract } = useContracts()
   const { getTypedFeatureVote } = useTypedFeatureVote()
   const { waku } = useWaku()
-  const { activeVoting, votes, votesToSend } = useFeaturedVotes()
+  const { activeVoting, votes } = useFeaturedVotes()
   const featuredVotingState = useFeaturedVotingState(activeVoting)
   const castVotes = useContractFunction(featuredVotingContract, 'castVotes')
   const finalizeVoting = useContractFunction(featuredVotingContract, 'finalizeVoting')
   const [loading, setLoading] = useState(false)
 
-  const evaluated = activeVoting?.evaluated ?? false
-  const finalized = activeVoting?.finalized ?? false
-  const allVotes = votes ?? {}
-  const votesCount: number = Object.values(allVotes).reduce(
+  if (!activeVoting) {
+    return (
+      <InfoWrap>
+        <PageInfo
+          heading="Current directory"
+          text="Vote on your favourite communities being included in
+      Weekly Featured Communities"
+        />
+      </InfoWrap>
+    )
+  }
+
+  const evaluated = activeVoting.evaluated
+  const finalized = activeVoting.finalized
+  const votesCount: number = Object.values(votes).reduce(
     (acc: number, curr: any) => acc + Object.keys(curr?.votes).length,
     0
   )
 
   const beingFinalized = !evaluated && finalized
   const beingEvaluated = evaluated && !finalized
-  const currentPosition = activeVoting?.evaluatingPos ?? 0
+  const currentPosition = activeVoting.evaluatingPos
   const firstFinalization = beingEvaluated && currentPosition === votesCount + 1
 
   const votesLeftCount = votesCount - currentPosition + 1
@@ -43,10 +54,6 @@ export function DirectoryInfo() {
   const batchLeftCount = Math.ceil(votesLeftCount / config.votesLimit)
 
   const batchDoneCount = batchCount - batchLeftCount
-  const batchedVotes = votesToSend?.slice(
-    batchDoneCount * config.votesLimit,
-    batchDoneCount * config.votesLimit + finalizeVotingLimit
-  )
 
   useEffect(() => {
     if (finalizeVoting.state.status === 'Success' || castVotes.state.status === 'Success') {

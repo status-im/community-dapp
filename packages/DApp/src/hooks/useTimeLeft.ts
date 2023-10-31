@@ -4,7 +4,7 @@ export function useTimeLeft(timeEndAt: number): number {
   const [timeLeft, setTimeLeft] = useState(timeEndAt - Math.floor(Date.now() / 1000))
 
   useEffect(() => {
-    const timer = setInterval(() => setTimeLeft(timeEndAt - Math.floor(Date.now() / 1000)), 5000)
+    const timer = setInterval(() => setTimeLeft(timeEndAt - Math.floor(Date.now() / 1000)), 1000)
 
     return () => {
       if (timer) clearInterval(timer)

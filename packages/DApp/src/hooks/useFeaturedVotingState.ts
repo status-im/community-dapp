@@ -29,7 +29,7 @@ export const useFeaturedVotingState = (featuredVoting: FeaturedVoting | null): P
 
     const timer = setInterval(() => {
       getState()
-    }, 5000)
+    }, 1000)
 
     getState()
 
