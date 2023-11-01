@@ -45,20 +45,18 @@ const configs: Record<typeof process.env.ENV, Config> = {
   /**
    * Preview/Stage.
    *
-   * All preview deployments (from pull requests) will share voting history.
+   * All preview deployments (from pull requests) will share voting history with production.
+   * Contracts haven't been deployed to testnet.
    */
   preview: {
     wakuConfig: {
       environment: 'production',
-      wakuTopic: `/communitiesCuration/preview/${version}/directory/proto/`,
-      wakuFeatureTopic: `/communitiesCuration/preview/${version}/featured/proto/`,
+      wakuTopic: `/communitiesCuration/${version}/directory/proto/`,
+      wakuFeatureTopic: `/communitiesCuration/${version}/featured/proto/`,
     },
     daapConfig: {
-      readOnlyChainId: ChainId.OptimismGoerli,
-      readOnlyUrls: {
-        [ChainId.OptimismGoerli]: `https://optimism-goerli.infura.io/v3/${process.env.INFURA_API_KEY}`,
-      },
-      networks: [OptimismGoerli],
+      readOnlyChainId: ChainId.Optimism,
+      networks: [Optimism],
       notifications: {
         checkInterval: 500,
         expirationPeriod: 50000,
