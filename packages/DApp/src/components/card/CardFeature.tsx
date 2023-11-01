@@ -10,7 +10,7 @@ import { VoteConfirmModal } from './VoteConfirmModal'
 import { useContractCall, useEthers } from '@usedapp/core'
 import { VoteBtn } from '../Button'
 import { useFeaturedVotes } from '../../hooks/useFeaturedVotes'
-import { getFeaturedVotingState } from '../../helpers/featuredVoting'
+import { useFeaturedVotingState } from '../../hooks/useFeaturedVotingState'
 import { useContracts } from '../../hooks/useContracts'
 import { BigNumber } from 'ethers'
 
@@ -38,7 +38,7 @@ export const CardFeature = ({ community, featured }: CardFeatureProps) => {
   const [heading, setHeading] = useState('Weekly Feature vote')
   const [icon, setIcon] = useState('⭐')
   const { activeVoting, alreadyVoted } = useFeaturedVotes()
-  const featuredVotingState = getFeaturedVotingState(activeVoting)
+  const featuredVotingState = useFeaturedVotingState(activeVoting)
 
   const [savedVotes] =
     useContractCall({

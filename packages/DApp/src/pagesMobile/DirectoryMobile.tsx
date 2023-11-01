@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { DirectoryCard } from '../components/directory/DirectoryCard'
 import { TopBarMobile } from '../componentsMobile/TopBarMobile'
 import { useDirectoryCommunities } from '../hooks/useDirectoryCommunities'
@@ -11,12 +11,41 @@ import { WeeklyFeature } from '../components/WeeklyFeature'
 import { FilterList } from '../components/Filter'
 import { useHistory } from 'react-router'
 import { DirectorySkeletonMobile } from '../componentsMobile/DirectorySkeletonMobile'
+import { useContractFunction, useEthers } from '@usedapp/core'
+import { useContracts } from '../hooks/useContracts'
+import { useFeaturedVotes } from '../hooks/useFeaturedVotes'
+import { useFeaturedVotingState } from '../hooks/useFeaturedVotingState'
+import { config } from '../config'
+import { ConnectButton } from '../components/ConnectButton'
+import { ProposeButton } from './VotesMobile'
+import { useFeaturedBatches } from '../hooks/useFeaturedBatches'
+import { mapFeaturesVotes, receiveWakuFeature } from '../helpers/receiveWakuFeature'
+import { useTypedFeatureVote } from '../hooks/useTypedFeatureVote'
+import { useWaku } from '../providers/waku/provider'
 
 export function DirectoryMobile() {
+  const { account } = useEthers()
+  const { featuredVotingContract } = useContracts()
+  const { getTypedFeatureVote } = useTypedFeatureVote()
+  const { waku } = useWaku()
+
+  const { activeVoting } = useFeaturedVotes()
+  const featuredVotingState = useFeaturedVotingState(activeVoting)
+  const castVotes = useContractFunction(featuredVotingContract, 'castVotes')
+  const finalizeVoting = useContractFunction(featuredVotingContract, 'finalizeVoting')
+
   const [filterKeyword, setFilterKeyword] = useState('')
   const [sortedBy, setSortedBy] = useState(DirectorySortingEnum.IncludedRecently)
   const [communities, publicKeys] = useDirectoryCommunities(filterKeyword, sortedBy)
   const history = useHistory()
+
+  const { finalizeVotingLimit, batchCount, batchDoneCount, beingEvaluated, beingFinalized } = useFeaturedBatches()
+
+  useEffect(() => {
+    if (finalizeVoting.state.status === 'Success' || castVotes.state.status === 'Success') {
+      history.go(0)
+    }
+  }, [finalizeVoting.state.status, castVotes.state.status])
 
   const renderCommunities = () => {
     if (!publicKeys) {
@@ -61,6 +90,49 @@ export function DirectoryMobile() {
       <Voting>
         <WeeklyFeature />
         {renderCommunities()}
+        <>
+          {!account && <ConnectButton />}
+          {account && featuredVotingState === 'verification' && (
+            <ProposeButton
+              onClick={async () => {
+                const { votesToSend } = await receiveWakuFeature(
+                  waku,
+                  config.wakuConfig.wakuFeatureTopic,
+                  activeVoting!
+                )
+                const votes = mapFeaturesVotes(votesToSend, getTypedFeatureVote)
+
+                const batchedVotes = votes.slice(
+                  batchDoneCount * config.votesLimit,
+                  batchDoneCount * config.votesLimit + finalizeVotingLimit
+                )
+
+                await castVotes.send(batchedVotes)
+              }}
+            >
+              Verify Weekly featured{' '}
+              {batchCount > 1 && (
+                <>
+                  ({beingEvaluated ? batchDoneCount : 0}/{batchCount})
+                </>
+              )}
+            </ProposeButton>
+          )}
+          {account && featuredVotingState === 'ended' && (
+            <ProposeButton
+              onClick={() => {
+                finalizeVoting.send(finalizeVotingLimit < 1 ? 1 : finalizeVotingLimit)
+              }}
+            >
+              Finalize Weekly featured{' '}
+              {batchCount > 1 && (
+                <>
+                  ({beingFinalized ? batchDoneCount : 0}/{batchCount})
+                </>
+              )}
+            </ProposeButton>
+          )}
+        </>
       </Voting>
     </div>
   )

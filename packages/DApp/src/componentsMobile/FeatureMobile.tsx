@@ -15,16 +15,32 @@ import { CommunitySkeleton } from '../components/skeleton/CommunitySkeleton'
 import { HeaderVotingMobile } from './VotingMobile'
 import { ConnectMobile } from './ConnectMobile'
 import { HistoryLink } from './CardVoteMobile'
-import { useEthers } from '@usedapp/core'
+import { useContractCall, useContractFunction, useEthers } from '@usedapp/core'
 import { useGetCurrentVoting } from '../hooks/useGetCurrentVoting'
 import { MobileHeading, MobileBlock, MobileTop, MobileWrap, ColumnFlexDiv } from '../constants/styles'
+import { useFeaturedVotes } from '../hooks/useFeaturedVotes'
+import { useContracts } from '../hooks/useContracts'
+import { useSendWakuFeature } from '../hooks/useSendWakuFeature'
+import { useFeaturedVotingState } from '../hooks/useFeaturedVotingState'
 
 export function FeatureMobile() {
   const { publicKey } = useParams<{ publicKey: string }>()
   const [community] = useCommunities([publicKey])
   const [proposingAmount, setProposingAmount] = useState(0)
   const { account } = useEthers()
-  const disabled = proposingAmount === 0 || !account
+  const sendWaku = useSendWakuFeature()
+  const { activeVoting } = useFeaturedVotes()
+  const { featuredVotingContract } = useContracts()
+  const { send } = useContractFunction(featuredVotingContract, 'initializeVoting')
+  const featuredVotingState = useFeaturedVotingState(activeVoting)
+  const [isInCooldownPeriod] =
+    useContractCall({
+      abi: featuredVotingContract.interface,
+      address: featuredVotingContract.address,
+      method: 'isInCooldownPeriod',
+      args: [community.publicKey],
+    }) ?? []
+  const inFeatured = isInCooldownPeriod
 
   const [showHistory, setShowHistory] = useState(false)
   const isDisabled = community ? community.votingHistory.length === 0 : false
@@ -47,9 +63,19 @@ export function FeatureMobile() {
         <MobileBlock>
           <FeatureHeading>{`Feature ${community.name}?`}</FeatureHeading>
           <VotePropose setProposingAmount={setProposingAmount} proposingAmount={proposingAmount} />
-          <FeatureBtn disabled>Coming soon!</FeatureBtn>
-
-          <FeatureBtn disabled={disabled}>
+          <FeatureBtn
+            disabled={
+              !account || inFeatured || featuredVotingState === 'verification' || featuredVotingState === 'ended'
+            }
+            onClick={async () => {
+              if (!activeVoting) {
+                await send(community.publicKey, proposingAmount)
+              } else {
+                await sendWaku(proposingAmount, community.publicKey)
+              }
+              history.go(-1)
+            }}
+          >
             Feature this community! <span style={{ fontSize: '20px' }}>⭐️</span>
           </FeatureBtn>
           {currentVoting && (

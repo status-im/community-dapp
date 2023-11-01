@@ -14,6 +14,8 @@ export function votingFromRoom(votingRoom: VotingRoom) {
   const currentVoting: CurrentVoting = {
     timeLeft: votingRoom.verificationStartAt.toNumber() - currentTimestamp,
     timeLeftVerification: votingRoom.endAt.toNumber() - currentTimestamp,
+    votingEndAt: votingRoom.verificationStartAt.toNumber(),
+    verificationEndAt: votingRoom.endAt.toNumber(),
     type: votingRoom.voteType === 1 ? 'Add' : 'Remove',
     voteFor: votingRoom.totalVotesFor,
     voteAgainst: votingRoom.totalVotesAgainst,

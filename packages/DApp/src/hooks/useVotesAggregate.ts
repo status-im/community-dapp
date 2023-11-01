@@ -20,19 +20,22 @@ export function useVotesAggregate(room: number | undefined, verificationStartAt:
     }) ?? []
   const { waku } = useWaku()
   const [votesToSend, setVotesToSend] = useState<any[]>([])
+  const [allVotes, setAllVotes] = useState<any[]>([])
   const { getTypedVote } = useTypedVote()
+
   useEffect(() => {
     const accumulateVotes = async () => {
       if (waku && alreadyVotedList && room) {
         const messages = await wakuMessage.receive(waku, config.wakuConfig.wakuTopic, room)
-        const validMessages = messages?.filter((message) => validateVote(message, verificationStartAt, startAt))
+        const validMessages = messages?.filter((message) => validateVote(message, verificationStartAt, startAt)) ?? []
         const verifiedMessages = wakuMessage.filterVerified(validMessages, alreadyVotedList, getTypedVote)
 
+        setAllVotes(validMessages)
         setVotesToSend(verifiedMessages)
       }
     }
     accumulateVotes()
   }, [waku, room, alreadyVotedList])
 
-  return { votes: votesToSend }
+  return { votesToSend, allVotes }
 }

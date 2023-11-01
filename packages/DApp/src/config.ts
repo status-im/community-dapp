@@ -10,6 +10,7 @@ export interface Config {
     wakuFeatureTopic: string
   }
   daapConfig: DAppConfig
+  votesLimit: number
 }
 
 /**
@@ -41,6 +42,7 @@ const configs: Record<typeof process.env.ENV, Config> = {
         expirationPeriod: 50000,
       },
     },
+    votesLimit: 2,
   },
   /**
    * Preview/Stage.
@@ -64,6 +66,7 @@ const configs: Record<typeof process.env.ENV, Config> = {
         expirationPeriod: 50000,
       },
     },
+    votesLimit: 2,
   },
   /**
    * Production.
@@ -82,6 +85,7 @@ const configs: Record<typeof process.env.ENV, Config> = {
         expirationPeriod: 50000,
       },
     },
+    votesLimit: 400,
   },
 }
 

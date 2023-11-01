@@ -44,6 +44,8 @@ export const communities: Array<CommunityDetail> = [
       type: 'Remove',
       voteFor: BigNumber.from(16740235),
       voteAgainst: BigNumber.from(6740235),
+      votingEndAt: 10000,
+      verificationEndAt: 10000,
     },
     featureVotes: BigNumber.from(62142321),
     directoryInfo: {
@@ -145,6 +147,8 @@ export const communities: Array<CommunityDetail> = [
       type: 'Add',
       voteFor: BigNumber.from(16740235),
       voteAgainst: BigNumber.from(126740235),
+      votingEndAt: 10000,
+      verificationEndAt: 10000,
     },
   },
   {
@@ -165,6 +169,8 @@ export const communities: Array<CommunityDetail> = [
       type: 'Add',
       voteFor: BigNumber.from(16740235),
       voteAgainst: BigNumber.from(126740235),
+      votingEndAt: 10000,
+      verificationEndAt: 10000,
     },
   },
 ]

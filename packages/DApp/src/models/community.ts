@@ -8,6 +8,8 @@ export type CurrentVoting = {
   voteFor: BigNumber // number of snt for a vote
   voteAgainst: BigNumber // number of snt against a vote
   ID?: number // id of voting room
+  verificationEndAt: number
+  votingEndAt: number
 }
 
 export type CommunityDetail = {

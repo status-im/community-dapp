@@ -3,13 +3,13 @@ import { DetailedVotingRoom } from '../models/smartContract'
 import { useVotesAggregate } from './useVotesAggregate'
 
 export function useRoomAggregateVotes(room: DetailedVotingRoom, showConfirmModal: boolean) {
-  const { votes } = useVotesAggregate(room.roomNumber, room.verificationStartAt, room.startAt)
+  const { votesToSend } = useVotesAggregate(room.roomNumber, room.verificationStartAt, room.startAt)
 
   const [returnRoom, setReturnRoom] = useState(room)
 
   useEffect(() => {
     if (room.endAt.toNumber() > Date.now() / 1000 && showConfirmModal === false) {
-      const reducedVotes = votes.reduce(
+      const reducedVotes = votesToSend.reduce(
         (accumulator, vote) => {
           if (vote[1].mod(2).toNumber()) {
             return { for: accumulator.for.add(vote[2]), against: accumulator.against }
@@ -20,7 +20,7 @@ export function useRoomAggregateVotes(room: DetailedVotingRoom, showConfirmModal
       )
       setReturnRoom({ ...room, totalVotesAgainst: reducedVotes.against, totalVotesFor: reducedVotes.for })
     }
-  }, [JSON.stringify(votes), JSON.stringify(room), showConfirmModal])
+  }, [JSON.stringify(votesToSend), JSON.stringify(room), showConfirmModal])
 
   return returnRoom
 }

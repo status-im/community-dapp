@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { ProposeButton } from './Button'
 import { useEthers } from '@usedapp/core'
 

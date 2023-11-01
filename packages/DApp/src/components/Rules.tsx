@@ -27,13 +27,6 @@ export function Rules() {
           directory. Otherwise, a new vote for removal can be submitted after about 30 days.
         </RuleText>
       </Rule>
-      {/* <Rule>
-        <RuleIcon>✌️️</RuleIcon>
-        <RuleText>
-          The minimum amount of SNT needed to start a new vote doubles with every failed vote attempt (for both addition
-          and removal votes).
-        </RuleText>
-      </Rule> */}
       <Rule>
         <RuleIcon>⏳</RuleIcon>
         <RuleText>
@@ -48,14 +41,6 @@ export function Rules() {
           a finalization transaction.
         </RuleText>
       </Rule>
-      {/* <Rule>
-        <RuleIcon>⚠️</RuleIcon>
-        <RuleText>
-          If a single vote of more than 2,000,000 SNT votes for is made in favor of the removal of a community, the
-          remaining vote duration shortens to 24 hours. This shortening of the vote duration can be reversed if a single
-          vote of more than 2,000,000 SNT is made against the removal.
-        </RuleText>
-      </Rule> */}
       <Rule>
         <RuleIcon>⭐</RuleIcon>
         <RuleText>
