@@ -8,8 +8,9 @@ Proposed api is available [here](API.md)
 
 # Running the project
 
-Note: Use node `v18.15.0`
-NOte: Use Foundry ([getfoundry.sh](https://getfoundry.sh))
+Note: 
+- Use node `v18.15.0`
+- Use Foundry ([getfoundry.sh](https://getfoundry.sh))
 
 1. Install dependencies: Run `yarn` to install the necessary packages and dependencies.
 2. Run local anvil node: Run `anvil`
