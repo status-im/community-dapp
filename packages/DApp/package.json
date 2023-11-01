@@ -3,7 +3,11 @@
   "version": "0.0.1",
   "description": "Community directory curator dApp for Status",
   "main": "index.js",
-  "repository": "git@github.com:EthWorks/status-community-dapp.git",
+  "repository": {
+    "url": "https://github.com/status-im/community-dapp.git",
+    "directory": "packages/DApp",
+    "type": "git"
+  },
   "license": "MIT",
   "type": "module",
   "scripts": {
