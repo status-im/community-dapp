@@ -3,17 +3,10 @@ import { ChainId } from '@usedapp/core'
 // todo?: move to config.ts
 export const contracts = {
   [ChainId.Optimism]: {
-    // TO BE PROVIDED
-    votingContract: '0x0000000000000000000000000000000000000000',
-    featuredVotingContract: '0x0000000000000000000000000000000000000000',
-    directoryContract: '0x0000000000000000000000000000000000000000',
-    tokenContract: '0x0000000000000000000000000000000000000000',
-  },
-  [ChainId.OptimismGoerli]: {
-    votingContract: '0x7864aDdE74cFa6Efb2ee8E8d7bd96f9C3dd068b3',
-    featuredVotingContract: '0x2243f6e24b827bB5Dd8F4F89CC43F8b6902f238B',
-    directoryContract: '0x7E01b56d0CEa1D2b5D4018E550A2d2A288a38C6B',
-    tokenContract: '0xfb8dC8748F24F8B155123b0341a762C898511c76',
+    votingContract: '0x321Ba646d994200257Ce4bfe18F66C9283ad1407',
+    featuredVotingContract: '0x2EA9700E7F27E09F254f2DaEc5E05015b2b961d0',
+    directoryContract: '0xA8d270048a086F5807A8dc0a9ae0e96280C41e3A',
+    tokenContract: '0x650AF3C15AF43dcB218406d30784416D64Cfb6B2',
   },
   [ChainId.Hardhat]: {
     votingContract: process.env.VOTING_CONTRACT ?? '0x0000000000000000000000000000000000000000',
