@@ -6,9 +6,7 @@ export function useTimeLeft(timeEndAt: number): number {
   useEffect(() => {
     const timer = setInterval(() => setTimeLeft(timeEndAt - Math.floor(Date.now() / 1000)), 1000)
 
-    return () => {
-      if (timer) clearInterval(timer)
-    }
+    return () => clearInterval(timer)
   }, [])
 
   return timeLeft

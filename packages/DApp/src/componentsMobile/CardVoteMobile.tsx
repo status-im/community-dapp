@@ -20,10 +20,8 @@ import { DetailedVotingRoom } from '../models/smartContract'
 import arrowDown from '../assets/images/arrowDown.svg'
 import { useSendWakuVote } from '../hooks/useSendWakuVote'
 import { WrapperBottom, WrapperTop } from '../constants/styles'
-import { useRoomAggregateVotes } from '../hooks/useRoomAggregateVotes'
-import { useVotesAggregate } from '../hooks/useVotesAggregate'
 import { useUnverifiedVotes } from '../hooks/useUnverifiedVotes'
-import { config } from '../config'
+import { useVotingBatches } from '../hooks/useVotingBatches'
 
 interface CardVoteMobileProps {
   room: DetailedVotingRoom
@@ -35,6 +33,7 @@ export const CardVoteMobile = ({ room }: CardVoteMobileProps) => {
   const [sentVotesFor, setSentVotesFor] = useState(0)
   const [sentVotesAgainst, setSentVotesAgainst] = useState(0)
   const [verificationPeriod, setVerificationPeriod] = useState(false)
+  const [finalizationPeriod, setFinalizationPeriod] = useState(false)
   const [voted, setVoted] = useState<null | boolean>(null)
 
   useEffect(() => {
@@ -44,22 +43,10 @@ export const CardVoteMobile = ({ room }: CardVoteMobileProps) => {
   const { votingContract } = useContracts()
   const vote = voting.fromRoom(room)
   const voteConstants = voteTypes[vote.type]
-  const { votesToSend, allVotes } = useVotesAggregate(vote.ID, room.verificationStartAt, room.startAt)
   const castVotes = useContractFunction(votingContract, 'castVotes')
+  const { finalizeVotingLimit, batchedVotes } = useVotingBatches({ room })
 
   const finalizeVoting = useContractFunction(votingContract, 'finalizeVotingRoom')
-  const { evaluated, finalized, evaluatingPos } = useRoomAggregateVotes(room, false)
-
-  const beingEvaluated = evaluated && !finalized
-  const firstFinalization = beingEvaluated && evaluatingPos === allVotes.length + 1
-  const currentPosition = evaluatingPos ?? 0
-
-  const votesLeftCount = allVotes.length - currentPosition + 1
-  const finalizeVotingLimit = firstFinalization
-    ? Math.min(allVotes.length, config.votesLimit)
-    : Math.min(votesLeftCount, config.votesLimit)
-
-  const batchedVotes = votesToSend?.slice(0, finalizeVotingLimit)
 
   useEffect(() => {
     const checkPeriod = () => {
@@ -67,15 +54,15 @@ export const CardVoteMobile = ({ room }: CardVoteMobileProps) => {
       const verificationStarted = room.verificationStartAt.toNumber() - now < 0
       const verificationEnded = room.endAt.toNumber() - now < 0
       const verificationPeriod = verificationStarted && !verificationEnded
+      const finalizationPeriod = verificationStarted && verificationEnded
       setVerificationPeriod(verificationPeriod)
+      setFinalizationPeriod(finalizationPeriod)
     }
 
     checkPeriod()
 
     const timer = setInterval(checkPeriod, 1000)
-    return () => {
-      if (timer) clearInterval(timer)
-    }
+    return () => clearInterval(timer)
   }, [])
 
   useEffect(() => {
@@ -158,7 +145,7 @@ export const CardVoteMobile = ({ room }: CardVoteMobileProps) => {
             Verify votes
           </VoteBtnFinal>
         )}
-        {Boolean(winner) && (
+        {finalizationPeriod && (
           <VoteBtnFinal
             onClick={() => finalizeVoting.send(room.roomNumber, finalizeVotingLimit < 1 ? 1 : finalizeVotingLimit)}
             disabled={!account}
@@ -167,7 +154,7 @@ export const CardVoteMobile = ({ room }: CardVoteMobileProps) => {
           </VoteBtnFinal>
         )}
 
-        {!verificationPeriod && !winner && (
+        {!verificationPeriod && !finalizationPeriod && (
           <VotesBtns>
             <VoteBtn
               disabled={!canVote}

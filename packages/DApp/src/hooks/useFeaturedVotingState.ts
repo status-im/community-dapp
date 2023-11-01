@@ -33,9 +33,7 @@ export const useFeaturedVotingState = (featuredVoting: FeaturedVoting | null): P
 
     getState()
 
-    return () => {
-      if (timer) clearInterval(timer)
-    }
+    return () => clearInterval(timer)
   })
 
   return votingState

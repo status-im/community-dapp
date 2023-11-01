@@ -10,17 +10,25 @@ import { useWaku } from '../../providers/waku/provider'
 import { mapFeaturesVotes, receiveWakuFeature } from '../../helpers/receiveWakuFeature'
 import { config } from '../../config'
 import { useTypedFeatureVote } from '../../hooks/useTypedFeatureVote'
+import { useFeaturedBatches } from '../../hooks/useFeaturedBatches'
 
 export function DirectoryInfo() {
   const { account } = useEthers()
   const { featuredVotingContract } = useContracts()
   const { getTypedFeatureVote } = useTypedFeatureVote()
   const { waku } = useWaku()
-  const { activeVoting, votes } = useFeaturedVotes()
+  const { activeVoting } = useFeaturedVotes()
   const featuredVotingState = useFeaturedVotingState(activeVoting)
   const castVotes = useContractFunction(featuredVotingContract, 'castVotes')
   const finalizeVoting = useContractFunction(featuredVotingContract, 'finalizeVoting')
   const [loading, setLoading] = useState(false)
+  const { finalizeVotingLimit, batchCount, batchDoneCount, beingEvaluated, beingFinalized } = useFeaturedBatches()
+
+  useEffect(() => {
+    if (finalizeVoting.state.status === 'Success' || castVotes.state.status === 'Success') {
+      history.go(0)
+    }
+  }, [finalizeVoting.state.status, castVotes.state.status])
 
   if (!activeVoting) {
     return (
@@ -33,33 +41,6 @@ export function DirectoryInfo() {
       </InfoWrap>
     )
   }
-
-  const evaluated = activeVoting.evaluated
-  const finalized = activeVoting.finalized
-  const votesCount: number = Object.values(votes).reduce(
-    (acc: number, curr: any) => acc + Object.keys(curr?.votes).length,
-    0
-  )
-
-  const beingFinalized = !evaluated && finalized
-  const beingEvaluated = evaluated && !finalized
-  const currentPosition = activeVoting.evaluatingPos
-  const firstFinalization = beingEvaluated && currentPosition === votesCount + 1
-
-  const votesLeftCount = votesCount - currentPosition + 1
-  const finalizeVotingLimit = firstFinalization
-    ? Math.min(votesCount, config.votesLimit)
-    : Math.min(votesLeftCount, config.votesLimit)
-  const batchCount = Math.ceil((beingFinalized ? votesCount + 1 : votesCount) / config.votesLimit)
-  const batchLeftCount = Math.ceil(votesLeftCount / config.votesLimit)
-
-  const batchDoneCount = batchCount - batchLeftCount
-
-  useEffect(() => {
-    if (finalizeVoting.state.status === 'Success' || castVotes.state.status === 'Success') {
-      history.go(0)
-    }
-  }, [finalizeVoting.state.status, castVotes.state.status])
 
   return (
     <InfoWrap>

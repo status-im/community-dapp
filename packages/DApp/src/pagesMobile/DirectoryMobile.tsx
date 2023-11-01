@@ -18,11 +18,18 @@ import { useFeaturedVotingState } from '../hooks/useFeaturedVotingState'
 import { config } from '../config'
 import { ConnectButton } from '../components/ConnectButton'
 import { ProposeButton } from './VotesMobile'
+import { useFeaturedBatches } from '../hooks/useFeaturedBatches'
+import { mapFeaturesVotes, receiveWakuFeature } from '../helpers/receiveWakuFeature'
+import { useTypedFeatureVote } from '../hooks/useTypedFeatureVote'
+import { useWaku } from '../providers/waku/provider'
 
 export function DirectoryMobile() {
   const { account } = useEthers()
   const { featuredVotingContract } = useContracts()
-  const { activeVoting, votes, votesToSend } = useFeaturedVotes()
+  const { getTypedFeatureVote } = useTypedFeatureVote()
+  const { waku } = useWaku()
+
+  const { activeVoting } = useFeaturedVotes()
   const featuredVotingState = useFeaturedVotingState(activeVoting)
   const castVotes = useContractFunction(featuredVotingContract, 'castVotes')
   const finalizeVoting = useContractFunction(featuredVotingContract, 'finalizeVoting')
@@ -32,31 +39,7 @@ export function DirectoryMobile() {
   const [communities, publicKeys] = useDirectoryCommunities(filterKeyword, sortedBy)
   const history = useHistory()
 
-  const evaluated = activeVoting?.evaluated ?? false
-  const finalized = activeVoting?.finalized ?? false
-  const allVotes = votes ?? {}
-  const votesCount: number = Object.values(allVotes).reduce(
-    (acc: number, curr: any) => acc + Object.keys(curr?.votes).length,
-    0
-  )
-
-  const beingFinalized = !evaluated && finalized
-  const beingEvaluated = evaluated && !finalized
-  const currentPosition = activeVoting?.evaluatingPos ?? 0
-  const firstFinalization = beingEvaluated && currentPosition === votesCount + 1
-
-  const votesLeftCount = votesCount - currentPosition + 1
-  const finalizeVotingLimit = firstFinalization
-    ? Math.min(votesCount, config.votesLimit)
-    : Math.min(votesLeftCount, config.votesLimit)
-  const batchCount = Math.ceil((beingFinalized ? votesCount + 1 : votesCount) / config.votesLimit)
-  const batchLeftCount = Math.ceil(votesLeftCount / config.votesLimit)
-
-  const batchDoneCount = batchCount - batchLeftCount
-  const batchedVotes = votesToSend?.slice(
-    batchDoneCount * config.votesLimit,
-    batchDoneCount * config.votesLimit + finalizeVotingLimit
-  )
+  const { finalizeVotingLimit, batchCount, batchDoneCount, beingEvaluated, beingFinalized } = useFeaturedBatches()
 
   useEffect(() => {
     if (finalizeVoting.state.status === 'Success' || castVotes.state.status === 'Success') {
@@ -112,10 +95,27 @@ export function DirectoryMobile() {
           {account && featuredVotingState === 'verification' && (
             <ProposeButton
               onClick={async () => {
+                const { votesToSend } = await receiveWakuFeature(
+                  waku,
+                  config.wakuConfig.wakuFeatureTopic,
+                  activeVoting!
+                )
+                const votes = mapFeaturesVotes(votesToSend, getTypedFeatureVote)
+
+                const batchedVotes = votes.slice(
+                  batchDoneCount * config.votesLimit,
+                  batchDoneCount * config.votesLimit + finalizeVotingLimit
+                )
+
                 await castVotes.send(batchedVotes)
               }}
             >
-              Verify Weekly featured
+              Verify Weekly featured{' '}
+              {batchCount > 1 && (
+                <>
+                  ({beingEvaluated ? batchDoneCount : 0}/{batchCount})
+                </>
+              )}
             </ProposeButton>
           )}
           {account && featuredVotingState === 'ended' && (
@@ -124,7 +124,12 @@ export function DirectoryMobile() {
                 finalizeVoting.send(finalizeVotingLimit < 1 ? 1 : finalizeVotingLimit)
               }}
             >
-              Finalize Weekly featured
+              Finalize Weekly featured{' '}
+              {batchCount > 1 && (
+                <>
+                  ({beingFinalized ? batchDoneCount : 0}/{batchCount})
+                </>
+              )}
             </ProposeButton>
           )}
         </>

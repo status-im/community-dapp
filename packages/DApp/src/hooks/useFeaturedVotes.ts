@@ -56,7 +56,7 @@ export function useFeaturedVotes() {
 
     loadFeatureVotes()
 
-    const task = setInterval(loadFeatureVotes, 5000)
+    const task = setInterval(loadFeatureVotes, 10000)
     return () => clearInterval(task)
   }, [waku, chainId, activeVoting])
 
