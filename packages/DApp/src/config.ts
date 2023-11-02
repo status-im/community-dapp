@@ -45,20 +45,19 @@ const configs: Record<typeof process.env.ENV, Config> = {
     votesLimit: 2,
   },
   /**
-   * Preview/Stage.
+   * Preview.
    *
-   * All preview deployments (from pull requests) will share voting history with production.
-   * Contracts haven't been deployed to testnet.
+   * All preview deployments (from pull requests) will share voting history.
    */
   preview: {
     wakuConfig: {
-      environment: 'production',
-      wakuTopic: `/communitiesCuration/${version}/directory/proto/`,
-      wakuFeatureTopic: `/communitiesCuration/${version}/featured/proto/`,
+      environment: 'test',
+      wakuTopic: `/communitiesCuration/preview/${version}/directory/proto/`,
+      wakuFeatureTopic: `/communitiesCuration/preview/${version}/featured/proto/`,
     },
     daapConfig: {
-      readOnlyChainId: ChainId.Optimism,
-      networks: [Optimism],
+      readOnlyChainId: ChainId.OptimismGoerli,
+      networks: [OptimismGoerli],
       notifications: {
         checkInterval: 500,
         expirationPeriod: 50000,

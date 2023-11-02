@@ -4,12 +4,16 @@ Community directory curator contracts
 
 # Deployments
 
-| **Contract**           | **Address**                                                                                                                    | **Snapshot**                                                                   |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------ |
-| **Goerli**             |                                                                                                                                |                                                                                |
-| Directory              | [`0x2fC419c6Ec940A3689922A845F5067577b2d9846`](https://goerli.etherscan.io/address/0x2fC419c6Ec940A3689922A845F5067577b2d9846) | [`5f0dd58`](https://github.com/status-im/communities-contracts/commit/5f0dd58) |
-| VotingContract         | [`0xCDE984e57cdb88c70b53437cc694345B646371f9`](https://goerli.etherscan.io/address/0xCDE984e57cdb88c70b53437cc694345B646371f9) | [`5f0dd58`](https://github.com/status-im/communities-contracts/commit/5f0dd58) |
-| FeaturedVotingContract | [`0xCe4839946e3e51dd467A75b93FF9d33B408E90d7`](https://goerli.etherscan.io/address/0xCDE984e57cdb88c70b53437cc694345B646371f9) | [`5f0dd58`](https://github.com/status-im/communities-contracts/commit/5f0dd58) |
+| **Contract**           | **Address**                                                                                                                             | **Snapshot**                                                                                             |
+| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| **Optimism Goerli**    |                                                                                                                                         |                                                                                                          |
+| Directory              | [`0xB3Ef5B0825D5f665bE14394eea41E684CE96A4c5`](https://goerli-optimism.etherscan.io/address/0xB3Ef5B0825D5f665bE14394eea41E684CE96A4c5) | [`a3967fc`](https://github.com/status-im/community-dapp/commit/a3967fcdf92ddc0c4d814e3fd19fc3bb6b32d2ee) |
+| VotingContract         | [`0x744Fd6e98dad09Fb8CCF530B5aBd32B56D64943b`](https://goerli-optimism.etherscan.io/address/0x744Fd6e98dad09Fb8CCF530B5aBd32B56D64943b) | [`a3967fc`](https://github.com/status-im/community-dapp/commit/a3967fcdf92ddc0c4d814e3fd19fc3bb6b32d2ee) |
+| FeaturedVotingContract | [`0x898331B756EE1f29302DeF227a4471e960c50612`](https://goerli-optimism.etherscan.io/address/0x744Fd6e98dad09Fb8CCF530B5aBd32B56D64943b) | [`a3967fc`](https://github.com/status-im/community-dapp/commit/a3967fcdf92ddc0c4d814e3fd19fc3bb6b32d2ee) |
+| **Optimism Mainnet**   |                                                                                                                                         |                                                                                                          |
+| Directory              | [`0xA8d270048a086F5807A8dc0a9ae0e96280C41e3A`](https://optimistic.etherscan.io/address/0xA8d270048a086F5807A8dc0a9ae0e96280C41e3A)      | [`af44986`](https://github.com/status-im/community-dapp/commit/af449861d7cd259e238136bab7efb09f148fb8bd) |
+| VotingContract         | [`0x321Ba646d994200257Ce4bfe18F66C9283ad1407`](https://optimistic.etherscan.io/address/0x321Ba646d994200257Ce4bfe18F66C9283ad1407)      | [`af44986`](https://github.com/status-im/community-dapp/commit/af449861d7cd259e238136bab7efb09f148fb8bd) |
+| FeaturedVotingContract | [`0x2EA9700E7F27E09F254f2DaEc5E05015b2b961d0`](https://optimistic.etherscan.io/address/0x2EA9700E7F27E09F254f2DaEc5E05015b2b961d0)      | [`af44986`](https://github.com/status-im/community-dapp/commit/af449861d7cd259e238136bab7efb09f148fb8bd) |
 
 ## Mock Contract
 
