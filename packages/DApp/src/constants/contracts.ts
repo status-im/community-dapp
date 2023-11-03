@@ -11,7 +11,7 @@ export const contracts = {
   },
   [ChainId.OptimismGoerli]: {
     votingContract: '0x744Fd6e98dad09Fb8CCF530B5aBd32B56D64943b',
-    featuredVotingContract: '0x744Fd6e98dad09Fb8CCF530B5aBd32B56D64943b',
+    featuredVotingContract: '0x898331B756EE1f29302DeF227a4471e960c50612',
     directoryContract: '0xB3Ef5B0825D5f665bE14394eea41E684CE96A4c5',
     tokenContract: '0xcAD273fA2bb77875333439FDf4417D995159c3E1',
     multicallContract: '0xcA11bde05977b3631167028862bE2a173976CA11',
