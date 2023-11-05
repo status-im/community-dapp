@@ -1,15 +1,15 @@
 import React, { useState } from 'react'
 import { InfoWrap, PageInfo } from '../PageInfo'
-import { useEthers } from '@usedapp/core'
 import { Modal } from '../Modal'
 import { ProposeModal } from '../card/ProposeModal'
 import { VoteConfirmModal } from '../card/VoteConfirmModal'
 import { CommunityDetail } from '../../models/community'
 import { ProposeButton } from '../Button'
-import { ConnectButton } from '../ConnectButton'
+import { ConnectionNetwork } from '../ConnectionNetwork'
+import { useAccount } from '../../hooks/useAccount'
 
 export function VotesInfo() {
-  const { account } = useEthers()
+  const { isActive } = useAccount()
   const [showProposeModal, setShowProposeModal] = useState(false)
   const [showConfirmModal, setShowConfirmModal] = useState(false)
   const [communityFound, setCommunityFound] = useState<undefined | CommunityDetail>(undefined)
@@ -44,11 +44,8 @@ export function VotesInfo() {
         </Modal>
       )}
 
-      {account ? (
-        <ProposeButton onClick={() => setShowProposeModal(true)}>Propose community</ProposeButton>
-      ) : (
-        <ConnectButton />
-      )}
+      {isActive && <ProposeButton onClick={() => setShowProposeModal(true)}>Propose community</ProposeButton>}
+      <ConnectionNetwork />
     </InfoWrap>
   )
 }

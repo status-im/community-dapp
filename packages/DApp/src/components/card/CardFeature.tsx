@@ -7,12 +7,13 @@ import { CommunityDetail } from '../../models/community'
 import { Modal } from '../Modal'
 import { FeatureModal } from './FeatureModal'
 import { VoteConfirmModal } from './VoteConfirmModal'
-import { useContractCall, useEthers } from '@usedapp/core'
+import { useContractCall } from '@usedapp/core'
 import { VoteBtn } from '../Button'
 import { useFeaturedVotes } from '../../hooks/useFeaturedVotes'
 import { useFeaturedVotingState } from '../../hooks/useFeaturedVotingState'
 import { useContracts } from '../../hooks/useContracts'
 import { BigNumber } from 'ethers'
+import { useAccount } from '../../hooks/useAccount'
 
 interface CardFeatureProps {
   community: CommunityDetail
@@ -29,7 +30,7 @@ export const CardFeature = ({ community, featured }: CardFeatureProps) => {
       args: [community.publicKey],
     }) ?? []
 
-  const { account } = useEthers()
+  const { account, isActive } = useAccount()
   const [showFeatureModal, setShowFeatureModal] = useState(false)
   const [showConfirmModal, setShowConfirmModal] = useState(false)
   const [verifiedVotes, setVerifiedVotes] = useState<BigNumber>(BigNumber.from(0))
@@ -118,6 +119,7 @@ export const CardFeature = ({ community, featured }: CardFeatureProps) => {
         <FeatureBtn
           disabled={
             !account ||
+            !isActive ||
             inFeatured ||
             featuredVotingState === 'verification' ||
             featuredVotingState === 'ended' ||
