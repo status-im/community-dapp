@@ -29,7 +29,11 @@ export function NotificationItem({ publicKey, text, transaction }: NotificationI
           <NotificationText>
             <span>{communityDetails.name}</span> {text}
           </NotificationText>
-          <NotificationLink href={getExplorerTransactionLink(transaction.hash, transaction.chainId)}>
+          <NotificationLink
+            href={getExplorerTransactionLink(transaction.hash, transaction.chainId)}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             View on Etherscan
           </NotificationLink>
         </NotificationContent>
