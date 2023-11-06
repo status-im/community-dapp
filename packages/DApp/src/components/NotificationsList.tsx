@@ -3,14 +3,20 @@ import React from 'react'
 import styled from 'styled-components'
 import { AnimationNotification, AnimationNotificationMobile } from '../constants/animation'
 import { useContracts } from '../hooks/useContracts'
-import { NotificationItem } from './NotificationItem'
+import { NotificationItem, NotificationInfoItem, NotificationErrorItem } from './NotificationItem'
+import { useWaku } from '../providers/waku/provider'
 
 export function NotificationsList() {
   const { notifications } = useNotifications()
   const { votingContract } = useContracts()
+  const { isLoading, isError, restart } = useWaku()
 
   return (
     <NotificationsWrapper>
+      {isLoading && <NotificationInfoItem text="Connecting to a Waku node." />}
+
+      {!isLoading && isError && <NotificationErrorItem text="Failed connect to a Waku node." action={restart} />}
+
       {notifications.map((notification) => {
         if ('receipt' in notification) {
           return notification.receipt.logs.map((log) => {
@@ -62,6 +68,7 @@ const NotificationsWrapper = styled.div`
   flex-direction: column;
   transition: all 0.3s;
   animation: ${AnimationNotification} 2s ease;
+  z-index: 100;
 
   @media (max-width: 600px) {
     top: unset;
