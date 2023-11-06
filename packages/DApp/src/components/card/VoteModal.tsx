@@ -8,6 +8,7 @@ import { VoteType } from '../../constants/voteTypes'
 import { useSendWakuVote } from '../../hooks/useSendWakuVote'
 import { ColumnFlexDiv } from '../../constants/styles'
 import { DetailedVotingRoom } from '../../models/smartContract'
+import { useWaku } from '../../providers/waku/provider'
 
 export interface VoteModalProps {
   vote: CurrentVoting
@@ -33,7 +34,7 @@ export function VoteModal({
   votesFor,
   votesAgainst,
 }: VoteModalProps) {
-  const disabled = proposingAmount === 0
+  const { isConnected } = useWaku()
   const sendWakuVote = useSendWakuVote()
 
   return (
@@ -61,7 +62,7 @@ export function VoteModal({
 
           setShowConfirmModal(true)
         }}
-        disabled={disabled}
+        disabled={!isConnected || proposingAmount === 0}
       >{`Vote ${selectedVote.verb} community ${selectedVote.icon}`}</VoteConfirmBtn>
     </ColumnFlexDiv>
   )

@@ -23,12 +23,14 @@ import { useContracts } from '../hooks/useContracts'
 import { useSendWakuFeature } from '../hooks/useSendWakuFeature'
 import { useFeaturedVotingState } from '../hooks/useFeaturedVotingState'
 import { useAccount } from '../hooks/useAccount'
+import { useWaku } from '../providers/waku/provider'
 
 export function FeatureMobile() {
   const { publicKey } = useParams<{ publicKey: string }>()
   const [community] = useCommunities([publicKey])
   const [proposingAmount, setProposingAmount] = useState(0)
   const { account, isActive } = useAccount()
+  const { isConnected } = useWaku()
   const sendWaku = useSendWakuFeature()
   const { activeVoting } = useFeaturedVotes()
   const { featuredVotingContract } = useContracts()
@@ -66,6 +68,7 @@ export function FeatureMobile() {
           <VotePropose setProposingAmount={setProposingAmount} proposingAmount={proposingAmount} />
           <FeatureBtn
             disabled={
+              !isConnected ||
               !account ||
               !isActive ||
               inFeatured ||

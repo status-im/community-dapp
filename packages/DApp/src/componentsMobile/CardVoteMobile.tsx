@@ -23,6 +23,7 @@ import { WrapperBottom, WrapperTop } from '../constants/styles'
 import { useUnverifiedVotes } from '../hooks/useUnverifiedVotes'
 import { useVotingBatches } from '../hooks/useVotingBatches'
 import { useAccount } from '../hooks/useAccount'
+import { useWaku } from '../providers/waku/provider'
 
 interface CardVoteMobileProps {
   room: DetailedVotingRoom
@@ -84,6 +85,7 @@ export const CardVoteMobile = ({ room }: CardVoteMobileProps) => {
 
   const [showHistory, setShowHistory] = useState(false)
   const isDisabled = room.details.votingHistory.length === 0
+  const { isConnected } = useWaku()
   const sendWakuVote = useSendWakuVote()
 
   const includeUnverifiedVotes = !winner || verificationPeriod
@@ -158,7 +160,7 @@ export const CardVoteMobile = ({ room }: CardVoteMobileProps) => {
         {!verificationPeriod && !finalizationPeriod && (
           <VotesBtns>
             <VoteBtn
-              disabled={!canVote}
+              disabled={!isConnected || !canVote}
               onClick={async () => {
                 await sendWakuVote(proposingAmount, room.roomNumber, 0)
                 setVoted(true)
@@ -168,7 +170,7 @@ export const CardVoteMobile = ({ room }: CardVoteMobileProps) => {
               {voteConstants.against.text} <span>{voteConstants.against.icon}</span>
             </VoteBtn>
             <VoteBtn
-              disabled={!canVote}
+              disabled={!isConnected || !canVote}
               onClick={async () => {
                 await sendWakuVote(proposingAmount, room.roomNumber, 1)
                 setVoted(true)
