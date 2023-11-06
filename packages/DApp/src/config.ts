@@ -57,6 +57,9 @@ const configs: Record<typeof process.env.ENV, Config> = {
     },
     daapConfig: {
       readOnlyChainId: ChainId.OptimismGoerli,
+      readOnlyUrls: {
+        [ChainId.OptimismGoerli]: `https://optimism-goerli.infura.io/v3/${process.env.INFURA_API_KEY}`,
+      },
       networks: [OptimismGoerli],
       notifications: {
         checkInterval: 500,
@@ -76,6 +79,9 @@ const configs: Record<typeof process.env.ENV, Config> = {
     },
     daapConfig: {
       readOnlyChainId: ChainId.Optimism,
+      readOnlyUrls: {
+        [ChainId.Optimism]: `https://optimism-mainnet.infura.io/v3/${process.env.INFURA_API_KEY}`,
+      },
       networks: [Optimism],
       notifications: {
         checkInterval: 500,
