@@ -37,16 +37,10 @@ contract DeploymentConfig is Script {
     address private multicallAddress;
 
     // solhint-disable-next-line var-name-mixedcase
-    address internal SNT_ADDRESS_GOERLI = 0x3D6AFAA395C31FCd391fE3D562E75fe9E8ec7E6a;
-    // solhint-disable-next-line var-name-mixedcase
-    address internal SNT_ADDRESS_MAINNET = 0x744d70FDBE2Ba4CF95131626614a1763DF805B9E;
-    // solhint-disable-next-line var-name-mixedcase
     address internal SNT_ADDRESS_OPTIMISM_MAINNET = 0x650AF3C15AF43dcB218406d30784416D64Cfb6B2;
     // solhint-disable-next-line var-name-mixedcase
     address internal SNT_ADDRESS_OPTIMISM_GOERLI = 0xcAD273fA2bb77875333439FDf4417D995159c3E1;
 
-    // solhint-disable-next-line var-name-mixedcase
-    address internal MULTICALL_ADDRESS_GOERLI = 0x77dCa2C955b15e9dE4dbBCf1246B4B85b651e50e;
     // solhint-disable-next-line var-name-mixedcase
     address internal MULTICALL_ADDRESS_OPTIMISM = 0xeAa6877139d436Dc6d1f75F3aF15B74662617B2C;
     // solhint-disable-next-line var-name-mixedcase
@@ -54,11 +48,7 @@ contract DeploymentConfig is Script {
 
     constructor(address _broadcaster) {
         deployer = _broadcaster;
-        if (block.chainid == 1) {
-            activeNetworkConfig = getMainnetConfig();
-        } else if (block.chainid == 5) {
-            activeNetworkConfig = getGoerliEthConfig();
-        } else if (block.chainid == 31_337) {
+        if (block.chainid == 31_337) {
             activeNetworkConfig = getOrCreateAnvilEthConfig();
         } else if (block.chainid == 10) {
             activeNetworkConfig = getOptimismMainnetConfig();
@@ -67,37 +57,6 @@ contract DeploymentConfig is Script {
         } else {
             revert("no network config for this chain");
         }
-    }
-
-    function getMainnetConfig() public view returns (NetworkConfig memory) {
-        return NetworkConfig({
-            votingLengthInSeconds: TWO_WEEKS_IN_SECONDS,
-            votingVerificationLengthInSeconds: ONE_WEEK_IN_SECONDS,
-            timeBetweenVotingInSeconds: THIRTY_DAYS_IN_SECONDS,
-            featuredVotingLengthInSeconds: FIVE_DAYS_IN_SECONDS,
-            featuredVotingVerificationLengthInSeconds: TWO_DAYS_IN_SECONDS,
-            cooldownPeriod: 3,
-            featuredPerVotingCount: 5,
-            voteToken: SNT_ADDRESS_MAINNET
-        });
-    }
-
-    function getGoerliEthConfig() public returns (NetworkConfig memory) {
-        // Actually, it'd be nicer to have `multicallAddress` be part of `NetworkConfig`,
-        // however, adding another field to the struct causes us to run into the
-        // "stack too deep" error during compilation, hence, we're using an additional
-        // property on the contract to access the value later from there.
-        multicallAddress = MULTICALL_ADDRESS_GOERLI;
-        return NetworkConfig({
-            votingLengthInSeconds: FOUR_MINS_IN_SECONDS,
-            votingVerificationLengthInSeconds: TWO_MINS_IN_SECONDS,
-            timeBetweenVotingInSeconds: ONE_MIN_IN_SECONDS,
-            featuredVotingLengthInSeconds: FOUR_MINS_IN_SECONDS,
-            featuredVotingVerificationLengthInSeconds: TWO_MINS_IN_SECONDS,
-            cooldownPeriod: 1,
-            featuredPerVotingCount: 3,
-            voteToken: SNT_ADDRESS_GOERLI
-        });
     }
 
     function getOptimismMainnetConfig() public returns (NetworkConfig memory) {
