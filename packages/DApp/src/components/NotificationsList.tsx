@@ -3,83 +3,44 @@ import React from 'react'
 import styled from 'styled-components'
 import { AnimationNotification, AnimationNotificationMobile } from '../constants/animation'
 import { useContracts } from '../hooks/useContracts'
-import { NotificationItem, NotificationItemPlain } from './NotificationItem'
+import { NotificationItem } from './NotificationItem'
 
-interface Props {
-  type: 'votes' | 'featured'
-}
-
-export function NotificationsList({ type }: Props) {
+export function NotificationsList() {
   const { notifications } = useNotifications()
-  const { votingContract, featuredVotingContract } = useContracts()
-
-  const getParsedLog = (log: any, type: 'votes' | 'featured') => {
-    switch (type) {
-      case 'votes': {
-        return votingContract.interface.parseLog(log)
-      }
-      case 'featured': {
-        return featuredVotingContract.interface.parseLog(log)
-      }
-    }
-  }
-
-  const parseVoting = (parsedLog: any) => {
-    let text = ''
-    if (parsedLog.name === 'VotingRoomStarted') {
-      text = ' voting room started.'
-    }
-    if (parsedLog.name === 'VotingRoomFinalized') {
-      if (parsedLog.args.passed == true) {
-        if (parsedLog.args.voteType === 1) {
-          text = ' is now in the communities directory!'
-        }
-
-        if (parsedLog.args.voteType === 0) {
-          text = ' is now removed from communities directory!'
-        }
-      }
-    }
-
-    return text
-  }
-
-  const parseFeatured = (parsedLog: any) => {
-    let text = ''
-    if (parsedLog.name === 'VotingStarted') {
-      text = 'Featured voting started.'
-    }
-    if (parsedLog.name === 'VotingFinalized') {
-      text = 'Featured voting was finalized.'
-    }
-
-    return text
-  }
+  const { votingContract } = useContracts()
 
   return (
     <NotificationsWrapper>
       {notifications.map((notification) => {
         if ('receipt' in notification) {
           return notification.receipt.logs.map((log) => {
-            const parsedLog = getParsedLog(log, type)
+            // this needs to be updated so it takes into account also interface of featuredVotingContract
+            const parsedLog = votingContract.interface.parseLog(log)
 
-            let res = ''
-            if (type === 'votes') {
-              res = parseVoting(parsedLog)
-            } else if (type === 'featured') {
-              res = parseFeatured(parsedLog)
+            let text
+            if (parsedLog.name === 'VotingRoomStarted') {
+              text = ' voting room started.'
             }
-            if (res && type === 'votes') {
+            if (parsedLog.name === 'VotingRoomFinalized') {
+              if (parsedLog.args.passed == true) {
+                if (parsedLog.args.voteType === 1) {
+                  text = ' is now in the communities directory!'
+                }
+
+                if (parsedLog.args.voteType === 0) {
+                  text = ' is now removed from communities directory!'
+                }
+              }
+            }
+            if (text) {
               return (
                 <NotificationItem
                   key={log.transactionHash}
                   publicKey={parsedLog.args.publicKey}
-                  text={res}
+                  text={text}
                   transaction={notification.transaction}
                 />
               )
-            } else if (res && type === 'featured') {
-              return <NotificationItemPlain key={log.transactionHash} text={res} />
             }
           })
         }
