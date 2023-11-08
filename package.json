@@ -15,10 +15,6 @@
     "test": "wsrun -e -c -s --exclude-missing test",
     "clean": "wsrun -e -c -s clean && rimraf node_modules"
   },
-  "resolutions": {
-    "js-waku": "0.30.0",
-    "protons-runtime": "3.1.0"
-  },
   "dependencies": {
     "prettier": "^2.3.1",
     "wsrun": "^5.2.4"

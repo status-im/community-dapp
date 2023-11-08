@@ -3,7 +3,7 @@ import { useWaku } from '../providers/waku/provider'
 import { useEthers, useSigner } from '@usedapp/core'
 import { config } from '../config'
 import { createWakuFeatureMsg } from '../helpers/wakuFeature'
-import { EncoderV0 } from 'js-waku/lib/waku_message/version_0'
+import { createEncoder } from '@waku/core'
 import { useTypedFeatureVote } from './useTypedFeatureVote'
 
 export function useSendWakuFeature() {
@@ -18,7 +18,9 @@ export function useSendWakuFeature() {
       const msg = await createWakuFeatureMsg(account, signer, voteAmount, publicKey, timestamp, getTypedFeatureVote)
       if (msg) {
         if (waku) {
-          await waku.lightPush.push(new EncoderV0(config.wakuConfig.wakuFeatureTopic), { payload: msg })
+          await waku.lightPush.send(createEncoder({ contentTopic: config.wakuConfig.wakuFeatureTopic }), {
+            payload: msg,
+          })
         } else {
           alert('error sending feature vote please try again')
         }
