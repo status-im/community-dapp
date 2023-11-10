@@ -5,12 +5,12 @@ import { shortenAddress } from '@usedapp/core'
 import logo from '../../assets/images/logo.svg'
 import { Colors } from '../../constants/styles'
 import { Animation } from '../../constants/animation'
-import { ConnectionNetwork } from '../ConnectionNetwork'
+import { ConnectButton } from '../ConnectionNetwork'
 import { useAccount } from '../../hooks/useAccount'
 import { config } from '../../config'
 
 export function TopBar() {
-  const { isActive, account, switchNetwork, deactivate } = useAccount()
+  const { isActive, account, switchNetwork, disconnect, connect } = useAccount()
   const [isOpened, setIsOpened] = useState(false)
 
   useEffect(() => {
@@ -59,29 +59,33 @@ export function TopBar() {
                 }}
                 isActive={isActive}
               >
-                {!isActive && '⚠️ '}
                 {shortenAddress(account)}
               </Account>
               <Subnav className={isOpened ? 'opened' : undefined}>
                 {!isActive && (
                   <>
-                    <Warning>⚠️ Unsupported network</Warning>
-                    <ButtonDisconnect
+                    <Warning>
+                      <span>⚠️</span>
+                      <span>Unsupported network</span>
+                    </Warning>
+                    <SubnavButton
                       className={isOpened ? 'opened' : undefined}
                       onClick={() => switchNetwork(config.daapConfig.readOnlyChainId!)}
                     >
                       Switch network
-                    </ButtonDisconnect>
+                    </SubnavButton>
                   </>
                 )}
 
-                <ButtonDisconnect className={isOpened ? 'opened' : undefined} onClick={() => deactivate()}>
+                <SubnavButton className={isOpened ? 'opened' : undefined} onClick={() => disconnect()}>
                   Disconnect
-                </ButtonDisconnect>
+                </SubnavButton>
               </Subnav>
             </AccountWrap>
           ) : (
-            <ConnectionNetwork autoWidth buttonText={'Connect'} />
+            <ConnectButton autoWidth onClick={connect}>
+              Connect
+            </ConnectButton>
           )}
         </MenuContent>
       </HeaderWrapper>
@@ -221,7 +225,7 @@ export const Account = styled.button<{ isActive: boolean }>`
   font-size: 13px;
   line-height: 22px;
   color: ${Colors.Black};
-  padding: 11px 16px;
+  padding: 11px 16px 11px 28px;
   background: ${Colors.White};
   border: 1px solid ${Colors.GrayBorder};
   border-radius: 21px;
@@ -237,22 +241,26 @@ export const Account = styled.button<{ isActive: boolean }>`
     border: 1px solid ${Colors.Violet};
   }
 
+  &::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    position: absolute;
+    top: 50%;
+    left: 17px;
+    transform: translate(-50%, -50%);
+    background-color: ${Colors.Red};
+    bacground-position: center;
+    border-radius: 50%;
+  }
+
   ${({ isActive }) =>
     isActive &&
     css`
       padding: 11px 16px 11px 28px;
 
       &::before {
-        content: '';
-        width: 6px;
-        height: 6px;
-        position: absolute;
-        top: 50%;
-        left: 17px;
-        transform: translate(-50%, -50%);
         background-color: ${Colors.Green};
-        bacground-position: center;
-        border-radius: 50%;
       }
     `}
 `
@@ -283,7 +291,7 @@ export const Subnav = styled.div`
   }
 `
 
-export const ButtonDisconnect = styled.button`
+export const SubnavButton = styled.button`
   font-weight: 500;
   font-size: 14px;
   line-height: 21px;
@@ -305,6 +313,11 @@ export const ButtonDisconnect = styled.button`
 `
 
 export const Warning = styled.div`
-  font-size: 10px;
-  padding: 16px 8px 6px;
+  font-size: 12px;
+  padding: 16px 12px 6px;
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  align-items: center;
+  line-height: 16px;
 `

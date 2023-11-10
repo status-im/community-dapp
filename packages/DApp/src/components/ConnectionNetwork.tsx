@@ -11,30 +11,28 @@ export type ConnectionNetworkProps = {
 }
 
 export function ConnectionNetwork({ buttonText, autoWidth = false }: ConnectionNetworkProps) {
-  const { activate, account, error, switchNetwork } = useAccount()
+  const { connect, account, error, switchNetwork } = useAccount()
 
-  if (account) {
+  if (account && error?.name === 'ChainIdError') {
     return (
       <>
-        {error?.name === 'ChainIdError' && (
-          <WarningWrapper>
-            <Warning text="You are connected to unsupported network." icon="⚠️" />
-          </WarningWrapper>
-        )}
-        {error?.name === 'ChainIdError' && Boolean(config.daapConfig.readOnlyChainId) && (
-          <ProposeButton onClick={() => switchNetwork(config.daapConfig.readOnlyChainId!)}>
-            Switch Network
-          </ProposeButton>
-        )}
+        <WarningWrapper>
+          <Warning text="You are connected to unsupported network." icon="⚠️" />
+        </WarningWrapper>
+        <ProposeButton onClick={() => switchNetwork(config.daapConfig.readOnlyChainId!)}>Switch Network</ProposeButton>
       </>
     )
   }
 
-  return (
-    <ConnectButton autoWidth={autoWidth} onClick={activate}>
-      {!buttonText ? 'Connect to Vote' : buttonText}
-    </ConnectButton>
-  )
+  if (!account) {
+    return (
+      <ConnectButton autoWidth={autoWidth} onClick={connect}>
+        {!buttonText ? 'Connect to Vote' : buttonText}
+      </ConnectButton>
+    )
+  }
+
+  return null
 }
 
 const WarningWrapper = styled.div`
@@ -50,7 +48,7 @@ const WarningWrapper = styled.div`
   }
 `
 
-const ConnectButton = styled(ProposeButton)<{ autoWidth: boolean }>`
+export const ConnectButton = styled(ProposeButton)<{ autoWidth: boolean }>`
   ${({ autoWidth }) =>
     autoWidth &&
     `

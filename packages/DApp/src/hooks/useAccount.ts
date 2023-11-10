@@ -1,5 +1,6 @@
 import { useEthers } from '@usedapp/core'
 import { useEffect, useState } from 'react'
+import { config } from '../config'
 
 type Error = {
   name: string
@@ -8,15 +9,7 @@ type Error = {
 }
 
 export function useAccount() {
-  const {
-    error,
-    isLoading,
-    active,
-    switchNetwork,
-    activateBrowserWallet,
-    deactivate: deactivateBrowserWallet,
-    account,
-  } = useEthers()
+  const { error, isLoading, active, switchNetwork, activateBrowserWallet, deactivate, account, library } = useEthers()
   const [activateError, setActivateError] = useState<Error | undefined>(undefined)
   const [isActive, setIsActive] = useState(false)
 
@@ -32,15 +25,21 @@ export function useAccount() {
     setIsActive(Boolean(account && !activateError))
   }, [account, activateError])
 
-  const activate = async () => {
+  useEffect(() => {
+    if (activateError?.name === 'ChainIdError') {
+      switchNetwork(config.daapConfig.readOnlyChainId!)
+    }
+  }, [activateError])
+
+  const connect = async () => {
     setActivateError(undefined)
     activateBrowserWallet()
   }
 
-  const deactivate = async () => {
+  const disconnect = async () => {
     setActivateError(undefined)
-    deactivateBrowserWallet()
+    deactivate()
   }
 
-  return { activate, deactivate, account, isActive, error: activateError, switchNetwork }
+  return { connect, disconnect, account, isActive, error: activateError, switchNetwork }
 }

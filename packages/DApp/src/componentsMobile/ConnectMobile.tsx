@@ -3,13 +3,13 @@ import styled from 'styled-components'
 import { shortenAddress } from '@usedapp/core'
 import infoIcon from '../assets/images/info.svg'
 import { Colors } from '../constants/styles'
-import { AccountWrap, Account, ButtonDisconnect, StyledNavLink, Subnav, Warning } from '../components/top/TopBar'
-import { ConnectionNetwork } from '../components/ConnectionNetwork'
+import { AccountWrap, Account, StyledNavLink, Subnav, Warning, SubnavButton } from '../components/top/TopBar'
+import { ConnectButton } from '../components/ConnectionNetwork'
 import { useAccount } from '../hooks/useAccount'
 import { config } from '../config'
 
 export const ConnectMobile = () => {
-  const { account, isActive, deactivate, switchNetwork } = useAccount()
+  const { account, isActive, disconnect, switchNetwork, connect } = useAccount()
   const [isOpened, setIsOpened] = useState(false)
 
   useEffect(() => {
@@ -38,22 +38,24 @@ export const ConnectMobile = () => {
             {!isActive && (
               <>
                 <Warning>⚠️ Unsupported network</Warning>
-                <ButtonDisconnect
+                <SubnavButton
                   className={isOpened ? 'opened' : undefined}
                   onClick={() => switchNetwork(config.daapConfig.readOnlyChainId!)}
                 >
                   Switch network
-                </ButtonDisconnect>
+                </SubnavButton>
               </>
             )}
 
-            <ButtonDisconnect className={isOpened ? 'opened' : undefined} onClick={() => deactivate()}>
+            <SubnavButton className={isOpened ? 'opened' : undefined} onClick={() => disconnect()}>
               Disconnect
-            </ButtonDisconnect>
+            </SubnavButton>
           </Subnav>
         </AccountWrap>
       ) : (
-        <ConnectionNetwork autoWidth buttonText={'Connect'} />
+        <ConnectButton autoWidth onClick={connect}>
+          Connect
+        </ConnectButton>
       )}
     </MenuContentMobile>
   )
