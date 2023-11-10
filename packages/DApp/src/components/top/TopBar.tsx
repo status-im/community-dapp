@@ -230,6 +230,7 @@ export const Account = styled.button<{ isActive: boolean }>`
   border: 1px solid ${Colors.GrayBorder};
   border-radius: 21px;
   outline: none;
+  min-width: 150px;
 
   @media (max-width: 600px) {
     padding: 7px 12px 7px 28px;
