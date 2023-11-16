@@ -3,6 +3,7 @@ import styled from 'styled-components'
 import { GlobalStyle } from './providers/GlobalStyle'
 import { MobileRouter } from './pagesMobile/MobileRouter'
 import { DesktopRouter } from './pages/DesktopRouter'
+import { NotificationsList } from './components/NotificationsList'
 
 export function App() {
   const [mobileVersion, setMobileVersion] = useState(false)
@@ -24,6 +25,7 @@ export function App() {
     <Page>
       <GlobalStyle />
       {mobileVersion ? <MobileRouter /> : <DesktopRouter />}
+      <NotificationsList />
     </Page>
   )
 }

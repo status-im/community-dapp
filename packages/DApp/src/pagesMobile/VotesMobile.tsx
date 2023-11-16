@@ -16,9 +16,11 @@ import { ConnectionNetwork } from '../components/ConnectionNetwork'
 import { VotingSkeletonMobile } from '../componentsMobile/VotingSkeletonMobile'
 import { DetailedVotingRoom } from '../models/smartContract'
 import { useAccount } from '../hooks/useAccount'
+import { useWaku } from '../providers/waku/provider'
 
 export function VotesMobile() {
   const { isActive } = useAccount()
+  const { isConnected } = useWaku()
   const [sortedBy, setSortedBy] = useState(VotingSortingEnum.EndingSoonest)
   const [voteType, setVoteType] = useState('')
   const [filterKeyword, setFilterKeyword] = useState('')
@@ -62,7 +64,11 @@ export function VotesMobile() {
       <VotingCardsWrapper>{renderCommunities()}</VotingCardsWrapper>
 
       <ProposeButtonWrapper>
-        {isActive && <ProposeButton onClick={() => history.push('/propose')}>Propose community</ProposeButton>}
+        {isActive && (
+          <ProposeButton onClick={() => history.push('/propose')} disabled={!isConnected}>
+            Propose community
+          </ProposeButton>
+        )}
         <ConnectionNetwork />
       </ProposeButtonWrapper>
     </div>

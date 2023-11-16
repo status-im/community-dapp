@@ -9,6 +9,7 @@ import { useSendWakuFeature } from '../../hooks/useSendWakuFeature'
 import { useContractFunction } from '@usedapp/core'
 import { useContracts } from '../../hooks/useContracts'
 import { useFeaturedVotes } from '../../hooks/useFeaturedVotes'
+import { useWaku } from '../../providers/waku/provider'
 
 interface FeatureModalProps {
   community: CommunityDetail
@@ -17,11 +18,12 @@ interface FeatureModalProps {
 
 export function FeatureModal({ community, setShowConfirmModal }: FeatureModalProps) {
   const [proposingAmount, setProposingAmount] = useState(0)
+  const { isConnected } = useWaku()
   const sendWaku = useSendWakuFeature()
   const { featuredVotingContract } = useContracts()
   const { send } = useContractFunction(featuredVotingContract, 'initializeVoting')
   const { activeVoting } = useFeaturedVotes()
-  const disabled = proposingAmount === 0
+  const disabled = !isConnected || proposingAmount === 0
 
   return (
     <ColumnFlexDiv>

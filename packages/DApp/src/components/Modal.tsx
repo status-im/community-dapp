@@ -2,6 +2,7 @@ import React, { ReactNode, useEffect } from 'react'
 import styled from 'styled-components'
 import { Colors } from '../constants/styles'
 import closeIcon from '../assets/images/close.svg'
+import refreshIcon from '../assets/images/refresh.svg'
 
 type ModalProps = {
   heading?: string
@@ -91,4 +92,14 @@ export const CloseButton = styled.button`
   width: 24px;
   height: 24px;
   background-image: url(${closeIcon});
+`
+
+export const RetryButton = styled.button`
+  position: absolute;
+  content: '';
+  top: 0;
+  right: 0;
+  width: 24px;
+  height: 24px;
+  background-image: url(${refreshIcon});
 `

@@ -9,9 +9,11 @@ import { ConnectionNetwork } from '../ConnectionNetwork'
 import styled from 'styled-components'
 import { Colors, ColumnFlexDiv } from '../../constants/styles'
 import { useAccount } from '../../hooks/useAccount'
+import { useWaku } from '../../providers/waku/provider'
 
 export function VotingEmpty() {
   const { isActive } = useAccount()
+  const { isConnected } = useWaku()
   const [showProposeModal, setShowProposeModal] = useState(false)
   const [showConfirmModal, setShowConfirmModal] = useState(false)
   const [communityFound, setCommunityFound] = useState<undefined | CommunityDetail>(undefined)
@@ -68,7 +70,11 @@ export function VotingEmpty() {
 
         {!mobileVersion && (
           <>
-            {isActive && <ProposeButton onClick={() => setShowProposeModal(true)}>Propose community</ProposeButton>}
+            {isActive && (
+              <ProposeButton onClick={() => setShowProposeModal(true)} disabled={!isConnected}>
+                Propose community
+              </ProposeButton>
+            )}
             <ConnectionNetwork />
           </>
         )}
