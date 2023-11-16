@@ -31,7 +31,6 @@ export const ConnectMobile = () => {
             }}
             isActive={isActive}
           >
-            {!isActive && '⚠️ '}
             {shortenAddress(account)}
           </Account>
           <Subnav className={isOpened ? 'opened' : undefined}>

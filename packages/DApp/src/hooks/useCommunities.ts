@@ -35,9 +35,6 @@ export function useCommunities(publicKeys: string[]): CommunityDetail[] {
         publicKeys.map(async (publicKey) => {
           const deserializedPublicKey = deserializePublicKey(publicKey)
 
-          console.log('deserializedPublicKey', deserializedPublicKey)
-          console.log('public key', publicKey)
-
           if (communitiesDetails[deserializedPublicKey]) {
             return
           }
@@ -62,7 +59,7 @@ export function useCommunities(publicKeys: string[]): CommunityDetail[] {
                   })
                 )
               : null,
-            link: `https://status.app/c/${publicKey}}`,
+            link: `https://status.app/c#${publicKey}`,
             currentVoting: undefined,
             tags: community.tags,
             numberOfMembers: Object.keys(community.members).length,
