@@ -6,7 +6,6 @@ import { bootstrap } from '@libp2p/bootstrap'
 import { Protocols } from '@waku/interfaces'
 import { createLightNode, waitForRemotePeer } from '@waku/sdk'
 import type { LightNode } from '@waku/interfaces'
-import { config } from '../../config'
 
 type Context = {
   waku: LightNode | undefined
@@ -40,8 +39,8 @@ export function WakuProvider({ peers, children }: Props) {
         emitSelf: true,
         libp2p: {
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore icorrectly exported types from @libp2p/boostrap#package.json; patched only in @status-im/js for now
-          peerDiscovery: [bootstrap({ list: peers[config.wakuConfig.environment] })],
+          // @ts-ignore icorrectly  types from @libp2p/boostrap#package.json; patched only in @status-im/js for now
+          peerDiscovery: [bootstrap({ list: peers, timeout: 0, tagTTL: Infinity })],
         },
       })
 
