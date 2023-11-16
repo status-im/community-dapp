@@ -1,15 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
-import { shortenAddress } from '@usedapp/core'
+import { useEthers, shortenAddress } from '@usedapp/core'
 import infoIcon from '../assets/images/info.svg'
 import { Colors } from '../constants/styles'
-import { AccountWrap, Account, ButtonDisconnect, StyledNavLink, Subnav, Warning } from '../components/top/TopBar'
-import { ConnectionNetwork } from '../components/ConnectionNetwork'
-import { useAccount } from '../hooks/useAccount'
-import { config } from '../config'
+import { AccountWrap, Account, ButtonDisconnect, ButtonConnect, StyledNavLink } from '../components/top/TopBar'
 
 export const ConnectMobile = () => {
-  const { account, isActive, deactivate, switchNetwork } = useAccount()
+  const { account, deactivate } = useEthers()
   const [isOpened, setIsOpened] = useState(false)
 
   useEffect(() => {
@@ -29,31 +26,15 @@ export const ConnectMobile = () => {
               e.stopPropagation()
               setIsOpened(!isOpened)
             }}
-            isActive={isActive}
           >
-            {!isActive && '⚠️ '}
             {shortenAddress(account)}
           </Account>
-          <Subnav className={isOpened ? 'opened' : undefined}>
-            {!isActive && (
-              <>
-                <Warning>⚠️ Unsupported network</Warning>
-                <ButtonDisconnect
-                  className={isOpened ? 'opened' : undefined}
-                  onClick={() => switchNetwork(config.daapConfig.readOnlyChainId!)}
-                >
-                  Switch network
-                </ButtonDisconnect>
-              </>
-            )}
-
-            <ButtonDisconnect className={isOpened ? 'opened' : undefined} onClick={() => deactivate()}>
-              Disconnect
-            </ButtonDisconnect>
-          </Subnav>
+          <ButtonDisconnect className={isOpened ? 'opened' : undefined} onClick={() => deactivate()}>
+            Disconnect
+          </ButtonDisconnect>
         </AccountWrap>
       ) : (
-        <ConnectionNetwork autoWidth buttonText={'Connect'} />
+        <ButtonConnect text={'Connect'} />
       )}
     </MenuContentMobile>
   )

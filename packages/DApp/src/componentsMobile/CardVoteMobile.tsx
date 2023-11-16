@@ -1,4 +1,4 @@
-import { useContractFunction } from '@usedapp/core'
+import { useContractFunction, useEthers } from '@usedapp/core'
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { VotesBtns, VoteBtn } from '../components/Button'
@@ -22,14 +22,13 @@ import { useSendWakuVote } from '../hooks/useSendWakuVote'
 import { WrapperBottom, WrapperTop } from '../constants/styles'
 import { useUnverifiedVotes } from '../hooks/useUnverifiedVotes'
 import { useVotingBatches } from '../hooks/useVotingBatches'
-import { useAccount } from '../hooks/useAccount'
 
 interface CardVoteMobileProps {
   room: DetailedVotingRoom
 }
 
 export const CardVoteMobile = ({ room }: CardVoteMobileProps) => {
-  const { isActive, account } = useAccount()
+  const { account } = useEthers()
   const selectedVoted = voteTypes['Add'].for
   const [sentVotesFor, setSentVotesFor] = useState(0)
   const [sentVotesAgainst, setSentVotesAgainst] = useState(0)
@@ -141,7 +140,7 @@ export const CardVoteMobile = ({ room }: CardVoteMobileProps) => {
               setSentVotesFor(0)
               setSentVotesAgainst(0)
             }}
-            disabled={!isActive}
+            disabled={!account}
           >
             Verify votes
           </VoteBtnFinal>
@@ -149,7 +148,7 @@ export const CardVoteMobile = ({ room }: CardVoteMobileProps) => {
         {finalizationPeriod && (
           <VoteBtnFinal
             onClick={() => finalizeVoting.send(room.roomNumber, finalizeVotingLimit < 1 ? 1 : finalizeVotingLimit)}
-            disabled={!isActive}
+            disabled={!account}
           >
             Finalize the vote <span>✍️</span>
           </VoteBtnFinal>

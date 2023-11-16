@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react'
 import { VoteModal } from './../VoteModal'
 import { VoteChart } from './../../votes/VoteChart'
 import { voteTypes } from './../../../constants/voteTypes'
+import { useEthers } from '@usedapp/core'
 import { useContractFunction } from '@usedapp/core'
 import { useContracts } from '../../../hooks/useContracts'
 import { getVotingWinner } from '../../../helpers/voting'
@@ -16,7 +17,6 @@ import { VoteBtn, VotesBtns } from '../../Button'
 import { CardHeading, CardVoteBlock } from '../../Card'
 import { useUnverifiedVotes } from '../../../hooks/useUnverifiedVotes'
 import { useVotingBatches } from '../../../hooks/useVotingBatches'
-import { useAccount } from '../../../hooks/useAccount'
 
 interface CardVoteProps {
   room: DetailedVotingRoom
@@ -24,7 +24,7 @@ interface CardVoteProps {
 }
 
 export const CardVote = ({ room, hideModalFunction }: CardVoteProps) => {
-  const { account, isActive } = useAccount()
+  const { account } = useEthers()
   const [showVoteModal, setShowVoteModal] = useState(false)
   const [showConfirmModal, setShowConfirmModal] = useState(false)
   const [proposingAmount, setProposingAmount] = useState(0)
@@ -197,7 +197,7 @@ export const CardVote = ({ room, hideModalFunction }: CardVoteProps) => {
         {finalizationPeriod && (
           <VoteBtnFinal
             onClick={() => finalizeVoting.send(room.roomNumber, finalizeVotingLimit < 1 ? 1 : finalizeVotingLimit)}
-            disabled={!isActive}
+            disabled={!account}
           >
             <>
               Finalize the vote <span>✍️</span>
@@ -214,7 +214,7 @@ export const CardVote = ({ room, hideModalFunction }: CardVoteProps) => {
         {!verificationPeriod && !finalizationPeriod && (
           <VotesBtns>
             <VoteBtn
-              disabled={!canVote || !isActive}
+              disabled={!canVote}
               onClick={() => {
                 setSelectedVoted(voteConstants.against)
                 setShowVoteModal(true)
@@ -223,7 +223,7 @@ export const CardVote = ({ room, hideModalFunction }: CardVoteProps) => {
               {voteConstants.against.text} <span>{voteConstants.against.icon}</span>
             </VoteBtn>
             <VoteBtn
-              disabled={!canVote || !isActive}
+              disabled={!canVote}
               onClick={() => {
                 setSelectedVoted(voteConstants.for)
                 setShowVoteModal(true)

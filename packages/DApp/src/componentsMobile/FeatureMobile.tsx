@@ -15,20 +15,19 @@ import { CommunitySkeleton } from '../components/skeleton/CommunitySkeleton'
 import { HeaderVotingMobile } from './VotingMobile'
 import { ConnectMobile } from './ConnectMobile'
 import { HistoryLink } from './CardVoteMobile'
-import { useContractCall, useContractFunction } from '@usedapp/core'
+import { useContractCall, useContractFunction, useEthers } from '@usedapp/core'
 import { useGetCurrentVoting } from '../hooks/useGetCurrentVoting'
 import { MobileHeading, MobileBlock, MobileTop, MobileWrap, ColumnFlexDiv } from '../constants/styles'
 import { useFeaturedVotes } from '../hooks/useFeaturedVotes'
 import { useContracts } from '../hooks/useContracts'
 import { useSendWakuFeature } from '../hooks/useSendWakuFeature'
 import { useFeaturedVotingState } from '../hooks/useFeaturedVotingState'
-import { useAccount } from '../hooks/useAccount'
 
 export function FeatureMobile() {
   const { publicKey } = useParams<{ publicKey: string }>()
   const [community] = useCommunities([publicKey])
   const [proposingAmount, setProposingAmount] = useState(0)
-  const { account, isActive } = useAccount()
+  const { account } = useEthers()
   const sendWaku = useSendWakuFeature()
   const { activeVoting } = useFeaturedVotes()
   const { featuredVotingContract } = useContracts()
@@ -66,11 +65,7 @@ export function FeatureMobile() {
           <VotePropose setProposingAmount={setProposingAmount} proposingAmount={proposingAmount} />
           <FeatureBtn
             disabled={
-              !account ||
-              !isActive ||
-              inFeatured ||
-              featuredVotingState === 'verification' ||
-              featuredVotingState === 'ended'
+              !account || inFeatured || featuredVotingState === 'verification' || featuredVotingState === 'ended'
             }
             onClick={async () => {
               if (!activeVoting) {
