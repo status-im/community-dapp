@@ -5,10 +5,10 @@ import { utils } from 'ethers'
 import proto from './loadProtons'
 import { WakuVoteData } from '../models/waku'
 import { TypedVote } from '../models/TypedData'
-import { DecoderV0 } from 'js-waku/lib/waku_message/version_0'
+import { createDecoder } from '@waku/core'
 
-import type { WakuLight } from 'js-waku/lib/interfaces'
-import type { MessageV0 as WakuMessage } from 'js-waku/lib/waku_message/version_0'
+import type { DecodedMessage } from '@waku/core'
+import type { LightNode } from '@waku/interfaces'
 
 function getContractParameters(
   address: string,
@@ -51,7 +51,7 @@ export function filterVerifiedVotes(
   return verified
 }
 
-function decodeWakuVote(msg: WakuMessage): WakuVoteData | undefined {
+function decodeWakuVote(msg: DecodedMessage): WakuVoteData | undefined {
   try {
     if (!msg.payload) {
       return undefined
@@ -72,10 +72,10 @@ export function decodeWakuVotes(messages: any[] | null) {
 }
 
 // todo?: pass complete topic
-export async function receiveWakuVotes(waku: WakuLight, topic: string, room: number) {
-  const messages: WakuMessage[] = []
+export async function receiveWakuVotes(waku: LightNode, topic: string, room: number) {
+  const messages: DecodedMessage[] = []
   // todo: init decoder once
-  await waku.store.queryOrderedCallback([new DecoderV0(topic + room.toString())], (wakuMessage: WakuMessage) => {
+  await waku.store.queryWithOrderedCallback([createDecoder(topic + room.toString())], (wakuMessage: DecodedMessage) => {
     messages.push(wakuMessage)
   })
 

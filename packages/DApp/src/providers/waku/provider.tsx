@@ -2,14 +2,13 @@
 // note: !waku and waku && conditions to use isConnected when implementing detection of dicsonnections
 
 import React, { ReactNode, createContext, useContext, useEffect, useState } from 'react'
-import { Protocols } from 'js-waku'
-import { createLightNode } from 'js-waku/lib/create_waku'
-import { PeerDiscoveryStaticPeers } from 'js-waku/lib/peer_discovery_static_list'
-import { waitForRemotePeer } from 'js-waku/lib/wait_for_remote_peer'
-import type { WakuLight } from 'js-waku/lib/interfaces'
+import { bootstrap } from '@libp2p/bootstrap'
+import { Protocols } from '@waku/interfaces'
+import { createLightNode, waitForRemotePeer } from '@waku/sdk'
+import type { LightNode } from '@waku/interfaces'
 
 type Context = {
-  waku: WakuLight | undefined
+  waku: LightNode | undefined
   isLoading: boolean
   isConnected: boolean
   isError: boolean
@@ -24,7 +23,7 @@ type Props = {
 }
 
 export function WakuProvider({ peers, children }: Props) {
-  const [waku, setWaku] = useState<WakuLight>()
+  const [waku, setWaku] = useState<LightNode>()
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [isConnected, setIsConnected] = useState<boolean>(false)
   const [isError, setIsError] = useState<boolean>(false)
@@ -39,7 +38,16 @@ export function WakuProvider({ peers, children }: Props) {
         // @ts-ignore
         emitSelf: true,
         libp2p: {
-          peerDiscovery: [new PeerDiscoveryStaticPeers(peers, { maxPeers: 1 })],
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore icorrectly  types from @libp2p/boostrap#package.json; patched only in @status-im/js for now
+          peerDiscovery: [
+            bootstrap({
+              list: peers,
+              timeout: 0,
+              // note: Infinity prevents connection
+              // tagTTL: Infinity,
+            }),
+          ],
         },
       })
 

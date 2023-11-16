@@ -6,7 +6,7 @@ import { JsonRpcSigner } from '@ethersproject/providers'
 import proto from '../../../src/helpers/loadProtons'
 import { BigNumber, utils } from 'ethers'
 import protons from 'protons'
-import { EncoderV0 } from 'js-waku/lib/waku_message/version_0'
+import { createEncoder } from '@waku/core'
 
 const proto2 = protons(`
 message WakuVote {
@@ -22,7 +22,7 @@ describe('wakuMessage', () => {
 
   describe('decode waku vote', () => {
     it('success', async () => {
-      const encoder = new EncoderV0('/test2/')
+      const encoder = createEncoder({ contentTopic: '/test2/' })
 
       const payload = proto.WakuVote.encode({
         address: '0x0',
@@ -69,7 +69,7 @@ describe('wakuMessage', () => {
   })
 
   it('wrong data', async () => {
-    const encoder = new EncoderV0('/test/')
+    const encoder = createEncoder({ contentTopic: '/test2/' })
 
     const payload = proto2.WakuVote.encode({
       address: '0x0',
@@ -101,7 +101,7 @@ describe('wakuMessage', () => {
 
   describe('decode waku feature', () => {
     it('success', async () => {
-      const encoder = new EncoderV0('/test/')
+      const encoder = createEncoder({ contentTopic: '/test2/' })
 
       const payload = proto2.WakuFeature.encode({
         voter: '0x0',
@@ -136,7 +136,7 @@ describe('wakuMessage', () => {
 
   describe('create', () => {
     it('success', async () => {
-      const encoder = new EncoderV0('/test/')
+      const encoder = createEncoder({ contentTopic: '/test2/' })
       const payload = await wakuMessage.create(
         alice.address,
         alice as unknown as JsonRpcSigner,
@@ -147,7 +147,7 @@ describe('wakuMessage', () => {
         () => [],
         '0x01'
       )
-      const msg = await encoder.toProtoObj({ payload })
+      const msg = await encoder.toProtoObj({ payload: payload! })
 
       expect(msg?.payload).to.not.be.undefined
       if (msg?.payload) {
@@ -161,7 +161,7 @@ describe('wakuMessage', () => {
     })
 
     it('different payload', async () => {
-      const encoder = new EncoderV0('/test/')
+      const encoder = createEncoder({ contentTopic: '/test2/' })
       const payload = await wakuMessage.create(
         alice.address,
         alice as unknown as JsonRpcSigner,
@@ -172,7 +172,7 @@ describe('wakuMessage', () => {
         () => [],
         '0x01'
       )
-      const msg = await encoder.toProtoObj({ payload })
+      const msg = await encoder.toProtoObj({ payload: payload! })
 
       expect(msg?.payload).to.not.be.undefined
       if (msg?.payload) {
@@ -186,23 +186,23 @@ describe('wakuMessage', () => {
     })
 
     it('no address', async () => {
-      const encoder = new EncoderV0('/test/')
+      const encoder = createEncoder({ contentTopic: '/test2/' })
       const payload = await wakuMessage.create(undefined, alice as unknown as JsonRpcSigner, 1, 100, 1, 1, () => [])
-      const msg = await encoder.toProtoObj({ payload })
+      const msg = await encoder.toProtoObj({ payload: payload! })
       expect(msg?.payload).to.be.undefined
     })
 
     it('no signer', async () => {
-      const encoder = new EncoderV0('/test/')
+      const encoder = createEncoder({ contentTopic: '/test2/' })
       const payload = await wakuMessage.create(alice.address, undefined, 1, 100, 1, 1, () => [])
-      const msg = await encoder.toProtoObj({ payload })
+      const msg = await encoder.toProtoObj({ payload: payload! })
       expect(msg?.payload).to.be.undefined
     })
 
     it('different signer', async () => {
-      const encoder = new EncoderV0('/test/')
+      const encoder = createEncoder({ contentTopic: '/test2/' })
       const payload = await wakuMessage.create(alice.address, bob as unknown as JsonRpcSigner, 1, 100, 1, 1, () => [])
-      const msg = await encoder.toProtoObj({ payload })
+      const msg = await encoder.toProtoObj({ payload: payload! })
       expect(msg?.payload).to.be.undefined
     })
   })

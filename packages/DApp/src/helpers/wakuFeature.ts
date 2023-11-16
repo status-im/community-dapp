@@ -2,13 +2,13 @@ import { WakuFeatureData } from '../models/waku'
 import { utils, BigNumber } from 'ethers'
 import { JsonRpcSigner } from '@ethersproject/providers'
 import proto from './loadProtons'
-import { DecoderV0 } from 'js-waku/lib/waku_message/version_0'
+import { createDecoder } from '@waku/core'
 
-import type { WakuLight } from 'js-waku/lib/interfaces'
-import type { MessageV0 as WakuMessage } from 'js-waku/lib/waku_message/version_0'
+import type { LightNode } from '@waku/interfaces'
+import type { DecodedMessage } from '@waku/core'
 import { getContractParameters } from './receiveWakuFeature'
 
-function decodeWakuFeature(msg: WakuMessage): WakuFeatureData | undefined {
+function decodeWakuFeature(msg: DecodedMessage): WakuFeatureData | undefined {
   try {
     if (!msg.payload) {
       return undefined
@@ -29,11 +29,11 @@ export function decodeWakuFeatures(messages: any[] | null) {
   return messages?.map(decodeWakuFeature).filter((e): e is WakuFeatureData => !!e)
 }
 
-export async function receiveWakuFeatureMsg(waku: WakuLight | undefined, topic: string) {
+export async function receiveWakuFeatureMsg(waku: LightNode | undefined, topic: string) {
   if (waku) {
-    const messages: WakuMessage[] = []
+    const messages: DecodedMessage[] = []
     // todo: init decoder once
-    await waku.store.queryOrderedCallback([new DecoderV0(topic)], (wakuMessage: WakuMessage) => {
+    await waku.store.queryWithOrderedCallback([createDecoder(topic)], (wakuMessage: DecodedMessage) => {
       messages.push(wakuMessage)
     })
 

@@ -3,7 +3,7 @@ import lodash from 'lodash'
 import { BigNumber, utils } from 'ethers'
 import { recoverAddress } from './ethMessage'
 
-import type { WakuLight } from 'js-waku/lib/interfaces'
+import type { LightNode } from '@waku/interfaces'
 import { FeaturedVoting } from '../models/smartContract'
 import { TypedFeature } from '../models/TypedData'
 import { WakuFeatureData } from '../models/waku'
@@ -43,7 +43,7 @@ function sumVotes(map: CommunitiesFeatureVotes) {
   }
 }
 
-export async function receiveWakuFeature(waku: WakuLight | undefined, topic: string, activeVoting: FeaturedVoting) {
+export async function receiveWakuFeature(waku: LightNode | undefined, topic: string, activeVoting: FeaturedVoting) {
   const messages = await receiveWakuFeatureMsg(waku, topic)
   const featureVotes: CommunitiesFeatureVotes = {}
   const validatedMessages = []
