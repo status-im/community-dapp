@@ -1,8 +1,5 @@
 // note: pull on restart/reconnect
-// note: upgrade waku in status-im
-// note: tooltip
-// note: permanent? notification/toast
-// fixme: const { waku } = useWaku(); !waku conditions
+// note: !waku and waku && conditions to use isConnected when implementing detection of dicsonnections
 
 import React, { ReactNode, createContext, useContext, useEffect, useState } from 'react'
 import { Protocols } from 'js-waku'
