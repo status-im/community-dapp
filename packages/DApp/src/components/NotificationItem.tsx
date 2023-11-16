@@ -5,7 +5,7 @@ import styled from 'styled-components'
 import { Colors } from '../constants/styles'
 import { useCommunities } from '../hooks/useCommunities'
 import { LinkExternal } from './Link'
-import { CloseButton } from './Modal'
+import { CloseButton, RetryButton } from './Modal'
 import { getExplorerTransactionLink } from '@usedapp/core'
 
 interface NotificationItemProps {
@@ -37,33 +37,34 @@ export function NotificationItem({ publicKey, text, transaction }: NotificationI
             View on Etherscan
           </NotificationLink>
         </NotificationContent>
+
         <NotificationCloseButton onClick={() => setShow(false)} />
       </NotificationBlock>
     )
   }
-
   return null
 }
 
-interface NotificationItemPlainProps {
-  text: string
+export function NotificationInfoItem({ text }: { text: string }) {
+  return (
+    <NotificationBlock>
+      <NotificationContent>
+        <NotificationText>{text}</NotificationText>
+      </NotificationContent>
+    </NotificationBlock>
+  )
 }
 
-export function NotificationItemPlain({ text }: NotificationItemPlainProps) {
-  const [show, setShow] = useState(true)
+export function NotificationErrorItem({ text, action }: { text: string; action: () => void }) {
+  return (
+    <NotificationBlock>
+      <NotificationContent>
+        <NotificationText>{text}</NotificationText>
+      </NotificationContent>
 
-  if (show) {
-    return (
-      <NotificationBlock>
-        <NotificationContent>
-          <NotificationText>{text}</NotificationText>
-        </NotificationContent>
-        <NotificationCloseButton onClick={() => setShow(false)} />
-      </NotificationBlock>
-    )
-  }
-
-  return null
+      <NotificationRetryButton onClick={() => action()} />
+    </NotificationBlock>
+  )
 }
 
 const NotificationBlock = styled.div`
@@ -73,7 +74,6 @@ const NotificationBlock = styled.div`
   width: 345px;
   border-radius: 16px;
   filter: drop-shadow(0px 4px 6px rgba(0, 0, 0, 0.15));
-  z-index: 9999;
 `
 
 const NotificationLogoWrap = styled.div`
@@ -111,6 +111,13 @@ const NotificationLink = styled(LinkExternal)`
 `
 
 const NotificationCloseButton = styled(CloseButton)`
+  top: unset;
+  right: 13px;
+  bottom: 50%;
+  transform: translateY(50%);
+`
+
+const NotificationRetryButton = styled(RetryButton)`
   top: unset;
   right: 13px;
   bottom: 50%;

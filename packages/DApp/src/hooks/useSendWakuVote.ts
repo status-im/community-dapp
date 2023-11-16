@@ -4,7 +4,7 @@ import { useEthers, useSigner } from '@usedapp/core'
 import { config } from '../config'
 import { createWakuVote } from '../helpers/wakuVote'
 import { useTypedVote } from './useTypedVote'
-import { EncoderV0 } from 'js-waku/lib/waku_message/version_0'
+import { createEncoder } from '@waku/core'
 
 export function useSendWakuVote() {
   const { waku } = useWaku()
@@ -18,7 +18,9 @@ export function useSendWakuVote() {
       const msg = await createWakuVote(account, signer, room, voteAmount, type, timestamp, getTypedVote)
       if (msg) {
         if (waku) {
-          await waku.lightPush.push(new EncoderV0(config.wakuConfig.wakuTopic + room.toString()), { payload: msg })
+          await waku.lightPush.send(createEncoder({ contentTopic: config.wakuConfig.wakuTopic + room.toString() }), {
+            payload: msg,
+          })
         } else {
           alert('error sending vote please try again')
         }
