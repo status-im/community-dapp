@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { InfoWrap, PageInfo } from '../PageInfo'
-import { useContractFunction, useEthers } from '@usedapp/core'
-import { ConnectButton } from '../ConnectButton'
+import { useContractFunction } from '@usedapp/core'
+import { ConnectionNetwork } from '../ConnectionNetwork'
 import { ProposeButton } from '../Button'
 import { useFeaturedVotes } from '../../hooks/useFeaturedVotes'
 import { useFeaturedVotingState } from '../../hooks/useFeaturedVotingState'
@@ -11,9 +11,10 @@ import { mapFeaturesVotes, receiveWakuFeature } from '../../helpers/receiveWakuF
 import { config } from '../../config'
 import { useTypedFeatureVote } from '../../hooks/useTypedFeatureVote'
 import { useFeaturedBatches } from '../../hooks/useFeaturedBatches'
+import { useAccount } from '../../hooks/useAccount'
 
 export function DirectoryInfo() {
-  const { account } = useEthers()
+  const { account, isActive } = useAccount()
   const { featuredVotingContract } = useContracts()
   const { getTypedFeatureVote } = useTypedFeatureVote()
   const { waku } = useWaku()
@@ -38,6 +39,8 @@ export function DirectoryInfo() {
           text="Vote on your favourite communities being included in
       Weekly Featured Communities"
         />
+
+        <ConnectionNetwork />
       </InfoWrap>
     )
   }
@@ -50,8 +53,8 @@ export function DirectoryInfo() {
       Weekly Featured Communities"
       />
 
-      {!account && <ConnectButton />}
-      {account && featuredVotingState === 'verification' && (
+      <ConnectionNetwork />
+      {isActive && featuredVotingState === 'verification' && (
         <ProposeButton
           onClick={async () => {
             setLoading(true)
@@ -81,7 +84,7 @@ export function DirectoryInfo() {
           )}
         </ProposeButton>
       )}
-      {account && featuredVotingState === 'ended' && (
+      {isActive && featuredVotingState === 'ended' && (
         <ProposeButton
           onClick={() => {
             finalizeVoting.send(finalizeVotingLimit < 1 ? 1 : finalizeVotingLimit)

@@ -59,7 +59,7 @@ export function useCommunities(publicKeys: string[]): CommunityDetail[] {
                   })
                 )
               : null,
-            link: `https://join.status.im/c/${deserializedPublicKey}}`,
+            link: `https://status.app/c#${publicKey}`,
             currentVoting: undefined,
             tags: community.tags,
             numberOfMembers: Object.keys(community.members).length,

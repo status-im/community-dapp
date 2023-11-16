@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from 'react'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 import { NavLink } from 'react-router-dom'
-import { useEthers, shortenAddress } from '@usedapp/core'
+import { shortenAddress } from '@usedapp/core'
 import logo from '../../assets/images/logo.svg'
 import { Colors } from '../../constants/styles'
 import { Animation } from '../../constants/animation'
-import { ConnectButton } from '../ConnectButton'
+import { ConnectButton } from '../ConnectionNetwork'
+import { useAccount } from '../../hooks/useAccount'
+import { config } from '../../config'
 
 export function TopBar() {
-  const { account, deactivate } = useEthers()
+  const { isActive, account, switchNetwork, disconnect, connect } = useAccount()
   const [isOpened, setIsOpened] = useState(false)
 
   useEffect(() => {
@@ -55,15 +57,35 @@ export function TopBar() {
                   e.stopPropagation()
                   setIsOpened(!isOpened)
                 }}
+                isActive={isActive}
               >
                 {shortenAddress(account)}
               </Account>
-              <ButtonDisconnect className={isOpened ? 'opened' : undefined} onClick={() => deactivate()}>
-                Disconnect
-              </ButtonDisconnect>
+              <Subnav className={isOpened ? 'opened' : undefined}>
+                {!isActive && (
+                  <>
+                    <Warning>
+                      <span>⚠️</span>
+                      <span>Unsupported network</span>
+                    </Warning>
+                    <SubnavButton
+                      className={isOpened ? 'opened' : undefined}
+                      onClick={() => switchNetwork(config.daapConfig.readOnlyChainId!)}
+                    >
+                      Switch network
+                    </SubnavButton>
+                  </>
+                )}
+
+                <SubnavButton className={isOpened ? 'opened' : undefined} onClick={() => disconnect()}>
+                  Disconnect
+                </SubnavButton>
+              </Subnav>
             </AccountWrap>
           ) : (
-            <ButtonConnect text={'Connect'} />
+            <ConnectButton autoWidth onClick={connect}>
+              Connect
+            </ConnectButton>
           )}
         </MenuContent>
       </HeaderWrapper>
@@ -193,31 +215,22 @@ export const StyledNavLink = styled(NavLink)`
   }
 `
 
-export const ButtonConnect = styled(ConnectButton)`
-  padding: 10px 27px;
-  width: auto;
-
-  @media (max-width: 600px) {
-    padding: 7px 27px;
-    margin-top: -9px;
-  }
-`
-
 export const AccountWrap = styled.div`
   position: relative;
 `
 
-export const Account = styled.button`
+export const Account = styled.button<{ isActive: boolean }>`
   position: relative;
   font-weight: 500;
   font-size: 13px;
   line-height: 22px;
   color: ${Colors.Black};
-  padding: 11px 12px 11px 28px;
+  padding: 11px 16px 11px 28px;
   background: ${Colors.White};
   border: 1px solid ${Colors.GrayBorder};
   border-radius: 21px;
   outline: none;
+  min-width: 150px;
 
   @media (max-width: 600px) {
     padding: 7px 12px 7px 28px;
@@ -237,31 +250,59 @@ export const Account = styled.button`
     top: 50%;
     left: 17px;
     transform: translate(-50%, -50%);
-    background-color: ${Colors.Green};
+    background-color: ${Colors.Red};
     bacground-position: center;
     border-radius: 50%;
   }
+
+  ${({ isActive }) =>
+    isActive &&
+    css`
+      padding: 11px 16px 11px 28px;
+
+      &::before {
+        background-color: ${Colors.Green};
+      }
+    `}
 `
-export const ButtonDisconnect = styled.button`
+
+export const Subnav = styled.div`
   position: absolute;
   top: calc(100% + 4px);
   right: 0;
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
-  font-weight: 500;
-  font-size: 15px;
-  line-height: 22px;
-  text-align: center;
-  padding: 15px 32px;
-  cursor: pointer;
-  color: ${Colors.VioletDark};
   background: ${Colors.White};
   border: 1px solid ${Colors.GrayBorder};
-  border-radius: 16px 4px 16px 16px;
+  border-radius: 16px;
   box-shadow: 0px 2px 16px rgba(0, 9, 26, 0.12);
   transition: all 0.3s;
   outline: none;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+
+  &.opened {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    z-index: 10;
+  }
+`
+
+export const SubnavButton = styled.button`
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 21px;
+  text-align: center;
+  cursor: pointer;
+  padding: 8px 16px;
+  color: ${Colors.VioletDark};
+  width: 100%;
+  display: flex;
+  justify-content: center;
 
   &:hover {
     background: ${Colors.VioletSecondaryDark};
@@ -270,11 +311,14 @@ export const ButtonDisconnect = styled.button`
   &:active {
     background: ${Colors.VioletSecondaryLight};
   }
+`
 
-  &.opened {
-    opacity: 1;
-    visibility: visible;
-    pointer-events: auto;
-    z-index: 10;
-  }
+export const Warning = styled.div`
+  font-size: 12px;
+  padding: 16px 12px 6px;
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  align-items: center;
+  line-height: 16px;
 `

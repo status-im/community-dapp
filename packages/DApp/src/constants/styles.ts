@@ -21,6 +21,7 @@ export const Colors = {
   GrayBorder: '#EEF2F5',
   Green: '#4EBC60',
   ShadowCard: '0px 2px 12px rgba(0, 0, 0, 0.15)',
+  Red: '#D0342C',
 }
 
 export const Font = 'Inter, sans-serif'

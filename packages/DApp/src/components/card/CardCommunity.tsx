@@ -11,6 +11,7 @@ import { CardHeading } from '../Card'
 import { useEthers, getExplorerAddressLink, ChainId } from '@usedapp/core'
 import { useHistory } from 'react-router'
 import { contracts } from '../../constants/contracts'
+import { useAccount } from '../../hooks/useAccount'
 
 interface CardCommunityProps {
   community: CommunityDetail
@@ -27,7 +28,8 @@ export const CardCommunity = ({
   customStyle,
   currentVoting,
 }: CardCommunityProps) => {
-  const { account, chainId } = useEthers()
+  const { chainId } = useEthers()
+  const { isActive } = useAccount()
 
   const [showHistoryModal, setShowHistoryModal] = useState(false)
   const [showRemoveModal, setShowRemoveModal] = useState(false)
@@ -91,14 +93,14 @@ export const CardCommunity = ({
       <Community>
         <CardLogoWrap>
           {community.icon && <CardLogo src={community.icon} alt={`${community.name} logo`} />}
-          {showRemoveButton && !currentVoting && <RemoveBtnMobile onClick={handleMobileRemove} disabled={!account} />}
+          {showRemoveButton && !currentVoting && <RemoveBtnMobile onClick={handleMobileRemove} disabled={!isActive} />}
         </CardLogoWrap>
 
         <CommunityInfo>
           <CardTop>
             <CardHeading>{customHeading ? customHeading : community.name}</CardHeading>
             {showRemoveButton && !currentVoting && (
-              <RemoveBtn onClick={() => setShowRemoveModal(true)} disabled={!account} />
+              <RemoveBtn onClick={() => setShowRemoveModal(true)} disabled={!isActive} />
             )}
           </CardTop>
           <CardText>{community.description}</CardText>
