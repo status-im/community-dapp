@@ -11,20 +11,21 @@ import { WeeklyFeature } from '../components/WeeklyFeature'
 import { FilterList } from '../components/Filter'
 import { useHistory } from 'react-router'
 import { DirectorySkeletonMobile } from '../componentsMobile/DirectorySkeletonMobile'
-import { useContractFunction, useEthers } from '@usedapp/core'
+import { useContractFunction } from '@usedapp/core'
 import { useContracts } from '../hooks/useContracts'
 import { useFeaturedVotes } from '../hooks/useFeaturedVotes'
 import { useFeaturedVotingState } from '../hooks/useFeaturedVotingState'
 import { config } from '../config'
-import { ConnectButton } from '../components/ConnectButton'
+import { ConnectionNetwork } from '../components/ConnectionNetwork'
 import { ProposeButton } from './VotesMobile'
 import { useFeaturedBatches } from '../hooks/useFeaturedBatches'
 import { mapFeaturesVotes, receiveWakuFeature } from '../helpers/receiveWakuFeature'
 import { useTypedFeatureVote } from '../hooks/useTypedFeatureVote'
 import { useWaku } from '../providers/waku/provider'
+import { useAccount } from '../hooks/useAccount'
 
 export function DirectoryMobile() {
-  const { account } = useEthers()
+  const { account, isActive } = useAccount()
   const { featuredVotingContract } = useContracts()
   const { getTypedFeatureVote } = useTypedFeatureVote()
   const { waku } = useWaku()
@@ -91,8 +92,8 @@ export function DirectoryMobile() {
         <WeeklyFeature />
         {renderCommunities()}
         <>
-          {!account && <ConnectButton />}
-          {account && featuredVotingState === 'verification' && (
+          <ConnectionNetwork />
+          {isActive && featuredVotingState === 'verification' && (
             <ProposeButton
               onClick={async () => {
                 const { votesToSend } = await receiveWakuFeature(
@@ -118,7 +119,7 @@ export function DirectoryMobile() {
               )}
             </ProposeButton>
           )}
-          {account && featuredVotingState === 'ended' && (
+          {isActive && featuredVotingState === 'ended' && (
             <ProposeButton
               onClick={() => {
                 finalizeVoting.send(finalizeVotingLimit < 1 ? 1 : finalizeVotingLimit)

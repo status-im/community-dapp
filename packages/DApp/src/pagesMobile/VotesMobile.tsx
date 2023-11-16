@@ -12,13 +12,13 @@ import { VotingSortingOptions } from '../constants/SortingOptions'
 import { VotingCardCover } from '../componentsMobile/VotingCardCover'
 import { ButtonPrimary } from '../components/Button'
 import { useHistory } from 'react-router'
-import { useEthers } from '@usedapp/core'
-import { ConnectButton } from '../components/ConnectButton'
+import { ConnectionNetwork } from '../components/ConnectionNetwork'
 import { VotingSkeletonMobile } from '../componentsMobile/VotingSkeletonMobile'
 import { DetailedVotingRoom } from '../models/smartContract'
+import { useAccount } from '../hooks/useAccount'
 
 export function VotesMobile() {
-  const { account } = useEthers()
+  const { isActive } = useAccount()
   const [sortedBy, setSortedBy] = useState(VotingSortingEnum.EndingSoonest)
   const [voteType, setVoteType] = useState('')
   const [filterKeyword, setFilterKeyword] = useState('')
@@ -62,11 +62,8 @@ export function VotesMobile() {
       <VotingCardsWrapper>{renderCommunities()}</VotingCardsWrapper>
 
       <ProposeButtonWrapper>
-        {account ? (
-          <ProposeButton onClick={() => history.push('/propose')}>Propose community</ProposeButton>
-        ) : (
-          <ConnectButton />
-        )}
+        {isActive && <ProposeButton onClick={() => history.push('/propose')}>Propose community</ProposeButton>}
+        <ConnectionNetwork />
       </ProposeButtonWrapper>
     </div>
   )
