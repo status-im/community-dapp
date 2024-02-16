@@ -22,7 +22,6 @@ export function useContracts() {
 
   useEffect(() => {
     if (chainId) {
-      // @ts-expect-error Ethers does not type chainId
       const chainConfig = contracts[chainId]
       if (chainConfig) {
         setVotingContract(new Contract(chainConfig.votingContract, new Interface(VotingContract.abi)))
