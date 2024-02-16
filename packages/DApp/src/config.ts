@@ -6,7 +6,7 @@ const version = '0.0.6'
 export const OptimismSepolia: Chain = {
   chainId: 11155420,
   chainName: 'OptimismSepolia',
-  isTestChain: false,
+  isTestChain: true,
   isLocalChain: false,
   multicallAddress: '0xcA11bde05977b3631167028862bE2a173976CA11',
   rpcUrl: 'https://sepolia.optimism.io/',
