@@ -40,11 +40,15 @@ contract DeploymentConfig is Script {
     address internal SNT_ADDRESS_OPTIMISM_MAINNET = 0x650AF3C15AF43dcB218406d30784416D64Cfb6B2;
     // solhint-disable-next-line var-name-mixedcase
     address internal SNT_ADDRESS_OPTIMISM_GOERLI = 0xcAD273fA2bb77875333439FDf4417D995159c3E1;
+    // solhint-disable-next-line var-name-mixedcase
+    address internal SNT_ADDRESS_OPTIMISM_SEPOLIA = 0x0B5DAd18B8791ddb24252B433ec4f21f9e6e5Ed0;
 
     // solhint-disable-next-line var-name-mixedcase
     address internal MULTICALL_ADDRESS_OPTIMISM = 0xeAa6877139d436Dc6d1f75F3aF15B74662617B2C;
     // solhint-disable-next-line var-name-mixedcase
     address internal MULTICALL_ADDRESS_OPTIMISM_GOERLI = 0xcA11bde05977b3631167028862bE2a173976CA11;
+    // solhint-disable-next-line var-name-mixedcase
+    address internal MULTICALL_ADDRESS_OPTIMISM_SEPOLIA = 0xcA11bde05977b3631167028862bE2a173976CA11;
 
     constructor(address _broadcaster) {
         deployer = _broadcaster;
@@ -54,6 +58,8 @@ contract DeploymentConfig is Script {
             activeNetworkConfig = getOptimismMainnetConfig();
         } else if (block.chainid == 420) {
             activeNetworkConfig = getOptimismGoerliConfig();
+        } else if (block.chainid == 11_155_420) {
+            activeNetworkConfig = getOptimismSepoliaConfig();
         } else {
             revert("no network config for this chain");
         }
@@ -92,6 +98,24 @@ contract DeploymentConfig is Script {
             cooldownPeriod: 1,
             featuredPerVotingCount: 3,
             voteToken: SNT_ADDRESS_OPTIMISM_GOERLI
+        });
+    }
+
+    function getOptimismSepoliaConfig() public returns (NetworkConfig memory) {
+        // Actually, it'd be nicer to have `multicallAddress` be part of `NetworkConfig`,
+        // however, adding another field to the struct causes us to run into the
+        // "stack too deep" error during compilation, hence, we're using an additional
+        // property on the contract to access the value later from there.
+        multicallAddress = MULTICALL_ADDRESS_OPTIMISM_SEPOLIA;
+        return NetworkConfig({
+            votingLengthInSeconds: FOUR_MINS_IN_SECONDS,
+            votingVerificationLengthInSeconds: TWO_MINS_IN_SECONDS,
+            timeBetweenVotingInSeconds: ONE_MIN_IN_SECONDS,
+            featuredVotingLengthInSeconds: FOUR_MINS_IN_SECONDS,
+            featuredVotingVerificationLengthInSeconds: TWO_MINS_IN_SECONDS,
+            cooldownPeriod: 1,
+            featuredPerVotingCount: 3,
+            voteToken: SNT_ADDRESS_OPTIMISM_SEPOLIA
         });
     }
 
