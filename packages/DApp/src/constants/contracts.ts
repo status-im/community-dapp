@@ -1,4 +1,5 @@
 import { ChainId } from '@usedapp/core'
+import { OptimismSepolia } from '../config'
 
 // todo?: move to config.ts
 export const contracts = {
@@ -14,6 +15,13 @@ export const contracts = {
     featuredVotingContract: '0x898331B756EE1f29302DeF227a4471e960c50612',
     directoryContract: '0xB3Ef5B0825D5f665bE14394eea41E684CE96A4c5',
     tokenContract: '0xcAD273fA2bb77875333439FDf4417D995159c3E1',
+    multicallContract: '0xcA11bde05977b3631167028862bE2a173976CA11',
+  },
+  [OptimismSepolia.chainId]: {
+    votingContract: '0x7Ff554af5b6624db2135E4364F416d1D397f43e6',
+    featuredVotingContract: '0x336DFD512164Fe8CFA809BdE94B13E76e42edD6B',
+    directoryContract: '0x6B94e21FAB8Af38E8d89dd4A0480C04e9a5c53Ab',
+    tokenContract: '0x0B5DAd18B8791ddb24252B433ec4f21f9e6e5Ed0',
     multicallContract: '0xcA11bde05977b3631167028862bE2a173976CA11',
   },
   [ChainId.Hardhat]: {

@@ -1,7 +1,25 @@
 // import { v4 as uuidv4 } from 'uuid'
-import { ChainId, OptimismGoerli, Optimism, Config as DAppConfig, Localhost, Hardhat } from '@usedapp/core'
+import { Chain, ChainId, Optimism, OptimismGoerli, Config as DAppConfig, Localhost, Hardhat } from '@usedapp/core'
 
 const version = '0.0.6'
+
+export const OptimismSepolia: Chain = {
+  chainId: 11155420,
+  chainName: 'OptimismSepolia',
+  isTestChain: false,
+  isLocalChain: false,
+  multicallAddress: '0xcA11bde05977b3631167028862bE2a173976CA11',
+  rpcUrl: 'https://sepolia.optimism.io/',
+  nativeCurrency: {
+    name: 'Ether',
+    symbol: 'ETH',
+    decimals: 18,
+  },
+  blockExplorerUrl: 'https://sepolia-optimistic.etherscan.io/',
+  getExplorerAddressLink: (address: string) => `https://sepolia-optimistic.etherscan.io/address/${address}`,
+  getExplorerTransactionLink: (transactionHash: string) =>
+    `https://sepolia-optimistic.etherscan.io/tx/${transactionHash}`,
+}
 
 export interface Config {
   wakuConfig: {
@@ -56,11 +74,12 @@ const configs: Record<typeof process.env.ENV, Config> = {
       wakuFeatureTopic: `/communitiesCuration/preview/${version}/featured/proto/`,
     },
     daapConfig: {
-      readOnlyChainId: ChainId.OptimismGoerli,
+      readOnlyChainId: OptimismSepolia.chainId,
       readOnlyUrls: {
+        [OptimismSepolia.chainId]: `https://optimism-sepolia.infura.io/v3/${process.env.INFURA_API_KEY}`,
         [ChainId.OptimismGoerli]: `https://optimism-goerli.infura.io/v3/${process.env.INFURA_API_KEY}`,
       },
-      networks: [OptimismGoerli],
+      networks: [OptimismSepolia, OptimismGoerli],
       notifications: {
         checkInterval: 500,
         expirationPeriod: 50000,
