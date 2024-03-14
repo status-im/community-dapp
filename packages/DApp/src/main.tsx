@@ -12,7 +12,7 @@ import { peers } from './constants/peers'
 
 render(
   <React.StrictMode>
-    <WakuProvider peers={peers[config.wakuConfig.environment]}>
+    <WakuProvider peers={peers['test']}>
       <DAppProvider config={config.daapConfig}>
         <CommunitiesProvider>
           <App />

@@ -75,9 +75,12 @@ export function decodeWakuVotes(messages: any[] | null) {
 export async function receiveWakuVotes(waku: LightNode, topic: string, room: number) {
   const messages: DecodedMessage[] = []
   // todo: init decoder once
-  await waku.store.queryWithOrderedCallback([createDecoder(topic + room.toString())], (wakuMessage: DecodedMessage) => {
-    messages.push(wakuMessage)
-  })
+  await waku.store.queryWithOrderedCallback(
+    [createDecoder(topic + room.toString(), { clusterId: 16, shard: 32 })],
+    (wakuMessage: DecodedMessage) => {
+      messages.push(wakuMessage)
+    }
+  )
 
   return decodeWakuVotes(messages)
 }

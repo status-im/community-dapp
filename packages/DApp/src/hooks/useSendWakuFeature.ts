@@ -18,9 +18,15 @@ export function useSendWakuFeature() {
       const msg = await createWakuFeatureMsg(account, signer, voteAmount, publicKey, timestamp, getTypedFeatureVote)
       if (msg) {
         if (waku) {
-          await waku.lightPush.send(createEncoder({ contentTopic: config.wakuConfig.wakuFeatureTopic }), {
-            payload: msg,
-          })
+          await waku.lightPush.send(
+            createEncoder({
+              contentTopic: config.wakuConfig.wakuFeatureTopic,
+              pubsubTopicShardInfo: { clusterId: 16, shard: 32 },
+            }),
+            {
+              payload: msg,
+            }
+          )
         } else {
           alert('error sending feature vote please try again')
         }

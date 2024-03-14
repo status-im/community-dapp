@@ -49,6 +49,10 @@ export function WakuProvider({ peers, children }: Props) {
             }),
           ],
         },
+        shardInfo: {
+          clusterId: 16,
+          shards: [32],
+        },
       })
 
       await waku.start()

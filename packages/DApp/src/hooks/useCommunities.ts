@@ -39,6 +39,9 @@ export function useCommunities(publicKeys: string[]): CommunityDetail[] {
             return
           }
 
+          // note: await https://github.com/status-im/status-web/pull/529
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
           const requestClient = new RequestClient(waku)
           const community = await requestClient.fetchCommunityDescription(deserializedPublicKey)
 
