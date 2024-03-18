@@ -3,12 +3,17 @@
  */
 
 export const peers = {
-  production: [
-    '/dns4/node-01.ac-cn-hongkong-c.status.prod.statusim.net/tcp/443/wss/p2p/16Uiu2HAkvEZgh3KLwhLwXg95e5ojM8XykJ4Kxi2T7hk22rnA7pJC',
-  ],
+  production: [],
   test: [
-    '/dns4/node-01.ac-cn-hongkong-c.status.test.statusim.net/tcp/443/wss/p2p/16Uiu2HAm2BjXxCp1sYFJQKpLLbPbwd5juxbsYofu3TsS3auvT9Yi',
-    '/dns4/node-01.do-ams3.status.test.statusim.net/tcp/443/wss/p2p/16Uiu2HAkukebeXjTQ9QDBeNDWuGfbaSg79wkkhK4vPocLgR6QFDf',
-    '/dns4/node-01.gc-us-central1-a.status.test.statusim.net/tcp/443/wss/p2p/16Uiu2HAmGDX3iAFox93PupVYaHa88kULGqMpJ7AEHGwj3jbMtt76',
+    '/dns4/boot-01.do-ams3.shards.test.statusim.net/tcp/443/wss/p2p/16Uiu2HAmAR24Mbb6VuzoyUiGx42UenDkshENVDj4qnmmbabLvo31',
+    '/dns4/boot-01.gc-us-central1-a.shards.test.statusim.net/tcp/443/wss/p2p/16Uiu2HAm8mUZ18tBWPXDQsaF7PbCKYA35z7WB2xNZH2EVq1qS8LJ',
+    '/dns4/boot-01.ac-cn-hongkong-c.shards.test.statusim.net/tcp/443/wss/p2p/16Uiu2HAmGwcE8v7gmJNEWFtZtojYpPMTHy2jBLL6xRk33qgDxFWX',
+
+    '/dns4/store-01.do-ams3.shards.test.statusim.net/tcp/443/wss/p2p/16Uiu2HAmAUdrQ3uwzuE4Gy4D56hX6uLKEeerJAnhKEHZ3DxF1EfT',
+    '/dns4/store-02.do-ams3.shards.test.statusim.net/tcp/443/wss/p2p/16Uiu2HAm9aDJPkhGxc2SFcEACTFdZ91Q5TJjp76qZEhq9iF59x7R',
+    '/dns4/store-01.gc-us-central1-a.shards.test.statusim.net/tcp/443/wss/p2p/16Uiu2HAmMELCo218hncCtTvC2Dwbej3rbyHQcR8erXNnKGei7WPZ',
+    '/dns4/store-02.gc-us-central1-a.shards.test.statusim.net/tcp/443/wss/p2p/16Uiu2HAmJnVR7ZzFaYvciPVafUXuYGLHPzSUigqAmeNw9nJUVGeM',
+    '/dns4/store-01.ac-cn-hongkong-c.shards.test.statusim.net/tcp/443/wss/p2p/16Uiu2HAm2M7xs7cLPc3jamawkEqbr7cUJX11uvY7LxQ6WFUdUKUT',
+    '/dns4/store-02.ac-cn-hongkong-c.shards.test.statusim.net/tcp/443/wss/p2p/16Uiu2HAm9CQhsuwPR54q27kNj9iaQVfyRzTGKrhFmr94oD8ujU6P',
   ],
 }
