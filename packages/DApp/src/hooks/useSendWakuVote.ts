@@ -18,9 +18,15 @@ export function useSendWakuVote() {
       const msg = await createWakuVote(account, signer, room, voteAmount, type, timestamp, getTypedVote)
       if (msg) {
         if (waku) {
-          await waku.lightPush.send(createEncoder({ contentTopic: config.wakuConfig.wakuTopic + room.toString() }), {
-            payload: msg,
-          })
+          await waku.lightPush.send(
+            createEncoder({
+              contentTopic: config.wakuConfig.wakuTopic + room.toString(),
+              pubsubTopicShardInfo: { clusterId: 16, shard: 32 },
+            }),
+            {
+              payload: msg,
+            }
+          )
         } else {
           alert('error sending vote please try again')
         }
