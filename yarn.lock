@@ -2570,10 +2570,10 @@
   dependencies:
     antlr4ts "^0.5.0-alpha.4"
 
-"@status-im/js@0.5.0":
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/@status-im/js/-/js-0.5.0.tgz#774c8671c718c38ac09988ff357b0b80d7bacf2b"
-  integrity sha512-LYYSj1dFWu02NWtQJUDaxM2e/9frRcE1F3TwDU1klpVQ1o/KJ166BJI50MFdra7hCz7Z5yccbgUpBAOfxm9QNA==
+"@status-im/js@0.5.1":
+  version "0.5.1"
+  resolved "https://registry.yarnpkg.com/@status-im/js/-/js-0.5.1.tgz#cca1c2637a21ec23094cde965f864e8204818af1"
+  integrity sha512-a8/EsuMY+aTExSuVN7DGZXaSQaUeY20z44iJC4oR20l1GRlBXTt1H6BDVPULZSi4agmPuoVwcAKbIorzTg3iIw==
   dependencies:
     "@bufbuild/protobuf" "1.4.2"
     "@libp2p/bootstrap" "^9.0.10"
@@ -8915,7 +8915,7 @@ it-length-prefixed-stream@^1.0.0:
     uint8-varint "^2.0.1"
     uint8arraylist "^2.4.1"
 
-it-length-prefixed@^9.0.1, it-length-prefixed@^9.0.4:
+it-length-prefixed@9.0.4, it-length-prefixed@^9.0.1, it-length-prefixed@^9.0.4:
   version "9.0.4"
   resolved "https://registry.yarnpkg.com/it-length-prefixed/-/it-length-prefixed-9.0.4.tgz#8096c3270420fe8abaa920c7b4d5e5895144008e"
   integrity sha512-lz28fykbG0jq7s5XtvlzGxO5BeSOw6ikymkRllxjL21V5VKLcvB4pHr9wPvEnsAJ2et1xpOk3BRTMq9XrhgKsg==
