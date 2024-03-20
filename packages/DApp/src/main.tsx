@@ -8,11 +8,10 @@ import { DAppProvider } from '@usedapp/core'
 import { WakuProvider } from './providers/waku/provider'
 import { CommunitiesProvider } from './providers/communities/provider'
 import { config } from './config'
-import { peers } from './constants/peers'
 
 render(
   <React.StrictMode>
-    <WakuProvider peers={peers['test']}>
+    <WakuProvider peers={config.wakuConfig.peers}>
       <DAppProvider config={config.daapConfig}>
         <CommunitiesProvider>
           <App />

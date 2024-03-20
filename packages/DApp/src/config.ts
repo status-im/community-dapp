@@ -1,4 +1,5 @@
 // import { v4 as uuidv4 } from 'uuid'
+import { peers } from '@status-im/js'
 import { Chain, ChainId, Optimism, OptimismGoerli, Config as DAppConfig, Localhost, Hardhat } from '@usedapp/core'
 
 const version = '0.0.6'
@@ -23,7 +24,7 @@ export const OptimismSepolia: Chain = {
 
 export interface Config {
   wakuConfig: {
-    environment: 'test' | 'production'
+    peers: string[]
     wakuTopic: string
     wakuFeatureTopic: string
   }
@@ -40,7 +41,7 @@ const configs: Record<typeof process.env.ENV, Config> = {
    */
   development: {
     wakuConfig: {
-      environment: 'test',
+      peers: peers['test'],
       wakuTopic: `/communitiesCuration/localhost/${version}/directory/proto/`,
       wakuFeatureTopic: `/communitiesCuration/localhost/${version}/featured/proto/`,
     },
@@ -69,7 +70,7 @@ const configs: Record<typeof process.env.ENV, Config> = {
    */
   preview: {
     wakuConfig: {
-      environment: 'test',
+      peers: peers['test'],
       wakuTopic: `/communitiesCuration/preview/${version}/directory/proto/`,
       wakuFeatureTopic: `/communitiesCuration/preview/${version}/featured/proto/`,
     },
@@ -92,7 +93,7 @@ const configs: Record<typeof process.env.ENV, Config> = {
    */
   production: {
     wakuConfig: {
-      environment: 'production',
+      peers: peers['test'],
       wakuTopic: `/communitiesCuration/${version}/directory/proto/`,
       wakuFeatureTopic: `/communitiesCuration/${version}/featured/proto/`,
     },
