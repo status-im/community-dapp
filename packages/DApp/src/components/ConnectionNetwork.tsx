@@ -19,7 +19,9 @@ export function ConnectionNetwork({ buttonText, autoWidth = false }: ConnectionN
         <WarningWrapper>
           <Warning text="You are connected to unsupported network." icon="⚠️" />
         </WarningWrapper>
-        <ProposeButton onClick={() => switchNetwork(config.daapConfig.readOnlyChainId!)}>Switch Network</ProposeButton>
+        <ProposeButton onClick={() => switchNetwork(config.usedappConfig.readOnlyChainId!)}>
+          Switch Network
+        </ProposeButton>
       </>
     )
   }
@@ -54,7 +56,7 @@ export const ConnectButton = styled(ProposeButton)<{ autoWidth: boolean }>`
     `
     width: auto;
     padding: 10px 27px;
-    
+
     @media (max-width: 600px) {
       padding: 7px 27px;
       margin-top: -9px;

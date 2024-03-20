@@ -70,7 +70,7 @@ export function TopBar() {
                     </Warning>
                     <SubnavButton
                       className={isOpened ? 'opened' : undefined}
-                      onClick={() => switchNetwork(config.daapConfig.readOnlyChainId!)}
+                      onClick={() => switchNetwork(config.usedappConfig.readOnlyChainId!)}
                     >
                       Switch network
                     </SubnavButton>

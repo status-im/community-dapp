@@ -12,7 +12,7 @@ import { config } from './config'
 render(
   <React.StrictMode>
     <WakuProvider peers={config.wakuConfig.peers}>
-      <DAppProvider config={config.daapConfig}>
+      <DAppProvider config={config.usedappConfig}>
         <CommunitiesProvider>
           <App />
         </CommunitiesProvider>
