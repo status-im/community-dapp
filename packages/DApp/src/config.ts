@@ -42,7 +42,7 @@ const configs: Record<typeof process.env.ENV, Config> = {
    */
   development: {
     wakuConfig: {
-      peers: peers['test'],
+      peers: peers.development,
       wakuTopic: `/communitiesCuration/localhost/${version}/directory/proto/`,
       wakuFeatureTopic: `/communitiesCuration/localhost/${version}/featured/proto/`,
     },
@@ -80,7 +80,7 @@ const configs: Record<typeof process.env.ENV, Config> = {
    */
   preview: {
     wakuConfig: {
-      peers: peers['test'],
+      peers: peers.preview,
       wakuTopic: `/communitiesCuration/preview/${version}/directory/proto/`,
       wakuFeatureTopic: `/communitiesCuration/preview/${version}/featured/proto/`,
     },
@@ -119,7 +119,7 @@ const configs: Record<typeof process.env.ENV, Config> = {
    */
   production: {
     wakuConfig: {
-      peers: peers['test'],
+      peers: peers.production,
       wakuTopic: `/communitiesCuration/${version}/directory/proto/`,
       wakuFeatureTopic: `/communitiesCuration/${version}/featured/proto/`,
     },
