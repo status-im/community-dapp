@@ -10,8 +10,8 @@ import { RemoveModal } from './RemoveModal'
 import { CardHeading } from '../Card'
 import { useEthers, getExplorerAddressLink, ChainId } from '@usedapp/core'
 import { useHistory } from 'react-router'
-import { contracts } from '../../constants/contracts'
 import { useAccount } from '../../hooks/useAccount'
+import { config } from '../../config'
 
 interface CardCommunityProps {
   community: CommunityDetail
@@ -118,7 +118,7 @@ export const CardCommunity = ({
           Visit community
         </LinkExternal>
         <LinkExternal
-          href={getExplorerAddressLink(contracts[chainId as ChainId.Optimism]?.directoryContract, chainId!)}
+          href={getExplorerAddressLink(config.contracts[chainId as ChainId]?.directoryContract, chainId!)}
           target="_blank"
           rel="noopener noreferrer"
         >

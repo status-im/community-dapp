@@ -1,12 +1,11 @@
-import { useEthers, useTokenBalance } from '@usedapp/core'
-import { contracts } from '../constants/contracts'
+import { ChainId, useEthers, useTokenBalance } from '@usedapp/core'
 import { BigNumber } from 'ethers'
 import { useEffect, useState } from 'react'
+import { config } from '../config'
 
 export function useAvailableAmount() {
   const { account, chainId } = useEthers()
-  // @ts-expect-error fixme: https://github.com/status-im/community-dapp/pull/94#discussion_r1378964354 undefined or unsupported network
-  const tokenBalance = useTokenBalance(contracts[chainId as keyof typeof contracts | undefined].tokenContract, account)
+  const tokenBalance = useTokenBalance(config.contracts[chainId as ChainId]?.tokenContract, account)
 
   const [availableAmount, setAvailableAmount] = useState(0)
 

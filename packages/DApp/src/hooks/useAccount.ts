@@ -27,7 +27,7 @@ export function useAccount() {
 
   useEffect(() => {
     if (activateError?.name === 'ChainIdError') {
-      switchNetwork(config.daapConfig.readOnlyChainId!)
+      switchNetwork(config.usedappConfig.readOnlyChainId!)
     }
   }, [activateError])
 
