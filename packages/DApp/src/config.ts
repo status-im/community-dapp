@@ -1,9 +1,10 @@
 // import { v4 as uuidv4 } from 'uuid'
 import { Chain, ChainId, Optimism, OptimismGoerli, Config as DAppConfig, Localhost, Hardhat } from '@usedapp/core'
+import { peers } from './constants/peers'
 
 const version = '0.0.6'
 
-export const OptimismSepolia: Chain = {
+const OptimismSepolia: Chain = {
   chainId: 11155420,
   chainName: 'OptimismSepolia',
   isTestChain: true,
@@ -23,11 +24,12 @@ export const OptimismSepolia: Chain = {
 
 export interface Config {
   wakuConfig: {
-    environment: 'test' | 'production'
+    peers: string[]
     wakuTopic: string
     wakuFeatureTopic: string
   }
-  daapConfig: DAppConfig
+  usedappConfig: DAppConfig
+  contracts: Record<number, Record<string, string>>
   votesLimit: number
 }
 
@@ -40,11 +42,11 @@ const configs: Record<typeof process.env.ENV, Config> = {
    */
   development: {
     wakuConfig: {
-      environment: 'test',
+      peers: peers.development,
       wakuTopic: `/communitiesCuration/localhost/${version}/directory/proto/`,
       wakuFeatureTopic: `/communitiesCuration/localhost/${version}/featured/proto/`,
     },
-    daapConfig: {
+    usedappConfig: {
       readOnlyChainId: ChainId.Hardhat,
       readOnlyUrls: {
         [ChainId.Hardhat]: 'http://127.0.0.1:8545',
@@ -61,6 +63,15 @@ const configs: Record<typeof process.env.ENV, Config> = {
       },
     },
     votesLimit: 2,
+    contracts: {
+      [ChainId.Hardhat]: {
+        votingContract: process.env.VOTING_CONTRACT ?? '0x0000000000000000000000000000000000000000',
+        directoryContract: process.env.DIRECTORY_CONTRACT ?? '0x0000000000000000000000000000000000000000',
+        tokenContract: process.env.TOKEN_CONTRACT ?? '0x0000000000000000000000000000000000000000',
+        multicallContract: process.env.MULTICALL_CONTRACT ?? '0x0000000000000000000000000000000000000000',
+        featuredVotingContract: process.env.FEATURED_VOTING_CONTRACT ?? '0x0000000000000000000000000000000000000000',
+      },
+    },
   },
   /**
    * Preview.
@@ -69,11 +80,11 @@ const configs: Record<typeof process.env.ENV, Config> = {
    */
   preview: {
     wakuConfig: {
-      environment: 'test',
+      peers: peers.preview,
       wakuTopic: `/communitiesCuration/preview/${version}/directory/proto/`,
       wakuFeatureTopic: `/communitiesCuration/preview/${version}/featured/proto/`,
     },
-    daapConfig: {
+    usedappConfig: {
       readOnlyChainId: OptimismSepolia.chainId,
       readOnlyUrls: {
         [OptimismSepolia.chainId]: `https://optimism-sepolia.infura.io/v3/${process.env.INFURA_API_KEY}`,
@@ -86,17 +97,33 @@ const configs: Record<typeof process.env.ENV, Config> = {
       },
     },
     votesLimit: 2,
+    contracts: {
+      [OptimismSepolia.chainId]: {
+        votingContract: '0x7Ff554af5b6624db2135E4364F416d1D397f43e6',
+        featuredVotingContract: '0x336DFD512164Fe8CFA809BdE94B13E76e42edD6B',
+        directoryContract: '0x6B94e21FAB8Af38E8d89dd4A0480C04e9a5c53Ab',
+        tokenContract: '0x0B5DAd18B8791ddb24252B433ec4f21f9e6e5Ed0',
+        multicallContract: '0xcA11bde05977b3631167028862bE2a173976CA11',
+      },
+      [ChainId.OptimismGoerli]: {
+        votingContract: '0x744Fd6e98dad09Fb8CCF530B5aBd32B56D64943b',
+        featuredVotingContract: '0x898331B756EE1f29302DeF227a4471e960c50612',
+        directoryContract: '0xB3Ef5B0825D5f665bE14394eea41E684CE96A4c5',
+        tokenContract: '0xcAD273fA2bb77875333439FDf4417D995159c3E1',
+        multicallContract: '0xcA11bde05977b3631167028862bE2a173976CA11',
+      },
+    },
   },
   /**
    * Production.
    */
   production: {
     wakuConfig: {
-      environment: 'production',
+      peers: peers.production,
       wakuTopic: `/communitiesCuration/${version}/directory/proto/`,
       wakuFeatureTopic: `/communitiesCuration/${version}/featured/proto/`,
     },
-    daapConfig: {
+    usedappConfig: {
       readOnlyChainId: ChainId.Optimism,
       readOnlyUrls: {
         [ChainId.Optimism]: `https://optimism-mainnet.infura.io/v3/${process.env.INFURA_API_KEY}`,
@@ -108,6 +135,15 @@ const configs: Record<typeof process.env.ENV, Config> = {
       },
     },
     votesLimit: 400,
+    contracts: {
+      [ChainId.Optimism]: {
+        votingContract: '0x321Ba646d994200257Ce4bfe18F66C9283ad1407',
+        featuredVotingContract: '0x2EA9700E7F27E09F254f2DaEc5E05015b2b961d0',
+        directoryContract: '0xA8d270048a086F5807A8dc0a9ae0e96280C41e3A',
+        tokenContract: '0x650AF3C15AF43dcB218406d30784416D64Cfb6B2',
+        multicallContract: '0xeAa6877139d436Dc6d1f75F3aF15B74662617B2C',
+      },
+    },
   },
 }
 
