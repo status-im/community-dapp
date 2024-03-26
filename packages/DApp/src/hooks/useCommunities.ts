@@ -4,9 +4,10 @@ import { useEffect } from 'react'
 import { useContractCalls } from '@usedapp/core'
 import { useContracts } from './useContracts'
 import { useWaku } from '../providers/waku/provider'
-import { deserializePublicKey, RequestClient } from '@status-im/js'
+import { deserializePublicKey } from '@status-im/js'
 import { BigNumber } from 'ethers'
 import { useFeaturedVotes } from './useFeaturedVotes'
+import { getRequestClient } from '../lib/request-client'
 
 export function useCommunities(publicKeys: string[]): CommunityDetail[] {
   const { communitiesDetails, dispatch } = useCommunitiesProvider()
@@ -39,7 +40,7 @@ export function useCommunities(publicKeys: string[]): CommunityDetail[] {
             return
           }
 
-          const requestClient = new RequestClient(waku)
+          const requestClient = getRequestClient(waku)
           const community = await requestClient.fetchCommunityDescription(deserializedPublicKey)
 
           if (!community) {
