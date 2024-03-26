@@ -25,7 +25,7 @@ export function PublicKeyInput({ onPublicKeyChange }: Props) {
       Community public key
       <CommunityKey
         value={value}
-        placeholder="E.g. 0xbede83eef5d82c4dd5d82c4dd5fa837ad"
+        placeholder="E.g. zQ3shf8EvhRKHSc3skg7upULuLdWhS95SczZkuS69P6rJTaed"
         onChange={(e) => setValue(e.currentTarget.value)}
       />
     </CommunityKeyLabel>
