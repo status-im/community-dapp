@@ -2570,10 +2570,10 @@
   dependencies:
     antlr4ts "^0.5.0-alpha.4"
 
-"@status-im/js@0.6.1":
-  version "0.6.1"
-  resolved "https://registry.yarnpkg.com/@status-im/js/-/js-0.6.1.tgz#0e6ad504b79d661e1b5f93b3f7b68d9487ad8bad"
-  integrity sha512-VTWu/vv8Rp3N/j7Q66EAnxMz1dg3e1XFu/9DaFbM/5t+rT818Fu/0etqu46UlPv0XAyvodxPrM0RxvPfSUb0Vw==
+"@status-im/js@0.6.5":
+  version "0.6.5"
+  resolved "https://registry.yarnpkg.com/@status-im/js/-/js-0.6.5.tgz#7a1803c42801b8e9beb433a07ff3511a1d695049"
+  integrity sha512-rMoK5SerHHC30vWk31Ona/JKeiFZPWdf/KaDC+ClhSXUixxIHER5DhGH+Wgr+Ef/fUyb795LCRB8QUxKF9eXmg==
   dependencies:
     "@bufbuild/protobuf" "1.4.2"
     "@libp2p/bootstrap" "^9.0.10"
