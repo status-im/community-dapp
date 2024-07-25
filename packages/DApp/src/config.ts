@@ -1,6 +1,6 @@
 // import { v4 as uuidv4 } from 'uuid'
 import { Chain, ChainId, Optimism, OptimismGoerli, Config as DAppConfig, Localhost, Hardhat } from '@usedapp/core'
-import { peers } from './constants/peers'
+import { peers } from '@status-im/js'
 
 const version = '0.0.6'
 
