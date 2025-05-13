@@ -4,7 +4,8 @@ import { useEffect } from 'react'
 import { useContractCalls } from '@usedapp/core'
 import { useContracts } from './useContracts'
 import { useWaku } from '../providers/waku/provider'
-import { deserializePublicKey } from '@status-im/js'
+import { deserializePublicKey, tagsToIndices } from '@status-im/js'
+import { createCommunityURLWithData } from '@status-im/js/create-url'
 import { BigNumber } from 'ethers'
 import { useFeaturedVotes } from './useFeaturedVotes'
 import { getRequestClient } from '../lib/request-client'
@@ -48,6 +49,20 @@ export function useCommunities(publicKeys: string[]): CommunityDetail[] {
             return
           }
 
+          const numericTags = tagsToIndices(community.tags)
+
+          const encodedCommunity = {
+            ...community,
+            tags: numericTags,
+            displayName: community.identity?.displayName || '',
+            description: community.identity?.description || '',
+            membersCount: Object.keys(community.members).length,
+            color: '#000000',
+            tagIndices: numericTags,
+          }
+
+          const encodedUrl = await createCommunityURLWithData(encodedCommunity, publicKey)
+
           dispatch({
             publicKey: deserializedPublicKey,
             name: community!.identity!.displayName,
@@ -60,7 +75,7 @@ export function useCommunities(publicKeys: string[]): CommunityDetail[] {
                   })
                 )
               : null,
-            link: `https://status.app/c#${publicKey}`,
+            link: encodedUrl.href,
             currentVoting: undefined,
             tags: community.tags,
             numberOfMembers: Object.keys(community.members).length,
