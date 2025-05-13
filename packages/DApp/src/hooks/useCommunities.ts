@@ -57,7 +57,7 @@ export function useCommunities(publicKeys: string[]): CommunityDetail[] {
             displayName: community.identity?.displayName || '',
             description: community.identity?.description || '',
             membersCount: Object.keys(community.members).length,
-            color: '#000000',
+            color: community.identity?.color || '#000000',
             tagIndices: numericTags,
           }
 
