@@ -4,7 +4,7 @@ import { useEffect } from 'react'
 import { useContractCalls } from '@usedapp/core'
 import { useContracts } from './useContracts'
 import { useWaku } from '../providers/waku/provider'
-import { deserializePublicKey, tagsToIndices } from '@status-im/js'
+import { deserializePublicKey, serializePublicKey, tagsToIndices } from '@status-im/js'
 import { createCommunityURLWithData } from '@status-im/js/create-url'
 import { BigNumber } from 'ethers'
 import { useFeaturedVotes } from './useFeaturedVotes'
@@ -57,7 +57,7 @@ export function useCommunities(publicKeys: string[]): CommunityDetail[] {
               membersCount: Object.keys(community.members).length,
               tagIndices: tagsToIndices(community.tags),
             },
-            publicKey
+            serializePublicKey(publicKey)
           )
 
           dispatch({
