@@ -51,7 +51,7 @@ export function useCommunities(publicKeys: string[]): CommunityDetail[] {
 
           const numericTags = tagsToIndices(community.tags)
 
-          const encodedCommunity = {
+          const communityData = {
             ...community,
             tags: numericTags,
             displayName: community.identity?.displayName || '',
@@ -61,7 +61,7 @@ export function useCommunities(publicKeys: string[]): CommunityDetail[] {
             tagIndices: numericTags,
           }
 
-          const encodedUrl = await createCommunityURLWithData(encodedCommunity, publicKey)
+          const encodedUrl = await createCommunityURLWithData(communityData, publicKey)
 
           dispatch({
             publicKey: deserializedPublicKey,
