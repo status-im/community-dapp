@@ -10,6 +10,9 @@
   },
   "license": "MIT",
   "type": "module",
+  "engines": {
+    "node": ">=18.18.0"
+  },
   "scripts": {
     "dev": "NODE_OPTIONS=--openssl-legacy-provider webpack serve --mode=development --https",
     "build": "NODE_OPTIONS=--openssl-legacy-provider webpack --mode=production",

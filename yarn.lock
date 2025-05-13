@@ -8916,7 +8916,7 @@ it-length-prefixed-stream@^1.0.0:
     uint8-varint "^2.0.1"
     uint8arraylist "^2.4.1"
 
-it-length-prefixed@^9.0.1, it-length-prefixed@^9.0.4:
+it-length-prefixed@9.0.4, it-length-prefixed@^9.0.1, it-length-prefixed@^9.0.4:
   version "9.0.4"
   resolved "https://registry.yarnpkg.com/it-length-prefixed/-/it-length-prefixed-9.0.4.tgz#8096c3270420fe8abaa920c7b4d5e5895144008e"
   integrity sha512-lz28fykbG0jq7s5XtvlzGxO5BeSOw6ikymkRllxjL21V5VKLcvB4pHr9wPvEnsAJ2et1xpOk3BRTMq9XrhgKsg==
