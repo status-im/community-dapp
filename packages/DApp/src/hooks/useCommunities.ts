@@ -49,19 +49,16 @@ export function useCommunities(publicKeys: string[]): CommunityDetail[] {
             return
           }
 
-          const numericTags = tagsToIndices(community.tags)
-
-          const communityData = {
-            ...community,
-            tags: numericTags,
-            displayName: community.identity?.displayName || '',
-            description: community.identity?.description || '',
-            membersCount: Object.keys(community.members).length,
-            color: community.identity?.color || '#000000',
-            tagIndices: numericTags,
-          }
-
-          const encodedUrl = await createCommunityURLWithData(communityData, publicKey)
+          const encodedUrl = await createCommunityURLWithData(
+            {
+              description: community.identity!.description,
+              displayName: community.identity!.displayName,
+              color: community.identity!.color,
+              membersCount: Object.keys(community.members).length,
+              tagIndices: tagsToIndices(community.tags),
+            },
+            publicKey
+          )
 
           dispatch({
             publicKey: deserializedPublicKey,
