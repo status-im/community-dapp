@@ -4,7 +4,7 @@ import { useEffect } from 'react'
 import { useContractCalls } from '@usedapp/core'
 import { useContracts } from './useContracts'
 import { useWaku } from '../providers/waku/provider'
-import { deserializePublicKey } from '@status-im/js'
+import { deserializePublicKey, serializePublicKey } from '@status-im/js'
 import { BigNumber } from 'ethers'
 import { useFeaturedVotes } from './useFeaturedVotes'
 import { getRequestClient } from '../lib/request-client'
@@ -60,7 +60,7 @@ export function useCommunities(publicKeys: string[]): CommunityDetail[] {
                   })
                 )
               : null,
-            link: `https://status.app/c#${publicKey}`,
+            link: `https://status.app/c#${serializePublicKey(publicKey)}`,
             currentVoting: undefined,
             tags: community.tags,
             numberOfMembers: Object.keys(community.members).length,

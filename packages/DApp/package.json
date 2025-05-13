@@ -10,6 +10,9 @@
   },
   "license": "MIT",
   "type": "module",
+  "engines": {
+    "node": ">=18.18.0"
+  },
   "scripts": {
     "dev": "NODE_OPTIONS=--openssl-legacy-provider webpack serve --mode=development --https",
     "build": "NODE_OPTIONS=--openssl-legacy-provider webpack --mode=production",
@@ -22,7 +25,7 @@
   },
   "dependencies": {
     "@libp2p/bootstrap": "^9.0.10",
-    "@status-im/js": "0.6.7",
+    "@status-im/js": "^1.1.0",
     "@usedapp/core": "^1.2.8",
     "@waku/core": "^0.0.27",
     "@waku/sdk": "^0.0.22",

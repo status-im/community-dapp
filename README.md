@@ -9,7 +9,8 @@ Proposed api is available [here](API.md)
 # Running the project
 
 Note: 
-- Use node `v18.15.0`
+- Use node `v18.18.0`
+- Use yarn `1.22.19`
 - Use Foundry ([getfoundry.sh](https://getfoundry.sh))
 
 1. Install dependencies: Run `yarn` to install the necessary packages and dependencies.
