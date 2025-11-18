@@ -104,6 +104,10 @@ module.exports = () => {
         overlay: true,
       },
     },
+    snapshot: {
+      managedPaths: [path.resolve(__dirname, 'node_modules')],
+      immutablePaths: [],
+    },
     stats: 'minimal',
   }
 }
