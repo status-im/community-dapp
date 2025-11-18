@@ -2,9 +2,8 @@
 // note: !waku and waku && conditions to use isConnected when implementing detection of dicsonnections
 
 import React, { ReactNode, createContext, useContext, useEffect, useState } from 'react'
-import { bootstrap } from '@libp2p/bootstrap'
 import { Protocols } from '@waku/interfaces'
-import { createLightNode, waitForRemotePeer } from '@waku/sdk'
+import { createLightNode } from '@waku/sdk'
 import type { LightNode } from '@waku/interfaces'
 
 type Context = {
@@ -37,26 +36,18 @@ export function WakuProvider({ peers, children }: Props) {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         emitSelf: true,
+        bootstrapPeers: peers,
         libp2p: {
-          peerDiscovery: [
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore icorrectly  types from @libp2p/boostrap#package.json; patched only in @status-im/js for now
-            bootstrap({
-              list: peers,
-              timeout: 0,
-              // note: Infinity prevents connection
-              // tagTTL: Infinity,
-            }),
-          ],
+          filterMultiaddrs: false,
         },
-        shardInfo: {
+        networkConfig: {
           clusterId: 16,
           shards: [32],
         },
       })
 
       await waku.start()
-      await waitForRemotePeer(waku, [Protocols.Store, Protocols.LightPush], 15 * 1000)
+      await waku.waitForPeers([Protocols.Store, Protocols.LightPush], 15 * 1000)
 
       setWaku(waku)
       setIsLoading(false)
