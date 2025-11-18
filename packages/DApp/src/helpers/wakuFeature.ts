@@ -4,7 +4,7 @@ import { JsonRpcSigner } from '@ethersproject/providers'
 import proto from './loadProtons'
 import { createDecoder } from '@waku/core'
 
-import type { LightNode } from '@waku/interfaces'
+import type { LightNode, IDecodedMessage } from '@waku/interfaces'
 import type { DecodedMessage } from '@waku/core'
 import { getContractParameters } from './receiveWakuFeature'
 
@@ -35,9 +35,9 @@ export async function receiveWakuFeatureMsg(waku: LightNode | undefined, topic: 
     // todo: init decoder once
     await waku.store.queryWithOrderedCallback(
       [createDecoder(topic, { clusterId: 16, shard: 32 })],
-      (wakuMessage: DecodedMessage) => {
-        messages.push(wakuMessage)
-      }
+      (wakuMessage: IDecodedMessage) => {
+        messages.push(wakuMessage as DecodedMessage)
+      },
     )
 
     return decodeWakuFeatures(messages)
@@ -50,7 +50,7 @@ export async function createWakuFeatureMsg(
   sntAmount: number,
   community: string,
   time: number,
-  getTypedData: (data: [string, string, BigNumber, BigNumber]) => any
+  getTypedData: (data: [string, string, BigNumber, BigNumber]) => any,
 ) {
   if (!voter || !signer) {
     return undefined

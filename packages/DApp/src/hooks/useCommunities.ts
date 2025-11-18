@@ -55,7 +55,7 @@ export function useCommunities(publicKeys: string[]): CommunityDetail[] {
             ens: community!.identity!.ensName,
             icon: community!.identity!.images.large
               ? URL.createObjectURL(
-                  new Blob([community!.identity!.images.large.payload], {
+                  new Blob([new Uint8Array(community!.identity!.images.large.payload)], {
                     type: 'image/jpeg',
                   })
                 )

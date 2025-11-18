@@ -29,7 +29,12 @@ module.exports = () => {
         stream: require.resolve('stream-browserify'),
         assert: require.resolve('assert'),
         zlib: false,
+        fs: false,
+        path: false,
       },
+    },
+    externals: {
+      'protobufjs-cli': 'commonjs protobufjs-cli',
     },
     module: {
       rules: [
@@ -93,9 +98,11 @@ module.exports = () => {
     devServer: {
       historyApiFallback: true,
       host: '0.0.0.0',
-      stats: 'errors-only',
-      overlay: true,
       hot: true,
+      server: 'https',
+      client: {
+        overlay: true,
+      },
     },
     stats: 'minimal',
   }

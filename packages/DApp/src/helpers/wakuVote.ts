@@ -8,7 +8,7 @@ import { TypedVote } from '../models/TypedData'
 import { createDecoder } from '@waku/core'
 
 import type { DecodedMessage } from '@waku/core'
-import type { LightNode } from '@waku/interfaces'
+import type { LightNode, IDecodedMessage } from '@waku/interfaces'
 
 function getContractParameters(
   address: string,
@@ -58,7 +58,7 @@ function decodeWakuVote(msg: DecodedMessage): WakuVoteData | undefined {
     }
     const data = proto.WakuVote.decode(msg.payload)
     if (data && data.address && data.timestamp && data.roomID && data.sign && data.sntAmount && data.vote) {
-      return { ...data, sntAmount: BigNumber.from(data.sntAmount) }
+      return { ...data, sntAmount: BigNumber.from(data.sntAmount), roomID: Number(data.roomID) }
     } else {
       return undefined
     }
@@ -77,9 +77,9 @@ export async function receiveWakuVotes(waku: LightNode, topic: string, room: num
   // todo: init decoder once
   await waku.store.queryWithOrderedCallback(
     [createDecoder(topic + room.toString(), { clusterId: 16, shard: 32 })],
-    (wakuMessage: DecodedMessage) => {
-      messages.push(wakuMessage)
-    }
+    (wakuMessage: IDecodedMessage) => {
+      messages.push(wakuMessage as DecodedMessage)
+    },
   )
 
   return decodeWakuVotes(messages)
@@ -116,7 +116,7 @@ export async function createWakuVote(
       sntAmount: utils.arrayify(BigNumber.from(voteAmount)),
       sign: signature,
       timestamp: timestamp,
-      roomID: room,
+      roomID: BigInt(room),
     })
 
     return payload

@@ -38,9 +38,9 @@ export function WakuProvider({ peers, children }: Props) {
         // @ts-ignore
         emitSelf: true,
         libp2p: {
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore icorrectly  types from @libp2p/boostrap#package.json; patched only in @status-im/js for now
           peerDiscovery: [
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore icorrectly  types from @libp2p/boostrap#package.json; patched only in @status-im/js for now
             bootstrap({
               list: peers,
               timeout: 0,
