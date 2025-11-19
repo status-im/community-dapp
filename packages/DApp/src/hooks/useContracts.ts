@@ -9,15 +9,15 @@ export function useContracts() {
   const { chainId } = useEthers()
 
   const [votingContract, setVotingContract] = useState(
-    new Contract('0x0000000000000000000000000000000000000000', new Interface(VotingContract.abi))
+    new Contract('0x0000000000000000000000000000000000000000', new Interface(VotingContract.abi)),
   )
 
   const [directoryContract, setDirectoryContract] = useState(
-    new Contract('0x0000000000000000000000000000000000000000', new Interface(Directory.abi))
+    new Contract('0x0000000000000000000000000000000000000000', new Interface(Directory.abi)),
   )
 
   const [featuredVotingContract, setFeaturedVotingContract] = useState(
-    new Contract('0x0000000000000000000000000000000000000000', new Interface(FeaturedVotingContract.abi))
+    new Contract('0x0000000000000000000000000000000000000000', new Interface(FeaturedVotingContract.abi)),
   )
 
   useEffect(() => {
@@ -27,7 +27,7 @@ export function useContracts() {
         setVotingContract(new Contract(chainConfig.votingContract, new Interface(VotingContract.abi)))
         setDirectoryContract(new Contract(chainConfig.directoryContract, new Interface(Directory.abi)))
         setFeaturedVotingContract(
-          new Contract(chainConfig.featuredVotingContract, new Interface(FeaturedVotingContract.abi))
+          new Contract(chainConfig.featuredVotingContract, new Interface(FeaturedVotingContract.abi)),
         )
       }
     }

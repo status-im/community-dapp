@@ -40,7 +40,7 @@ export function useTypedFeatureVote() {
         },
       } as TypedFeature
     },
-    [chainId, featuredVotingContract.address]
+    [chainId, featuredVotingContract.address],
   )
 
   return { getTypedFeatureVote }

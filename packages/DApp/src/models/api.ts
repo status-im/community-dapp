@@ -9,5 +9,5 @@ export type APIOptions = {
 
 export type APIFunction = (
   pageNumber: number,
-  options: APIOptions
+  options: APIOptions,
 ) => Promise<{ page: number; communities: CommunityDetail[] }>

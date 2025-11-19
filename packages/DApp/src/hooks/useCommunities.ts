@@ -25,7 +25,7 @@ export function useCommunities(publicKeys: string[]): CommunityDetail[] {
           method: 'getVotingHistory',
           args: [publicKey],
         }
-      })
+      }),
     ) ?? []
 
   useEffect(() => {
@@ -57,7 +57,7 @@ export function useCommunities(publicKeys: string[]): CommunityDetail[] {
               ? URL.createObjectURL(
                   new Blob([new Uint8Array(community!.identity!.images.large.payload)], {
                     type: 'image/jpeg',
-                  })
+                  }),
                 )
               : null,
             link: `https://status.app/c#${serializePublicKey(publicKey)}`,
@@ -67,7 +67,7 @@ export function useCommunities(publicKeys: string[]): CommunityDetail[] {
             votingHistory: [],
             validForAddition: true,
           })
-        })
+        }),
       )
     }
 

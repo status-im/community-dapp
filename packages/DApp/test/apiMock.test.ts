@@ -5,7 +5,7 @@ import { communities } from '../src/helpers/apiMockData'
 describe('getCommunityDetails', () => {
   it('success', async () => {
     expect(getCommunityDetailsSync('0x0d9cb350e1dc415303e2816a21b0a439530725b4b2b42d2948e967cb211eab89d5')).to.deep.eq(
-      communities[0]
+      communities[0],
     )
   })
   it('gets different community', async () => {

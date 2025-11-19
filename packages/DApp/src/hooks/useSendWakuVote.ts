@@ -25,14 +25,14 @@ export function useSendWakuVote() {
             }),
             {
               payload: msg,
-            }
+            },
           )
         } else {
           alert('error sending vote please try again')
         }
       }
     },
-    [waku, signer, account, getTypedVote]
+    [waku, signer, account, getTypedVote],
   )
 
   return sendWakuVote

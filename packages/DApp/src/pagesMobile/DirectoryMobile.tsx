@@ -25,7 +25,7 @@ import { useWaku } from '../providers/waku/provider'
 import { useAccount } from '../hooks/useAccount'
 
 export function DirectoryMobile() {
-  const { account, isActive } = useAccount()
+  const { isActive } = useAccount()
   const { featuredVotingContract } = useContracts()
   const { getTypedFeatureVote } = useTypedFeatureVote()
   const { waku } = useWaku()
@@ -99,13 +99,13 @@ export function DirectoryMobile() {
                 const { votesToSend } = await receiveWakuFeature(
                   waku,
                   config.wakuConfig.wakuFeatureTopic,
-                  activeVoting!
+                  activeVoting!,
                 )
                 const votes = mapFeaturesVotes(votesToSend, getTypedFeatureVote)
 
                 const batchedVotes = votes.slice(
                   batchDoneCount * config.votesLimit,
-                  batchDoneCount * config.votesLimit + finalizeVotingLimit
+                  batchDoneCount * config.votesLimit + finalizeVotingLimit,
                 )
 
                 await castVotes.send(batchedVotes)

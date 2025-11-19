@@ -15,7 +15,7 @@ function getContractParameters(
   room: number,
   type: number,
   sntAmount: number,
-  timestamp: number
+  timestamp: number,
 ): [string, BigNumber, BigNumber, BigNumber] {
   return [address, BigNumber.from(room).mul(2).add(type), BigNumber.from(sntAmount), BigNumber.from(timestamp)]
 }
@@ -23,7 +23,7 @@ function getContractParameters(
 export function filterVerifiedVotes(
   messages: WakuVoteData[] | undefined,
   alreadyVoted: string[],
-  getTypedData: (data: [string, BigNumber, BigNumber, BigNumber]) => TypedVote
+  getTypedData: (data: [string, BigNumber, BigNumber, BigNumber]) => TypedVote,
 ) {
   if (!messages) {
     return []
@@ -36,7 +36,7 @@ export function filterVerifiedVotes(
       msg.roomID,
       msg.vote == 'yes' ? 1 : 0,
       msg.sntAmount.toNumber(),
-      msg.timestamp
+      msg.timestamp,
     )
 
     if (utils.getAddress(recoverAddress(getTypedData(params), msg.sign)) == msg.address) {
@@ -93,7 +93,7 @@ export async function createWakuVote(
   type: number,
   timestamp: number,
   getTypedData: (data: [string, BigNumber, BigNumber, BigNumber]) => any,
-  sig?: string
+  sig?: string,
 ) {
   if (!account || !signer) {
     return undefined

@@ -1,5 +1,8 @@
 {
   "extends": [
     "../../.eslintrc.json"
+  ],
+  "ignorePatterns": [
+    "src/helpers/waku.ts"
   ]
 }

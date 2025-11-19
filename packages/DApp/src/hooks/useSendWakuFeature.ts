@@ -25,14 +25,14 @@ export function useSendWakuFeature() {
             }),
             {
               payload: msg,
-            }
+            },
           )
         } else {
           alert('error sending feature vote please try again')
         }
       }
     },
-    [waku, signer, account, getTypedFeatureVote]
+    [waku, signer, account, getTypedFeatureVote],
   )
 
   return sendWakuFeature
