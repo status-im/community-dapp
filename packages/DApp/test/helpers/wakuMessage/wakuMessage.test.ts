@@ -35,7 +35,7 @@ describe('wakuMessage', () => {
     it('success', async () => {
       const encoder = createEncoder({
         contentTopic: '/communitiesCuration/test/0.0.6/directory/proto/2',
-        pubsubTopicShardInfo: { clusterId: 16, shard: 32 },
+        routingInfo: { pubsubTopic: '/waku/2/rs/16/32', clusterId: 16, shardId: 32 },
       })
 
       const payload = proto.WakuVote.encode({
@@ -85,7 +85,7 @@ describe('wakuMessage', () => {
   it('wrong data', async () => {
     const encoder = createEncoder({
       contentTopic: '/communitiesCuration/test/0.0.6/directory/proto/2',
-      pubsubTopicShardInfo: { clusterId: 16, shard: 32 },
+      routingInfo: { pubsubTopic: '/waku/2/rs/16/32', clusterId: 16, shardId: 32 },
     })
 
     const payload = proto2.WakuVote.encode({
@@ -120,7 +120,7 @@ describe('wakuMessage', () => {
     it('success', async () => {
       const encoder = createEncoder({
         contentTopic: '/communitiesCuration/test/0.0.6/directory/proto/2',
-        pubsubTopicShardInfo: { clusterId: 16, shard: 32 },
+        routingInfo: { pubsubTopic: '/waku/2/rs/16/32', clusterId: 16, shardId: 32 },
       })
 
       const payload = proto2.WakuFeature.encode({
@@ -158,7 +158,7 @@ describe('wakuMessage', () => {
     it('success', async () => {
       const encoder = createEncoder({
         contentTopic: '/communitiesCuration/test/0.0.6/directory/proto/2',
-        pubsubTopicShardInfo: { clusterId: 16, shard: 32 },
+        routingInfo: { pubsubTopic: '/waku/2/rs/16/32', clusterId: 16, shardId: 32 },
       })
       const payload = await wakuMessage.create(
         alice.address,
@@ -186,7 +186,7 @@ describe('wakuMessage', () => {
     it('different payload', async () => {
       const encoder = createEncoder({
         contentTopic: '/communitiesCuration/test/0.0.6/directory/proto/2',
-        pubsubTopicShardInfo: { clusterId: 16, shard: 32 },
+        routingInfo: { pubsubTopic: '/waku/2/rs/16/32', clusterId: 16, shardId: 32 },
       })
       const payload = await wakuMessage.create(
         alice.address,
@@ -214,7 +214,7 @@ describe('wakuMessage', () => {
     it('no address', async () => {
       const encoder = createEncoder({
         contentTopic: '/communitiesCuration/test/0.0.6/directory/proto/2',
-        pubsubTopicShardInfo: { clusterId: 16, shard: 32 },
+        routingInfo: { pubsubTopic: '/waku/2/rs/16/32', clusterId: 16, shardId: 32 },
       })
       const payload = await wakuMessage.create(undefined, alice as unknown as JsonRpcSigner, 1, 100, 1, 1, () => [])
       const msg = await encoder.toProtoObj({ payload: payload! })
@@ -224,7 +224,7 @@ describe('wakuMessage', () => {
     it('no signer', async () => {
       const encoder = createEncoder({
         contentTopic: '/communitiesCuration/test/0.0.6/directory/proto/2',
-        pubsubTopicShardInfo: { clusterId: 16, shard: 32 },
+        routingInfo: { pubsubTopic: '/waku/2/rs/16/32', clusterId: 16, shardId: 32 },
       })
       const payload = await wakuMessage.create(alice.address, undefined, 1, 100, 1, 1, () => [])
       const msg = await encoder.toProtoObj({ payload: payload! })
@@ -234,7 +234,7 @@ describe('wakuMessage', () => {
     it('different signer', async () => {
       const encoder = createEncoder({
         contentTopic: '/communitiesCuration/test/0.0.6/directory/proto/2',
-        pubsubTopicShardInfo: { clusterId: 16, shard: 32 },
+        routingInfo: { pubsubTopic: '/waku/2/rs/16/32', clusterId: 16, shardId: 32 },
       })
       const payload = await wakuMessage.create(alice.address, bob as unknown as JsonRpcSigner, 1, 100, 1, 1, () => [])
       const msg = await encoder.toProtoObj({ payload: payload! })

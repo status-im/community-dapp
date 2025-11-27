@@ -34,7 +34,7 @@ export async function receiveWakuFeatureMsg(waku: LightNode | undefined, topic: 
     const messages: DecodedMessage[] = []
     // todo: init decoder once
     await waku.store.queryWithOrderedCallback(
-      [createDecoder(topic, { clusterId: 16, shard: 32 })],
+      [createDecoder(topic, { pubsubTopic: '/waku/2/rs/16/32', clusterId: 16, shardId: 32 })],
       (wakuMessage: IDecodedMessage) => {
         messages.push(wakuMessage as DecodedMessage)
       },

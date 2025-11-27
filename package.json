@@ -10,7 +10,6 @@
   "resolutions": {
     "it-length-prefixed": "9.0.4",
     "protons-runtime": "5.6.0",
-    "@waku/interfaces": "0.0.32",
     "uint8arraylist": "2.4.8"
   },
   "scripts": {

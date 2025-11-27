@@ -42,7 +42,6 @@ export function WakuProvider({ peers, children }: Props) {
         },
         networkConfig: {
           clusterId: 16,
-          shards: [32],
         },
       })
 

@@ -76,7 +76,7 @@ export async function receiveWakuVotes(waku: LightNode, topic: string, room: num
   const messages: DecodedMessage[] = []
   // todo: init decoder once
   await waku.store.queryWithOrderedCallback(
-    [createDecoder(topic + room.toString(), { clusterId: 16, shard: 32 })],
+    [createDecoder(topic + room.toString(), { pubsubTopic: '/waku/2/rs/16/32', clusterId: 16, shardId: 32 })],
     (wakuMessage: IDecodedMessage) => {
       messages.push(wakuMessage as DecodedMessage)
     },
