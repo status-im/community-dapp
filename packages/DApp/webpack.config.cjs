@@ -28,6 +28,7 @@ module.exports = () => {
         crypto: require.resolve('crypto-browserify'),
         stream: require.resolve('stream-browserify'),
         assert: require.resolve('assert'),
+        process: require.resolve('process/browser.js'),
         zlib: false,
         fs: false,
         path: false,
