@@ -27,6 +27,8 @@ export interface Config {
     peers: string[]
     wakuTopic: string
     wakuFeatureTopic: string
+    clusterId: number
+    shards: number[]
   }
   usedappConfig: DAppConfig
   contracts: Record<number, Record<string, string>>
@@ -45,6 +47,8 @@ const configs: Record<typeof process.env.ENV, Config> = {
       peers: peers.development,
       wakuTopic: `/communitiesCuration/localhost/${version}/directory/proto/`,
       wakuFeatureTopic: `/communitiesCuration/localhost/${version}/featured/proto/`,
+      clusterId: 16,
+      shards: [32, 128, 256],
     },
     usedappConfig: {
       readOnlyChainId: ChainId.Hardhat,
@@ -83,6 +87,8 @@ const configs: Record<typeof process.env.ENV, Config> = {
       peers: peers.preview,
       wakuTopic: `/communitiesCuration/preview/${version}/directory/proto/`,
       wakuFeatureTopic: `/communitiesCuration/preview/${version}/featured/proto/`,
+      clusterId: 16,
+      shards: [32, 128, 256],
     },
     usedappConfig: {
       readOnlyChainId: OptimismSepolia.chainId,
@@ -122,6 +128,8 @@ const configs: Record<typeof process.env.ENV, Config> = {
       peers: peers.production,
       wakuTopic: `/communitiesCuration/${version}/directory/proto/`,
       wakuFeatureTopic: `/communitiesCuration/${version}/featured/proto/`,
+      clusterId: 16,
+      shards: [32, 128, 256],
     },
     usedappConfig: {
       readOnlyChainId: ChainId.Optimism,

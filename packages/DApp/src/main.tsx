@@ -11,7 +11,7 @@ import { config } from './config'
 
 render(
   <React.StrictMode>
-    <WakuProvider peers={config.wakuConfig.peers}>
+    <WakuProvider peers={config.wakuConfig.peers} clusterId={config.wakuConfig.clusterId}>
       <DAppProvider config={config.usedappConfig}>
         <CommunitiesProvider>
           <App />
