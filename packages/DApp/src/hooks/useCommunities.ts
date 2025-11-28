@@ -32,7 +32,7 @@ export function useCommunities(publicKeys: string[]): CommunityDetail[] {
     if (!waku || publicKeys.length === 0) return
 
     const fetch = async () => {
-      await Promise.all(
+      await Promise.allSettled(
         publicKeys.map(async (publicKey) => {
           const deserializedPublicKey = deserializePublicKey(publicKey)
 

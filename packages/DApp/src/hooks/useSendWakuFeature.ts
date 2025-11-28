@@ -6,6 +6,8 @@ import { createWakuFeatureMsg } from '../helpers/wakuFeature'
 import { createEncoder } from '@waku/core'
 import { useTypedFeatureVote } from './useTypedFeatureVote'
 
+const { clusterId, shards } = config.wakuConfig
+
 export function useSendWakuFeature() {
   const { waku } = useWaku()
   const signer = useSigner()
@@ -18,14 +20,16 @@ export function useSendWakuFeature() {
       const msg = await createWakuFeatureMsg(account, signer, voteAmount, publicKey, timestamp, getTypedFeatureVote)
       if (msg) {
         if (waku) {
-          await waku.lightPush.send(
-            createEncoder({
-              contentTopic: config.wakuConfig.wakuFeatureTopic,
-              routingInfo: { pubsubTopic: '/waku/2/rs/16/32', clusterId: 16, shardId: 32 },
-            }),
-            {
-              payload: msg,
-            },
+          await Promise.allSettled(
+            shards.map((shardId) =>
+              waku.lightPush.send(
+                createEncoder({
+                  contentTopic: config.wakuConfig.wakuFeatureTopic,
+                  routingInfo: { pubsubTopic: `/waku/2/rs/${clusterId}/${shardId}`, clusterId, shardId },
+                }),
+                { payload: msg },
+              ),
+            ),
           )
         } else {
           alert('error sending feature vote please try again')
