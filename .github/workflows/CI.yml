@@ -2,7 +2,7 @@ name: CI
 on:
   pull_request:
     branches:
-    - master
+      - master
 
 env:
   FOUNDRY_PROFILE: ci
@@ -11,25 +11,25 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - name: Use Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: 18.18.0
-    - name: Install deps
-      run: yarn install --frozen-lockfile
-    - name: Lint
-      run: yarn lint
-    - name: Build
-      run: yarn build
-    - name: Test
-      run: yarn test
+      - uses: actions/checkout@v3
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22.17.0
+      - name: Install deps
+        run: yarn install --frozen-lockfile
+      - name: Lint
+        run: yarn lint
+      - name: Build
+        run: yarn build
+      - name: Test
+        run: yarn test
 
   test_foundry:
     strategy:
       fail-fast: true
 
-    name: Foundry tests 
+    name: Foundry tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3

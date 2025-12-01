@@ -29,7 +29,7 @@ export function VotingCardCover({ room }: VotingCardCoverProps) {
   const { votesFor: votesForUnverified, votesAgainst: votesAgainstUnverified } = useUnverifiedVotes(
     vote.ID,
     room.verificationStartAt,
-    room.startAt
+    room.startAt,
   )
 
   const includeUnverifiedVotes = !winner || verificationPeriod

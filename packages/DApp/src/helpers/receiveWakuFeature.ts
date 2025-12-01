@@ -29,7 +29,7 @@ export function getContractParameters(
   address: string,
   community: string,
   sntAmount: number,
-  timestamp: number
+  timestamp: number,
 ): [string, string, BigNumber, BigNumber] {
   return [address, community, BigNumber.from(sntAmount), BigNumber.from(timestamp)]
 }
@@ -78,7 +78,7 @@ export async function receiveWakuFeature(waku: LightNode | undefined, topic: str
 // note: copy of filterVerifiedFeaturesVotes()
 export function mapFeaturesVotes(
   messages: WakuFeatureData[] | undefined,
-  getTypedData: (data: [string, string, BigNumber, BigNumber]) => TypedFeature
+  getTypedData: (data: [string, string, BigNumber, BigNumber]) => TypedFeature,
 ) {
   if (!messages) {
     return []
@@ -99,7 +99,7 @@ export function mapFeaturesVotes(
 export async function filterVerifiedFeaturesVotes(
   messages: WakuFeatureData[] | undefined,
   alreadyVoted: AlreadyVoted,
-  getTypedData: (data: [string, string, BigNumber, BigNumber]) => TypedFeature
+  getTypedData: (data: [string, string, BigNumber, BigNumber]) => TypedFeature,
 ) {
   if (!messages) {
     return []

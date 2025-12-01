@@ -8,8 +8,8 @@ Proposed api is available [here](API.md)
 
 # Running the project
 
-Note: 
-- Use node `v18.18.0`
+Note:
+- Use node `v22.17.0`
 - Use yarn `1.22.19`
 - Use Foundry ([getfoundry.sh](https://getfoundry.sh))
 

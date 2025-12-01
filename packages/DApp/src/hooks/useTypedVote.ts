@@ -40,7 +40,7 @@ export function useTypedVote() {
         },
       } as TypedVote
     },
-    [chainId, votingContract.address]
+    [chainId, votingContract.address],
   )
   return { getTypedVote }
 }

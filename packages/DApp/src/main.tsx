@@ -19,5 +19,5 @@ render(
       </DAppProvider>
     </WakuProvider>
   </React.StrictMode>,
-  document.getElementById('root') as HTMLElement
+  document.getElementById('root') as HTMLElement,
 )

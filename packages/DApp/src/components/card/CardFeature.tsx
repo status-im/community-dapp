@@ -53,7 +53,7 @@ export const CardFeature = ({ community, featured }: CardFeatureProps) => {
     account &&
       ((community.publicKey in alreadyVoted && !alreadyVoted[community.publicKey].includes(account)) ||
         !(community.publicKey in alreadyVoted)) &&
-      (savedVotes?.[0]?.community !== community.publicKey || savedVotes?.[0]?.voter !== account)
+      (savedVotes?.[0]?.community !== community.publicKey || savedVotes?.[0]?.voter !== account),
   )
 
   useEffect(() => {

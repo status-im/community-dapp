@@ -8,7 +8,7 @@ import { VoteConfirmModal } from './VoteConfirmModal'
 import binIcon from '../../assets/images/bin.svg'
 import { RemoveModal } from './RemoveModal'
 import { CardHeading } from '../Card'
-import { useEthers, getExplorerAddressLink, ChainId } from '@usedapp/core'
+import { useEthers, ChainId } from '@usedapp/core'
 import { useHistory } from 'react-router'
 import { useAccount } from '../../hooks/useAccount'
 import { config } from '../../config'
@@ -118,7 +118,11 @@ export const CardCommunity = ({
           Visit community
         </LinkExternal>
         <LinkExternal
-          href={getExplorerAddressLink(config.contracts[chainId as ChainId]?.directoryContract, chainId!)}
+          href={
+            config.usedappConfig.networks
+              ?.find((chain) => chain.chainId === chainId)
+              ?.getExplorerAddressLink(config.contracts[chainId as ChainId]?.directoryContract || '') || '#'
+          }
           target="_blank"
           rel="noopener noreferrer"
         >

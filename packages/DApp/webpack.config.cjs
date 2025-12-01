@@ -28,8 +28,14 @@ module.exports = () => {
         crypto: require.resolve('crypto-browserify'),
         stream: require.resolve('stream-browserify'),
         assert: require.resolve('assert'),
+        process: require.resolve('process/browser.js'),
         zlib: false,
+        fs: false,
+        path: false,
       },
+    },
+    externals: {
+      'protobufjs-cli': 'commonjs protobufjs-cli',
     },
     module: {
       rules: [
@@ -93,9 +99,15 @@ module.exports = () => {
     devServer: {
       historyApiFallback: true,
       host: '0.0.0.0',
-      stats: 'errors-only',
-      overlay: true,
       hot: true,
+      server: 'https',
+      client: {
+        overlay: true,
+      },
+    },
+    snapshot: {
+      managedPaths: [path.resolve(__dirname, 'node_modules')],
+      immutablePaths: [],
     },
     stats: 'minimal',
   }
