@@ -21,18 +21,18 @@ export function useSendWakuFeature() {
           await waku.lightPush.send(
             createEncoder({
               contentTopic: config.wakuConfig.wakuFeatureTopic,
-              pubsubTopicShardInfo: { clusterId: 16, shard: 32 },
+              routingInfo: { pubsubTopic: '/waku/2/rs/16/32', clusterId: 16, shardId: 32 },
             }),
             {
               payload: msg,
-            }
+            },
           )
         } else {
           alert('error sending feature vote please try again')
         }
       }
     },
-    [waku, signer, account, getTypedFeatureVote]
+    [waku, signer, account, getTypedFeatureVote],
   )
 
   return sendWakuFeature

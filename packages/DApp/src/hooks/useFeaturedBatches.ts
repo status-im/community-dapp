@@ -19,7 +19,7 @@ export const useFeaturedBatches = () => {
   const allVotes = votes ?? {}
   const votesCount: number = Object.values(allVotes).reduce(
     (acc: number, curr: any) => acc + Object.keys(curr?.votes).length,
-    0
+    0,
   )
 
   const beingFinalized = !evaluated && finalized

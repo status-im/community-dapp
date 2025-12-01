@@ -29,7 +29,7 @@ export function useVotingCommunities(filterKeyword: string, voteType: string, so
         method: 'votingRooms',
         args: [el - 1],
       }
-    })
+    }),
   )
 
   const publicKeys = votingRooms.map((votingRoom: any) => votingRoom?.community).filter(Boolean)

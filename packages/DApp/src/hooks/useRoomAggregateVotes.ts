@@ -16,7 +16,7 @@ export function useRoomAggregateVotes(room: DetailedVotingRoom, showConfirmModal
           }
           return { for: accumulator.for, against: accumulator.against.add(vote[2]) }
         },
-        { for: room.totalVotesFor, against: room.totalVotesAgainst }
+        { for: room.totalVotesFor, against: room.totalVotesAgainst },
       )
       setReturnRoom({ ...room, totalVotesAgainst: reducedVotes.against, totalVotesFor: reducedVotes.for })
     }

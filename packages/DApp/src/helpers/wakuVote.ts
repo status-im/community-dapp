@@ -8,14 +8,14 @@ import { TypedVote } from '../models/TypedData'
 import { createDecoder } from '@waku/core'
 
 import type { DecodedMessage } from '@waku/core'
-import type { LightNode } from '@waku/interfaces'
+import type { LightNode, IDecodedMessage } from '@waku/interfaces'
 
 function getContractParameters(
   address: string,
   room: number,
   type: number,
   sntAmount: number,
-  timestamp: number
+  timestamp: number,
 ): [string, BigNumber, BigNumber, BigNumber] {
   return [address, BigNumber.from(room).mul(2).add(type), BigNumber.from(sntAmount), BigNumber.from(timestamp)]
 }
@@ -23,7 +23,7 @@ function getContractParameters(
 export function filterVerifiedVotes(
   messages: WakuVoteData[] | undefined,
   alreadyVoted: string[],
-  getTypedData: (data: [string, BigNumber, BigNumber, BigNumber]) => TypedVote
+  getTypedData: (data: [string, BigNumber, BigNumber, BigNumber]) => TypedVote,
 ) {
   if (!messages) {
     return []
@@ -36,7 +36,7 @@ export function filterVerifiedVotes(
       msg.roomID,
       msg.vote == 'yes' ? 1 : 0,
       msg.sntAmount.toNumber(),
-      msg.timestamp
+      msg.timestamp,
     )
 
     if (utils.getAddress(recoverAddress(getTypedData(params), msg.sign)) == msg.address) {
@@ -58,7 +58,7 @@ function decodeWakuVote(msg: DecodedMessage): WakuVoteData | undefined {
     }
     const data = proto.WakuVote.decode(msg.payload)
     if (data && data.address && data.timestamp && data.roomID && data.sign && data.sntAmount && data.vote) {
-      return { ...data, sntAmount: BigNumber.from(data.sntAmount) }
+      return { ...data, sntAmount: BigNumber.from(data.sntAmount), roomID: Number(data.roomID) }
     } else {
       return undefined
     }
@@ -76,10 +76,10 @@ export async function receiveWakuVotes(waku: LightNode, topic: string, room: num
   const messages: DecodedMessage[] = []
   // todo: init decoder once
   await waku.store.queryWithOrderedCallback(
-    [createDecoder(topic + room.toString(), { clusterId: 16, shard: 32 })],
-    (wakuMessage: DecodedMessage) => {
-      messages.push(wakuMessage)
-    }
+    [createDecoder(topic + room.toString(), { pubsubTopic: '/waku/2/rs/16/32', clusterId: 16, shardId: 32 })],
+    (wakuMessage: IDecodedMessage) => {
+      messages.push(wakuMessage as DecodedMessage)
+    },
   )
 
   return decodeWakuVotes(messages)
@@ -93,7 +93,7 @@ export async function createWakuVote(
   type: number,
   timestamp: number,
   getTypedData: (data: [string, BigNumber, BigNumber, BigNumber]) => any,
-  sig?: string
+  sig?: string,
 ) {
   if (!account || !signer) {
     return undefined
@@ -116,7 +116,7 @@ export async function createWakuVote(
       sntAmount: utils.arrayify(BigNumber.from(voteAmount)),
       sign: signature,
       timestamp: timestamp,
-      roomID: room,
+      roomID: BigInt(room),
     })
 
     return payload

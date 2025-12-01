@@ -9,7 +9,7 @@ type Error = {
 }
 
 export function useAccount() {
-  const { error, isLoading, active, switchNetwork, activateBrowserWallet, deactivate, account, library } = useEthers()
+  const { error, isLoading, active, switchNetwork, activateBrowserWallet, deactivate, account } = useEthers()
   const [activateError, setActivateError] = useState<Error | undefined>(undefined)
   const [isActive, setIsActive] = useState(false)
 
