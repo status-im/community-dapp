@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import backgroundImage from '../assets/images/curve-shape.svg'
 import { Colors } from '../constants/styles'
 import { useFeaturedVotingState } from '../hooks/useFeaturedVotingState'
-import { useFeaturedVotes } from '../hooks/useFeaturedVotes'
+import { useFeaturedVotes } from '../providers/featuredVotes/provider'
 import { formatTimeLeft } from '../helpers/fomatTimeLeft'
 
 export const WeeklyFeature = () => {

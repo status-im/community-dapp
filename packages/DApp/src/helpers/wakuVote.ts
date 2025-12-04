@@ -6,9 +6,12 @@ import proto from './loadProtons'
 import { WakuVoteData } from '../models/waku'
 import { TypedVote } from '../models/TypedData'
 import { createDecoder } from '@waku/core'
+import { config } from '../config'
 
 import type { DecodedMessage } from '@waku/core'
 import type { LightNode, IDecodedMessage } from '@waku/interfaces'
+
+const { clusterId, shards } = config.wakuConfig
 
 function getContractParameters(
   address: string,
@@ -75,11 +78,21 @@ export function decodeWakuVotes(messages: any[] | null) {
 export async function receiveWakuVotes(waku: LightNode, topic: string, room: number) {
   const messages: DecodedMessage[] = []
   // todo: init decoder once
-  await waku.store.queryWithOrderedCallback(
-    [createDecoder(topic + room.toString(), { pubsubTopic: '/waku/2/rs/16/32', clusterId: 16, shardId: 32 })],
-    (wakuMessage: IDecodedMessage) => {
-      messages.push(wakuMessage as DecodedMessage)
-    },
+  await Promise.allSettled(
+    shards.map((shardId) =>
+      waku.store.queryWithOrderedCallback(
+        [
+          createDecoder(topic + room.toString(), {
+            pubsubTopic: `/waku/2/rs/${clusterId}/${shardId}`,
+            clusterId,
+            shardId,
+          }),
+        ],
+        (wakuMessage: IDecodedMessage) => {
+          messages.push(wakuMessage as DecodedMessage)
+        },
+      ),
+    ),
   )
 
   return decodeWakuVotes(messages)
