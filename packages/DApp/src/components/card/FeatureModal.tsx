@@ -8,7 +8,7 @@ import { ColumnFlexDiv } from '../../constants/styles'
 import { useSendWakuFeature } from '../../hooks/useSendWakuFeature'
 import { useContractFunction } from '@usedapp/core'
 import { useContracts } from '../../hooks/useContracts'
-import { useFeaturedVotes } from '../../hooks/useFeaturedVotes'
+import { useFeaturedVotes } from '../../providers/featuredVotes/provider'
 import { useWaku } from '../../providers/waku/provider'
 
 interface FeatureModalProps {

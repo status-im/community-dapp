@@ -7,7 +7,7 @@ import { useContracts } from './useContracts'
 import { useWaku } from '../providers/waku/provider'
 import { deserializePublicKey, serializePublicKey } from '@status-im/js'
 import { BigNumber } from 'ethers'
-import { useFeaturedVotes } from './useFeaturedVotes'
+import { useFeaturedVotes } from '../providers/featuredVotes/provider'
 import { getRequestClient } from '../lib/request-client'
 
 export function useCommunities(publicKeys: string[]): CommunityDetail[] {
