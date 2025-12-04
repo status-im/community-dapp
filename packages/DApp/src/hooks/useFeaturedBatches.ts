@@ -1,5 +1,5 @@
 import { config } from '../config'
-import { useFeaturedVotes } from './useFeaturedVotes'
+import { useFeaturedVotes } from '../providers/featuredVotes/provider'
 
 export const useFeaturedBatches = () => {
   const { activeVoting, votes } = useFeaturedVotes()
