@@ -18,10 +18,11 @@ const WakuContext = createContext<Context | null>(null)
 
 type Props = {
   peers: string[]
+  clusterId: number
   children: ReactNode
 }
 
-export function WakuProvider({ peers, children }: Props) {
+export function WakuProvider({ peers, clusterId, children }: Props) {
   const [waku, setWaku] = useState<LightNode>()
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [isConnected, setIsConnected] = useState<boolean>(false)
@@ -40,9 +41,7 @@ export function WakuProvider({ peers, children }: Props) {
         libp2p: {
           filterMultiaddrs: false,
         },
-        networkConfig: {
-          clusterId: 16,
-        },
+        networkConfig: { clusterId },
       })
 
       await waku.start()

@@ -10,6 +10,8 @@ env:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      ENV: development
     steps:
       - uses: actions/checkout@v3
       - name: Use Node.js

@@ -3,10 +3,13 @@ import { utils, BigNumber } from 'ethers'
 import { JsonRpcSigner } from '@ethersproject/providers'
 import proto from './loadProtons'
 import { createDecoder } from '@waku/core'
+import { config } from '../config'
 
 import type { LightNode, IDecodedMessage } from '@waku/interfaces'
 import type { DecodedMessage } from '@waku/core'
 import { getContractParameters } from './receiveWakuFeature'
+
+const { clusterId, shards } = config.wakuConfig
 
 function decodeWakuFeature(msg: DecodedMessage): WakuFeatureData | undefined {
   try {
@@ -33,11 +36,15 @@ export async function receiveWakuFeatureMsg(waku: LightNode | undefined, topic: 
   if (waku) {
     const messages: DecodedMessage[] = []
     // todo: init decoder once
-    await waku.store.queryWithOrderedCallback(
-      [createDecoder(topic, { pubsubTopic: '/waku/2/rs/16/32', clusterId: 16, shardId: 32 })],
-      (wakuMessage: IDecodedMessage) => {
-        messages.push(wakuMessage as DecodedMessage)
-      },
+    await Promise.allSettled(
+      shards.map((shardId) =>
+        waku.store.queryWithOrderedCallback(
+          [createDecoder(topic, { pubsubTopic: `/waku/2/rs/${clusterId}/${shardId}`, clusterId, shardId })],
+          (wakuMessage: IDecodedMessage) => {
+            messages.push(wakuMessage as DecodedMessage)
+          },
+        ),
+      ),
     )
 
     return decodeWakuFeatures(messages)

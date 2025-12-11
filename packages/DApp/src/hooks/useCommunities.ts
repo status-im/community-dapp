@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { useCommunitiesProvider } from '../providers/communities/provider'
 import { CommunityDetail } from '../models/community'
 import { useEffect } from 'react'
@@ -6,7 +7,7 @@ import { useContracts } from './useContracts'
 import { useWaku } from '../providers/waku/provider'
 import { deserializePublicKey, serializePublicKey } from '@status-im/js'
 import { BigNumber } from 'ethers'
-import { useFeaturedVotes } from './useFeaturedVotes'
+import { useFeaturedVotes } from '../providers/featuredVotes/provider'
 import { getRequestClient } from '../lib/request-client'
 
 export function useCommunities(publicKeys: string[]): CommunityDetail[] {
@@ -32,7 +33,7 @@ export function useCommunities(publicKeys: string[]): CommunityDetail[] {
     if (!waku || publicKeys.length === 0) return
 
     const fetch = async () => {
-      await Promise.all(
+      await Promise.allSettled(
         publicKeys.map(async (publicKey) => {
           const deserializedPublicKey = deserializePublicKey(publicKey)
 
@@ -72,36 +73,38 @@ export function useCommunities(publicKeys: string[]): CommunityDetail[] {
     }
 
     fetch()
-  }, [waku, JSON.stringify(publicKeys)])
+  }, [waku, JSON.stringify(publicKeys), JSON.stringify(communitiesDetails)])
 
-  const communities = publicKeys
-    .map((publicKey, index) => {
-      const deserializedPublicKey = deserializePublicKey(publicKey)
-      if (!communitiesDetails[deserializedPublicKey]) {
-        return
-      }
+  const communities = useMemo(() => {
+    return publicKeys
+      .map((publicKey, index) => {
+        const deserializedPublicKey = deserializePublicKey(publicKey)
+        if (!communitiesDetails[deserializedPublicKey]) {
+          return
+        }
 
-      const votingRooms = votingHistories[index]?.[0]
+        const votingRooms = votingHistories[index]?.[0]
 
-      const votingHistory =
-        votingRooms?.map((room: any) => {
-          const endAt = new Date(room.endAt.toNumber() * 1000)
-          return {
-            ID: room.roomNumber.toNumber(),
-            type: room.voteType === 1 ? 'Add' : 'Remove',
-            result:
-              endAt > new Date() ? 'Ongoing' : room.totalVotesFor.gt(room.totalVotesAgainst) ? 'Passed' : 'Failed',
-            date: endAt,
-          } as const
-        }) ?? []
+        const votingHistory =
+          votingRooms?.map((room: any) => {
+            const endAt = new Date(room.endAt.toNumber() * 1000)
+            return {
+              ID: room.roomNumber.toNumber(),
+              type: room.voteType === 1 ? 'Add' : 'Remove',
+              result:
+                endAt > new Date() ? 'Ongoing' : room.totalVotesFor.gt(room.totalVotesAgainst) ? 'Passed' : 'Failed',
+              date: endAt,
+            } as const
+          }) ?? []
 
-      return {
-        ...communitiesDetails[deserializedPublicKey],
-        votingHistory,
-        featureVotes: votes?.[publicKey]?.sum ?? BigNumber.from(0),
-      }
-    })
-    .filter(Boolean)
+        return {
+          ...communitiesDetails[deserializedPublicKey],
+          votingHistory,
+          featureVotes: votes?.[publicKey]?.sum ?? BigNumber.from(0),
+        }
+      })
+      .filter(Boolean)
+  }, [publicKeys, votingHistories, communitiesDetails, votes])
 
   // TypeScript doesn't know that the filter above removes undefined values
   return communities as CommunityDetail[]
