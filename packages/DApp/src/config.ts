@@ -94,7 +94,6 @@ const configs: Record<typeof process.env.ENV, Config> = {
       readOnlyChainId: OptimismSepolia.chainId,
       readOnlyUrls: {
         [OptimismSepolia.chainId]: `https://optimism-sepolia.infura.io/v3/${process.env.INFURA_API_KEY}`,
-        [ChainId.OptimismGoerli]: `https://optimism-goerli.infura.io/v3/${process.env.INFURA_API_KEY}`,
       },
       networks: [OptimismSepolia, OptimismGoerli],
       notifications: {
