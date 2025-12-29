@@ -9,7 +9,7 @@ index 313fdff..d15be8a 100644
 -export const MAX_DATA_LENGTH = 1024 * 1024 * 4;
 +// export const MAX_DATA_LENGTH = 1024 * 1024 * 4;
 +// note: https://github.com/status-im/status-go/blob/afd72ace28ed6629297820af73053cea3e73e63b/waku/common/const.go#L43C33-L43C49
-+export const MAX_DATA_LENGTH = 10 * 1024 * 1024;
++export const MAX_DATA_LENGTH = 20 * 1024 * 1024;
  var ReadMode;
  (function (ReadMode) {
      ReadMode[ReadMode["LENGTH"] = 0] = "LENGTH";

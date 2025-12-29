@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { useCommunitiesProvider } from '../providers/communities/provider'
 import { CommunityDetail } from '../models/community'
 import { useEffect } from 'react'
@@ -14,6 +14,7 @@ export function useCommunities(publicKeys: string[]): CommunityDetail[] {
   const { communitiesDetails, dispatch } = useCommunitiesProvider()
   const { waku } = useWaku()
   const { votes } = useFeaturedVotes()
+  const [processedKeys, setProcessedKeys] = useState<Set<string>>(new Set())
 
   const { votingContract } = useContracts()
 
@@ -30,15 +31,22 @@ export function useCommunities(publicKeys: string[]): CommunityDetail[] {
     ) ?? []
 
   useEffect(() => {
-    if (!waku || publicKeys.length === 0) return
+    setProcessedKeys(new Set())
+
+    if (!waku || publicKeys.length === 0) {
+      return
+    }
 
     const fetch = async () => {
-      await Promise.allSettled(
-        publicKeys.map(async (publicKey) => {
+      const newProcessedKeys = new Set<string>()
+
+      for (const publicKey of publicKeys) {
+        try {
           const deserializedPublicKey = deserializePublicKey(publicKey)
 
           if (communitiesDetails[deserializedPublicKey]) {
-            return
+            newProcessedKeys.add(publicKey)
+            continue
           }
 
           const requestClient = getRequestClient(waku)
@@ -46,7 +54,8 @@ export function useCommunities(publicKeys: string[]): CommunityDetail[] {
 
           if (!community) {
             console.warn(`Community ${deserializedPublicKey} not found`)
-            return
+            newProcessedKeys.add(publicKey)
+            continue
           }
 
           dispatch({
@@ -68,14 +77,26 @@ export function useCommunities(publicKeys: string[]): CommunityDetail[] {
             votingHistory: [],
             validForAddition: true,
           })
-        }),
-      )
+          newProcessedKeys.add(publicKey)
+        } catch (error) {
+          console.error('Error fetching community', error)
+          newProcessedKeys.add(publicKey)
+        }
+      }
+
+      setProcessedKeys(newProcessedKeys)
     }
 
     fetch()
   }, [waku, JSON.stringify(publicKeys), JSON.stringify(communitiesDetails)])
 
+  const allProcessed = publicKeys.length > 0 && publicKeys.every((key) => processedKeys.has(key))
+
   const communities = useMemo(() => {
+    if (!allProcessed) {
+      return []
+    }
+
     return publicKeys
       .map((publicKey, index) => {
         const deserializedPublicKey = deserializePublicKey(publicKey)
@@ -104,7 +125,7 @@ export function useCommunities(publicKeys: string[]): CommunityDetail[] {
         }
       })
       .filter(Boolean)
-  }, [publicKeys, votingHistories, communitiesDetails, votes])
+  }, [publicKeys, votingHistories, communitiesDetails, votes, allProcessed])
 
   // TypeScript doesn't know that the filter above removes undefined values
   return communities as CommunityDetail[]
